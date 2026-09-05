@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>Chapter 4: Network Layer — Data Plane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+
+:root{
+  color-scheme: light;
+  --paper:#F6F4EE;
+  --bg:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --accent:#1B3A5C;
+  --accent2:#2B6CB0;
+  --accent-soft:#EAF1FA;
+  --correct:#256D46;
+  --correct-soft:#E7F3EB;
+  --incorrect:#B3341F;
+  --incorrect-soft:#FBEAE6;
+  --flag:#B7862C;
+  --flag-soft:#FBF1DA;
+  --unanswered:#9A9486;
+  --fontScale:1;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Sarabun',"Segoe UI",sans-serif;
+  background:var(--paper);
+  color:var(--text);
+}
+header{
+  background:var(--navy-deep);
+  border-bottom:4px solid var(--flag);
+  box-shadow:0 2px 10px rgba(15,39,64,0.25);
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+header h1{
+  font-size:18px;
+  margin:0;
+  color:#F2EFE6;
+  font-weight:700;
+}
+header .subtitle{
+  font-size:12.5px;
+  color:#C9C2AE;
+  margin-top:2px;
+}
+.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.layout{
+  display:flex;
+  max-width:1200px;
+  margin:0 auto;
+  gap:20px;
+  padding:20px;
+}
+.sidebar{width:250px;flex-shrink:0;}
+.sidebar-panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:16px;
+  position:sticky;
+  top:80px;
+  box-shadow:0 2px 8px rgba(15,39,64,0.06);
+  max-height:calc(100vh - 100px);
+  overflow-y:auto;
+}
+.sidebar-panel h3{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-soft);
+  margin:0 0 10px 0;
+  font-weight:600;
+}
+.toc-list{list-style:none;margin:0;padding:0;}
+.toc-list li{margin-bottom:2px;}
+.toc-list a{
+  display:block;
+  padding:7px 10px;
+  border-radius:4px;
+  color:var(--text);
+  text-decoration:none;
+  font-size:13px;
+  border-left:3px solid transparent;
+}
+.toc-list a:hover{background:var(--accent-soft);color:var(--accent2);}
+.toc-list a.active{background:var(--accent-soft);color:var(--navy);border-left:3px solid var(--navy);font-weight:600;}
+main{flex:1;min-width:0;}
+.section-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:0 2px 10px rgba(15,39,64,0.06);
+  scroll-margin-top:80px;
+}
+.section-card h2{
+  margin:0 0 14px 0;
+  font-size:18px;
+  color:var(--navy-deep);
+  padding-bottom:10px;
+  border-bottom:2px solid var(--border);
+}
+.section-card h3{
+  font-size:15px;
+  color:var(--navy);
+  margin:20px 0 10px 0;
+}
+.section-card .body-text{
+  font-size:14.5px;
+  line-height:1.9;
+  white-space:pre-wrap;
+}
+.callout{
+  margin:16px 0;
+  padding:14px 16px;
+  border-radius:6px;
+  border-left:4px solid;
+  font-size:14px;
+  line-height:1.8;
+}
+.callout-note{background:var(--accent-soft);border-color:var(--accent2);}
+.callout-example{background:#F4F2E8;border-color:var(--flag);}
+.callout-warning{background:var(--incorrect-soft);border-color:var(--incorrect);}
+.callout-formula{
+  background:var(--navy-deep);
+  color:#EAF1FA;
+  border-color:var(--flag);
+  font-family:'JetBrains Mono',monospace;
+  overflow-x:auto;
+}
+.callout-title{
+  font-weight:700;
+  font-size:12.5px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:8px;
+  display:block;
+}
+.callout-note .callout-title{color:var(--accent2);}
+.callout-example .callout-title{color:var(--flag);}
+.callout-warning .callout-title{color:var(--incorrect);}
+.callout-formula .callout-title{color:#C9DCF0;}
+.image-block{
+  margin:18px 0;
+  text-align:center;
+}
+.image-block img{
+  max-width:100%;
+  height:auto;
+  border-radius:6px;
+  border:1px solid var(--border);
+  box-shadow:0 2px 10px rgba(15,39,64,0.08);
+}
+.image-block .image-caption{
+  font-size:12.5px;
+  color:var(--text-soft);
+  margin-top:8px;
+  font-style:italic;
+}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13.5px;}
+table th{background:var(--navy-deep);color:#F2EFE6;padding:9px 12px;text-align:left;}
+table td{padding:8px 12px;border-bottom:1px solid var(--border);}
+table tr:nth-child(even) td{background:#F4F2E8;}
+@media (max-width:800px){
+  .layout{flex-direction:column;}
+  .sidebar{width:100%;}
+  .sidebar-panel{position:static;max-height:none;}
+}
+
+</style>
+<style>
+
+/* ===== Readability & diagram enhancements ===== */
+#readProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--flag),var(--accent2));width:0%;z-index:999;transition:width .12s ease;}
+
+#backToTop{
+  position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;
+  background:var(--navy-deep);color:#F2EFE6;border:none;cursor:pointer;font-size:18px;
+  box-shadow:0 4px 14px rgba(15,39,64,0.3);display:none;align-items:center;justify-content:center;
+  z-index:998;opacity:0;transition:opacity .2s ease, transform .2s ease;
+}
+#backToTop:hover{transform:translateY(-2px);}
+#backToTop.show{display:flex;opacity:1;}
+
+#fontCtrl{display:flex;gap:6px;align-items:center;}
+#fontCtrl button{
+  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
+  width:32px;height:32px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:700;
+  font-family:'Sarabun',sans-serif;
+}
+#fontCtrl button:hover{background:#fff;}
+
+.section-card{opacity:0;transform:translateY(14px);transition:opacity .55s ease, transform .55s ease;}
+.section-card.revealed{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion: reduce){
+  .section-card{opacity:1;transform:none;transition:none;}
+}
+
+.section-card .body-text{font-size:calc(14.5px * var(--fontScale)) !important;}
+.section-card h2{font-size:calc(18px * var(--fontScale)) !important;}
+.section-card h3{font-size:calc(15px * var(--fontScale)) !important;}
+.callout{font-size:calc(14px * var(--fontScale)) !important;}
+table{font-size:calc(13.5px * var(--fontScale)) !important;}
+
+.callout-note .callout-title::before{content:"📝 ";}
+.callout-example .callout-title::before{content:"💡 ";}
+.callout-warning .callout-title::before{content:"⚠️ ";}
+.callout-formula .callout-title::before{content:"∑ ";}
+
+/* ==== Animated sequence / flow diagrams ==== */
+.diagram-block{
+  margin:20px 0;padding:16px 18px 14px;background:#FBFAF6;border:1px solid var(--border);
+  border-radius:8px;
+}
+.diagram-block h4{
+  margin:0 0 12px 0;font-size:calc(14.5px * var(--fontScale));color:var(--navy-deep);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.diagram-play-btn{
+  border:1.5px solid var(--accent2);background:#fff;color:var(--accent2);padding:5px 12px;
+  border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;
+  flex-shrink:0;
+}
+.diagram-play-btn:hover{background:var(--accent-soft);}
+.diagram-svg-wrap{overflow-x:auto;}
+.diagram-svg{display:block;margin:0 auto;min-width:420px;}
+.diagram-actor-label{font-family:'Sarabun',sans-serif;font-size:11.5px;font-weight:600;fill:var(--navy-deep);}
+.diagram-lifeline{stroke:var(--border);stroke-width:1.5;stroke-dasharray:3,3;}
+.diagram-node-box{fill:var(--panel);stroke:var(--navy);stroke-width:1.3;}
+.diagram-arrow-path{fill:none;stroke:var(--accent2);stroke-width:2;marker-end:url(#arrowhead);}
+.diagram-arrow-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;fill:var(--navy-deep);}
+.diagram-glow-dot{fill:var(--flag);filter:url(#glowFilter);opacity:0;}
+.diagram-steps-list{list-style:none;margin:12px 0 0;padding:0;font-size:calc(13px * var(--fontScale));line-height:1.7;}
+.diagram-steps-list li{padding:6px 10px;border-left:3px solid transparent;border-radius:4px;transition:background .3s ease, border-color .3s ease;}
+.diagram-steps-list li.step-active{background:var(--accent-soft);border-left-color:var(--flag);}
+.diagram-steps-list .step-num{
+  display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;
+  text-align:center;line-height:20px;font-size:11px;margin-right:8px;font-family:'JetBrains Mono',monospace;
+}
+
+</style>
+</head>
+<body>
+<div id="readProgress"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#2B6CB0"></path></marker>
+<filter id="glowFilter" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+</defs>
+</svg>
+
+<header>
+  <div>
+    <h1>Chapter 4: Network Layer — Data Plane</h1>
+    <div class="subtitle">Computer Networking: A Top-Down Approach (8th ed.) — Kurose & Ross | บทที่ 4: ชั้นเครือข่าย (Data Plane)</div>
+  </div>
+  <div class="header-actions">
+    <div id="fontCtrl">
+      <button id="fontMinus" title="ลดขนาดตัวอักษร / Decrease font size">A&minus;</button>
+      <button id="fontPlus" title="เพิ่มขนาดตัวอักษร / Increase font size">A+</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-panel">
+      <h3>สารบัญ / Contents</h3>
+      <ul class="toc-list" id="tocList"></ul>
+    </div>
+  </div>
+  <main id="mainArea"></main>
+</div>
+
+<button id="backToTop" title="กลับขึ้นด้านบน / Back to top">&uarr;</button>
+
+<script>
+const SECTIONS = [{"title": "ภาพรวม Network Layer: Data Plane vs Control Plane", "body": "Network layer มี 2 หน้าที่หลักที่ **แยกกันโดยสิ้นเชิง**: **forwarding** (data plane) และ **routing** (control plane) — บทนี้เน้นที่ data plane เป็นหลัก (control plane จะอยู่ในบทถัดไป)", "blocks": [{"type": "subheading", "content": "Forwarding vs Routing: Analogy การเดินทาง"}, {"type": "note", "content": "**Forwarding**: การย้าย packet จาก input link ของ router ไปยัง output link ที่เหมาะสม — เปรียบเหมือน**กระบวนการผ่าน interchange (ทางแยก) เดียว**บนถนน\n\n**Routing**: การกำหนดเส้นทางที่ packet จะเดินทางจาก source ถึง destination โดยใช้ **routing algorithm** — เปรียบเหมือน**การวางแผนการเดินทางทั้งหมด**จากต้นทางถึงปลายทาง"}, {"type": "subheading", "content": "Data Plane vs Control Plane"}, {"type": "table", "content": "<table><tr><th></th><th>Data Plane</th><th>Control Plane</th></tr><tr><td>ขอบเขต</td><td>local, per-router function</td><td>network-wide logic</td></tr><tr><td>หน้าที่</td><td>กำหนดว่า datagram ที่มาถึง input port จะถูก forward ไปยัง output port ไหน</td><td>กำหนดว่า datagram จะถูก route ผ่าน router ใดบ้างตลอดเส้นทาง source-destination</td></tr><tr><td>ความเร็ว</td><td>hardware, ทำงานระดับ **nanosecond**</td><td>software, ทำงานระดับ **millisecond**</td></tr></table>"}, {"type": "note", "content": "**2 แนวทางของ Control Plane**:\n1. **Traditional routing algorithms**: implement อยู่ **ในตัว router แต่ละตัวเอง** (per-router control plane) — routing algorithm component ในทุก router สื่อสารกันเอง\n2. **Software-Defined Networking (SDN)**: implement อยู่ที่ **remote controller/server** ซึ่งคำนวณและติดตั้ง forwarding table เข้าไปในทุก router จากส่วนกลาง"}, {"type": "subheading", "content": "Network Service Model: Best-Effort ของอินเทอร์เน็ต"}, {"type": "table", "content": "<table><tr><th>Network Architecture</th><th>Service Model</th><th>Bandwidth</th><th>Loss</th><th>Order</th><th>Timing</th></tr><tr><td>Internet</td><td>Best effort</td><td>ไม่มี</td><td>อาจสูญเสีย</td><td>ไม่รับประกัน</td><td>ไม่รับประกัน</td></tr><tr><td>ATM</td><td>Constant Bit Rate</td><td>คงที่</td><td>ไม่สูญเสีย</td><td>รับประกัน</td><td>รับประกัน</td></tr><tr><td>ATM</td><td>Available Bit Rate</td><td>รับประกันขั้นต่ำ</td><td>อาจสูญเสีย</td><td>รับประกัน</td><td>ไม่รับประกัน</td></tr><tr><td>Internet</td><td>Intserv Guaranteed (RFC 1633)</td><td>รับประกัน</td><td>ไม่สูญเสีย</td><td>รับประกัน</td><td>รับประกัน</td></tr><tr><td>Internet</td><td>Diffserv (RFC 2475)</td><td>เป็นไปได้</td><td>อาจสูญเสีย</td><td>อาจรับประกัน</td><td>ไม่รับประกัน</td></tr></table>"}, {"type": "warning", "content": "**อินเทอร์เน็ตใช้ \"best effort\" service model**: ไม่มีการรับประกันใดๆ ทั้งการส่งถึงปลายทางสำเร็จ, จังหวะเวลา/ลำดับการส่ง, หรือ bandwidth ที่มีให้กับ flow แบบ end-to-end — แม้จะดูเหมือนไม่น่าเชื่อถือ แต่ความเรียบง่ายนี้เองที่ทำให้อินเทอร์เน็ตถูกนำไปใช้งานอย่างแพร่หลาย: การจัดสรร bandwidth ให้เพียงพอทำให้แอปพลิเคชัน real-time (เสียง/วิดีโอ) ทำงานได้ \"ดีพอ\" ในเวลาส่วนใหญ่, บริการแบบ distributed application-layer (data center, CDN) ช่วยให้บริการมาจากหลายที่ตั้งใกล้ผู้ใช้ได้, และ congestion control ของ \"elastic service\" ก็ช่วยจัดสรรทรัพยากรอย่างมีประสิทธิภาพ"}]}, {"title": "โครงสร้างภายในของ Router", "body": "Router ประกอบด้วย 4 องค์ประกอบหลัก: **input port**, **output port**, **switching fabric**, และ **routing processor** (control plane) ที่ทำงานคนละความเร็วกับ data plane อย่างชัดเจน", "blocks": [{"type": "subheading", "content": "สถาปัตยกรรมโดยรวม"}, {"type": "note", "content": "**Control plane** (software, routing/management): ทำงานที่ **routing processor** ในกรอบเวลาระดับ **มิลลิวินาที**\n\n**Data plane** (hardware, forwarding): ทำงานผ่าน **input port → high-speed switching fabric → output port** ในกรอบเวลาระดับ **นาโนวินาที**\n\n**Analogy วงเวียน (roundabout)**: entry road + entry station = input port (พร้อมฟังก์ชัน lookup หา output port), roundabout = switching fabric, exit road = output port"}, {"type": "subheading", "content": "หน้าที่ของ Input Port"}, {"type": "note", "content": "แต่ละ input port มี 3 ชั้น: **physical layer** (รับสัญญาณระดับบิต), **link layer** (ประกอบบิตเป็น frame เช่น Ethernet), และที่สำคัญที่สุดคือ **lookup/forwarding** — ใช้ค่าใน header เพื่อค้นหา output port ที่เหมาะสมจาก forwarding table ใน memory ของ input port (\"**match plus action**\") เป้าหมายคือประมวลผลให้เสร็จที่ **\"line speed\"** ไม่เช่นนั้น buffer จะเต็มและเกิด packet loss\n\n**Destination-based forwarding** (แบบดั้งเดิม): forward ตาม destination IP address เท่านั้น\n**Generalized forwarding**: forward ตาม header field ใดๆ ก็ได้ (ครอบคลุมมากกว่า)"}, {"type": "subheading", "content": "Longest Prefix Matching"}, {"type": "formula", "label": "หลักการ Longest Prefix Match", "content": "เมื่อค้นหา forwarding table entry สำหรับ destination address ที่กำหนด ให้ใช้ **prefix ที่ยาวที่สุด (specific ที่สุด)** ที่ตรงกับ destination address นั้น\n\n**ตัวอย่าง**: destination address `11001000 00010111 00010110 10100001` กับ forwarding table:\n- Entry 1: `11001000 00010111 00010***` → interface 0\n- Entry 2: `11001000 00010111 00011000` → interface 1\n- Entry 3: `11001000 00010111 00011***` → interface 2\n- otherwise → interface 3\n\naddress นี้ตรงกับ Entry 1 (prefix 21 บิต) เท่านั้น → **ใช้ interface 0**\n\nlongest prefix matching มักถูก implement ด้วย **TCAM (Ternary Content Addressable Memory)** ซึ่งค้นหาได้ใน**หนึ่ง clock cycle เดียว ไม่ว่า table จะใหญ่แค่ไหน** (เช่น Cisco Catalyst รองรับ routing table entry ได้ถึง ~1 ล้านรายการใน TCAM)"}, {"type": "subheading", "content": "Switching Fabric"}, {"type": "note", "content": "ทำหน้าที่ส่ง packet จาก input link ไปยัง output link ที่เหมาะสม — **switching rate** วัดเป็นอัตราส่วนของ line rate เช่นสำหรับ $N$ input port ควรมี switching rate = $N \\times R$ (rate ของแต่ละ link) เพื่อไม่ให้เกิดคอขวดที่ fabric เอง วิธี implement มีทั้งแบบ **memory-based, bus-based**, และ **interconnection network** (เช่น Crossbar, Clos network) — router สมัยใหม่ (เช่น Cisco CRS) ใช้หลาย \"switching plane\" ทำงานขนานกันเพื่อรองรับ capacity ระดับหลายร้อย Tbps"}, {"type": "subheading", "content": "Input Port Queuing และ Head-of-Line (HOL) Blocking"}, {"type": "warning", "content": "ถ้า switching fabric ทำงานช้ากว่าอัตรารวมของ input port → เกิด queueing ที่ input queue → เกิด delay และ packet loss จาก buffer overflow\n\n**Head-of-Line (HOL) Blocking**: datagram ที่อยู่**หน้าสุดของ queue**อาจไปบล็อก datagram อื่นที่อยู่ด้านหลังไม่ให้เคลื่อนที่ต่อไปได้ แม้ datagram เหล่านั้นจะพร้อมส่งไปยัง output port อื่นที่ว่างอยู่ก็ตาม — เกิดจาก**output port contention**: เมื่อมีหลาย datagram ต้องการไปที่ output port เดียวกันพร้อมกัน มีเพียง 1 ตัวเท่านั้นที่ส่งได้ในเวลาหนึ่ง ตัวที่เหลือต้องรอ ซึ่งอาจไปบล็อก datagram ตัวอื่นที่อยู่หลังมันในคิวเดียวกัน (แม้ปลายทางจะต่างกัน)"}, {"type": "subheading", "content": "Output Port Queuing"}, {"type": "note", "content": "เมื่อ datagram มาจาก switching fabric **เร็วกว่า**อัตราการส่งของ link ที่ output port ต้อง**buffer**ไว้ — หาก buffer เต็ม จะเกิด packet loss (ต้องมี **drop policy** ว่าจะทิ้ง datagram ตัวไหน) และต้องมี **scheduling discipline** เพื่อเลือกว่าจะส่ง datagram ตัวไหนก่อนจากคิวที่รอ (เกี่ยวข้องกับเรื่อง priority scheduling และ network neutrality)"}, {"type": "formula", "label": "กฎง่ายๆ สำหรับขนาด Buffer ที่เหมาะสม", "content": "**RFC 3439 rule of thumb**: ขนาด buffer เฉลี่ยที่เหมาะสม $\\approx RTT_{typical} \\times C$ โดย $C$ = link capacity\n\nตัวอย่าง: link $C$ = 10 Gbps, $RTT$ = 250 msec → buffer ที่ต้องการ $= 0.25 \\times 10\\text{Gbps} = 2.5$ Gbit\n\n**ข้อเสนอที่ทันสมัยกว่า**: เมื่อมี $N$ flow แชร์ link เดียวกัน ขนาด buffer ที่เหมาะสม $\\approx \\dfrac{RTT \\times C}{\\sqrt{N}}$"}, {"type": "warning", "content": "**Buffer ยิ่งเยอะยิ่งดีไหม?** ไม่เสมอไป! Buffer มากเกินไปจะทำให้ **delay สูงขึ้น** โดยเฉพาะใน home router — RTT ที่ยาวขึ้นทำให้ real-time application ทำงานแย่ลง และ TCP ตอบสนองต่อ congestion ช้าลง (\"sluggish\") — สอดคล้องกับหลักการ delay-based congestion control ที่ว่า \"keep bottleneck link just full enough (busy) but no fuller\" (เติมให้พอดี ไม่ล้น)"}, {"type": "subheading", "content": "Packet Scheduling Policies"}, {"type": "table", "content": "<table><tr><th>Policy</th><th>หลักการ</th></tr><tr><td>FCFS (First-Come-First-Served / FIFO)</td><td>ส่ง packet ตามลำดับที่มาถึง output port</td></tr><tr><td>Priority</td><td>จัด traffic เป็น class ตาม header field ใดๆ ก็ได้ — ส่ง packet จาก **queue ที่ priority สูงสุด**ที่มี packet รออยู่เสมอ, ภายใน class เดียวกันใช้ FCFS</td></tr><tr><td>Round Robin (RR)</td><td>วนส่ง packet ครบ 1 ตัวจากแต่ละ class ตามลำดับ ถ้ามี</td></tr><tr><td>Weighted Fair Queueing (WFQ)</td><td>เป็น Round Robin แบบ generalized — แต่ละ class $i$ มีน้ำหนัก $w_i$ ได้รับส่วนแบ่ง service ตามสัดส่วน $\\dfrac{w_i}{\\sum_j w_j}$ ในแต่ละรอบ ให้การรับประกัน bandwidth ขั้นต่ำต่อ traffic class</td></tr></table>"}, {"type": "subheading", "content": "Sidebar: Network Neutrality"}, {"type": "note", "content": "**Network neutrality** คือหลักการ (ทั้งเชิงเทคนิคและเชิงสังคม/เศรษฐกิจ) ว่า ISP ควรจัดสรร/แบ่งปัน resource ของตัวเองอย่างไร — กลไกทางเทคนิคคือ packet scheduling และ buffer management ส่วนหลักการเชิงสังคมครอบคลุมการปกป้องเสรีภาพในการแสดงออกและการส่งเสริมนวัตกรรม/การแข่งขัน แต่ละประเทศมีจุดยืนต่อ network neutrality แตกต่างกัน — ตัวอย่าง **2015 US FCC Order** กำหนด 3 กฎชัดเจน: **ห้าม block** เนื้อหา/แอป/บริการที่ถูกกฎหมาย, **ห้าม throttle** (บีบ) traffic ตามเนื้อหา/แอป, และ **ห้าม paid prioritization** (รับเงินเพื่อจัดลำดับความสำคัญ)"}, {"type": "diagram", "layout": "flow", "title": "เส้นทางของ Packet ภายใน Router", "actors": ["Input Port\n(รับ Packet)", "Lookup\n(Longest Prefix Match)", "Switching Fabric", "Output Port\n(ส่งออก)"], "steps": [{"from": 0, "to": 1, "label": "ตรวจสอบ Header", "note": "อ่าน destination IP"}, {"from": 1, "to": 2, "label": "หา Port ปลายทาง", "note": "จับคู่กับ forwarding table ที่ match ยาวที่สุด"}, {"from": 2, "to": 3, "label": "สลับส่งไปยัง Output Port", "note": "ผ่าน switching fabric"}]}]}, {"title": "IP: The Internet Protocol — Datagram Format และ Fragmentation", "body": "IP protocol กำหนดรูปแบบของ datagram, ระบบ addressing, และแนวทางจัดการ packet — เป็นหัวใจของ network layer ในอินเทอร์เน็ต", "blocks": [{"type": "subheading", "content": "โครงสร้าง IP Datagram (IPv4)"}, {"type": "table", "content": "<table><tr><th>Field</th><th>ความหมาย</th></tr><tr><td>Version (ver)</td><td>เลขเวอร์ชัน IP protocol (4 หรือ 6)</td></tr><tr><td>Header length</td><td>ความยาวของ header (byte)</td></tr><tr><td>Type of service</td><td>diffserv (bit 0-5) + ECN (bit 6-7)</td></tr><tr><td>Length</td><td>ความยาวรวมของ datagram (byte) — สูงสุด 64K byte แต่ในทางปฏิบัติมักไม่เกิน 1500 byte</td></tr><tr><td>16-bit identifier, flags, fragment offset</td><td>ใช้สำหรับ fragmentation/reassembly</td></tr><tr><td>Time to Live (TTL)</td><td>จำนวน hop สูงสุดที่เหลือ — ลดลง 1 ทุกครั้งที่ผ่าน router</td></tr><tr><td>Upper layer</td><td>protocol ชั้นบน (เช่น TCP หรือ UDP)</td></tr><tr><td>Header checksum</td><td>ตรวจสอบความถูกต้องของ header</td></tr><tr><td>Source/Destination IP address</td><td>ที่อยู่ 32 บิตของต้นทาง/ปลายทาง</td></tr><tr><td>Options</td><td>เช่น timestamp, record route taken (พบไม่บ่อย)</td></tr></table>"}, {"type": "warning", "content": "**Overhead ของ TCP+IP**: header ของ TCP (20 byte) + header ของ IP (20 byte) = **40 byte overhead** สำหรับทุก segment ที่ส่ง (ยังไม่รวม application-layer overhead) — สำหรับ payload ขนาดเล็กมากๆ overhead นี้อาจกินสัดส่วนที่มีนัยสำคัญ"}, {"type": "subheading", "content": "IP Fragmentation และ Reassembly"}, {"type": "note", "content": "แต่ละ network link มี **MTU (Maximum Transfer Size)** — ขนาด link-level frame ที่ใหญ่ที่สุดที่รองรับได้ ซึ่งต่างกันไปตามประเภทของ link — ถ้า IP datagram ใหญ่เกิน MTU ของ link ใด router จะ**แบ่ง (fragment)** datagram นั้นออกเป็นหลาย datagram ย่อย โดยการ **reassemble กลับคืนจะเกิดขึ้นที่ host ปลายทางเท่านั้น** (ไม่ใช่ที่ router ระหว่างทาง) header bit ต่างๆ ถูกใช้ระบุและเรียงลำดับ fragment ที่เกี่ยวข้องกัน"}, {"type": "example", "content": "**ตัวอย่างการคำนวณ Fragmentation**: datagram ขนาด 4000 byte, MTU = 1500 byte\n\nเนื่องจาก IP header กิน 20 byte ดังนั้นแต่ละ fragment เก็บข้อมูลได้สูงสุด $1500 - 20 = 1480$ byte (ต้องเป็นจำนวนเท่าของ 8 ด้วย เพราะ offset วัดเป็นหน่วย 8 byte)\n\n| Fragment | Length | ID | Fragflag | Offset |\n|---|---|---|---|---|\n| ต้นฉบับ | 4000 | x | 0 | 0 |\n| #1 | 1500 (data 1480) | x | 1 (มีต่อ) | 0 |\n| #2 | 1500 (data 1480) | x | 1 (มีต่อ) | 1480/8 = 185 |\n| #3 | 1040 (data 1020+header) | x | 0 (ตัวสุดท้าย) | 2960/8 = 370 |\n\n**หมายเหตุ**: offset ระบุเป็นหน่วย 8 byte เสมอ, `fragflag=1` หมายถึง \"ยังมี fragment ต่อไปอีก\", `fragflag=0` หมายถึง \"นี่คือ fragment สุดท้าย\" — ทุก fragment ใช้ ID เดียวกัน (x) เพื่อให้ปลายทางรู้ว่าอยู่ใน datagram เดียวกัน"}, {"type": "diagram", "layout": "flow", "title": "IP Fragmentation: แบ่ง Datagram เมื่อ MTU เล็กลง", "actors": ["Datagram ต้นทาง\n(1500 bytes)", "Router\n(ตรวจ MTU=500)", "3 Fragments\nส่งต่อ", "ปลายทาง\n(Reassembly)"], "steps": [{"from": 0, "to": 1, "label": "ส่ง Datagram เต็มขนาด", "note": "router เจอ link ที่ MTU เล็กกว่า"}, {"from": 1, "to": 2, "label": "แบ่งเป็น 3 Fragment", "note": "แต่ละ fragment มี identification เดียวกัน + offset"}, {"from": 2, "to": 3, "label": "ประกอบกลับที่ปลายทาง", "note": "reassembly ใช้ offset เรียงคืนข้อมูลเดิม"}]}]}, {"title": "IP Addressing: Subnets, CIDR และ DHCP", "body": "**IP address** เป็น identifier 32 บิตที่ผูกกับ **interface** ของ host หรือ router (ไม่ใช่ผูกกับตัว host/router โดยตรง) — router มักมีหลาย interface ในขณะที่ host ทั่วไปมี 1-2 interface", "blocks": [{"type": "subheading", "content": "Subnet คืออะไร"}, {"type": "note", "content": "**Subnet**: กลุ่มของ device interface ที่สามารถเข้าถึงกันได้โดยตรงทางกายภาพ**โดยไม่ต้องผ่าน router** — IP address มีโครงสร้าง 2 ส่วน: **subnet part** (bit สูง ที่ device ใน subnet เดียวกันมีค่าเหมือนกัน) และ **host part** (bit ต่ำที่เหลือ ระบุ device เฉพาะภายใน subnet)\n\n**วิธีหา subnet**: แยก interface ออกจาก host/router ของมัน จะเห็น \"เกาะ\" ของเครือข่ายที่แยกจากกัน แต่ละเกาะคือ 1 subnet"}, {"type": "subheading", "content": "CIDR: Classless InterDomain Routing"}, {"type": "formula", "label": "รูปแบบ Address ของ CIDR", "content": "รูปแบบ: `a.b.c.d/x` โดย $x$ = จำนวนบิตของส่วน subnet\n\n**ตัวอย่าง**: `200.23.16.0/23` หมายถึง 23 บิตแรก (จาก 32 บิต) เป็น subnet part ที่เหลือ 9 บิตเป็น host part — สามารถมี host ได้สูงสุด $2^9 = 512$ address (ในทางปฏิบัติหักลบ network address และ broadcast address ออก)"}, {"type": "subheading", "content": "การจัดสรร Address แบบลำดับชั้น (Hierarchical Addressing)"}, {"type": "note", "content": "ISP จะได้รับ block ของ address จากผู้ให้บริการต้นทาง เช่น ISP ได้ `200.23.16.0/20` แล้วแบ่งย่อยออกเป็น 8 block ให้แต่ละองค์กร (each `/23`) — **Route aggregation**: การจัดโครงสร้างแบบลำดับชั้นแบบนี้ทำให้ router ภายนอกสามารถ**ประกาศ route เดียว** (เช่น \"ส่งอะไรก็ตามที่ขึ้นต้นด้วย 200.23.16.0/20 มาที่ฉัน\") แทนที่จะต้องประกาศ route แยกสำหรับทุกองค์กรย่อย ทำให้ routing table มีขนาดเล็กลงมาก\n\n**More specific routes**: ถ้าองค์กรหนึ่งย้ายไปใช้ ISP อื่น ISP ใหม่จะต้องประกาศ **route ที่ specific กว่า** (เช่น `200.23.18.0/23` เจาะจงกว่า `200.23.16.0/20` เดิม) เพื่อดึง traffic ของเฉพาะองค์กรนั้นมาที่ตัวเอง — Router จะเลือกใช้ route ที่ specific ที่สุดเสมอ (ตามหลัก longest prefix matching)"}, {"type": "subheading", "content": "DHCP: Dynamic Host Configuration Protocol"}, {"type": "note", "content": "เป้าหมาย: ให้ host ได้รับ IP address แบบอัตโนมัติเมื่อ \"เข้าร่วม\" เครือข่าย (\"plug-and-play\") รองรับการ renew lease, ใช้ address ซ้ำได้ (ถือ address แค่ตอนที่เชื่อมต่ออยู่), และรองรับ mobile user ที่เข้า-ออกเครือข่ายบ่อย DHCP server มักอยู่ในตัว router เอง ให้บริการกับทุก subnet ที่ router เชื่อมต่ออยู่"}, {"type": "table", "content": "<table><tr><th>ขั้นตอน</th><th>รายละเอียด</th></tr><tr><td>1. DHCP Discover</td><td>client broadcast ถามหา DHCP server (src: 0.0.0.0, dest: 255.255.255.255)</td></tr><tr><td>2. DHCP Offer</td><td>server broadcast เสนอ IP address ที่ใช้ได้ พร้อม lifetime (เช่น 3600 วินาที)</td></tr><tr><td>3. DHCP Request</td><td>client broadcast ยืนยันว่าต้องการใช้ IP address ที่เสนอมา</td></tr><tr><td>4. DHCP ACK</td><td>server broadcast ยืนยันการจัดสรร IP address ให้ client นั้น</td></tr></table>"}, {"type": "note", "content": "**DHCP ให้ข้อมูลมากกว่าแค่ IP address**: รวมถึง address ของ first-hop router (default gateway), ชื่อและ IP address ของ DNS server, และ network mask ด้วย — DHCP message ถูกห่อหุ้มตามลำดับ **DHCP → UDP → IP → Ethernet** เมื่อส่งผ่านเครือข่าย"}, {"type": "diagram", "layout": "lifeline", "title": "DHCP: การขอ IP Address อัตโนมัติ (DORA)", "actors": ["Host\n(อุปกรณ์ใหม่)", "DHCP Server"], "steps": [{"from": 0, "to": 1, "label": "DHCP DISCOVER", "note": "broadcast หา DHCP server"}, {"from": 1, "to": 0, "label": "DHCP OFFER", "note": "เสนอ IP ที่ว่างให้"}, {"from": 0, "to": 1, "label": "DHCP REQUEST", "note": "ขอยืนยันใช้ IP นั้น"}, {"from": 1, "to": 0, "label": "DHCP ACK", "note": "ยืนยันให้ใช้งานได้"}]}]}, {"title": "NAT: Network Address Translation", "body": "**NAT** ทำให้อุปกรณ์ทุกตัวในเครือข่ายท้องถิ่น (เช่น บ้าน) **แชร์ IP address สาธารณะเพียงตัวเดียว** เมื่อมองจากภายนอก", "blocks": [{"type": "subheading", "content": "หลักการทำงานของ NAT"}, {"type": "note", "content": "อุปกรณ์ในเครือข่ายท้องถิ่นใช้ **private IP address space** (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) ซึ่งใช้ได้เฉพาะภายในเครือข่ายนั้นเท่านั้น — datagram ทุกตัวที่**ออก**จากเครือข่ายท้องถิ่นจะถูกเปลี่ยน source IP เป็น **NAT IP address เดียวกัน** (แต่ใช้ port number ต่างกันสำหรับแต่ละ device/connection)"}, {"type": "table", "content": "<table><tr><th>ข้อดีของ NAT</th></tr><tr><td>ต้องการ IP address จาก ISP เพียง 1 ตัวสำหรับทุก device ในเครือข่าย</td></tr><tr><td>เปลี่ยน address ของ host ภายในได้โดยไม่ต้องแจ้งใครภายนอก</td></tr><tr><td>เปลี่ยน ISP ได้โดยไม่ต้องเปลี่ยน address ของ device ภายใน</td></tr><tr><td>ด้านความปลอดภัย: device ภายในไม่สามารถถูก address โดยตรงหรือมองเห็นจากภายนอกได้</td></tr></table>"}, {"type": "subheading", "content": "การ Implement: NAT Translation Table"}, {"type": "example", "content": "**ตัวอย่างการทำงานของ NAT แบบ step-by-step**:\n\n1. Host `10.0.0.1` ส่ง datagram ไปยัง `128.119.40.186:80` ด้วย source `10.0.0.1:3345`\n2. NAT router เปลี่ยน source address เป็น `138.76.29.7:5001` (NAT IP + port ใหม่) แล้ว**บันทึกลง NAT translation table**: `138.76.29.7, 5001 ↔ 10.0.0.1, 3345`\n3. Reply กลับมาถึง NAT router ที่ `138.76.29.7:5001`\n4. NAT router ค้นหาใน table แล้วเปลี่ยน destination กลับเป็น `10.0.0.1:3345` ก่อนส่งต่อเข้าเครือข่ายภายใน\n\nกระบวนการนี้เกิดขึ้นแบบ**โปร่งใส**ต่อทั้งฝั่ง client ภายในและ server ภายนอก"}, {"type": "warning", "content": "**NAT เป็นประเด็นที่ถกเถียงกันมาก**: (1) ผิดหลักการที่ว่า router ควรประมวลผลแค่ระดับ layer 3 เท่านั้น (แต่ NAT ต้องเข้าไปแก้ port number ที่เป็นข้อมูลระดับ transport layer) (2) ปัญหาการขาดแคลน address \"ควร\" แก้ด้วย IPv6 ไม่ใช่ NAT (3) **ผิดหลักการ end-to-end argument** เพราะ network-layer device เข้าไปยุ่งกับ port number ซึ่งควรเป็นเรื่องของ end host เท่านั้น (4) เกิดปัญหา **NAT traversal**: ถ้า client ภายนอกต้องการเชื่อมต่อไปยัง server ที่อยู่หลัง NAT จะทำอย่างไร (ต้องใช้เทคนิคเสริม เช่น port forwarding)\n\nแม้จะมีข้อถกเถียง แต่ **NAT ก็ยังคงถูกใช้งานอย่างแพร่หลาย** ทั้งในเครือข่ายบ้าน สถาบัน และเครือข่ายมือถือ 4G/5G เพราะแก้ปัญหาจริงได้อย่างมีประสิทธิภาพ"}, {"type": "diagram", "layout": "lifeline", "title": "NAT: การแปลง Address ขาออก-ขาเข้า", "actors": ["Host\n(Private IP)", "NAT Router", "Server\n(Public IP)"], "steps": [{"from": 0, "to": 1, "label": "src=10.0.0.1:3345", "note": "ส่งออกด้วย private IP"}, {"from": 1, "to": 2, "label": "src แปลงเป็น Public:5001", "note": "NAT บันทึกลง translation table"}, {"from": 2, "to": 1, "label": "ตอบกลับ dst=Public:5001", "note": "server ตอบกลับ public address"}, {"from": 1, "to": 0, "label": "แปลงกลับ dst=10.0.0.1:3345", "note": "NAT ค้น table แล้วส่งกลับ host เดิม"}]}]}, {"title": "IPv6", "body": "**IPv6** ถูกออกแบบมาเพื่อแก้ปัญหาหลักคือ **พื้นที่ address 32 บิตของ IPv4 กำลังจะถูกจัดสรรหมด** พร้อมทั้งปรับปรุง performance การประมวลผลที่ router", "blocks": [{"type": "subheading", "content": "แรงจูงใจและโครงสร้าง IPv6 Datagram"}, {"type": "note", "content": "**แรงจูงใจเพิ่มเติม**: เพิ่มความเร็วในการประมวลผล/forward ด้วย **header ความยาวคงที่ 40 byte**, และเปิดทางให้ network layer จัดการ \"flow\" ของข้อมูลแตกต่างกันได้"}, {"type": "table", "content": "<table><tr><th>Field</th><th>ความหมาย</th></tr><tr><td>Flow label</td><td>ระบุ datagram ที่อยู่ใน \"flow\" เดียวกัน (แนวคิด \"flow\" ยังไม่ถูกนิยามชัดเจนนัก)</td></tr><tr><td>Priority</td><td>ระบุลำดับความสำคัญระหว่าง datagram ใน flow เดียวกัน</td></tr><tr><td>Hop limit</td><td>เทียบเท่ากับ TTL ของ IPv4</td></tr><tr><td>Source/Destination address</td><td>**128 บิต** (ใหญ่กว่า IPv4 มาก)</td></tr></table>"}, {"type": "warning", "content": "**สิ่งที่ IPv6 ตัดออกเมื่อเทียบกับ IPv4** (เพื่อความเร็ว): **ไม่มี checksum** (เร่งการประมวลผลที่ router — ให้ layer อื่นตรวจสอบแทน), **ไม่มี fragmentation/reassembly ที่ router ระหว่างทาง** (ต้องทำที่ host ต้นทางเท่านั้น หรือใช้ Path MTU Discovery), **ไม่มี options ใน header หลัก** (ย้ายไปเป็น \"next header\" protocol แยกต่างหากที่ประมวลผลที่ upper layer แทน) — ทั้งหมดนี้ทำให้ IPv6 header \"เบา\" และประมวลผลได้เร็วกว่า"}, {"type": "subheading", "content": "การเปลี่ยนผ่านจาก IPv4 สู่ IPv6: Tunneling"}, {"type": "note", "content": "เนื่องจากไม่สามารถอัปเกรด router ทุกตัวพร้อมกันได้ในคราวเดียว (\"ไม่มี flag day\") จึงต้องมีวิธีให้เครือข่ายผสม IPv4/IPv6 ทำงานร่วมกันได้ — ใช้เทคนิค **Tunneling**: **ห่อ IPv6 datagram ทั้งก้อนไว้เป็น payload ของ IPv4 datagram** (\"packet within a packet\") เพื่อส่งผ่านเครือข่าย IPv4 ที่คั่นกลางระหว่าง router ที่เป็น IPv6 สองตัว — เมื่อถึงปลายอีกฝั่งของ tunnel (router ที่รองรับ IPv6/v4 ทั้งคู่) จะแกะ IPv6 datagram ออกมาแล้วส่งต่อในรูปแบบ IPv6 ปกติ (เทคนิค tunneling แบบนี้ยังใช้ในบริบทอื่นด้วย เช่น 4G/5G)"}, {"type": "subheading", "content": "การยอมรับใช้งาน IPv6 (Adoption)"}, {"type": "note", "content": "จากข้อมูลของ Google (2023): ประมาณ **40% ของ client เข้าถึงบริการผ่าน IPv6** และตาม NIST พบว่า 1 ใน 3 ของ domain รัฐบาลสหรัฐฯ รองรับ IPv6 แล้ว — แม้จะมีความคืบหน้า แต่การ deploy ใช้เวลานานมาก (**25 ปีและยังนับต่อไป!**) เมื่อเทียบกับการเปลี่ยนแปลงระดับ application ในช่วง 25 ปีที่ผ่านมา (WWW, social media, streaming, gaming, telepresence ล้วนเกิดขึ้นและเปลี่ยนแปลงไปมากในเวลาเท่ากัน) แสดงให้เห็นว่าการเปลี่ยนแปลงที่ระดับ **network layer (\"thin waist\")** ยากกว่าการเปลี่ยนแปลงที่ application layer มาก เพราะต้องอาศัยการประสานงานจากอุปกรณ์นับพันล้านตัวทั่วโลก"}, {"type": "image", "src": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAGvAyADASIAAhEBAxEB/8QAHAABAQACAwEBAAAAAAAAAAAAAAQGBwECBQMI/8QAVxAAAQMCAgUGCQgIBQEFBgcAAQACAwQRBRQGEiGT0RMxUVNU0gcVIkFhcXORsjIzNVVjkqOxIzRCQ1JygdMWJGKhwcIIFzZ04WSUosPi8CVFZYKEs/H/xAAaAQEAAwEBAQAAAAAAAAAAAAAAAwQFAQIG/8QAMhEBAAICAQMDAwEGBgMAAAAAAAECAxEEEjFhEyFRFCJBoQUjcZGx0TIzQlKB8MHh8f/aAAwDAQACEQMRAD8A/VKmnr6ODluXqqePkQ0ya8jRqa3Ne52X811StI+EXCa6rxLTvL4fPMKhuEiI8g57ZNWTyuYeUB57cwQbqpqiGqhbLTSxzRO5nxuDmn1ELpU1lLSuibU1EMLpXasYkeGl56BfnK1FW4Bj/g/whmLYO99bM+umlqsNw6B0dPqyx6jNSIX2MeGG/pK8KtwnSTCtK6KSriqMXxNsFBHTPqaDNxzHWvUXlOyHVJLrix+T0IN91VVBSMa+qmihY5wYHSPDQSeYbfOuK6spqCklqq2eKnpohrPlleGtaOkk7AtW+F/C8W0rxqiwPDMNdVU1NSy1cj5JDDGJnAxxEPIILmbXav5LENM67SLSDA5G4hBpDEJsEjEFJTUz+TlqmvInEwDf9IIvbYQQg/Q7SHAFpBB5iFytNz1Wk7NPGRxSY2JxicDIadsTsicO5Ma7nG2rrX1tpOsDZeBoxXaQ45T8nSV+kdU+eixJlaZQ7kW6pcKfkXEW1iRY2JPOCg34+tpY6uGlfUwtqZmufFEXgPe1ttYtHOQLi9ulfdaIwrx5Bg+jn+HmYu+rhwWuaRWQP/R1Qjj1WDXaLNDgQ0cxt511hrNKX4HibcMq9JnUpkw5sc9ZE8VDZnSWqAy7blgHPs1R6kG+UWG+DhmJ0z9IqHEqjEKmCkxJ0dJNWkue6Lk2H5RA1hcu2rMkBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQERdDNEASZGAB2oTrDYej1oO6LqHtLnNDmlzecA7QuyAiIgKLB8LosGw9lFhkDaelYXObG0kgFzi48585JP9VaiAi667NfU1m69r6t9tuldkBERARca7dfU1hr2va+23SuUBERAREQEXVr2uLg1zSWmxseY9C7ICLh72sF3uDRcDabc65QEREBFw97WN1nuDRcC5NufYjHte0OY4OafODdByi6GaMRukMjNRt7u1hYW59qNmjc4tbIwuF9gcL7DY/7oO6Il0BF8o6iGSJkkcsbo3mzXNcCHHoBXEFXTzvcyGeKRzdpDHgke5B9kXSWWOGN0kr2sY3nc42A/qu4IIv5kBERAREQEXUPYXlgc0uAva+23/2ED2F5aHN1hYkX2i/Mg7IiICIiAiLrNKyGN0kr2sjaLlzjYD+qDsi6RSxzRtkie18bhcOabg/1XdARcPe1jS57g1o5yTZcoCIiAiIgIpn19IyQxvqoGvB1S0yNBB6LXVDHte0OY4OafODdByiIgIi4L2tLQXAFxsATzoOURca7dfU1hrWva+2yDlERARF1a9ri4NcCWmxAPN50HZERAREQERLhAREQERdIZop2a8MjJGXI1mOBFxsI2IO6IiAiLq97WW13BtyALm208yDsiJdAREQEREBF0nmjgidJPIyONvO57gAP6lcxvZIxr43NcxwuHA3BCDsiLh72sF3uDRcC5NkHKIiAiIgIvhLWU0IvLUQsF9W7ngbehfZrmvaHNILSLgg3BCDlF0bLG6V8bXtMjLFzQRcX5rhd0BERAWqtLcAq8T0nxHA6eGRtJXAYwJmghjZo4jE0X5r8oIX2/wBK2qiDSk+K44yjhxiMz4W3GXVFXM9zHNe2SNsccMR/RSH5LHODbDW5r+Y5npXi2I0ujWBOlkqKaqq3RtqpIRyTWHki4hzix5jBcLbGk3s3ZdZwiDT1JjGltXgE+Ix1ddm6TCopG0+WAEkrpZmPe4FmsXNY1rtUAbQDq7bLJdFMUxmfRvH5WS+MJafX8XvOs8yOEQOrrmOPXGvsuG+e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", "alt": "กราฟแสดงอัตราการใช้งาน IPv6 ของผู้ใช้ Google ตั้งแต่ปี 2008-ปัจจุบัน", "caption": "อัตราการใช้งาน IPv6 ของผู้ใช้ Google เพิ่มขึ้นอย่างต่อเนื่องแต่ค่อยเป็นค่อยไป จากเกือบ 0% ในปี 2008 สู่ราว 40% ในปัจจุบัน"}]}, {"title": "Generalized Forwarding และ SDN: Match+Action", "body": "แนวคิด **\"match plus action\"** เป็น abstraction ที่รวม forwarding ของอุปกรณ์เครือข่ายหลายประเภทเข้าด้วยกัน — เป็นรากฐานของ Software-Defined Networking (SDN)", "blocks": [{"type": "subheading", "content": "จาก Destination-based สู่ Generalized Forwarding"}, {"type": "note", "content": "Router แบบดั้งเดิม forward ตาม **destination IP address เท่านั้น** — แต่ **generalized forwarding** เปิดกว้างกว่านั้นมาก: header field**ใดๆ ก็ได้** (จาก link, network, หรือ transport layer) สามารถใช้กำหนด action ได้ และ action ที่เป็นไปได้ก็หลากหลายกว่าแค่ \"forward\" เช่น **drop, copy, modify, log** packet"}, {"type": "subheading", "content": "Flow Table Abstraction"}, {"type": "table", "content": "<table><tr><th>องค์ประกอบ</th><th>ความหมาย</th></tr><tr><td>Flow</td><td>นิยามโดยชุดค่าของ header field (link/network/transport layer)</td></tr><tr><td>Match</td><td>pattern ของค่าใน header field ที่ต้องการจับคู่</td></tr><tr><td>Action</td><td>สำหรับ packet ที่ match: drop, forward, modify, หรือส่งไปยัง controller</td></tr><tr><td>Priority</td><td>ใช้แก้ความกำกวมเมื่อมีหลาย pattern ที่ overlap กัน</td></tr><tr><td>Counters</td><td>นับจำนวน byte และ packet ที่ผ่าน rule นั้น</td></tr></table>"}, {"type": "example", "content": "**ตัวอย่าง Flow Table Rules**:\n```\nsrc=*.*.*.*, dest=3.4.*.*     → forward(2)\nsrc=1.2.*.*, dest=*.*.*.*     → drop\nsrc=10.1.2.3, dest=*.*.*.*    → send to controller\n```\n(`*` = wildcard, จับคู่กับค่าอะไรก็ได้)"}, {"type": "subheading", "content": "OpenFlow: Match+Action ในทางปฏิบัติ"}, {"type": "note", "content": "OpenFlow อนุญาตให้ match บนหลายชั้น: **Link layer** (Ingress Port, Src/Dst MAC, Eth Type, VLAN), **Network layer** (IP Src/Dst, IP Proto, IP ToS), **Transport layer** (TCP/UDP Src/Dst Port) — action ที่ทำได้: forward ไปยัง port, drop, modify header field, หรือ encapsulate ส่งไปยัง controller"}, {"type": "table", "content": "<table><tr><th>ตัวอย่างการใช้งาน</th><th>Rule</th></tr><tr><td>Destination-based forwarding</td><td>IP Dst = 51.6.0.8 → forward(port 6)</td></tr><tr><td>Firewall (block SSH)</td><td>TCP Dst Port = 22 → drop</td></tr><tr><td>Firewall (block host)</td><td>IP Src = 128.119.1.1 → drop</td></tr><tr><td>Layer 2 forwarding</td><td>MAC Dst = 22:A7:23:11:E1:02 → forward(port 3)</td></tr></table>"}, {"type": "subheading", "content": "OpenFlow Abstraction รวมอุปกรณ์หลายชนิดเป็นแนวคิดเดียว"}, {"type": "table", "content": "<table><tr><th>อุปกรณ์</th><th>Match</th><th>Action</th></tr><tr><td>Router</td><td>longest destination IP prefix</td><td>forward ออกทาง link ที่กำหนด</td></tr><tr><td>Switch</td><td>destination MAC address</td><td>forward หรือ flood</td></tr><tr><td>Firewall</td><td>IP address และ TCP/UDP port</td><td>permit หรือ deny</td></tr><tr><td>NAT</td><td>IP address และ port</td><td>rewrite address และ port</td></tr></table>"}, {"type": "note", "content": "**สรุป Generalized Forwarding**: \"match plus action\" คือ abstraction ที่ match บิตใน packet header (ในชั้นใดก็ได้), ทำ local action (drop/forward/modify/ส่งไป controller) — ทำให้เกิด**พฤติกรรมระดับเครือข่ายทั้งหมด**ได้จากการ \"เขียนโปรแกรม\" ตาราง match+action ในแต่ละอุปกรณ์ (\"orchestrated tables\") นี่คือรูปแบบพื้นฐานของ **network programmability** — มีรากฐานย้อนไปถึงแนวคิด active networking และปัจจุบันพัฒนาต่อเป็นภาษาโปรแกรมเครือข่ายที่ generalized มากขึ้น เช่น **P4** (p4.org)"}]}, {"title": "Middleboxes และหลักการทางสถาปัตยกรรมของอินเทอร์เน็ต", "body": "**Middlebox** [RFC 3234] คือ \"กล่องตัวกลางใดๆ ที่ทำหน้าที่นอกเหนือจากฟังก์ชันมาตรฐานปกติของ IP router บนเส้นทางข้อมูลระหว่าง source host และ destination host\"", "blocks": [{"type": "subheading", "content": "Middlebox พบได้ทุกที่"}, {"type": "table", "content": "<table><tr><th>ประเภท Middlebox</th><th>พบใน</th></tr><tr><td>Firewall, IDS (Intrusion Detection System)</td><td>corporate, institutional, service provider, ISP</td></tr><tr><td>NAT</td><td>home, cellular, institutional network</td></tr><tr><td>Load balancer</td><td>corporate, service provider, data center, mobile network</td></tr><tr><td>Cache</td><td>service provider, mobile, CDN</td></tr><tr><td>Application-specific device</td><td>service provider, institutional, CDN</td></tr></table>"}, {"type": "note", "content": "**วิวัฒนาการของ Middlebox**: เดิมทีเป็น hardware แบบ**ปิด (proprietary)** เฉพาะยี่ห้อ — ปัจจุบันเคลื่อนไปสู่ **\"whitebox\" hardware** ที่มี open API และ programmable local action ผ่าน match+action แทน ความแตกต่าง/นวัตกรรมย้ายไปอยู่ที่**ระดับ software** โดย **SDN** ให้การควบคุมแบบรวมศูนย์ (logically centralized) มักอยู่บน private/public cloud และ **NFV (Network Functions Virtualization)** ทำให้บริการเครือข่ายกลายเป็น programmable service บน whitebox hardware/compute/storage ทั่วไป"}, {"type": "subheading", "content": "IP Hourglass: \"เอวคอด\" ของอินเทอร์เน็ต"}, {"type": "note", "content": "**Internet's \"thin waist\"**: มี network-layer protocol เพียง**หนึ่งเดียว** คือ **IP** ที่ต้องถูก implement โดยอุปกรณ์เชื่อมต่ออินเทอร์เน็ตนับพันล้านตัว — ในขณะที่ **physical, link, transport, และ application layer** มี protocol ที่หลากหลายมาก (เช่น Ethernet, WiFi, Bluetooth ที่ link layer; TCP, UDP ที่ transport layer; HTTP, SMTP, RTP, QUIC, DASH ที่ application layer) — ภาพนี้เรียกว่า **\"hourglass\" (นาฬิกาทราย)** เพราะเอวตรงกลาง (IP) แคบมาก ในขณะที่ชั้นบนและชั้นล่างกว้างและหลากหลาย"}, {"type": "warning", "content": "**\"เอวคอดที่มี love handles\"**: เมื่ออินเทอร์เน็ตมีอายุมากขึ้น middlebox ต่างๆ (caching, NAT, NFV, firewall) เริ่มเข้ามาแทรกและทำงาน**ภายในเครือข่าย** (ไม่ใช่แค่ที่ปลายทาง) ทำให้ IP hourglass ไม่ \"บาง\" เหมือนเดิม — เกิดคำถามทางสถาปัตยกรรมว่าสิ่งนี้ขัดกับหลักการดั้งเดิมของอินเทอร์เน็ตหรือไม่"}, {"type": "subheading", "content": "หลักการทางสถาปัตยกรรมของอินเทอร์เน็ต [RFC 1958]"}, {"type": "note", "content": "RFC 1958 ระบุว่า \"เป้าหมายคือ connectivity, เครื่องมือคือ Internet Protocol, และความฉลาด (intelligence) อยู่ที่ปลายทาง (end-to-end) ไม่ใช่ซ่อนอยู่ในเครือข่าย\" มี 3 หลักการสำคัญ: **(1) simple connectivity** (2) **IP protocol** เป็น \"เอวแคบ\" ที่เชื่อมทุกอย่าง (3) **intelligence และความซับซ้อนอยู่ที่ network edge** (ไม่ใช่ตรงกลาง)"}, {"type": "subheading", "content": "The End-to-End Argument"}, {"type": "note", "content": "หลักการจาก Saltzer, Reed, Clark (1981): \"ฟังก์ชันที่กำลังพิจารณาสามารถ implement ได้อย่างสมบูรณ์และถูกต้องก็ต่อเมื่อมีความรู้และความช่วยเหลือจาก **application ที่อยู่ที่ปลายทาง**ของระบบสื่อสารเท่านั้น ดังนั้นการให้ฟังก์ชันนั้นเป็นส่วนหนึ่งของระบบสื่อสารเอง (ตรงกลางเครือข่าย) จึง**ไม่สามารถทำได้อย่างสมบูรณ์** (แม้บางครั้งการ implement แบบไม่สมบูรณ์ในระบบสื่อสารอาจมีประโยชน์เพื่อเพิ่ม performance ก็ตาม)\" — ตัวอย่างเช่น **reliable data transfer** และ **congestion control** ถูก implement ที่ **transport layer ในตัว end host** (TCP) ไม่ใช่ที่ router ระหว่างทาง เพราะมีแต่ end host เท่านั้นที่รู้บริบทครบถ้วนของแอปพลิเคชัน"}, {"type": "subheading", "content": "ความฉลาดของเครือข่ายอยู่ที่ไหน? — วิวัฒนาการเชิงประวัติศาสตร์"}, {"type": "note", "content": "**เครือข่ายโทรศัพท์ยุคศตวรรษที่ 20**: ปลายทาง (โทรศัพท์แบบหมุน) เป็นอุปกรณ์ \"โง่\" ล้วนๆ — ความฉลาด/การประมวลผลทั้งหมดอยู่ที่ **switch ภายในเครือข่าย** เพราะปลายทางทำอะไรไม่ได้มากไปกว่าส่งสัญญาณเสียง/ตัวเลข\n\n**อินเทอร์เน็ตยุคก่อน 2005**: ปลายทาง (คอมพิวเตอร์) เป็นอุปกรณ์ที่ตั้งโปรแกรมได้ — ความฉลาด/การประมวลผลจึงย้ายไปอยู่ที่**ขอบเครือข่าย (edge)** ตามหลัก end-to-end argument ของ RFC 1958\n\n**อินเทอร์เน็ตยุคหลัง 2005**: middlebox และ SDN เริ่มมีบทบาทมากขึ้น เกิด**อุปกรณ์เครือข่ายที่ตั้งโปรแกรมได้**ภายในเครือข่ายเอง ในขณะเดียวกัน data center และ CDN ก็สร้าง**application-level infrastructure ขนาดใหญ่ที่ edge** ยิ่งซับซ้อนและมี computing power สูงขึ้นไปอีก — กล่าวได้ว่า intelligence กระจายอยู่ทั้งที่ edge (มากขึ้นกว่าเดิมมาก) และเริ่มปรากฏใน middlebox ภายในเครือข่ายบางส่วนด้วย"}]}, {"title": "สรุปท้ายบท: Chapter 4", "body": "บทนี้ครอบคลุมหลักการของ network layer data plane อย่างครบถ้วน ตั้งแต่โครงสร้างภายใน router ไปจนถึงหลักการทางสถาปัตยกรรมของอินเทอร์เน็ตทั้งระบบ", "blocks": [{"type": "subheading", "content": "หัวข้อที่ครอบคลุมในบทนี้"}, {"type": "note", "content": "- **Network layer overview**: forwarding vs routing, data plane vs control plane\n- **โครงสร้างภายใน router**: input port, switching fabric, output port, buffer management, scheduling\n- **IP protocol**: datagram format, addressing (subnet, CIDR, DHCP), NAT, IPv6\n- **Generalized Forwarding, SDN**: match+action abstraction, OpenFlow\n- **Middleboxes**: วิวัฒนาการและหลักการทางสถาปัตยกรรม (end-to-end argument, IP hourglass)"}, {"type": "warning", "content": "**คำถามที่ยังไม่ได้ตอบ**: forwarding table (สำหรับ destination-based forwarding) หรือ flow table (สำหรับ generalized forwarding) ถูก**คำนวณ**ขึ้นมาได้อย่างไร?\n\n**คำตอบ**: โดย **control plane** — ซึ่งจะเป็นหัวข้อหลักของบทถัดไป (**Chapter 5: Network Layer — Control Plane**) ครอบคลุมทั้ง traditional routing algorithm และ SDN controller"}]}];
+
+function renderTOC(){
+  const toc = document.getElementById("tocList");
+  toc.innerHTML = "";
+  SECTIONS.forEach((sec, idx)=>{
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#section_"+idx;
+    a.textContent = sec.title;
+    a.dataset.idx = idx;
+    li.appendChild(a);
+    toc.appendChild(li);
+  });
+}
+
+function escapeXml(s){
+  return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function fmtTspans(text, x){
+  return String(text==null?"":text).split("\n").map(function(line,i){
+    return '<tspan x="'+x+'" dy="'+(i===0?0:15)+'">'+escapeXml(line)+'</tspan>';
+  }).join("");
+}
+
+function renderDiagramBlock(block, secIdx, blockIdx){
+  const uid = "dg_"+secIdx+"_"+blockIdx;
+  const layout = block.layout || "lifeline";
+  const actors = block.actors || [];
+  const steps = block.steps || [];
+  const n = actors.length;
+  const W = 680;
+  const margin = 76;
+  const nodesX = [];
+  for(let i=0;i<n;i++){ nodesX.push(n===1 ? W/2 : margin + i*((W-2*margin)/Math.max(1,n-1))); }
+  let inner = "";
+  let H = 0;
+
+  if(layout === "flow"){
+    const boxY = 50, boxH = 46;
+    const boxW = Math.min(128, Math.max(70,(W-2*margin)/Math.max(1,n-1)-14));
+    H = 168;
+    actors.forEach(function(a,i){
+      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+boxY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
+      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(boxY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
+    });
+    steps.forEach(function(st,i){
+      const x1 = nodesX[st.from]+boxW/2+3, x2 = nodesX[st.to]-boxW/2-3;
+      const y = boxY+boxH/2;
+      const pid = uid+"_p"+i, mid = uid+"_m"+i;
+      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
+      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(boxY-12)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
+      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
+             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
+             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
+             + '</circle>';
+    });
+  } else {
+    const rowH = 64, topY = 12, boxH = 38;
+    H = topY + boxH + steps.length*rowH + 26;
+    const boxW = Math.min(160, Math.max(80,(W-2*margin)/Math.max(1,n-1)-10));
+    actors.forEach(function(a,i){
+      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+topY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
+      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(topY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
+      inner += '<line class="diagram-lifeline" x1="'+nodesX[i]+'" y1="'+(topY+boxH)+'" x2="'+nodesX[i]+'" y2="'+(H-8)+'"></line>';
+    });
+    steps.forEach(function(st,i){
+      const y = topY+boxH+22 + i*rowH;
+      const x1 = nodesX[st.from], x2 = nodesX[st.to];
+      const pid = uid+"_p"+i, mid = uid+"_m"+i;
+      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
+      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(y-9)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
+      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
+             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
+             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
+             + '</circle>';
+    });
+  }
+
+  const svg = '<svg class="diagram-svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" preserveAspectRatio="xMidYMid meet">'+inner+'</svg>';
+
+  let stepsHtml = '<ol class="diagram-steps-list">';
+  steps.forEach(function(st,i){
+    stepsHtml += '<li><span class="step-num">'+(i+1)+'</span><strong>'+escapeXml(st.label||"")+'</strong>'+(st.note?(' — '+escapeXml(st.note)):'')+'</li>';
+  });
+  stepsHtml += '</ol>';
+
+  return '<div class="diagram-block" id="'+uid+'">'
+       + '<h4><span>🔀 '+escapeXml(block.title||"")+'</span><button class="diagram-play-btn" data-diagram-id="'+uid+'">&#9654; เล่นแอนิเมชัน / Play animation</button></h4>'
+       + '<div class="diagram-svg-wrap">'+svg+'</div>'
+       + stepsHtml
+       + '</div>';
+}
+
+function diagramPlay(containerId){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  const svg = wrap.querySelector('svg');
+  const paths = svg.querySelectorAll('.diagram-arrow-path');
+  const dots = svg.querySelectorAll('.diagram-glow-dot');
+  const items = wrap.querySelectorAll('.diagram-steps-list li');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  items.forEach(function(li){ li.classList.remove('step-active'); });
+  if(reduced){ return; }
+  const stepDur = 850;
+  paths.forEach(function(p){
+    const len = p.getTotalLength();
+    p.style.transition = 'none';
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+  void svg.getBoundingClientRect();
+  paths.forEach(function(p,i){
+    setTimeout(function(){
+      p.style.transition = 'stroke-dashoffset '+(stepDur-100)+'ms ease';
+      p.style.strokeDashoffset = 0;
+      const anim = dots[i] ? dots[i].querySelector('animateMotion') : null;
+      if(anim){ try{ anim.beginElement(); }catch(e){} }
+      if(items[i]) items[i].classList.add('step-active');
+    }, i*stepDur);
+  });
+}
+
+function wireDiagramButtons(){
+  document.querySelectorAll('.diagram-play-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ diagramPlay(btn.dataset.diagramId); });
+  });
+}
+
+function renderContent(){
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  SECTIONS.forEach((sec, idx)=>{
+    const card = document.createElement("div");
+    card.className = "section-card";
+    card.id = "section_"+idx;
+    let html = "<h2>"+sec.title+"</h2>";
+    if(sec.body){
+      html += '<div class="body-text">'+sec.body+'</div>';
+    }
+    (sec.blocks || []).forEach((block, bi)=>{
+      if(block.type === "note"){
+        html += '<div class="callout callout-note"><span class="callout-title">หมายเหตุ / Note</span>'+block.content+'</div>';
+      } else if(block.type === "example"){
+        html += '<div class="callout callout-example"><span class="callout-title">ตัวอย่าง / Example</span>'+block.content+'</div>';
+      } else if(block.type === "warning"){
+        html += '<div class="callout callout-warning"><span class="callout-title">ข้อควรระวัง / Warning</span>'+block.content+'</div>';
+      } else if(block.type === "formula"){
+        html += '<div class="callout callout-formula"><span class="callout-title">'+(block.label || "สูตร / Formula")+'</span>'+block.content+'</div>';
+      } else if(block.type === "subheading"){
+        html += '<h3>'+block.content+'</h3>';
+      } else if(block.type === "table"){
+        html += block.content;
+      } else if(block.type === "image"){
+        html += '<div class="image-block"><img src="'+block.src+'" alt="'+(block.alt || "")+'" loading="lazy">';
+        if(block.caption){
+          html += '<div class="image-caption">'+block.caption+'</div>';
+        }
+        html += '</div>';
+      } else if(block.type === "diagram"){
+        html += renderDiagramBlock(block, idx, bi);
+      }
+    });
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+
+  if(window.renderMathInElement){
+    renderMathInElement(main, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  }
+}
+
+function setupScrollSpy(){
+  const links = document.querySelectorAll(".toc-list a");
+  const sections = document.querySelectorAll(".section-card");
+  window.addEventListener("scroll", ()=>{
+    let currentIdx = 0;
+    sections.forEach((sec, idx)=>{
+      const rect = sec.getBoundingClientRect();
+      if(rect.top <= 100) currentIdx = idx;
+    });
+    links.forEach(l=>l.classList.remove("active"));
+    if(links[currentIdx]) links[currentIdx].classList.add("active");
+  });
+}
+
+function setupReveal(){
+  const cards = document.querySelectorAll('.section-card');
+  if(!('IntersectionObserver' in window)){
+    cards.forEach(function(c){ c.classList.add('revealed'); });
+    return;
+  }
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.08, rootMargin:'0px 0px -60px 0px'});
+  cards.forEach(function(c){ io.observe(c); });
+}
+
+let fontScale = parseFloat(localStorage.getItem('netbook_fontScale')||'1');
+function setFontScale(v){
+  fontScale = Math.min(1.3, Math.max(0.85, Math.round(v*10)/10));
+  try{ localStorage.setItem('netbook_fontScale', fontScale); }catch(e){}
+  document.documentElement.style.setProperty('--fontScale', fontScale);
+}
+
+function updateProgress(){
+  const el = document.documentElement;
+  const max = el.scrollHeight - el.clientHeight;
+  const pct = max>0 ? (el.scrollTop/max*100) : 0;
+  const bar = document.getElementById('readProgress');
+  if(bar) bar.style.width = pct+'%';
+  const btt = document.getElementById('backToTop');
+  if(btt){ if(el.scrollTop>420){ btt.classList.add('show'); } else { btt.classList.remove('show'); } }
+}
+
+renderTOC();
+renderContent();
+setupScrollSpy();
+setupReveal();
+wireDiagramButtons();
+setFontScale(fontScale);
+
+window.addEventListener('scroll', updateProgress);
+const backToTopBtn = document.getElementById('backToTop');
+if(backToTopBtn){ backToTopBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); }); }
+const fontMinusBtn = document.getElementById('fontMinus');
+if(fontMinusBtn){ fontMinusBtn.addEventListener('click', function(){ setFontScale(fontScale-0.1); }); }
+const fontPlusBtn = document.getElementById('fontPlus');
+if(fontPlusBtn){ fontPlusBtn.addEventListener('click', function(){ setFontScale(fontScale+0.1); }); }
+
+</script>
+</body>
+</html>
