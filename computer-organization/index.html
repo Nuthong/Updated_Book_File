@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Computer Organization — สารบัญหนังสือ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --accent2:#2B6CB0;
+  --flag:#B7862C;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12161d; --panel:#1b212b; --border:#333c48;
+    --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0; --accent2:#8ec1f2;
+  }
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;font-family:'Sarabun',"Segoe UI",sans-serif;background:var(--paper);color:var(--text);
+}
+header{
+  background:var(--navy-deep);border-bottom:4px solid var(--flag);
+  box-shadow:0 2px 10px rgba(15,39,64,0.25);padding:36px 20px;text-align:center;
+}
+.back-to-books{display:inline-block;font-size:12.5px;color:#C9DCF0;text-decoration:none;margin-bottom:14px;opacity:0.85;}
+.back-to-books:hover{opacity:1;text-decoration:underline;}
+header h1{margin:0 0 8px 0;font-size:26px;color:#F2EFE6;}
+header p{margin:0;font-size:14px;color:#C9C2AE;}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px;}
+.chapter-list{display:flex;flex-direction:column;gap:12px;}
+.chapter-card{
+  display:flex;align-items:center;gap:16px;background:var(--panel);border:1px solid var(--border);
+  border-left:4px solid var(--navy);border-radius:8px;padding:16px 18px;text-decoration:none;color:inherit;
+  box-shadow:0 2px 8px rgba(15,39,64,0.06);transition:transform .15s ease, box-shadow .15s ease;
+}
+.chapter-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(15,39,64,0.12);}
+.chapter-icon{font-size:26px;flex-shrink:0;width:40px;text-align:center;}
+.chapter-info{flex:1;min-width:0;}
+.chapter-title{font-weight:700;font-size:15.5px;color:var(--navy-deep);}
+@media (prefers-color-scheme: dark){.chapter-title{color:var(--navy);}}
+.chapter-desc{font-size:13px;color:var(--text-soft);margin-top:3px;}
+.chapter-arrow{font-size:18px;color:var(--accent2);flex-shrink:0;}
+footer{text-align:center;padding:20px;font-size:12px;color:var(--text-soft);}
+</style>
+</head>
+<body>
+<header>
+  <a class="back-to-books" href="../index.html">&larr; ทุกเล่ม / All Books</a>
+  <h1>Computer Organization</h1>
+  <p>310-2202 Computer Organization — สรุปบทเรียนฉบับอ่านง่าย พร้อม diagram แอนิเมชัน</p>
+</header>
+<div class="wrap">
+  <div class="chapter-list">
+<a class="chapter-card" href="Topic0_Brushup.html">
+  <div class="chapter-icon">🧰</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 0: Brushup</div>
+    <div class="chapter-desc">ปูพื้นฐานก่อนเรียน — ไฟฟ้า, ทรานซิสเตอร์, เลขฐาน, Logic Gate</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic1_Introduction_to_Computing_Systems.html">
+  <div class="chapter-icon">🖥️</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 1: Introduction to Computing Systems</div>
+    <div class="chapter-desc">ภาพรวมวิชา, Von Neumann Model, ประวัติศาสตร์คอมพิวเตอร์</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic2_Bit_Data_Types_and_Operations.html">
+  <div class="chapter-icon">🔢</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 2: Bit, Data Types, and Operations</div>
+    <div class="chapter-desc">เลขฐานสอง, 2's Complement, Logical Operations</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic3_Digital_Logic.html">
+  <div class="chapter-icon">⚡</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 3: Digital Logic</div>
+    <div class="chapter-desc">CMOS, Combinational/Sequential Logic, State Machine</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic4_The_von_Neumann_Model.html">
+  <div class="chapter-icon">🔁</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 4: The von Neumann Model</div>
+    <div class="chapter-desc">Instruction Cycle 6 ขั้นตอน, Control Unit</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic5_The_LC3_Instructions.html">
+  <div class="chapter-icon">📜</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 5: The LC-3 Instructions</div>
+    <div class="chapter-desc">Operate, Data Movement, Control Instructions</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic6_LC3_Programming.html">
+  <div class="chapter-icon">🐞</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 6: LC-3 Programming</div>
+    <div class="chapter-desc">Booting, Problem Solving, Debugging</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic7_Assembly_Language_Program.html">
+  <div class="chapter-icon">📝</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 7: Assembly Language Program</div>
+    <div class="chapter-desc">Syntax, Directives, Trap Codes, Memory Map</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic8_Data_Structures_and_Subroutines.html">
+  <div class="chapter-icon">📚</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 8: Data Structures and Subroutines</div>
+    <div class="chapter-desc">Stack, Call Stack, Calling Convention</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic9_InputOutput.html">
+  <div class="chapter-icon">🔌</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 9: Input/Output</div>
+    <div class="chapter-desc">Memory-Mapped I/O, Polling, Interrupt-Driven I/O</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic10_LC3_to_RISCV.html">
+  <div class="chapter-icon">🌉</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 10: สะพาน LC-3 → RISC-V</div>
+    <div class="chapter-desc">เปรียบเทียบ ISA, การย้ายจาก LC-3 สู่ RV32I</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+  </div>
+</div>
+<footer>Patt &amp; Patel, Introduction to Computing Systems: From Bits and Gates to C and Beyond (3rd ed.)</footer>
+</body>
+</html>

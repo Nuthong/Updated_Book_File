@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>ห้องสมุดสรุปบทเรียน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --accent2:#2B6CB0;
+  --flag:#B7862C;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12161d; --panel:#1b212b; --border:#333c48;
+    --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0; --accent2:#8ec1f2;
+  }
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;font-family:'Sarabun',"Segoe UI",sans-serif;background:var(--paper);color:var(--text);
+}
+header{
+  background:var(--navy-deep);border-bottom:4px solid var(--flag);
+  box-shadow:0 2px 10px rgba(15,39,64,0.25);padding:40px 20px;text-align:center;
+}
+header h1{margin:0 0 8px 0;font-size:28px;color:#F2EFE6;}
+header p{margin:0;font-size:14px;color:#C9C2AE;}
+.wrap{max-width:820px;margin:0 auto;padding:32px 20px 60px;}
+.book-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+.book-card{
+  display:block;background:var(--panel);border:1px solid var(--border);
+  border-top:5px solid var(--navy);border-radius:10px;padding:26px 22px;text-decoration:none;color:inherit;
+  box-shadow:0 2px 10px rgba(15,39,64,0.07);transition:transform .15s ease, box-shadow .15s ease;
+}
+.book-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(15,39,64,0.14);}
+.book-icon{font-size:38px;margin-bottom:12px;}
+.book-title{font-weight:700;font-size:18px;color:var(--navy-deep);margin-bottom:6px;}
+@media (prefers-color-scheme: dark){.book-title{color:var(--navy);}}
+.book-desc{font-size:13.5px;color:var(--text-soft);line-height:1.6;margin-bottom:10px;}
+.book-meta{font-size:12px;color:var(--accent2);font-weight:600;}
+footer{text-align:center;padding:24px;font-size:12px;color:var(--text-soft);}
+</style>
+</head>
+<body>
+<header>
+  <h1>ห้องสมุดสรุปบทเรียน</h1>
+  <p>เลือกเล่มที่ต้องการอ่าน — สรุปฉบับอ่านง่าย พร้อม diagram แอนิเมชันอธิบายขั้นตอนการทำงาน</p>
+</header>
+<div class="wrap">
+  <div class="book-grid">
+    <a class="book-card" href="networking-book/index.html">
+      <div class="book-icon">🌐</div>
+      <div class="book-title">Computer Networking: A Top-Down Approach</div>
+      <div class="book-desc">สรุปครบ 8 บท + OSI Model + พื้นฐานเครือข่ายบ้าน — TCP handshake, DNS, Routing, Wireless, Security</div>
+      <div class="book-meta">10 บท &middot; Kurose &amp; Ross (8th ed.)</div>
+    </a>
+    <a class="book-card" href="computer-organization/index.html">
+      <div class="book-icon">🖥️</div>
+      <div class="book-title">Computer Organization</div>
+      <div class="book-desc">จาก Bit และ Logic Gate สู่ Von Neumann Model, LC-3 Assembly, และสะพานเชื่อมสู่ RISC-V</div>
+      <div class="book-meta">11 Topic &middot; Patt &amp; Patel (3rd ed.)</div>
+    </a>
+  </div>
+</div>
+<footer>สรุปบทเรียนสำหรับทบทวน — ไม่ใช่เอกสารทางการของวิชา</footer>
+</body>
+</html>

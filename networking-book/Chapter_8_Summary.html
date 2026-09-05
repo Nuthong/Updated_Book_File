@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Chapter 8: Security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+
+:root{
+  color-scheme: light dark;
+  --paper:#F6F4EE;
+  --bg:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --accent:#1B3A5C;
+  --accent2:#2B6CB0;
+  --accent-soft:#EAF1FA;
+  --correct:#256D46;
+  --correct-soft:#E7F3EB;
+  --incorrect:#B3341F;
+  --incorrect-soft:#FBEAE6;
+  --flag:#B7862C;
+  --flag-soft:#FBF1DA;
+  --unanswered:#9A9486;
+  --cream:#F4F2E8;
+  --diagram-bg:#FBFAF6;
+  --fontScale:1;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12161d;
+    --panel:#1b212b;
+    --border:#333c48;
+    --text:#e4e7ec;
+    --text-soft:#9aa5b3;
+    --navy:#7fb0e0;
+    --accent:#7fb0e0;
+    --accent2:#8ec1f2;
+    --accent-soft:#1c2b3d;
+    --correct:#7fd0a0;
+    --correct-soft:#173323;
+    --incorrect:#f0958a;
+    --incorrect-soft:#33201d;
+    --flag:#e3bd74;
+    --flag-soft:#332a17;
+    --unanswered:#8b93a0;
+    --cream:#232922;
+    --diagram-bg:#181e27;
+  }
+  .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Sarabun',"Segoe UI",sans-serif;
+  background:var(--paper);
+  color:var(--text);
+}
+header{
+  background:var(--navy-deep);
+  border-bottom:4px solid var(--flag);
+  box-shadow:0 2px 10px rgba(15,39,64,0.25);
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+header h1{
+  font-size:18px;
+  margin:0;
+  color:#F2EFE6;
+  font-weight:700;
+}
+header .subtitle{
+  font-size:12.5px;
+  color:#C9C2AE;
+  margin-top:2px;
+}
+.back-to-index{
+  display:inline-block;
+  font-size:12px;
+  color:#C9DCF0;
+  text-decoration:none;
+  margin-bottom:6px;
+  opacity:0.85;
+}
+.back-to-index:hover{opacity:1;text-decoration:underline;}
+@media print{.back-to-index{display:none;}}
+.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.layout{
+  display:flex;
+  max-width:1200px;
+  margin:0 auto;
+  gap:20px;
+  padding:20px;
+}
+.sidebar{width:250px;flex-shrink:0;}
+.sidebar-panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:16px;
+  position:sticky;
+  top:80px;
+  box-shadow:0 2px 8px rgba(15,39,64,0.06);
+  max-height:calc(100vh - 100px);
+  overflow-y:auto;
+}
+.sidebar-panel summary{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-soft);
+  margin:0 0 10px 0;
+  font-weight:600;
+  cursor:pointer;
+  user-select:none;
+}
+.toc-list{list-style:none;margin:0;padding:0;}
+.toc-list li{margin-bottom:2px;}
+.toc-list a{
+  display:block;
+  padding:7px 10px;
+  border-radius:4px;
+  color:var(--text);
+  text-decoration:none;
+  font-size:13px;
+  border-left:3px solid transparent;
+}
+.toc-list a:hover{background:var(--accent-soft);color:var(--accent2);}
+.toc-list a.active{background:var(--accent-soft);color:var(--navy);border-left:3px solid var(--navy);font-weight:600;}
+main{flex:1;min-width:0;}
+.section-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:0 2px 10px rgba(15,39,64,0.06);
+  scroll-margin-top:80px;
+}
+.section-card h2{
+  margin:0 0 14px 0;
+  font-size:18px;
+  color:var(--navy-deep);
+  padding-bottom:10px;
+  border-bottom:2px solid var(--border);
+}
+.section-card h3{
+  font-size:15px;
+  color:var(--navy);
+  margin:20px 0 10px 0;
+}
+.section-card .body-text{
+  font-size:14.5px;
+  line-height:1.9;
+  white-space:pre-wrap;
+}
+.callout{
+  margin:16px 0;
+  padding:14px 16px;
+  border-radius:6px;
+  border-left:4px solid;
+  font-size:14px;
+  line-height:1.8;
+  white-space:pre-wrap;
+}
+.callout-note{background:var(--accent-soft);border-color:var(--accent2);}
+.callout-example{background:var(--cream);border-color:var(--flag);}
+.callout-warning{background:var(--incorrect-soft);border-color:var(--incorrect);}
+.callout-formula{
+  background:var(--navy-deep);
+  color:#EAF1FA;
+  border-color:var(--flag);
+  font-family:'JetBrains Mono',monospace;
+  overflow-x:auto;
+}
+.callout-title{
+  font-weight:700;
+  font-size:12.5px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:8px;
+  display:block;
+  white-space:normal;
+}
+.callout code, .body-text code{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.92em;
+  background:rgba(127,127,127,0.16);
+  padding:1px 5px;
+  border-radius:3px;
+}
+.callout-note .callout-title{color:var(--accent2);}
+.callout-example .callout-title{color:var(--flag);}
+.callout-warning .callout-title{color:var(--incorrect);}
+.callout-formula .callout-title{color:#C9DCF0;}
+.image-block{
+  margin:18px 0;
+  text-align:center;
+}
+.image-block img{
+  max-width:100%;
+  height:auto;
+  border-radius:6px;
+  border:1px solid var(--border);
+  box-shadow:0 2px 10px rgba(15,39,64,0.08);
+}
+.image-block .image-caption{
+  font-size:12.5px;
+  color:var(--text-soft);
+  margin-top:8px;
+  font-style:italic;
+}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13.5px;}
+table th{background:var(--navy-deep);color:#F2EFE6;padding:9px 12px;text-align:left;}
+table td{padding:8px 12px;border-bottom:1px solid var(--border);}
+table tr:nth-child(even) td{background:var(--cream);}
+@media (max-width:800px){
+  .layout{flex-direction:column;}
+  .sidebar{width:100%;}
+  .sidebar-panel{position:static;max-height:none;}
+}
+@media print{
+  header .header-actions, .sidebar, #readProgress, #backToTop, .diagram-play-btn{display:none !important;}
+  .layout{display:block;padding:0;max-width:100%;}
+  main{width:100%;}
+  header{position:static;box-shadow:none;}
+  .section-card{opacity:1 !important;transform:none !important;box-shadow:none;border:1px solid #ccc;break-inside:avoid;}
+  body{background:#fff;}
+}
+
+</style>
+<style>
+
+/* ===== Readability & diagram enhancements ===== */
+#readProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--flag),var(--accent2));width:0%;z-index:999;transition:width .12s ease;}
+
+#backToTop{
+  position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;
+  background:var(--navy-deep);color:#F2EFE6;border:none;cursor:pointer;font-size:18px;
+  box-shadow:0 4px 14px rgba(15,39,64,0.3);display:none;align-items:center;justify-content:center;
+  z-index:998;opacity:0;transition:opacity .2s ease, transform .2s ease;
+}
+#backToTop:hover{transform:translateY(-2px);}
+#backToTop.show{display:flex;opacity:1;}
+
+#fontCtrl{display:flex;gap:6px;align-items:center;}
+#fontCtrl button{
+  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
+  width:32px;height:32px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:700;
+  font-family:'Sarabun',sans-serif;
+}
+#fontCtrl button:hover{background:#fff;}
+
+.read-time-badge{
+  font-size:11.5px;color:#C9C2AE;background:rgba(255,255,255,0.08);padding:5px 10px;border-radius:20px;
+  border:1px solid rgba(242,239,230,0.25);white-space:nowrap;
+}
+
+.section-card{opacity:0;transform:translateY(14px);transition:opacity .55s ease, transform .55s ease;}
+.section-card.revealed{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion: reduce){
+  .section-card{opacity:1;transform:none;transition:none;}
+}
+
+.section-card .body-text{font-size:calc(14.5px * var(--fontScale)) !important;}
+.section-card h2{font-size:calc(18px * var(--fontScale)) !important;}
+.section-card h3{font-size:calc(15px * var(--fontScale)) !important;}
+.callout{font-size:calc(14px * var(--fontScale)) !important;}
+table{font-size:calc(13.5px * var(--fontScale)) !important;}
+
+.callout-note .callout-title::before{content:"📝 ";}
+.callout-example .callout-title::before{content:"💡 ";}
+.callout-warning .callout-title::before{content:"⚠️ ";}
+.callout-formula .callout-title::before{content:"∑ ";}
+
+/* ==== Animated sequence / flow diagrams ==== */
+.diagram-block{
+  margin:20px 0;padding:16px 18px 14px;background:var(--diagram-bg);border:1px solid var(--border);
+  border-radius:8px;
+}
+.diagram-block h4{
+  margin:0 0 12px 0;font-size:calc(14.5px * var(--fontScale));color:var(--navy-deep);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.diagram-play-btn{
+  border:1.5px solid var(--accent2);background:#fff;color:var(--accent2);padding:5px 12px;
+  border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;
+  flex-shrink:0;
+}
+.diagram-play-btn:hover{background:var(--accent-soft);}
+.diagram-svg-wrap{overflow-x:auto;}
+.diagram-svg{display:block;margin:0 auto;min-width:420px;}
+.diagram-actor-label{font-family:'Sarabun',sans-serif;font-size:11.5px;font-weight:600;fill:var(--navy-deep);}
+.diagram-lifeline{stroke:var(--border);stroke-width:1.5;stroke-dasharray:3,3;}
+.diagram-node-box{fill:var(--panel);stroke:var(--navy);stroke-width:1.3;}
+.diagram-arrow-path{fill:none;stroke:var(--accent2);stroke-width:2;marker-end:url(#arrowhead);}
+.diagram-arrow-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;fill:var(--navy-deep);}
+.diagram-glow-dot{fill:var(--flag);filter:url(#glowFilter);opacity:0;}
+.diagram-steps-list{list-style:none;margin:12px 0 0;padding:0;font-size:calc(13px * var(--fontScale));line-height:1.7;}
+.diagram-steps-list li{padding:6px 10px;border-left:3px solid transparent;border-radius:4px;transition:background .3s ease, border-color .3s ease;}
+.diagram-steps-list li.step-active{background:var(--accent-soft);border-left-color:var(--flag);}
+.diagram-steps-list .step-num{
+  display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;
+  text-align:center;line-height:20px;font-size:11px;margin-right:8px;font-family:'JetBrains Mono',monospace;
+}
+
+</style>
+</head>
+<body>
+<div id="readProgress"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#2B6CB0"></path></marker>
+<filter id="glowFilter" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+</defs>
+</svg>
+
+<header>
+  <div>
+    <a class="back-to-index" href="index.html">&larr; สารบัญทั้งหมด / All Chapters</a>
+    <h1>Chapter 8: Security</h1>
+    <div class="subtitle">Computer Networking: A Top-Down Approach (8th ed.) — Kurose & Ross | บทที่ 8: ความปลอดภัยของเครือข่าย</div>
+  </div>
+  <div class="header-actions">
+    <span class="read-time-badge" id="readTimeBadge"></span>
+    <div id="fontCtrl">
+      <button id="fontMinus" title="ลดขนาดตัวอักษร / Decrease font size">A&minus;</button>
+      <button id="fontPlus" title="เพิ่มขนาดตัวอักษร / Increase font size">A+</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="sidebar">
+    <details class="sidebar-panel" id="tocPanel" open>
+      <summary>สารบัญ / Contents</summary>
+      <ul class="toc-list" id="tocList"></ul>
+    </details>
+  </div>
+  <main id="mainArea"></main>
+</div>
+
+<button id="backToTop" title="กลับขึ้นด้านบน / Back to top">&uarr;</button>
+
+<script>
+const SECTIONS = [{"title": "Network Security คืออะไร", "body": "Network security ครอบคลุมเป้าหมายหลัก 4 ประการ ที่ต้องทำให้ได้พร้อมกันในการสื่อสารที่ \"ปลอดภัย\" ระหว่างสองฝ่าย", "blocks": [{"type": "table", "content": "<table><tr><th>เป้าหมาย</th><th>ความหมาย</th></tr><tr><td>Confidentiality (การรักษาความลับ)</td><td>มีเพียงผู้ส่งและผู้รับที่ตั้งใจเท่านั้นที่ \"เข้าใจ\" เนื้อหาข้อความได้ — ผู้ส่งเข้ารหัส (encrypt), ผู้รับถอดรหัส (decrypt)</td></tr><tr><td>Authentication (การพิสูจน์ตัวตน)</td><td>ผู้ส่งและผู้รับต้องการยืนยันตัวตนของกันและกัน</td></tr><tr><td>Message Integrity (ความถูกต้องของข้อความ)</td><td>ผู้ส่งและผู้รับต้องการมั่นใจว่าข้อความไม่ถูกเปลี่ยนแปลง (ระหว่างทาง หรือภายหลัง) โดยไม่มีการตรวจพบ</td></tr><tr><td>Access and Availability (การเข้าถึงและความพร้อมใช้งาน)</td><td>บริการต้องเข้าถึงได้และพร้อมใช้งานสำหรับผู้ใช้ที่ถูกต้อง</td></tr></table>"}, {"type": "subheading", "content": "Alice, Bob และ Trudy: ตัวละครมาตรฐานของวงการ Security"}, {"type": "note", "content": "**Bob และ Alice** (คู่รัก) ต้องการสื่อสารกันอย่าง \"ปลอดภัย\" ผ่าน channel ที่มี **Trudy** (ผู้บุกรุก) คอยดักฟัง ลบ หรือแทรกข้อความได้\n\n**ในโลกจริง Bob/Alice คือใครได้บ้าง?**: web browser/server สำหรับธุรกรรมออนไลน์, client/server ของธนาคารออนไลน์, DNS server, router ที่แลกเปลี่ยนข้อมูล BGP routing table — โดยพื้นฐานแล้วคือคู่สื่อสารใดๆ ก็ตามในเครือข่าย"}, {"type": "subheading", "content": "\"คนร้าย\" ทำอะไรได้บ้าง?"}, {"type": "table", "content": "<table><tr><th>ประเภทการโจมตี</th><th>รายละเอียด</th></tr><tr><td>Eavesdrop</td><td>ดักฟัง/สกัดกั้นข้อความ</td></tr><tr><td>Active insertion</td><td>แทรกข้อความเข้าไปใน connection โดยตรง</td></tr><tr><td>Impersonation</td><td>ปลอมแปลง (spoof) source address ใน packet (หรือ field ใดๆ ก็ได้ใน packet)</td></tr><tr><td>Hijacking</td><td>\"ยึด\" connection ที่กำลังดำเนินอยู่ โดยตัดผู้ส่ง/ผู้รับออกแล้วสวมรอยแทนที่</td></tr><tr><td>Denial of Service</td><td>ทำให้บริการไม่สามารถถูกใช้งานโดยผู้อื่นได้ (เช่น ทำให้ resource overload)</td></tr></table>"}]}, {"title": "หลักการของ Cryptography", "body": "Cryptography เป็นรากฐานของ network security เกือบทุกด้าน — เริ่มจากภาษาพื้นฐานและวิธีการโจมตี ก่อนเข้าสู่ symmetric key cryptography", "blocks": [{"type": "subheading", "content": "ภาษาพื้นฐานของ Cryptography"}, {"type": "note", "content": "$m$ = plaintext message (ข้อความต้นฉบับ), $K_A(m)$ = ciphertext ที่เข้ารหัสด้วย key $K_A$ — ความสัมพันธ์พื้นฐาน: $m = K_B(K_A(m))$ (ถอดรหัสด้วย key ที่ถูกต้องแล้วได้ข้อความเดิมกลับคืนมา)"}, {"type": "subheading", "content": "วิธีการโจมตีระบบเข้ารหัส (Breaking an Encryption Scheme)"}, {"type": "table", "content": "<table><tr><th>ประเภทการโจมตี</th><th>รายละเอียด</th></tr><tr><td>Cipher-text only attack</td><td>Trudy มีแค่ ciphertext ให้วิเคราะห์ — ใช้ **brute force** (ลองทุก key) หรือ **statistical analysis**</td></tr><tr><td>Known-plaintext attack</td><td>Trudy มี plaintext ที่ตรงกับ ciphertext — เช่นใน monoalphabetic cipher สามารถหาคู่ตัวอักษรที่ถูกแทนที่ได้จากตัวอย่างที่รู้</td></tr><tr><td>Chosen-plaintext attack</td><td>Trudy สามารถเลือก plaintext และรับ ciphertext ที่สอดคล้องกลับมาได้</td></tr></table>"}, {"type": "subheading", "content": "Symmetric Key Cryptography"}, {"type": "note", "content": "Bob และ Alice **ใช้ key เดียวกัน** ($K_S$) ทั้งเข้ารหัสและถอดรหัส — คำถามสำคัญ: **Bob กับ Alice จะตกลง key ร่วมกันได้อย่างไร** (โดยเฉพาะถ้าไม่เคยพบกันมาก่อน)?"}, {"type": "example", "content": "**Monoalphabetic substitution cipher**: แทนที่ตัวอักษรแต่ละตัวด้วยตัวอักษรอื่นตามตารางคงที่\n```\nplaintext:  abcdefghijklmnopqrstuvwxyz\nciphertext: mnbvcxzasdfghjklpoiuytrewq\n```\nเช่น \"bob. i love you. alice\" → \"nkn. s gktc wky. mgsbc\"\n\n**Polyalphabetic cipher (ซับซ้อนกว่า)**: ใช้ substitution cipher หลายชุด ($M_1, M_2, ..., M_n$) สลับกันเป็นวงจร เช่น $n=4$: ใช้ $M_1, M_3, M_4, M_3, M_2$ วนซ้ำไปเรื่อยๆ ทำให้ตัวอักษรเดียวกันในตำแหน่งต่างกันถูกแทนที่ต่างกัน (ยากต่อการวิเคราะห์ทางสถิติมากกว่า monoalphabetic)"}, {"type": "subheading", "content": "DES และ AES: มาตรฐาน Symmetric Key จริงในปัจจุบัน"}, {"type": "table", "content": "<table><tr><th>มาตรฐาน</th><th>รายละเอียด</th></tr><tr><td>DES (Data Encryption Standard)</td><td>มาตรฐานสหรัฐฯ [NIST 1993] — key แบบ symmetric 56 บิต, input แบบ plaintext 64 บิต — เป็น block cipher พร้อม cipher block chaining — DES Challenge แสดงว่าถอดรหัสด้วย brute force ได้ในเวลาไม่ถึง 1 วัน (ไม่มี known good analytic attack) — **3DES**: เข้ารหัส 3 ครั้งด้วย 3 key ต่างกัน เพื่อเพิ่มความปลอดภัย</td></tr><tr><td>AES (Advanced Encryption Standard)</td><td>มาตรฐาน NIST ที่แทนที่ DES (พ.ย. 2001) — ประมวลผลข้อมูลเป็น block ขนาด 128 บิต, ใช้ key ขนาด 128/192/256 บิต — **การ brute-force ที่ใช้เวลา 1 วินาทีบน DES จะใช้เวลาถึง 149 ล้านล้านปีบน AES!**</td></tr></table>"}]}, {"title": "Public Key Cryptography และ RSA", "body": "**Public key cryptography** [Diffie-Hellman 1976, RSA 1978] เป็นแนวทางที่**แตกต่างอย่างสิ้นเชิง**จาก symmetric key — ปฏิวัติวงการ cryptography ที่มีอายุกว่า 2,000 ปีที่เคยพึ่ง symmetric key เพียงอย่างเดียว", "blocks": [{"type": "subheading", "content": "หลักการของ Public Key Cryptography"}, {"type": "note", "content": "ผู้ส่งและผู้รับ**ไม่ต้องแชร์ secret key ร่วมกัน**: **public encryption key** ($K_B^+$) เปิดเผยให้ทุกคนรู้ได้, **private decryption key** ($K_B^-$) รู้เฉพาะผู้รับเท่านั้น\n\nความสัมพันธ์: $m = K_B^-(K_B^+(m))$ — เข้ารหัสด้วย public key ของ Bob, ถอดรหัสได้เฉพาะด้วย private key ของ Bob เท่านั้น"}, {"type": "formula", "label": "ข้อกำหนดของ Public Key Algorithm", "content": "ต้องการฟังก์ชัน $K_B^+()$ และ $K_B^-()$ ที่ทำให้:\n\n1. $K_B^-(K_B^+(m)) = m$\n2. เมื่อรู้ public key $K_B^+$ แล้ว **เป็นไปไม่ได้ในทางปฏิบัติ**ที่จะคำนวณหา private key $K_B^-$\n\n**RSA** (Rivest, Shamir, Adleman) คืออัลกอริทึมที่โด่งดังที่สุดที่ตอบโจทย์นี้ได้"}, {"type": "formula", "label": "พื้นฐาน: Modular Arithmetic", "content": "$x \\bmod n$ = เศษที่เหลือเมื่อหาร $x$ ด้วย $n$\n\nคุณสมบัติสำคัญ:\n$$[(a \\bmod n) + (b \\bmod n)] \\bmod n = (a+b) \\bmod n$$\n$$[(a \\bmod n) \\times (b \\bmod n)] \\bmod n = (a \\times b) \\bmod n$$\n$$\\text{ดังนั้น: } (a \\bmod n)^d \\bmod n = a^d \\bmod n$$\n\n**ตัวอย่าง**: $x=14, n=10, d=2$: $(x \\bmod n)^d \\bmod n = 4^2 \\bmod 10 = 6$ และ $x^d = 14^2 = 196$, $196 \\bmod 10 = 6$ — ตรงกัน!"}, {"type": "formula", "label": "ขั้นตอนการสร้าง RSA Key Pair", "content": "1. เลือกจำนวนเฉพาะขนาดใหญ่ 2 ตัว $p, q$ (เช่น 1024 บิตแต่ละตัว)\n2. คำนวณ $n = pq$, $z = (p-1)(q-1)$\n3. เลือก $e$ (โดย $e<n$) ที่ **ไม่มีตัวประกอบร่วม**กับ $z$ (\"relatively prime\")\n4. เลือก $d$ ที่ทำให้ $ed-1$ หารด้วย $z$ ลงตัวพอดี (กล่าวคือ $ed \\bmod z = 1$)\n5. **Public key** = $(n,e)$ — **Private key** = $(n,d)$"}, {"type": "formula", "label": "การเข้ารหัส/ถอดรหัสด้วย RSA", "content": "**เข้ารหัส** ข้อความ $m$ (โดย $m<n$): $$c = m^e \\bmod n$$\n**ถอดรหัส** ค่าที่ได้รับ $c$: $$m = c^d \\bmod n$$"}, {"type": "example", "content": "**ตัวอย่างเต็ม**: Bob เลือก $p=5, q=7$ → $n=35, z=24$ → $e=5$ (relatively prime กับ 24) → $d=29$ (เพราะ $ed-1 = 144$ หารด้วย 24 ลงตัวพอดี)\n\nเข้ารหัสข้อความ 8-bit: $m = 12$ (bit pattern `0000l000`) → $c = 12^5 \\bmod 35 = 17$\n\nถอดรหัส: $c=17$ → $m = 17^{29} \\bmod 35 = 12$ ✓ ได้ข้อความเดิมกลับคืนมา"}, {"type": "warning", "content": "**ทำไม RSA ปลอดภัย?** เมื่อรู้ public key $(n,e)$ ของ Bob แล้ว การหา $d$ ต้องอาศัยการ**แยกตัวประกอบ $n$**กลับเป็น $p$ และ $q$ — และ **การแยกตัวประกอบของเลขจำนวนมากๆ เป็นปัญหาที่ยากมาก** (ในทางคำนวณ) นี่คือรากฐานความปลอดภัยของ RSA ทั้งหมด"}, {"type": "subheading", "content": "คุณสมบัติพิเศษของ RSA และการใช้งานจริง"}, {"type": "note", "content": "**คุณสมบัติสำคัญ**: $K_B^-(K_B^+(m)) = K_B^+(K_B^-(m))$ — ใช้ private key ก่อนแล้วตามด้วย public key ให้ผลลัพธ์**เดียวกัน**กับใช้ public key ก่อนแล้วตามด้วย private key! (พิสูจน์ได้จาก modular arithmetic โดยตรง) คุณสมบัตินี้เป็นรากฐานสำคัญของ **digital signature**\n\n**RSA ในทางปฏิบัติ — Session Key**: การยกกำลัง (exponentiation) ใน RSA ใช้การคำนวณหนักมาก — **DES เร็วกว่า RSA อย่างน้อย 100 เท่า** — วิธีแก้: ใช้ public key crypto เพื่อสร้าง connection ที่ปลอดภัยก่อน แล้วแลกเปลี่ยน **session key** ($K_S$) แบบ symmetric สำหรับเข้ารหัสข้อมูลจริง — Bob และ Alice ใช้ RSA แลกเปลี่ยน $K_S$ กัน จากนั้นทั้งคู่ใช้ symmetric key cryptography ที่เร็วกว่ามากในการสื่อสารข้อมูลปริมาณมาก"}]}, {"title": "Authentication: การพิสูจน์ตัวตน", "body": "เป้าหมาย: Bob ต้องการให้ Alice \"พิสูจน์\" ตัวตนของเธอ — บทนี้พัฒนา protocol ทีละขั้น โดยแต่ละเวอร์ชันแก้ปัญหาของเวอร์ชันก่อนหน้า แต่ก็เผยจุดอ่อนใหม่", "blocks": [{"type": "table", "content": "<table><tr><th>Protocol</th><th>วิธีการ</th><th>จุดอ่อน</th></tr><tr><td>ap1.0</td><td>Alice พูดว่า \"I am Alice\" เฉยๆ</td><td>Bob มองไม่เห็น Alice จริงๆ ในเครือข่าย — Trudy แค่ประกาศตัวว่าเป็น Alice ก็หลอกได้</td></tr><tr><td>ap2.0</td><td>Alice ส่ง \"I am Alice\" พร้อม source IP address ของตัวเอง</td><td>Trudy สร้าง packet ปลอม (spoof) IP address ของ Alice ได้ง่ายๆ</td></tr><tr><td>ap3.0</td><td>Alice ส่ง \"I am Alice\" พร้อมรหัสผ่านลับ (password) เพื่อ \"พิสูจน์\"</td><td>**Playback attack**: Trudy บันทึก packet ของ Alice ไว้ แล้วนำมาเล่นซ้ำ (replay) ให้ Bob ทีหลัง</td></tr><tr><td>ap3.0 (แก้ไข)</td><td>เข้ารหัส password ก่อนส่ง</td><td>**Playback attack ยังคงใช้ได้ผล!** เพราะ Trudy แค่บันทึก ciphertext ที่เข้ารหัสแล้วไว้ ไม่จำเป็นต้องรู้ password จริงๆ ก็เล่นซ้ำได้</td></tr></table>"}, {"type": "subheading", "content": "ap4.0: แก้ปัญหา Playback ด้วย Nonce"}, {"type": "note", "content": "**Nonce**: ตัวเลข ($R$) ที่ใช้เพียง**ครั้งเดียวในชีวิต** — protocol ap4.0: เพื่อพิสูจน์ว่า Alice \"มีตัวตนจริงในขณะนี้\" (live) Bob ส่ง nonce $R$ ให้ Alice — Alice ต้องส่ง $R$ กลับมาโดยเข้ารหัสด้วย **shared secret key**: $K_{A-B}(R)$\n\nBob จึงมั่นใจว่า Alice \"live\" อยู่จริง และมีเพียง Alice เท่านั้นที่รู้ key สำหรับเข้ารหัส nonce นี้ได้ — **ต้องอาศัย shared symmetric key** ระหว่างสองฝ่ายเป็นเงื่อนไขเบื้องต้น"}, {"type": "subheading", "content": "ap5.0: ใช้ Public Key Cryptography แทน — และช่องโหว่ Man-in-the-Middle"}, {"type": "note", "content": "ap5.0 ใช้ nonce ร่วมกับ public key cryptography แทน symmetric key: Bob คำนวณ $K_A^+(K_A^-(R)) = R$ และรู้ว่ามีเพียง Alice เท่านั้นที่ครอบครอง private key ที่เข้ารหัส $R$ ในลักษณะนี้ได้"}, {"type": "warning", "content": "**Man-in-the-Middle Attack**: Trudy สามารถสวมรอยเป็น Alice (กับ Bob) และสวมรอยเป็น Bob (กับ Alice) **พร้อมกัน**ได้ — Trudy ดักจับการสื่อสารทั้งสองทาง ใช้ public key ของตัวเองแทนที่ public key ของ Alice/Bob จริง โดยที่ทั้งสองฝ่ายไม่รู้ตัวเลย — ผลคือ Trudy สามารถอ่าน (และแก้ไข) ข้อความทั้งหมดที่ Bob กับ Alice \"คิดว่า\" กำลังส่งถึงกันโดยตรง — **ปัญหารากฐาน**: Bob และ Alice ไม่มีทางยืนยันได้ว่า public key ที่ได้รับมานั้นเป็นของอีกฝ่ายจริงๆ (ไม่ใช่ของ Trudy) — นี่คือเหตุผลที่ต้องมี **certificate** และ **Certification Authority (CA)**"}, {"type": "diagram", "layout": "lifeline", "title": "ช่องโหว่ Man-in-the-Middle ใน ap5.0", "actors": ["Alice", "Trudy\n(ผู้ร้าย)", "Bob"], "steps": [{"from": 0, "to": 1, "label": "ส่ง Public Key (คิดว่าส่งให้ Bob)", "note": "Trudy ดักกลางทาง"}, {"from": 1, "to": 2, "label": "ส่ง Public Key ของตัวเอง", "note": "แอบอ้างเป็น Alice"}, {"from": 2, "to": 1, "label": "เข้ารหัสข้อความด้วย Key ของ Trudy", "note": "Bob ไม่รู้ว่าถูกสวมรอย"}, {"from": 1, "to": 0, "label": "ดักอ่านแล้วส่งต่อ", "note": "Trudy อ่านข้อความได้ทั้งหมดโดยทั้งคู่ไม่รู้ตัว"}]}]}, {"title": "Digital Signatures และ Message Digests", "body": "**Digital signature** เป็นเทคนิคทาง cryptography ที่คล้ายลายเซ็นเขียนด้วยมือ: ผู้ส่งเซ็นเอกสารเพื่อยืนยันว่าตนเป็นเจ้าของ/ผู้สร้าง — สามารถ**พิสูจน์และห้ามปฏิเสธได้ (verifiable, nonforgeable)**", "blocks": [{"type": "subheading", "content": "หลักการพื้นฐานของ Digital Signature"}, {"type": "note", "content": "Bob เซ็นข้อความ $m$ โดยเข้ารหัสด้วย **private key ของตัวเอง**: $K_B^-(m)$ — สร้างเป็น \"signed message\"\n\n**การตรวจสอบของ Alice**: เมื่อได้รับ $m$ พร้อมลายเซ็น $K_B^-(m)$ Alice ใช้ **public key ของ Bob** ($K_B^+$) มาถอดรหัสลายเซ็น แล้วเช็คว่า $K_B^+(K_B^-(m)) = m$ หรือไม่\n\n**ถ้าตรงกัน** Alice จึงมั่นใจว่า: (1) Bob เซ็น $m$ จริง (2) ไม่มีใครอื่นเซ็น $m$ ได้ (3) Bob เซ็น $m$ ไม่ใช่ $m'$ อื่น — **Non-repudiation**: Alice สามารถนำ $m$ และลายเซ็น $K_B^-(m)$ ไปฟ้องศาลเพื่อพิสูจน์ว่า Bob เป็นผู้เซ็นจริงได้ (Bob ปฏิเสธไม่ได้)"}, {"type": "subheading", "content": "Message Digest: ลดต้นทุนการเข้ารหัส"}, {"type": "note", "content": "การเข้ารหัสข้อความยาวๆ ด้วย public key นั้น**ใช้การคำนวณหนักมาก** — เป้าหมาย: สร้าง \"ลายนิ้วมือดิจิทัล\" (digital fingerprint) ที่มีความยาวคงที่และคำนวณง่าย — ใช้ **hash function** $H$ กับข้อความ $m$ ได้ **message digest** $H(m)$ ความยาวคงที่"}, {"type": "table", "content": "<table><tr><th>คุณสมบัติของ Hash Function</th></tr><tr><td>Many-to-1 (หลายข้อความอาจ hash ได้ค่าเดียวกัน)</td></tr><tr><td>สร้าง message digest ที่มีขนาดคงที่เสมอ</td></tr><tr><td>เมื่อรู้ค่า message digest $x$ **เป็นไปไม่ได้ในทางคำนวณ**ที่จะหาข้อความ $m$ ที่ทำให้ $x = H(m)$</td></tr></table>"}, {"type": "warning", "content": "**Internet checksum เป็น crypto hash function ที่ \"อ่อนแอ\"**: มีคุณสมบัติบางอย่างคล้าย hash function (ความยาวคงที่, many-to-one) แต่**หาข้อความอื่นที่มี checksum เดียวกันได้ง่ายมาก** — ตัวอย่าง: ข้อความ \"IOU900.19BOB\" กับ \"IOU100.99BOB\" (ค่าต่างกันมาก แต่ตัวเลขบางตำแหน่งบวก/ลบชดเชยกันพอดี) ให้ **checksum เดียวกันทุกประการ** — Internet checksum จึง**ใช้เป็น cryptographic hash function ไม่ได้** ต้องใช้ hash function ที่แข็งแรงกว่า เช่น MD5 หรือ SHA-1"}, {"type": "subheading", "content": "Digital Signature = Signed Message Digest"}, {"type": "note", "content": "แนวทางจริงในทางปฏิบัติ: Bob **ไม่เข้ารหัสข้อความทั้งหมด** แต่เข้ารหัสเฉพาะ **message digest** เท่านั้น\n\n**ฝั่งส่ง (Bob)**: คำนวณ $H(m)$ → เข้ารหัสด้วย private key ได้ $K_B^-(H(m))$ (ลายเซ็นดิจิทัล) → ส่งทั้ง $m$ (plaintext) และลายเซ็นไปด้วยกัน\n\n**ฝั่งรับ (Alice)**: คำนวณ $H(m)$ ของข้อความที่ได้รับเอง → ถอดรหัสลายเซ็นด้วย public key ของ Bob ได้ $H(m)$ ที่ Bob ส่งมา → **เทียบสองค่านี้** ถ้าตรงกัน แสดงว่าข้อความไม่ถูกแก้ไข และมาจาก Bob จริง\n\n**Hash function algorithm ที่นิยมใช้**: **MD5** [RFC 1321] คำนวณ message digest 128 บิตผ่านกระบวนการ 4 ขั้นตอน (ยากที่จะสร้างข้อความอื่นที่มี MD5 hash เดียวกันกับค่าที่กำหนด) — **SHA-1** [NIST FIPS PUB 180-1] มาตรฐานสหรัฐฯ ให้ message digest 160 บิต"}, {"type": "subheading", "content": "การแก้ไข ap5.0: ทำไม Digital Signature ยังไม่พอ?"}, {"type": "warning", "content": "แม้จะมี digital signature แล้ว **Man-in-the-Middle attack ยังคงเกิดขึ้นได้** ถ้า Bob/Alice ไม่มีทางยืนยันได้ว่า public key ที่ได้รับมาเป็นของอีกฝ่ายจริง (ไม่ใช่ของ Trudy) — ปัญหานี้ยังไม่ถูกแก้ด้วยตัว digital signature เอง"}, {"type": "subheading", "content": "ความจำเป็นของ Certified Public Key"}, {"type": "example", "content": "**\"Pizza Prank\" — ตัวอย่างสถานการณ์จริง**: Trudy สร้างอีเมลสั่งพิซซ่าปลอมในนาม Bob (\"กรุณาส่งเปปเปอโรนี 4 ถาดมาให้ผม ขอบคุณ Bob\") แล้ว**เซ็นด้วย private key ของ Trudy เอง** จากนั้นส่ง **public key ของ Trudy** ไปให้ร้านพิซซ่าโดยอ้างว่าเป็น public key ของ Bob — ร้านพิซซ่าตรวจสอบลายเซ็นแล้วเชื่อว่าถูกต้อง (เพราะใช้ public key ที่ Trudy ส่งมาตรวจสอบ ซึ่งตรงกับลายเซ็นของ Trudy เองพอดี) → ส่งพิซซ่า 4 ถาดไปให้ Bob ทั้งที่ **Bob ไม่ชอบเปปเปอโรนีด้วยซ้ำ**\n\nนี่แสดงให้เห็นว่า **การมี digital signature เพียงอย่างเดียวไม่พอ** — ต้องมีวิธีที่**เชื่อถือได้**ในการยืนยันว่า public key ใดเป็นของใครจริงๆ"}, {"type": "subheading", "content": "Certification Authority (CA): ผู้รับรอง Public Key"}, {"type": "note", "content": "**CA**: หน่วยงานที่**ผูก public key เข้ากับตัวตนที่เฉพาะเจาะจง** ($E$)\n\n**กระบวนการ**:\n1. entity (บุคคล, เว็บไซต์, router) ลงทะเบียน public key กับ CA พร้อม \"หลักฐานยืนยันตัวตน\"\n2. CA สร้าง **certificate** ที่ผูกตัวตน $E$ เข้ากับ public key ของ $E$\n3. certificate ที่มี public key ของ $E$ ถูก**เซ็นด้วย private key ของ CA เอง**: CA \"รับรอง\" ว่า \"นี่คือ public key ของ $E$ จริง\"\n\n**เมื่อ Alice ต้องการ public key ของ Bob**: (1) ขอ certificate ของ Bob (จาก Bob เองหรือที่อื่น) (2) ใช้ **public key ของ CA** (ที่เชื่อถือได้อยู่แล้ว) มาตรวจสอบ certificate → ได้ public key ของ Bob ที่**ยืนยันแล้วว่าเป็นของจริง**"}, {"type": "diagram", "layout": "lifeline", "title": "Digital Signature: เซ็นและตรวจสอบ", "actors": ["ผู้ส่ง (Sender)", "ผู้รับ (Receiver)"], "steps": [{"from": 0, "to": 1, "label": "Message + Signed Digest", "note": "เซ็นด้วย Private Key ของผู้ส่ง"}, {"from": 1, "to": 0, "label": "Verified ✓ (ใช้ Public Key ของผู้ส่งตรวจสอบ)", "note": "ยืนยันว่าข้อความไม่ถูกแก้ไขและมาจากผู้ส่งจริง"}]}]}, {"title": "Secure E-mail: การผสมผสาน Confidentiality, Integrity, Authentication", "body": "การส่งอีเมลอย่างปลอดภัยต้องผสมผสานเทคนิคที่เรียนมาทั้งหมดเข้าด้วยกัน: symmetric key (สำหรับความเร็ว), public key (สำหรับแลกเปลี่ยน key และยืนยันตัวตน), และ hash function (สำหรับความถูกต้อง)", "blocks": [{"type": "subheading", "content": "Confidentiality เท่านั้น"}, {"type": "note", "content": "Alice ต้องการส่งอีเมลลับ $m$ ให้ Bob:\n\n1. Alice สร้าง **random symmetric key** ($K_S$)\n2. เข้ารหัสข้อความด้วย $K_S$: $K_S(m)$ (เพื่อความเร็ว)\n3. เข้ารหัส $K_S$ เองด้วย **public key ของ Bob**: $K_B^+(K_S)$\n4. ส่งทั้ง $K_S(m)$ และ $K_B^+(K_S)$ ไปให้ Bob\n\n**ฝั่ง Bob**: ใช้ private key ของตัวเองถอดรหัส $K_B^+(K_S)$ ได้ $K_S$ กลับมา → ใช้ $K_S$ ถอดรหัส $K_S(m)$ ได้ $m$ กลับคืนมา"}, {"type": "subheading", "content": "Integrity และ Authentication เท่านั้น"}, {"type": "note", "content": "Alice ต้องการให้ Bob มั่นใจว่าข้อความไม่ถูกแก้ไขและมาจาก Alice จริง (ไม่จำเป็นต้องลับ):\n\n1. Alice เซ็น hash ของข้อความด้วย private key ของตัวเอง: $K_A^-(H(m))$\n2. ส่งทั้งข้อความต้นฉบับ (แบบเปิดเผย/plaintext) และลายเซ็นไปพร้อมกัน\n\nวิธีนี้ให้ทั้ง**message integrity**และ**authentication** แต่**ไม่มี confidentiality** เลย"}, {"type": "subheading", "content": "รวมทั้ง 3 คุณสมบัติเข้าด้วยกัน"}, {"type": "note", "content": "เพื่อให้ได้ **confidentiality + integrity + authentication** ครบทั้งหมด Alice ใช้ **3 key**:\n\n1. **Private key ของ Alice**: เซ็น hash ของข้อความ $K_A^-(H(m))$\n2. ต่อข้อความต้นฉบับ $m$ เข้ากับลายเซ็นนี้\n3. **Symmetric key ใหม่ ($K_S$)**: เข้ารหัสข้อความ+ลายเซ็นทั้งหมดด้วย $K_S$\n4. **Public key ของ Bob**: เข้ารหัส $K_S$ ด้วย $K_B^+$\n\nฝั่ง Bob ทำขั้นตอนย้อนกลับตามลำดับ: ถอดรหัส $K_S$ ด้วย private key ตัวเอง → ถอดรหัสข้อความ+ลายเซ็นด้วย $K_S$ → ตรวจสอบลายเซ็นด้วย public key ของ Alice → เทียบ hash เพื่อยืนยัน integrity"}]}, {"title": "TLS: Transport Layer Security", "body": "**TLS** เป็น security protocol ที่ deploy อย่างแพร่หลายที่สุด อยู่เหนือ transport layer — รองรับโดยเกือบทุก browser/web server ผ่าน **https (port 443)**", "blocks": [{"type": "note", "content": "TLS ให้บริการครบทั้ง 3 ด้าน: **confidentiality** (ผ่าน symmetric encryption), **integrity** (ผ่าน cryptographic hashing), **authentication** (ผ่าน public key cryptography) — **ใช้เทคนิคทั้งหมดที่เรียนมาในบทนี้!**\n\n**ประวัติ**: เริ่มจากงานวิจัย secure network programming/secure sockets → **SSL (Secure Socket Layer)** ถูกเลิกใช้ (deprecated) ในปี 2015 → **TLS 1.3** [RFC 8446, 2018] คือมาตรฐานปัจจุบัน"}, {"type": "subheading", "content": "สร้าง Toy Protocol \"t-tls\" เพื่อเข้าใจว่าต้องการอะไรบ้าง"}, {"type": "table", "content": "<table><tr><th>ส่วนประกอบ</th><th>หน้าที่</th></tr><tr><td>Handshake</td><td>Alice, Bob ใช้ certificate และ private key เพื่อยืนยันตัวตนซึ่งกันและกัน แลกเปลี่ยนหรือสร้าง shared secret ร่วมกัน</td></tr><tr><td>Key derivation</td><td>ใช้ shared secret มาสร้างชุด key ต่างๆ ที่ต้องใช้</td></tr><tr><td>Data transfer</td><td>ส่งข้อมูลแบบ stream เป็นชุดของ \"record\" (ไม่ใช่แค่ transaction ครั้งเดียว)</td></tr><tr><td>Connection closure</td><td>มีข้อความพิเศษสำหรับปิด connection อย่างปลอดภัย</td></tr></table>"}, {"type": "subheading", "content": "t-tls Handshake และ 4 Cryptographic Keys"}, {"type": "note", "content": "**Handshake phase**: Bob สร้าง TCP connection กับ Alice → ยืนยันว่า Alice เป็น Alice จริง → Bob ส่ง **master secret key (MS)** ไปให้ Alice ซึ่งใช้สร้าง key อื่นๆ ทั้งหมดสำหรับ TLS session — **ปัญหา**: ต้องใช้ถึง 3 RTT ก่อนที่ client จะเริ่มรับข้อมูลได้ (รวม TCP handshake ด้วย)\n\n**หลักการ**: ไม่ควรใช้ key เดียวกันสำหรับหลายฟังก์ชัน cryptographic — ต้องมี key แยกสำหรับ MAC (Message Authentication Code) และ encryption **4 key**:\n- $K_c$: encryption key สำหรับข้อมูลจาก client→server\n- $M_c$: MAC key สำหรับข้อมูลจาก client→server\n- $K_s$: encryption key สำหรับข้อมูลจาก server→client\n- $M_s$: MAC key สำหรับข้อมูลจาก server→client\n\nทั้งหมดสร้างมาจาก **Key Derivation Function (KDF)** ที่รับ master secret (และอาจมีข้อมูลสุ่มเพิ่มเติม) มาสร้าง key ใหม่"}, {"type": "subheading", "content": "การเข้ารหัสข้อมูลแบบ Stream: Record"}, {"type": "warning", "content": "**ปัญหา**: TCP ให้บริการแบบ byte-stream ต่อเนื่อง — ถ้าเข้ารหัสข้อมูลแบบ in-stream แล้ว MAC ควรอยู่ตรงไหน? ถ้าอยู่ท้ายสุด **ไม่มี message integrity เลยจนกว่าข้อมูลทั้งหมดจะมาถึงและ connection ปิดแล้ว** — ทางแก้: แบ่ง stream เป็นชุดของ **\"record\"** แต่ละ record มี MAC (สร้างด้วย $M_c$) ของตัวเอง — ผู้รับสามารถประมวลผลแต่ละ record ได้ทันทีที่มาถึง (ไม่ต้องรอทั้งหมด)\n\n**การโจมตีที่อาจเกิดขึ้นกับ data stream**: **Re-ordering** (man-in-the-middle ดักจับ TCP segment แล้วสลับลำดับโดยแก้ sequence number ใน header ที่ไม่ได้เข้ารหัส), **Replay** — **ทางแก้**: ใช้ TLS sequence number (รวมเข้าไปใน MAC ด้วย) และใช้ nonce"}, {"type": "subheading", "content": "การปิด Connection อย่างปลอดภัย"}, {"type": "warning", "content": "**Truncation attack**: ผู้โจมตีปลอมแปลง TCP connection close segment ทำให้ฝ่ายใดฝ่ายหนึ่ง (หรือทั้งคู่) เข้าใจผิดว่าได้รับข้อมูลครบแล้ว ทั้งที่จริงยังไม่ครบ — **ทางแก้**: กำหนด record type แยกกัน (type 0 = data, type 1 = close) แล้วนำ **type เข้าไปคำนวณใน MAC ด้วย** (ร่วมกับ data และ sequence number) — ทำให้ปลอมแปลง close message ไม่ได้"}, {"type": "subheading", "content": "TLS 1.3: Cipher Suite และ Handshake"}, {"type": "note", "content": "**Cipher suite**: ชุด algorithm สำหรับ key generation, encryption, MAC, digital signature — TLS 1.3 (2018) มีตัวเลือกที่**จำกัดกว่า** TLS 1.2 (2008) มาก (เพียง 5 ตัวเลือกแทน 37 ตัวเลือก) — บังคับใช้ **Diffie-Hellman (DH)** สำหรับ key exchange (แทน DH หรือ RSA เดิม) — ใช้ **authenticated encryption** (รวม encryption + authentication เข้าด้วยกัน แทนการทำแยกกันตามลำดับ) — ส่วนใหญ่อิง AES และ HMAC ที่ใช้ SHA-256/384\n\n**TLS 1.3 Handshake ปกติ (1 RTT)**: (1) client ส่ง TLS hello พร้อมเดา key agreement protocol/parameter และระบุ cipher suite ที่รองรับ (2) server เลือก parameter/cipher suite แล้วส่ง server-signed certificate กลับมา (3) client ตรวจสอบ certificate, สร้าง key แล้วเริ่มส่ง application request ได้เลย (เช่น HTTPS GET)\n\n**TLS 1.3 Handshake แบบ 0-RTT (resumption)**: hello message เริ่มต้นมี **application data ที่เข้ารหัสแล้วแนบมาด้วยเลย** (สำหรับการเชื่อมต่อซ้ำกับ server เดิม) ใช้ \"resumption master secret\" จาก connection ก่อนหน้า — **เร็วกว่ามาก แต่เสี่ยงต่อ replay attack** จึงเหมาะกับ request ที่ไม่เปลี่ยน state ของ server เท่านั้น (เช่น HTTP GET ธรรมดา)"}, {"type": "diagram", "layout": "lifeline", "title": "TLS 1.3 Handshake แบบย่อ", "actors": ["Client", "Server"], "steps": [{"from": 0, "to": 1, "label": "Client Hello (Cipher Suites, Key Share)", "note": "เริ่มเจรจาการเข้ารหัส"}, {"from": 1, "to": 0, "label": "Server Hello + Certificate + Key Share", "note": "server เลือก cipher และส่ง certificate"}, {"from": 0, "to": 1, "label": "Finished", "note": "client ยืนยันพร้อมเข้ารหัส"}, {"from": 1, "to": 0, "label": "Finished", "note": "server ยืนยันกลับ เริ่มส่งข้อมูลแบบเข้ารหัส"}]}]}, {"title": "IPsec: Network-Layer Security", "body": "**IPsec** ให้บริการเข้ารหัส, authentication, และ integrity ระดับ**datagram** — ครอบคลุมทั้ง user traffic และ control traffic (เช่น BGP, DNS message)", "blocks": [{"type": "subheading", "content": "2 โหมดของ IPsec"}, {"type": "table", "content": "<table><tr><th>โหมด</th><th>รายละเอียด</th></tr><tr><td>Transport mode</td><td>เข้ารหัส/authenticate เฉพาะ **payload ของ datagram** เท่านั้น</td></tr><tr><td>Tunnel mode</td><td>เข้ารหัส/authenticate **ทั้ง datagram** (รวม header เดิม) แล้วห่อ (encapsulate) เป็น datagram ใหม่ที่มี IP header ใหม่ tunnel ไปยังปลายทาง</td></tr></table>"}, {"type": "subheading", "content": "2 Protocol ของ IPsec"}, {"type": "table", "content": "<table><tr><th>Protocol</th><th>บริการที่ให้</th></tr><tr><td>AH (Authentication Header) [RFC 4302]</td><td>ให้ source authentication และ data integrity แต่**ไม่ให้ confidentiality**</td></tr><tr><td>ESP (Encapsulation Security Protocol) [RFC 4303]</td><td>ให้ source authentication, data integrity, **และ confidentiality** — **ใช้กันแพร่หลายกว่า AH**</td></tr></table>"}, {"type": "subheading", "content": "Security Association (SA)"}, {"type": "note", "content": "ก่อนส่งข้อมูล ต้องสร้าง **Security Association (SA)** จากฝั่งส่งไปยังฝั่งรับก่อน (SA เป็นแบบ**ทิศทางเดียว**) — ทั้งสองฝั่งเก็บ state information เกี่ยวกับ SA นี้ไว้\n\n**IP เป็น connectionless แต่ IPsec เป็น connection-oriented!** — ข้อมูลที่ router (เช่น R1) เก็บไว้สำหรับ SA แต่ละอันประกอบด้วย: **SPI (Security Parameter Index)** 32-bit identifier, origin/destination SA interface, ประเภทการเข้ารหัสที่ใช้, encryption key, ประเภทการตรวจสอบ integrity ที่ใช้, authentication key"}, {"type": "subheading", "content": "โครงสร้าง IPsec Datagram (ESP Tunnel Mode)"}, {"type": "image", "src": "data:image/jpeg;base64,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", "alt": "โครงสร้างของ IPsec ESP datagram ในโหมด tunnel", "caption": "โครงสร้าง IPsec ESP datagram (tunnel mode): new IP header + ESP header (SPI, Seq#) + original IP header + original payload + ESP trailer (padding, pad length, next header) + ESP auth — ส่วน \"encrypted\" ครอบคลุมตั้งแต่ original header ถึง ESP trailer ส่วน \"authenticated\" ครอบคลุมตั้งแต่ ESP header ถึง ESP trailer"}, {"type": "note", "content": "**ESP trailer**: มี padding สำหรับ block cipher\n**ESP header**: มี **SPI** (บอกฝั่งรับว่าต้องทำอะไรกับ datagram นี้) และ **sequence number** (ป้องกัน replay attack)\n**MAC ใน ESP auth field** สร้างจาก shared secret key ที่ตกลงกันไว้ใน SA"}, {"type": "subheading", "content": "การทำงานที่ R1 (ESP Tunnel Mode)"}, {"type": "formula", "label": "ขั้นตอนการสร้าง ESP Tunnel Mode Datagram", "content": "1. ต่อ ESP trailer เข้ากับ datagram ต้นฉบับ (ซึ่งรวม header field เดิมด้วย)\n2. เข้ารหัสผลลัพธ์ทั้งหมดด้วย algorithm/key ที่ระบุใน SA\n3. ต่อ ESP header เข้าด้านหน้าของข้อมูลที่เข้ารหัสแล้ว\n4. สร้าง authentication MAC ด้วย algorithm/key ที่ระบุใน SA\n5. ต่อ MAC เข้าไปสร้างเป็น payload สมบูรณ์\n6. สร้าง IP header ใหม่ ระบุ address ไปยัง tunnel endpoint"}, {"type": "warning", "content": "**IPsec sequence number**: sender เริ่มต้น seq# ที่ 0 สำหรับ SA ใหม่ทุกครั้ง — ทุกครั้งที่ส่ง datagram บน SA นี้ จะเพิ่ม seq# counter — เป้าหมายคือ**ป้องกันไม่ให้ผู้โจมตีดักจับและเล่นซ้ำ (replay) packet ได้** — ฝั่งปลายทางตรวจสอบ duplicate โดย**ไม่ต้องเก็บทุก packet ที่เคยได้รับ** แต่ใช้ \"window\" แทน (ตรวจสอบเฉพาะช่วง sequence number ล่าสุด)"}, {"type": "subheading", "content": "Security Databases: SPD และ SAD"}, {"type": "note", "content": "**SAD (Security Association Database)**: endpoint เก็บ state ของ SA ทั้งหมดไว้ที่นี่ — เมื่อส่ง IPsec datagram, R1 เข้าถึง SAD เพื่อดูว่าต้องประมวลผล datagram อย่างไร — เมื่อ datagram มาถึง R2, R2 ตรวจสอบ SPI แล้ว index เข้า SAD เพื่อประมวลผลตามนั้น → **SAD บอก \"อย่างไร\" (how)**\n\n**SPD (Security Policy Database)**: บอก policy ว่า datagram แบบไหนควรใช้ IPsec หรือไม่ และควรใช้ SA ไหน — อาจอิงจาก source/destination IP address, protocol number → **SPD บอก \"อะไร\" (what)**"}, {"type": "subheading", "content": "IKE: Internet Key Exchange"}, {"type": "note", "content": "การกำหนด IPsec SA แบบ manual (ระบุ SPI, IP, algorithm, key ทุกอย่างด้วยมือ) **ไม่สามารถทำได้จริง**สำหรับ VPN ที่มี endpoint นับร้อย — ใช้ **IKE (Internet Key Exchange)** แทน\n\n**Authentication ผ่าน IKE ทำได้ 2 แบบ**:\n- **PSK (Pre-Shared Key)**: ทั้งสองฝั่งเริ่มด้วย secret ที่ใช้ร่วมกันอยู่แล้ว รัน IKE เพื่อยืนยันตัวตนกันและสร้าง IPsec SA (ทั้ง 2 ทิศทาง) รวมถึง encryption/authentication key\n- **PKI (Public Key Infrastructure)**: ทั้งสองฝั่งเริ่มด้วย public/private key pair และ certificate รัน IKE เพื่อยืนยันตัวตนและได้ IPsec SA — **คล้ายกับ handshake ของ SSL/TLS**\n\n**IKE มี 2 phase**: **Phase 1** สร้าง bidirectional IKE SA (หรือเรียกว่า ISAKMP security association ต่างจาก IPsec SA) มี 2 mode ย่อย: **aggressive mode** (ใช้ message น้อยกว่า) และ **main mode** (ให้ identity protection และยืดหยุ่นกว่า) — **Phase 2**: ใช้ ISAKMP เพื่อเจรจา IPsec SA คู่หนึ่ง (ทั้ง 2 ทิศทาง) อย่างปลอดภัย"}, {"type": "note", "content": "**สรุป IPsec**: ใช้ IKE แลกเปลี่ยน algorithm, secret key, SPI number → ใช้ AH หรือ ESP protocol (หรือทั้งคู่) → AH ให้ integrity+authentication, ESP (พร้อม AH) ให้ encryption เพิ่มด้วย → IPsec peer อาจเป็น end system คู่กัน, router/firewall คู่กัน, หรือ router/firewall กับ end system ก็ได้"}]}, {"title": "Security ในเครือข่ายไร้สายและ Mobile: 802.11 และ 4G/5G", "body": "การ authenticate และเข้ารหัสในเครือข่ายไร้สายมีความท้าทายเฉพาะตัว เพราะ mobile ต้อง associate กับ access point/base station ก่อน แล้วจึง authenticate เข้าสู่เครือข่าย", "blocks": [{"type": "subheading", "content": "802.11 (WiFi): Authentication และ Encryption แบบ WPA3"}, {"type": "note", "content": "Mobile ที่มาถึงต้อง: (1) **associate** กับ access point (ตั้งค่าการสื่อสารผ่าน wireless link) (2) **authenticate** เข้าสู่เครือข่าย — มีขั้นตอนย่อยดังนี้:"}, {"type": "formula", "label": "4 ขั้นตอนของ 802.11 Authentication/Encryption", "content": "**1. Discovery of security capabilities**: AP ประกาศการมีอยู่ของตัวเองและรูปแบบ authentication/encryption ที่รองรับ — device ขอรูปแบบที่ต้องการ — (ในขั้นนี้ device ยัง**ไม่ authenticated** และยังไม่มี encryption key)\n\n**2. Mutual authentication, key derivation**: AS (Authentication Server) และ mobile มี shared secret ร่วมกันอยู่แล้ว (เช่น password) — ทั้งคู่ใช้ shared secret, nonce (ป้องกัน replay attack), และ cryptographic hashing (รับประกัน message integrity) เพื่อยืนยันตัวตนซึ่งกันและกัน — ได้ symmetric session key ร่วมกัน\n\n**3. Shared symmetric key distribution**: session key เดียวกันถูกสร้างขึ้นทั้งที่ mobile และ AS — AS แจ้ง AP เกี่ยวกับ session key นี้ (เช่น สำหรับใช้เข้ารหัสแบบ AES)\n\n**4. Encrypted communication**: การสื่อสารระหว่าง mobile กับ remote host (ผ่าน AP) ถูกเข้ารหัสด้วย key ที่ตกลงกันแล้ว"}, {"type": "note", "content": "**WPA3 Handshake รายละเอียด**: (a) AS สร้าง $Nonce_{AS}$ ส่งให้ mobile (b) mobile รับ $Nonce_{AS}$ สร้าง $Nonce_M$ ของตัวเอง แล้วสร้าง session key $K_{M-AP}$ จาก initial shared secret + $Nonce_{AS}$ + $Nonce_M$ — ส่ง $Nonce_M$ พร้อม HMAC-signed value (ที่คำนวณจาก $Nonce_{AS}$ และ shared secret) กลับไป (c) AS ก็คำนวณ $K_{M-AP}$ แบบเดียวกันได้เอง — ทั้งคู่ได้ session key เดียวกันโดยไม่เคยส่ง key นั้นผ่าน channel เลย\n\n**EAP (Extensible Authentication Protocol)** [RFC 3748]: นิยาม request/response protocol แบบ end-to-end ระหว่าง mobile device กับ AS — ห่อหุ้มผ่าน **EAP over LAN (EAPoL)** ที่ link layer, ส่งต่อจาก AP ไปยัง AS ผ่าน **RADIUS** protocol บน UDP/IP"}, {"type": "subheading", "content": "Authentication และ Encryption ใน 4G LTE"}, {"type": "note", "content": "Mobile ที่มาถึงต้อง: (1) associate กับ BS (ตั้งค่าการสื่อสารผ่าน wireless link 4G) (2) authenticate ตัวเองเข้าสู่เครือข่าย **และ authenticate เครือข่ายกลับด้วย** (mutual)\n\n**ความแตกต่างสำคัญจาก WiFi**: **SIM card** ของ mobile ให้ identity ระดับโลกและเก็บ shared key ไว้ — บริการใน visited network ขึ้นกับ (paid) service subscription ใน home network — **MME (visited network) + HSS (home network) รวมกันเล่นบทบาทคล้าย AS ของ WiFi** — ผู้ยืนยันตัวตนขั้นสุดท้ายคือ **HSS** โดยอาศัยความไว้ใจและความสัมพันธ์ทางธุรกิจระหว่าง visited/home network"}, {"type": "formula", "label": "ขั้นตอนการ Authenticate ใน 4G LTE (5 ขั้นตอน)", "content": "(a) Mobile ส่ง attach message (มี IMSI, visited network info) → relay ผ่าน BS → visited MME → home HSS\n\n(b) HSS ใช้ shared-in-advance secret key ($K_{HSS-M}$) สร้าง **auth_token** และ **expected authentication response** ($xres_{HSS}$) — auth_token มีข้อมูลที่เข้ารหัสด้วย $K_{HSS-M}$ ทำให้ mobile รู้ว่าผู้สร้าง auth_token รู้ shared secret จริง → **mobile ยืนยันตัวตนของเครือข่าย** ได้ (mutual authentication ทิศทางแรก)\n\n(c) Mobile คำนวณ $res_M$ ด้วย secret key ของตัวเอง (คำนวณแบบเดียวกับที่ HSS คำนวณ $xres_{HSS}$) ส่งกลับไปยัง MME\n\n(d) MME เทียบ $res_M$ (จาก mobile) กับ $xres_{HSS}$ (จาก HSS) — ถ้าตรงกัน **mobile ถูกยืนยันตัวตนโดยเครือข่าย** (ทิศทางที่สอง) → MME แจ้ง BS ว่า mobile ผ่านการยืนยันแล้ว พร้อมสร้าง key ให้ BS\n\n(e) Mobile และ BS ได้ key สำหรับเข้ารหัสข้อมูล/control frame ผ่าน 4G wireless channel (อาจใช้ AES)"}, {"type": "subheading", "content": "วิวัฒนาการจาก 4G สู่ 5G Security"}, {"type": "table", "content": "<table><tr><th>ด้าน</th><th>4G</th><th>5G</th></tr><tr><td>ผู้ตัดสินใจ authenticate</td><td>MME ในเครือข่ายที่มาเยือนตัดสินใจ</td><td>**Home network เป็นผู้ตัดสินใจ** (visited MME เป็นแค่ \"middleman\" แต่ยังปฏิเสธได้)</td></tr><tr><td>Key</td><td>ใช้ shared-in-advance key</td><td>สำหรับ IoT: **key ไม่จำเป็นต้อง shared ล่วงหน้า**</td></tr><tr><td>ความเป็นส่วนตัวของ IMSI</td><td>IMSI ของ device ถูกส่งแบบ **cleartext (ไม่เข้ารหัส)** ไปยัง BS</td><td>**ใช้ public key crypto เข้ารหัส IMSI** เพื่อความเป็นส่วนตัวที่ดีขึ้น</td></tr></table>"}]}, {"title": "Firewalls: Operational Security", "body": "**Firewall** แยก (isolate) เครือข่ายภายในองค์กรออกจากอินเทอร์เน็ตวงกว้าง โดยอนุญาตให้ packet บางตัวผ่านได้ และบล็อกตัวอื่นๆ", "blocks": [{"type": "subheading", "content": "ทำไมต้องมี Firewall?"}, {"type": "table", "content": "<table><tr><th>เหตุผล</th><th>ตัวอย่าง</th></tr><tr><td>ป้องกัน Denial-of-Service attack</td><td>SYN flooding: ผู้โจมตีสร้าง TCP connection ปลอมจำนวนมาก จนไม่มี resource เหลือให้ connection จริง</td></tr><tr><td>ป้องกันการแก้ไข/เข้าถึงข้อมูลภายในโดยผิดกฎหมาย</td><td>เช่น ผู้โจมตีแทนที่หน้าเว็บด้วยเนื้อหาอื่น</td></tr><tr><td>อนุญาตเฉพาะการเข้าถึงที่ได้รับอนุญาต</td><td>เฉพาะกลุ่มผู้ใช้/host ที่ยืนยันตัวตนแล้ว</td></tr></table>"}, {"type": "note", "content": "**3 ประเภทของ Firewall**: **stateless packet filter**, **stateful packet filter**, **application gateway**"}, {"type": "subheading", "content": "Stateless Packet Filtering"}, {"type": "note", "content": "กรอง packet **ทีละตัว** โดยตัดสินใจ forward/drop ตาม: source/destination IP address, TCP/UDP source/destination port number, ICMP message type, TCP SYN/ACK bit"}, {"type": "table", "content": "<table><tr><th>Policy</th><th>Firewall Setting</th></tr><tr><td>ไม่ให้เข้าถึงเว็บภายนอก</td><td>drop outgoing packet ทุกตัวที่ไปยัง port 80 ของ IP address ใดๆ</td></tr><tr><td>ไม่ให้ TCP connection เข้ามาจากภายนอก ยกเว้น web server สาธารณะขององค์กร</td><td>drop incoming TCP SYN packet ทุกตัวยกเว้นที่ไปยัง IP 130.207.244.203 port 80</td></tr><tr><td>ป้องกัน web-radio กินแบนด์วิดท์</td><td>drop incoming UDP ทุกตัว ยกเว้น DNS และ router broadcast</td></tr><tr><td>ป้องกัน smurf DoS attack</td><td>drop ICMP packet ทุกตัวที่ไปยัง broadcast address</td></tr><tr><td>ป้องกันไม่ให้เครือข่ายถูก traceroute</td><td>drop outgoing ICMP TTL expired traffic ทุกตัว</td></tr></table>"}, {"type": "subheading", "content": "Access Control List (ACL)"}, {"type": "note", "content": "**ACL**: ตารางกฎที่ apply กับ packet ที่เข้ามาตามลำดับจากบนลงล่าง — แต่ละแถวคือคู่ (action, condition) — **มีลักษณะคล้าย OpenFlow forwarding table** (Chapter 4) มาก — ตัวอย่างกฎทั่วไป: อนุญาต outgoing TCP ที่ source port > 1023, dest port = 80 (HTTP request ออกไปข้างนอก), อนุญาต incoming TCP ที่ source port = 80, มี ACK bit set (HTTP response กลับมา), ปิดท้ายด้วยกฎ deny-all"}, {"type": "warning", "content": "**ข้อจำกัดของ Stateless Filter**: เป็นเครื่องมือที่ \"หยาบ\" เกินไป — อาจยอมรับ packet ที่ **\"ไม่สมเหตุสมผล\"** ได้ เช่น packet ที่ dest port = 80 พร้อม ACK bit set ทั้งที่**ไม่เคยมีการสร้าง TCP connection มาก่อนเลย** (ไม่มี SYN handshake) — filter แบบ stateless ไม่มีทางรู้ได้เพราะดูแค่ทีละ packet"}, {"type": "subheading", "content": "Stateful Packet Filtering"}, {"type": "note", "content": "**Stateful filter** ติดตามสถานะของทุก TCP connection: ติดตามการสร้าง connection (SYN) และการปิด (FIN) เพื่อพิจารณาว่า packet ที่เข้า/ออกนั้น \"สมเหตุสมผล\" หรือไม่ (สอดคล้องกับ connection ที่มีอยู่จริงหรือเปล่า) — timeout connection ที่ไม่มีการเคลื่อนไหว (inactive) แล้วเลิกรับ packet ของ connection นั้น\n\n**การ implement**: ACL ถูกเพิ่ม column พิเศษเพื่อระบุว่าต้อง**เช็ค connection state table**ก่อนอนุญาต packet หรือไม่ — เช่นกฎที่อนุญาต incoming TCP พร้อม ACK bit จะถูกกำกับด้วย \"check connection\" เพื่อยืนยันว่ามี connection ที่ SYN ไปแล้วจริงๆ ก่อนอนุญาตให้ผ่าน"}, {"type": "subheading", "content": "Application Gateway"}, {"type": "note", "content": "กรอง packet โดยดูทั้ง **application data** ไม่ใช่แค่ header ของ IP/TCP/UDP — ตัวอย่าง: อนุญาตเฉพาะ internal user ที่ได้รับอนุญาตให้ telnet ออกไปข้างนอก\n\n**ขั้นตอน**: (1) บังคับให้ผู้ใช้ telnet ทุกคนต้อง telnet **ผ่าน application gateway** เท่านั้น (2) สำหรับผู้ใช้ที่ได้รับอนุญาต gateway สร้าง telnet connection ไปยัง destination host จริง แล้ว **relay ข้อมูลระหว่าง 2 connection** (host-to-gateway และ gateway-to-remote-host) (3) router filter บล็อก telnet connection ทั้งหมดที่**ไม่ได้มาจาก gateway**"}, {"type": "warning", "content": "**ข้อจำกัดของ Firewall/Gateway**: **IP spoofing** — router ไม่มีทางรู้แน่ชัดว่าข้อมูล \"จริงๆ แล้ว\" มาจาก source ที่อ้างไว้หรือไม่ | ถ้ามีหลาย application ที่ต้องการการจัดการพิเศษ แต่ละตัวต้องมี application gateway ของตัวเอง | client software ต้องรู้วิธีติดต่อ gateway (เช่นต้องตั้งค่า IP ของ proxy ใน web browser เอง) | filter มักใช้นโยบาย \"all-or-nothing\" กับ UDP (ยากที่จะกรองแบบละเอียด) | มี **trade-off ระหว่างระดับการสื่อสารกับโลกภายนอกและระดับความปลอดภัย** เสมอ — แม้แต่ site ที่ได้รับการป้องกันอย่างดีก็ยังคงถูกโจมตีสำเร็จได้"}, {"type": "subheading", "content": "Intrusion Detection System (IDS)"}, {"type": "note", "content": "Packet filtering ทำงานที่ระดับ **TCP/IP header เท่านั้น** ไม่มีการตรวจสอบความสัมพันธ์ระหว่าง session ต่างๆ — **IDS** ก้าวไปไกลกว่านั้น:\n\n- **Deep packet inspection**: ตรวจดู**เนื้อหาของ packet** (เช่น เทียบ character string ในตัว packet กับฐานข้อมูลของ virus/attack string ที่รู้จัก)\n- **ตรวจสอบความสัมพันธ์ระหว่างหลาย packet**: port scanning, network mapping, DoS attack — ซึ่งไม่สามารถตรวจจับได้จาก packet เดี่ยวๆ\n\n**การ deploy หลาย IDS**: มักวาง IDS sensor ไว้หลายจุดในเครือข่าย เพื่อตรวจสอบประเภทต่างกัน — เช่น ใน **demilitarized zone (DMZ)** ที่มี web server, DNS server, FTP server มักมี IDS sensor คอยเฝ้าระวังแยกต่างหากจาก firewall หลักที่กั้นระหว่าง internal network กับ Internet"}, {"type": "diagram", "layout": "flow", "title": "Firewall: การกรอง Packet ขาเข้า", "actors": ["Packet ขาเข้า", "Firewall\n(ตรวจ ACL / State Table)", "Internal Host\n(ถ้าอนุญาต)"], "steps": [{"from": 0, "to": 1, "label": "Packet มาถึง", "note": "ตรวจสอบ source/destination/port"}, {"from": 1, "to": 2, "label": "อนุญาตผ่าน (Allow)", "note": "ตรงกับกฎที่อนุญาตไว้ — ถ้าไม่ตรงจะถูก Drop ทันที"}]}]}, {"title": "สรุปท้ายบท: Chapter 8 — Network Security", "body": "บทนี้เป็นบทสุดท้ายของหนังสือ ครอบคลุมเทคนิคพื้นฐานของ network security และการนำไปประยุกต์ใช้ในสถานการณ์จริงหลากหลายรูปแบบ", "blocks": [{"type": "subheading", "content": "เทคนิคพื้นฐาน (Basic Techniques)"}, {"type": "table", "content": "<table><tr><th>เทคนิค</th><th>สรุปสั้น</th></tr><tr><td>Cryptography</td><td>Symmetric key (DES, AES) และ Public key (RSA) — รากฐานของทุกอย่าง</td></tr><tr><td>Message Integrity</td><td>Hash function (MD5, SHA-1), message digest, digital signature</td></tr><tr><td>End-point Authentication</td><td>วิวัฒนาการจาก ap1.0 ถึง ap5.0 — nonce, public key, การแก้ปัญหา man-in-the-middle ด้วย certificate/CA</td></tr></table>"}, {"type": "subheading", "content": "การประยุกต์ใช้ในสถานการณ์จริง (Security Scenarios)"}, {"type": "table", "content": "<table><tr><th>สถานการณ์</th><th>เทคนิคที่ใช้</th></tr><tr><td>Secure e-mail</td><td>รวม symmetric key (ความเร็ว) + public key (แลกเปลี่ยน key, ยืนยันตัวตน) + hash (integrity)</td></tr><tr><td>Secure transport (TLS)</td><td>Handshake + key derivation + record-based data transfer + secure closure — ใช้ https ทุกวันนี้</td></tr><tr><td>IPsec</td><td>Network-layer security ผ่าน AH/ESP protocol, SA, IKE key exchange</td></tr><tr><td>802.11, 4G/5G</td><td>Wireless-specific authentication/encryption ผ่าน AS/HSS, EAP/RADIUS, mutual authentication</td></tr><tr><td>Operational security</td><td>Firewall (stateless/stateful packet filter, application gateway) และ IDS (deep packet inspection)</td></tr></table>"}, {"type": "note", "content": "**ข้อสังเกตสำคัญ**: หัวข้อทั้งหมดใน chapter นี้แสดงให้เห็นว่า **เทคนิค cryptography พื้นฐานเพียงไม่กี่อย่าง** (symmetric/public key encryption, hashing, digital signature, nonce) ถูกนำไปผสมผสานใช้ซ้ำแล้วซ้ำเล่าในบริบทที่แตกต่างกันโดยสิ้นเชิง — ตั้งแต่ระดับ application (email) ไปจนถึงระดับ transport (TLS), network (IPsec), และ link layer (WiFi/4G/5G) — เป็นตัวอย่างที่ดีของหลักการ **layering** ที่ปรากฏซ้ำตลอดทั้งเล่ม: ปัญหาเดียวกัน (การรักษาความปลอดภัยในการสื่อสาร) ถูกแก้ด้วยชุดเครื่องมือ (toolbox) เดียวกัน เพียงแค่ประยุกต์ใช้ในบริบทของแต่ละ layer ที่ต่างกันไป"}, {"type": "warning", "content": "จบหลักสูตรทั้ง 8 บทของ **Computer Networking: A Top-Down Approach** — เดินทางจาก Application Layer (บทที่ 2) ลงมาถึง Physical/Link Layer (บทที่ 6-7) แล้วปิดท้ายด้วยหัวข้อ **Security** ที่ตัดผ่านทุก layer ของ protocol stack — ครบถ้วนตามโครงสร้างของวิชา Computer Networking ระดับมหาวิทยาลัย"}]}];
+
+function renderTOC(){
+  const toc = document.getElementById("tocList");
+  toc.innerHTML = "";
+  SECTIONS.forEach((sec, idx)=>{
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#section_"+idx;
+    const hasDiagram = (sec.blocks||[]).some(function(b){ return b.type === "diagram"; });
+    a.textContent = (hasDiagram ? "🔀 " : "") + sec.title;
+    a.dataset.idx = idx;
+    li.appendChild(a);
+    toc.appendChild(li);
+  });
+}
+
+function setupTocPanel(){
+  const panel = document.getElementById("tocPanel");
+  if(panel && window.matchMedia("(max-width:800px)").matches){
+    panel.removeAttribute("open");
+  }
+}
+
+function escapeXml(s){
+  return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function mdFormat(s){
+  let t = escapeXml(s);
+  t = t.replace(/`([^`\n]+?)`/g, "<code>$1</code>");
+  t = t.replace(/\*\*([^*\n]+?)\*\*/g, "<strong>$1</strong>");
+  return t;
+}
+function computeReadingTime(){
+  const main = document.getElementById("mainArea");
+  const chars = (main.textContent || "").replace(/\s+/g, "").length;
+  return Math.max(1, Math.round(chars / 900));
+}
+function fmtTspans(text, x){
+  return String(text==null?"":text).split("\n").map(function(line,i){
+    return '<tspan x="'+x+'" dy="'+(i===0?0:15)+'">'+escapeXml(line)+'</tspan>';
+  }).join("");
+}
+
+function renderDiagramBlock(block, secIdx, blockIdx){
+  const uid = "dg_"+secIdx+"_"+blockIdx;
+  const layout = block.layout || "lifeline";
+  const actors = block.actors || [];
+  const steps = block.steps || [];
+  const n = actors.length;
+  const W = 680;
+  const margin = 76;
+  const nodesX = [];
+  for(let i=0;i<n;i++){ nodesX.push(n===1 ? W/2 : margin + i*((W-2*margin)/Math.max(1,n-1))); }
+  let inner = "";
+  let H = 0;
+
+  if(layout === "flow"){
+    const boxY = 50, boxH = 46;
+    const boxW = Math.min(128, Math.max(70,(W-2*margin)/Math.max(1,n-1)-14));
+    H = 168;
+    actors.forEach(function(a,i){
+      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+boxY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
+      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(boxY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
+    });
+    steps.forEach(function(st,i){
+      const x1 = nodesX[st.from]+boxW/2+3, x2 = nodesX[st.to]-boxW/2-3;
+      const y = boxY+boxH/2;
+      const pid = uid+"_p"+i, mid = uid+"_m"+i;
+      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
+      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(boxY-12)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
+      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
+             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
+             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
+             + '</circle>';
+    });
+  } else {
+    const rowH = 64, topY = 12, boxH = 38;
+    H = topY + boxH + steps.length*rowH + 26;
+    const boxW = Math.min(160, Math.max(80,(W-2*margin)/Math.max(1,n-1)-10));
+    actors.forEach(function(a,i){
+      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+topY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
+      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(topY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
+      inner += '<line class="diagram-lifeline" x1="'+nodesX[i]+'" y1="'+(topY+boxH)+'" x2="'+nodesX[i]+'" y2="'+(H-8)+'"></line>';
+    });
+    steps.forEach(function(st,i){
+      const y = topY+boxH+22 + i*rowH;
+      const x1 = nodesX[st.from], x2 = nodesX[st.to];
+      const pid = uid+"_p"+i, mid = uid+"_m"+i;
+      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
+      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(y-9)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
+      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
+             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
+             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
+             + '</circle>';
+    });
+  }
+
+  const svg = '<svg class="diagram-svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" preserveAspectRatio="xMidYMid meet">'+inner+'</svg>';
+
+  let stepsHtml = '<ol class="diagram-steps-list">';
+  steps.forEach(function(st,i){
+    stepsHtml += '<li><span class="step-num">'+(i+1)+'</span><strong>'+escapeXml(st.label||"")+'</strong>'+(st.note?(' — '+escapeXml(st.note)):'')+'</li>';
+  });
+  stepsHtml += '</ol>';
+
+  return '<div class="diagram-block" id="'+uid+'">'
+       + '<h4><span>🔀 '+escapeXml(block.title||"")+'</span><button class="diagram-play-btn" data-diagram-id="'+uid+'">&#9654; เล่นแอนิเมชัน / Play animation</button></h4>'
+       + '<div class="diagram-svg-wrap">'+svg+'</div>'
+       + stepsHtml
+       + '</div>';
+}
+
+function diagramPlay(containerId){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  const svg = wrap.querySelector('svg');
+  const paths = svg.querySelectorAll('.diagram-arrow-path');
+  const dots = svg.querySelectorAll('.diagram-glow-dot');
+  const items = wrap.querySelectorAll('.diagram-steps-list li');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  items.forEach(function(li){ li.classList.remove('step-active'); });
+  if(reduced){ return; }
+  const stepDur = 850;
+  paths.forEach(function(p){
+    const len = p.getTotalLength();
+    p.style.transition = 'none';
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+  void svg.getBoundingClientRect();
+  paths.forEach(function(p,i){
+    setTimeout(function(){
+      p.style.transition = 'stroke-dashoffset '+(stepDur-100)+'ms ease';
+      p.style.strokeDashoffset = 0;
+      const anim = dots[i] ? dots[i].querySelector('animateMotion') : null;
+      if(anim){ try{ anim.beginElement(); }catch(e){} }
+      if(items[i]) items[i].classList.add('step-active');
+    }, i*stepDur);
+  });
+}
+
+function wireDiagramButtons(){
+  document.querySelectorAll('.diagram-play-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ diagramPlay(btn.dataset.diagramId); });
+  });
+}
+
+function renderContent(){
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  SECTIONS.forEach((sec, idx)=>{
+    const card = document.createElement("div");
+    card.className = "section-card";
+    card.id = "section_"+idx;
+    let html = "<h2>"+sec.title+"</h2>";
+    if(sec.body){
+      html += '<div class="body-text">'+mdFormat(sec.body)+'</div>';
+    }
+    (sec.blocks || []).forEach((block, bi)=>{
+      if(block.type === "note"){
+        html += '<div class="callout callout-note"><span class="callout-title">หมายเหตุ / Note</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "example"){
+        html += '<div class="callout callout-example"><span class="callout-title">ตัวอย่าง / Example</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "warning"){
+        html += '<div class="callout callout-warning"><span class="callout-title">ข้อควรระวัง / Warning</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "formula"){
+        html += '<div class="callout callout-formula"><span class="callout-title">'+(block.label || "สูตร / Formula")+'</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "subheading"){
+        html += '<h3>'+mdFormat(block.content)+'</h3>';
+      } else if(block.type === "table"){
+        html += block.content;
+      } else if(block.type === "image"){
+        html += '<div class="image-block"><img src="'+block.src+'" alt="'+(block.alt || "")+'" loading="lazy">';
+        if(block.caption){
+          html += '<div class="image-caption">'+block.caption+'</div>';
+        }
+        html += '</div>';
+      } else if(block.type === "diagram"){
+        html += renderDiagramBlock(block, idx, bi);
+      }
+    });
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+
+  if(window.renderMathInElement){
+    renderMathInElement(main, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  }
+}
+
+function setupScrollSpy(){
+  const links = document.querySelectorAll(".toc-list a");
+  const sections = document.querySelectorAll(".section-card");
+  window.addEventListener("scroll", ()=>{
+    let currentIdx = 0;
+    sections.forEach((sec, idx)=>{
+      const rect = sec.getBoundingClientRect();
+      if(rect.top <= 100) currentIdx = idx;
+    });
+    links.forEach(l=>l.classList.remove("active"));
+    if(links[currentIdx]) links[currentIdx].classList.add("active");
+  });
+}
+
+function setupReveal(){
+  const cards = document.querySelectorAll('.section-card');
+  if(!('IntersectionObserver' in window)){
+    cards.forEach(function(c){ c.classList.add('revealed'); });
+    return;
+  }
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.08, rootMargin:'0px 0px -60px 0px'});
+  cards.forEach(function(c){ io.observe(c); });
+}
+
+let fontScale = parseFloat(localStorage.getItem('netbook_fontScale')||'1');
+function setFontScale(v){
+  fontScale = Math.min(1.3, Math.max(0.85, Math.round(v*10)/10));
+  try{ localStorage.setItem('netbook_fontScale', fontScale); }catch(e){}
+  document.documentElement.style.setProperty('--fontScale', fontScale);
+}
+
+function updateProgress(){
+  const el = document.documentElement;
+  const max = el.scrollHeight - el.clientHeight;
+  const pct = max>0 ? (el.scrollTop/max*100) : 0;
+  const bar = document.getElementById('readProgress');
+  if(bar) bar.style.width = pct+'%';
+  const btt = document.getElementById('backToTop');
+  if(btt){ if(el.scrollTop>420){ btt.classList.add('show'); } else { btt.classList.remove('show'); } }
+}
+
+renderTOC();
+renderContent();
+setupScrollSpy();
+setupReveal();
+setupTocPanel();
+wireDiagramButtons();
+setFontScale(fontScale);
+const readTimeBadge = document.getElementById('readTimeBadge');
+if(readTimeBadge){ readTimeBadge.textContent = '⏱ ~' + computeReadingTime() + ' นาทีในการอ่าน / min read'; }
+
+window.addEventListener('scroll', updateProgress);
+const backToTopBtn = document.getElementById('backToTop');
+if(backToTopBtn){ backToTopBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); }); }
+const fontMinusBtn = document.getElementById('fontMinus');
+if(fontMinusBtn){ fontMinusBtn.addEventListener('click', function(){ setFontScale(fontScale-0.1); }); }
+const fontPlusBtn = document.getElementById('fontPlus');
+if(fontPlusBtn){ fontPlusBtn.addEventListener('click', function(){ setFontScale(fontScale+0.1); }); }
+
+</script>
+</body>
+</html>
