@@ -445,13 +445,13 @@ function renderContent(){
     }
     (sec.blocks || []).forEach((block, bi)=>{
       if(block.type === "note"){
-        html += '<div class="callout callout-note"><span class="callout-title">หมายเหตุ / Note</span>'+block.content+'</div>';
+        html += '<div class="callout callout-note"><span class="callout-title">หมายเหตุ / Note</span>'+escapeXml(block.content)+'</div>';
       } else if(block.type === "example"){
-        html += '<div class="callout callout-example"><span class="callout-title">ตัวอย่าง / Example</span>'+block.content+'</div>';
+        html += '<div class="callout callout-example"><span class="callout-title">ตัวอย่าง / Example</span>'+escapeXml(block.content)+'</div>';
       } else if(block.type === "warning"){
-        html += '<div class="callout callout-warning"><span class="callout-title">ข้อควรระวัง / Warning</span>'+block.content+'</div>';
+        html += '<div class="callout callout-warning"><span class="callout-title">ข้อควรระวัง / Warning</span>'+escapeXml(block.content)+'</div>';
       } else if(block.type === "formula"){
-        html += '<div class="callout callout-formula"><span class="callout-title">'+(block.label || "สูตร / Formula")+'</span>'+block.content+'</div>';
+        html += '<div class="callout callout-formula"><span class="callout-title">'+(block.label || "สูตร / Formula")+'</span>'+escapeXml(block.content)+'</div>';
       } else if(block.type === "subheading"){
         html += '<h3>'+block.content+'</h3>';
       } else if(block.type === "table"){
