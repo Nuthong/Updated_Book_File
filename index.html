@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Computer Networking — สารบัญหนังสือ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --accent2:#2B6CB0;
+  --flag:#B7862C;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12161d; --panel:#1b212b; --border:#333c48;
+    --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0; --accent2:#8ec1f2;
+  }
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;font-family:'Sarabun',"Segoe UI",sans-serif;background:var(--paper);color:var(--text);
+}
+header{
+  background:var(--navy-deep);border-bottom:4px solid var(--flag);
+  box-shadow:0 2px 10px rgba(15,39,64,0.25);padding:36px 20px;text-align:center;
+}
+header h1{margin:0 0 8px 0;font-size:26px;color:#F2EFE6;}
+header p{margin:0;font-size:14px;color:#C9C2AE;}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px;}
+.chapter-list{display:flex;flex-direction:column;gap:12px;}
+.chapter-card{
+  display:flex;align-items:center;gap:16px;background:var(--panel);border:1px solid var(--border);
+  border-left:4px solid var(--navy);border-radius:8px;padding:16px 18px;text-decoration:none;color:inherit;
+  box-shadow:0 2px 8px rgba(15,39,64,0.06);transition:transform .15s ease, box-shadow .15s ease;
+}
+.chapter-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(15,39,64,0.12);}
+.chapter-icon{font-size:26px;flex-shrink:0;width:40px;text-align:center;}
+.chapter-info{flex:1;min-width:0;}
+.chapter-title{font-weight:700;font-size:15.5px;color:var(--navy-deep);}
+@media (prefers-color-scheme: dark){.chapter-title{color:var(--navy);}}
+.chapter-desc{font-size:13px;color:var(--text-soft);margin-top:3px;}
+.chapter-arrow{font-size:18px;color:var(--accent2);flex-shrink:0;}
+footer{text-align:center;padding:20px;font-size:12px;color:var(--text-soft);}
+</style>
+</head>
+<body>
+<header>
+  <h1>Computer Networking: A Top-Down Approach</h1>
+  <p>สรุปบทเรียนฉบับอ่านง่าย พร้อม diagram แอนิเมชัน — เลือกบทที่ต้องการอ่าน</p>
+</header>
+<div class="wrap">
+  <div class="chapter-list">
+<a class="chapter-card" href="Basic_Network_Summary.html">
+  <div class="chapter-icon">🏠</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Basic Network & Home Network 101</div>
+    <div class="chapter-desc">สรุปพื้นฐานเครือข่าย — จาก Wi-Fi ในบ้านสู่อินเทอร์เน็ตโลก</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="OSI_Model_Summary.html">
+  <div class="chapter-icon">🧱</div>
+  <div class="chapter-info">
+    <div class="chapter-title">OSI Model 7 Layer & IPv4 Subnetting</div>
+    <div class="chapter-desc">OSI Architecture, Encapsulation และการคำนวณ Subnetting</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Chapter_1_Summary.html">
+  <div class="chapter-icon">🌐</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Chapter 1: Introduction</div>
+    <div class="chapter-desc">บทนำสู่เครือข่ายคอมพิวเตอร์</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Chapter_2_Summary.html">
+  <div class="chapter-icon">📡</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Chapter 2: Application Layer</div>
+    <div class="chapter-desc">HTTP, DNS, Email, P2P, Video Streaming</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Chapter_3_Summary.html">
+  <div class="chapter-icon">🔀</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Chapter 3: Transport Layer</div>
+    <div class="chapter-desc">UDP, TCP, Reliable Data Transfer, Congestion Control</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Chapter_4_Summary.html">
+  <div class="chapter-icon">🧭</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Chapter 4: Network Layer — Data Plane</div>
+    <div class="chapter-desc">Router, IP Addressing, NAT, IPv6</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Chapter_5_Summary.html">
+  <div class="chapter-icon">🗺️</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Chapter 5: Network Layer — Control Plane</div>
+    <div class="chapter-desc">Routing Algorithms, OSPF, BGP, SDN</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Chapter_6_Summary.html">
+  <div class="chapter-icon">🔗</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Chapter 6: The Link Layer and LANs</div>
+    <div class="chapter-desc">Ethernet, ARP, Switch, VLAN, MPLS</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Chapter_7_Summary.html">
+  <div class="chapter-icon">📶</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Chapter 7: Wireless and Mobile Networks</div>
+    <div class="chapter-desc">WiFi, 4G/5G, Mobility Management</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Chapter_8_Summary.html">
+  <div class="chapter-icon">🔒</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Chapter 8: Security</div>
+    <div class="chapter-desc">Cryptography, TLS, IPsec, Firewalls</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+  </div>
+</div>
+<footer>Kurose &amp; Ross, Computer Networking: A Top-Down Approach (8th ed.)</footer>
+</body>
+</html>
