@@ -50,6 +50,8 @@ header{
 }
 header h1{font-size:18px;margin:0;color:#F2EFE6;font-weight:700;}
 header .subtitle{font-size:12px;color:#C9C2AE;margin-top:2px;}
+.back-to-books{display:inline-block;font-size:12px;color:#C9DCF0;text-decoration:none;margin-bottom:6px;opacity:0.85;}
+.back-to-books:hover{opacity:1;text-decoration:underline;}
 .mode-toggle{display:flex;border:1px solid rgba(242,239,230,0.4);border-radius:6px;overflow:hidden;background:rgba(242,239,230,0.08);}
 .mode-toggle button{border:none;background:transparent;color:#F2EFE6;padding:8px 16px;cursor:pointer;font-size:14px;font-family:'Sarabun',sans-serif;}
 .mode-toggle button.active{background:var(--flag);color:#1B1300;font-weight:700;}
@@ -179,6 +181,7 @@ main{flex:1;min-width:0;}
 
 <header>
   <div>
+    <a class="back-to-books" href="../index.html">&larr; ห้องสมุดทั้งหมด / All Books</a>
     <h1>แบบฝึกหัด Kana <span id="scriptLabel"></span></h1>
     <div class="subtitle">ลำดับขีดจาก KanjiVG (CC BY-SA) — สลับ Hiragana/Katakana ได้ที่ปุ่มขวา</div>
   </div>
