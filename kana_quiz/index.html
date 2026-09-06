@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<title>แบบฝึกหัด Kana: Hiragana ⇄ Katakana</title>
+<style>
+
+:root{
+  color-scheme: light dark;
+  --paper:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --accent:#1B3A5C;
+  --accent2:#2B6CB0;
+  --accent-soft:#EAF1FA;
+  --correct:#256D46;
+  --correct-soft:#E7F3EB;
+  --incorrect:#B3341F;
+  --incorrect-soft:#FBEAE6;
+  --flag:#B7862C;
+  --flag-soft:#FBF1DA;
+  --unanswered:#9A9486;
+  --cream:#F4F2E8;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12161d; --panel:#1b212b; --border:#333c48;
+    --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0; --navy-deep:#0b1420;
+    --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
+    --correct:#7fd0a0; --correct-soft:#173323;
+    --incorrect:#f0958a; --incorrect-soft:#33201d;
+    --flag:#e3bd74; --flag-soft:#332a17; --unanswered:#8b93a0; --cream:#232922;
+  }
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Sarabun',"Segoe UI",sans-serif;background:var(--paper);color:var(--text);}
+header{
+  background:var(--navy-deep);border-bottom:4px solid var(--flag);
+  box-shadow:0 2px 10px rgba(15,39,64,0.25);padding:16px 20px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  position:sticky;top:0;z-index:10;
+}
+header h1{font-size:18px;margin:0;color:#F2EFE6;font-weight:700;}
+header .subtitle{font-size:12px;color:#C9C2AE;margin-top:2px;}
+.mode-toggle{display:flex;border:1px solid rgba(242,239,230,0.4);border-radius:6px;overflow:hidden;background:rgba(242,239,230,0.08);}
+.mode-toggle button{border:none;background:transparent;color:#F2EFE6;padding:8px 16px;cursor:pointer;font-size:14px;font-family:'Sarabun',sans-serif;}
+.mode-toggle button.active{background:var(--flag);color:#1B1300;font-weight:700;}
+.script-toggle button{font-weight:700;font-size:15px;}
+.script-toggle button.active{background:var(--accent2);color:#fff;}
+.toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.toolbar select, .toolbar button{
+  border:1.5px solid var(--border);background:var(--panel);border-radius:4px;padding:6px 10px;
+  font-size:13px;color:var(--text);cursor:pointer;font-family:'Sarabun',sans-serif;
+}
+.timer-box{
+  display:flex;align-items:center;gap:6px;border:1.5px solid rgba(242,239,230,0.4);border-radius:4px;
+  padding:6px 10px;background:rgba(255,255,255,0.95);font-variant-numeric:tabular-nums;
+  font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--navy-deep);
+}
+.layout{display:flex;max-width:1200px;margin:0 auto;gap:20px;padding:20px;}
+.sidebar{width:230px;flex-shrink:0;}
+.sidebar-panel{
+  background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:16px;
+  margin-bottom:16px;position:sticky;top:76px;box-shadow:0 2px 8px rgba(15,39,64,0.06);
+  max-height:calc(100vh - 96px);overflow-y:auto;
+}
+.sidebar-panel h3{
+  font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text-soft);margin:0 0 10px 0;font-weight:600;
+}
+.nav-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:10px;}
+.nav-cell{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:4px;
+  background:var(--unanswered);color:#fff;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;
+  opacity:0.55;
+}
+.nav-cell.answered{background:var(--accent2);opacity:1;}
+.nav-cell.correct{background:var(--correct);opacity:1;}
+.nav-cell.incorrect{background:var(--incorrect);opacity:1;}
+.nav-cell.current{background:var(--flag);opacity:1;color:#1B1300;font-weight:700;}
+.legend{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--text-soft);margin-bottom:10px;}
+.legend .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;}
+.score-box{text-align:center;padding-top:8px;border-top:1px solid var(--border);}
+.score-box .big{font-size:24px;font-weight:700;color:var(--navy-deep);font-family:'JetBrains Mono',monospace;}
+.cat-select-btns{display:flex;gap:6px;margin-bottom:8px;}
+.cat-select-btns button{flex:1;font-size:11.5px;padding:5px;border:1px solid var(--border);background:var(--panel);border-radius:4px;cursor:pointer;color:var(--text);}
+.cat-section-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--flag);margin:10px 0 4px;}
+.cat-item{display:flex;align-items:center;gap:6px;font-size:12.5px;padding:3px 0;cursor:pointer;}
+.cat-item .cat-chars{color:var(--text-soft);font-size:12px;}
+main{flex:1;min-width:0;}
+.q-card{
+  background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--navy);border-radius:6px;
+  padding:22px;margin-bottom:16px;box-shadow:0 2px 10px rgba(15,39,64,0.06);scroll-margin-top:80px;
+}
+.q-index{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.q-prompt{font-size:16px;margin-bottom:14px;line-height:1.6;}
+.q-prompt .kanji-big{font-size:34px;font-weight:700;color:var(--navy-deep);}
+.sub-item{margin-bottom:12px;padding:10px 12px;border-radius:4px;border:1.5px solid var(--border);background:var(--paper);}
+.sub-item.correct{border-color:var(--correct);background:var(--correct-soft);}
+.sub-item.incorrect{border-color:var(--incorrect);background:var(--incorrect-soft);}
+.sub-item label{display:block;font-size:12.5px;color:var(--text-soft);margin-bottom:6px;}
+.sub-item select, .sub-item input{
+  width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:4px;font-size:15px;
+  font-family:'Sarabun',sans-serif;background:var(--panel);color:var(--text);
+}
+.hint-box{
+  margin-top:10px;padding:12px 14px;border-radius:4px;border-left:3px solid var(--flag);
+  background:var(--flag-soft);font-size:13px;white-space:pre-wrap;line-height:1.8;color:var(--text);
+}
+.stroke-btn, .footer-actions button.secondary{
+  display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--navy);background:var(--panel);
+  color:var(--navy);padding:6px 12px;border-radius:4px;font-size:12.5px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;font-weight:600;
+}
+.stroke-btn:hover{background:var(--accent-soft);}
+.stroke-anim-wrap{
+  margin-top:12px;padding:14px;border-radius:6px;border:1.5px solid var(--border);background:var(--cream);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.stroke-anim-svg{width:170px;height:170px;background:var(--panel);border-radius:6px;border:1px solid var(--border);}
+.kv-stroke{fill:none;stroke:var(--navy-deep);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;}
+.kv-num-bg{fill:var(--flag);stroke:var(--navy-deep);stroke-width:0.8;}
+.kv-num-text{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:9px;fill:var(--navy-deep);text-anchor:middle;dominant-baseline:central;}
+.kv-dot{fill:#fff;stroke:var(--incorrect);stroke-width:1.5;opacity:0;}
+.stroke-play-btn{
+  border:1.5px solid var(--accent2);background:var(--panel);color:var(--accent2);padding:5px 12px;
+  border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;
+}
+.stroke-play-btn:hover{background:var(--accent-soft);}
+.stroke-caption{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-soft);letter-spacing:.04em;}
+.answer-block{margin-top:6px;padding:12px 14px;border-radius:4px;border-left:3px solid var(--accent2);background:var(--accent-soft);font-size:14px;}
+.explain-block{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
+.explain-block h4{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 6px 0;color:var(--text-soft);}
+.explain-block .formula{background:var(--navy-deep);color:#EAF1FA;border-radius:4px;padding:12px;font-size:13px;white-space:pre-wrap;margin-bottom:10px;line-height:1.8;}
+.explain-block .steps{font-size:13px;line-height:1.8;white-space:pre-wrap;}
+.footer-actions{display:flex;justify-content:flex-start;align-items:center;margin-top:16px;flex-wrap:wrap;gap:8px;}
+.footer-actions .check-btn{border:none;background:var(--navy);color:#fff;padding:10px 20px;border-radius:4px;font-size:14px;cursor:pointer;font-family:'Sarabun',sans-serif;font-weight:600;}
+.footer-actions .check-btn:hover{background:var(--accent2);}
+.reveal-box{margin-top:14px;padding:12px 14px;border-radius:4px;border-left:3px solid var(--incorrect);background:var(--incorrect-soft);}
+.reveal-title{font-weight:700;font-size:12.5px;text-transform:uppercase;color:var(--incorrect);display:block;margin-bottom:6px;}
+.reveal-line{font-size:13.5px;margin-top:2px;}
+.flash-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:40px 20px;
+  min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 2px 14px rgba(15,39,64,0.08);cursor:pointer;margin-bottom:16px;
+}
+.flash-progress{position:absolute;margin-top:-380px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-soft);}
+.flash-char{font-size:96px;font-weight:700;color:var(--navy-deep);line-height:1;}
+.flash-char.small{font-size:56px;margin-bottom:10px;}
+.flash-hint{font-size:13px;color:var(--text-soft);margin-top:14px;}
+.flash-reading{font-size:20px;font-weight:600;color:var(--accent2);margin-bottom:6px;}
+.flash-mnemo{font-size:13px;color:var(--text-soft);text-align:center;max-width:340px;margin-top:6px;line-height:1.6;}
+.flash-controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.flash-controls button{border:1.5px solid var(--navy);background:var(--panel);color:var(--navy);padding:9px 18px;border-radius:6px;font-size:13.5px;cursor:pointer;font-family:'Sarabun',sans-serif;font-weight:600;}
+.flash-controls button.secondary{border-color:var(--border);color:var(--text-soft);}
+.flash-controls button:hover{background:var(--accent-soft);}
+.row-tip-banner{
+  background:var(--accent-soft);border-left:4px solid var(--accent2);border-radius:6px;
+  padding:12px 16px;margin-bottom:16px;font-size:13.5px;line-height:1.7;color:var(--text);
+}
+@media (max-width:800px){
+  .layout{flex-direction:column;}
+  .sidebar{width:100%;position:static;}
+  .sidebar-panel{position:static;max-height:none;}
+  .nav-grid{grid-template-columns:repeat(8,1fr);}
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>แบบฝึกหัด Kana <span id="scriptLabel"></span></h1>
+    <div class="subtitle">ลำดับขีดจาก KanjiVG (CC BY-SA) — สลับ Hiragana/Katakana ได้ที่ปุ่มขวา</div>
+  </div>
+  <div class="toolbar">
+    <div class="mode-toggle script-toggle" id="scriptToggle">
+      <button id="btnKatakana" class="active">カタカナ</button>
+      <button id="btnHiragana">ひらがな</button>
+    </div>
+    <div class="mode-toggle">
+      <button id="btnExerciseMode" class="active">แบบฝึกหัด</button>
+      <button id="btnAnswerMode">เฉลย</button>
+      <button id="btnFlashcardMode">Flashcard</button>
+    </div>
+    <button id="resetAllBtn" style="border:1.5px solid var(--flag);color:var(--flag);">↺ ทำใหม่ทั้งชุด</button>
+    <select id="orderSelect">
+      <option value="original">เรียงตามต้นฉบับ</option>
+      <option value="shuffle">สลับข้อ</option>
+      <option value="weak">ฝึกจุดอ่อนก่อน</option>
+    </select>
+    <select id="timerModeSelect">
+      <option value="stopwatch">นับขึ้น</option>
+      <option value="countdown">นับถอยหลัง</option>
+    </select>
+    <input type="number" id="countdownMinutes" placeholder="นาที" min="1" style="width:70px;padding:6px;border:1px solid var(--border);border-radius:6px;">
+    <div class="timer-box">
+      <span id="timerDisplay">00:00</span>
+      <button id="timerStartBtn">เริ่ม</button>
+      <button id="timerPauseBtn">พัก</button>
+      <button id="timerResetBtn">รีเซ็ต</button>
+    </div>
+  </div>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-panel">
+      <h3>สารบัญข้อ</h3>
+      <div class="nav-grid" id="navGrid"></div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--unanswered)"></span>ยังไม่ตอบ</span>
+        <span><span class="dot" style="background:var(--accent2)"></span>ตอบบางส่วน</span>
+        <span><span class="dot" style="background:var(--correct)"></span>ถูกต้อง</span>
+        <span><span class="dot" style="background:var(--incorrect)"></span>ไม่ถูกต้อง</span>
+      </div>
+      <div class="score-box" id="scoreBox" style="display:none;">
+        <div>คะแนน</div>
+        <div class="big" id="scoreText">0/0</div>
+      </div>
+    </div>
+    <div class="sidebar-panel">
+      <h3>เลือกหมวดหมู่ (วรรค)</h3>
+      <div class="cat-select-btns">
+        <button id="catSelectAllBtn" type="button">เลือกทั้งหมด</button>
+        <button id="catSelectNoneBtn" type="button">เหลือหมวดเดียว</button>
+      </div>
+      <div id="catPanelBody" class="cat-panel-body"></div>
+    </div>
+  </div>
+  <main id="mainArea"></main>
+</div>
+
+<script>
+const KANA = {"rows": [{"id": "a", "section": "พื้นฐาน", "label": "a", "tip": "5 เสียงสระหลัก a-i-u-e-o คือฐานของทุกแถว จำแถวนี้แม่นก่อน แถวอื่นคือ \"พยัญชนะ+สระชุดนี้\" ทั้งหมด", "chars": [{"hira": "あ", "kata": "ア", "romaji": "a", "mnemoHira": "เส้นโค้งท้ายม้วนคล้ายเสียง \"อา~\" ตอนอ้าปากกว้าง", "mnemoKata": "เหมือนหลังคาเต็นท์ทรงแหลม ปลายตวัดลง — \"อา\"คนกางแขนรับ"}, {"hira": "い", "kata": "イ", "romaji": "i", "mnemoHira": "สองขีดสั้นยืนเอียงคู่กัน เหมือนคนสองคน (i, i)", "mnemoKata": "คล้าย い แต่มีมุมเหลี่ยม เหมือนคนกำลังเดินก้าวขา"}, {"hira": "う", "kata": "ウ", "romaji": "u", "mnemoHira": "หลังคาโค้งมีจุดเล็กบนหัว เหมือนนกกำลังก้มจิก \"อุ\"", "mnemoKata": "เหมือน う แต่มีหมวกแหลมด้านบน คล้ายจมูกเรือ"}, {"hira": "え", "kata": "エ", "romaji": "e", "mnemoHira": "เส้นโค้งบิดคล้ายคนกำลังเอี้ยวตัว งอแขน", "mnemoKata": "รูปตัว I ขวางมีขีดบนล่าง เหมือนคานเหล็กก่อสร้าง (エ = เอ)"}, {"hira": "お", "kata": "オ", "romaji": "o", "mnemoHira": "มีห่วงเล็กคล้ายโบว์ผูกอยู่มุมขวา จำว่า \"โอ้! โบว์สวย\"", "mnemoKata": "คล้ายต้นไม้มีกิ่งกางออก คล้าย 才(ความสามารถ)"}]}, {"id": "ka", "section": "พื้นฐาน", "label": "ka", "tip": "ทุกตัวออกเสียงตรงไปตรงมา (ka-ki-ku-ke-ko) ไม่มีข้อยกเว้น จำง่ายที่สุดแถวหนึ่ง", "chars": [{"hira": "か", "kata": "カ", "romaji": "ka", "mnemoHira": "เหมือนตัว k คว่ำมีหางม้วนสั้นด้านขวา — \"คา\"", "mnemoKata": "เหมือนมีดพร้า/เคียว รูปตัว force มีขีดทะลุ"}, {"hira": "き", "kata": "キ", "romaji": "ki", "mnemoHira": "มีห่วงเล็กด้านล่าง คล้ายกุญแจ \"key\" (คีย์=คิ)", "mnemoKata": "คล้าย き แต่เหลี่ยมกว่า ไม่มีห่วง เหมือนกิ่งไม้กางออก"}, {"hira": "く", "kata": "ク", "romaji": "ku", "mnemoHira": "เส้นหักมุมเดียวคล้ายปากนกกำลังจิก หรือติ๊กถูก (く=ku)", "mnemoKata": "คล้าย く มีขีดสั้นเพิ่มด้านบน เหมือนติ๊กถูกมีหาง"}, {"hira": "け", "kata": "ケ", "romaji": "ke", "mnemoHira": "คล้าย き ผสมกับขีดตั้ง เหมือนธงปักบนพื้น", "mnemoKata": "คล้าย ク มีขีดยาวขึ้นด้านบนซ้าย เหมือนคนแบกของ"}, {"hira": "こ", "kata": "コ", "romaji": "ko", "mnemoHira": "สองขีดแนวนอนโค้งเล็กน้อย เหมือนงูสองตัวนอนคู่กัน (โคะ)", "mnemoKata": "เหมือนกล่องเปิดด้านขวา ตัว \"ko\" = กล่อง (box มีมุมฉาก)"}]}, {"id": "sa", "section": "พื้นฐาน", "label": "sa", "tip": "⚠️ ข้อยกเว้นสำคัญ: し อ่านว่า \"shi\" ไม่ใช่ \"si\" — ตัวอื่นตรงไปตรงมา (sa-shi-su-se-so)", "chars": [{"hira": "さ", "kata": "サ", "romaji": "sa", "mnemoHira": "เหมือนเลข 2 มีขีดตัดกลาง จำว่า \"ซ่า\" เหมือนงูแลบลิ้น", "mnemoKata": "เหมือนไม้กางเขนมีขาสั้นด้านซ้าย"}, {"hira": "し", "kata": "シ", "romaji": "shi", "mnemoHira": "เส้นโค้งเดียวคล้ายตะขอ เหมือนคนนั่งงอตัว (shi)", "mnemoKata": "สามจุดวางเฉียง+ตวัด คล้ายหยดน้ำ 3 หยด (ระวังสับสนกับ ツ)"}, {"hira": "す", "kata": "ス", "romaji": "su", "mnemoHira": "เหมือน す มีห่วงม้วนหางยาว คล้ายลูกอมมีก้าน", "mnemoKata": "เส้นตัดกากบาทเฉียง เหมือนดาบไขว้สั้นๆ"}, {"hira": "せ", "kata": "セ", "romaji": "se", "mnemoHira": "คล้าย む/む ผสมขีดสั้น เหมือนคนยืนกอดอก", "mnemoKata": "คล้ายตัว E เอียง มีขีดสั้นแทงทะลุ"}, {"hira": "そ", "kata": "ソ", "romaji": "so", "mnemoHira": "เส้นหยักซิกแซกต่อเนื่อง เหมือนงูเลื้อย \"โซะ\"", "mnemoKata": "สองจุดวางเฉียงคู่กัน คล้ายหยดน้ำ 2 หยด (ระวังสับสนกับ ン)"}]}, {"id": "ta", "section": "พื้นฐาน", "label": "ta", "tip": "⚠️ มี 2 ข้อยกเว้น: ち อ่าน \"chi\" (ไม่ใช่ ti), つ อ่าน \"tsu\" (ไม่ใช่ tu) — จำคู่นี้ควบกัน", "chars": [{"hira": "た", "kata": "タ", "romaji": "ta", "mnemoHira": "คล้าย столик มีขาซ้ายสั้น เหมือนโต๊ะขาเดียว", "mnemoKata": "เหมือนคนกางแขนก้มหัว ทักทาย \"ทาโกะ (ปลาหมึก)\""}, {"hira": "ち", "kata": "チ", "romaji": "chi", "mnemoHira": "เส้นโค้งม้วนตัวเดียว เหมือนเชือกขมวดปม (chi)", "mnemoKata": "คล้ายไม้กางเขนมีขาสั้น จำคู่กับ 千 (พัน)"}, {"hira": "つ", "kata": "ツ", "romaji": "tsu", "mnemoHira": "เส้นโค้งเดียวคล้ายคลื่นทะเล \"สึนามิ\" (tsu=คลื่น)", "mnemoKata": "สามจุดวางตวัดขึ้น คล้ายเล็บมือ 3 เล็บ (ระวังสับสนกับ シ)"}, {"hira": "て", "kata": "テ", "romaji": "te", "mnemoHira": "เส้นเดียวโค้งงอ เหมือนมือ (手=te แปลว่ามือ) ยกขึ้น", "mnemoKata": "คล้ายเสาอากาศทีวี มีขีดขวางบนหัว (เทเลวิชั่น=เท)"}, {"hira": "と", "kata": "ト", "romaji": "to", "mnemoHira": "เส้นตั้งมีขอเกี่ยวปลาย เหมือนประตู (户) แง้มเปิด", "mnemoKata": "ขีดตั้งสั้นมีขีดสั้นชี้ทางขวา เหมือนป้ายบอกทาง"}]}, {"id": "na", "section": "พื้นฐาน", "label": "na", "tip": "แถวนี้ตรงไปตรงมาทั้งหมด (na-ni-nu-ne-no) ใช้ฝึกความไวได้ดี เพราะไม่มีข้อยกเว้นให้สับสน", "chars": [{"hira": "な", "kata": "ナ", "romaji": "na", "mnemoHira": "มีห่วงคู่พันกันด้านขวา เหมือนเชือกผูกโบว์ \"นะ~\"", "mnemoKata": "คล้ายไม้กางเขนสั้น จำคู่กับตัว 十(สิบ) ที่คล้ายกัน"}, {"hira": "に", "kata": "ニ", "romaji": "ni", "mnemoHira": "สองขีดสั้นแนวนอนด้านขวาเส้นตั้ง เหมือนตะเกียบคีบของ (に)", "mnemoKata": "สองขีดแนวนอนซ้อนกัน เหมือนเลข 二 (สอง)"}, {"hira": "ぬ", "kata": "ヌ", "romaji": "nu", "mnemoHira": "ห่วงพันกันซับซ้อน เหมือนบะหมี่พันกัน \"หนุ้ก\" (ぬ=nu)", "mnemoKata": "เส้นตัดกันแบบง่าย เหมือนมีดกรีดเป็นกากบาท"}, {"hira": "ね", "kata": "ネ", "romaji": "ne", "mnemoHira": "คล้าย ぬ แต่มีหางม้วนพลิ้ว เหมือนแมวห่วงเล่นเชือก \"เนะ~\"", "mnemoKata": "คล้าย ラ มีขีดเฉียงเพิ่ม เหมือนเสื้อคลุมมีชายพลิ้ว (礻=เครื่องบูชา)"}, {"hira": "の", "kata": "ノ", "romaji": "no", "mnemoHira": "วงกลมม้วนเป็นเกลียวเดียว เหมือนงูขดตัว \"โนะ\" (の = ของ)", "mnemoKata": "ขีดเฉียงเดียวสั้นๆ เหมือนปากกาขีดลากผ่าน"}]}, {"id": "ha", "section": "พื้นฐาน", "label": "ha", "tip": "⚠️ ข้อยกเว้น: ふ อ่าน \"fu\" (ไม่ใช่ hu) — ตัวอื่นตรงไปตรงมา (ha-hi-fu-he-ho)", "chars": [{"hira": "は", "kata": "ハ", "romaji": "ha", "mnemoHira": "เหมือน t คว่ำมีห่วงเล็กขวาล่าง เหมือนคนยืนกางขา \"ฮะ\"", "mnemoKata": "สองขีดกางออกคล้ายภูเขา หรือคนกางขาสองข้าง"}, {"hira": "ひ", "kata": "ヒ", "romaji": "hi", "mnemoHira": "เส้นโค้งเดียวคล้ายรอยยิ้ม เหมือนคิ้วโก่ง \"ฮิ ฮิ\"", "mnemoKata": "คล้ายบันไดสองขั้น เหมือนคนยืนบนขั้นบันได"}, {"hira": "ふ", "kata": "フ", "romaji": "fu", "mnemoHira": "หลายเส้นโค้งซับซ้อนคล้ายภูเขาไฟฟูจิ (富士山=Fuji=ふ)", "mnemoKata": "เส้นเดียวหักมุมคล้ายตะขอแขวนผ้า"}, {"hira": "へ", "kata": "ヘ", "romaji": "he", "mnemoHira": "เส้นเดียวหักมุมเหมือนภูเขารูปตัว へ (คิ้วขมวด)", "mnemoKata": "เหมือนกันกับ へ เกือบทุกกระเบียดนิ้ว จำคู่กันได้เลย"}, {"hira": "ほ", "kata": "ホ", "romaji": "ho", "mnemoHira": "คล้าย は มีขีดเพิ่มตรงกลาง เหมือนธงมีเสาสองต้น", "mnemoKata": "คล้าย 木 (ต้นไม้) มีกิ่งกางสี่ทิศ"}]}, {"id": "ma", "section": "พื้นฐาน", "label": "ma", "tip": "แถวนี้ตรงไปตรงมาทั้งหมด (ma-mi-mu-me-mo) เทียบเสียงกับภาษาไทยได้ตรงเกือบทุกตัว", "chars": [{"hira": "ま", "kata": "マ", "romaji": "ma", "mnemoHira": "คล้าย ま มีห่วงกลมปลายเส้น เหมือนไม้ตีกลองมีลูกกลม", "mnemoKata": "เส้นหักมุมสั้นๆ เหมือนตะขอเกี่ยวเสื้อ"}, {"hira": "み", "kata": "ミ", "romaji": "mi", "mnemoHira": "เส้นโค้งม้วนสวยงาม เหมือนเลข 3 เขียนหวัด", "mnemoKata": "สามขีดเฉียงขนานกัน เหมือนสามเสียงคลื่นน้ำ (mi=3 พยางค์cขีด)"}, {"hira": "む", "kata": "ム", "romaji": "mu", "mnemoHira": "ห่วงพันปลายม้วน เหมือนวัวร้อง \"มู้~\" (mu=เสียงวัว)", "mnemoKata": "สองขีดไขว้แหลม เหมือนหลังคาจั่วบ้าน"}, {"hira": "め", "kata": "メ", "romaji": "me", "mnemoHira": "ห่วงพันกันคล้ายลูกตา (目=me แปลว่าตา)", "mnemoKata": "กากบาทเฉียงเรียบง่าย เหมือนเครื่องหมายกากบาท"}, {"hira": "も", "kata": "モ", "romaji": "mo", "mnemoHira": "คล้าย き ผสมขีดตั้งยาว เหมือนต้นไม้มีรากยาว", "mnemoKata": "คล้าย き ผสมขีดยาว จำคู่กับ も ได้ง่าย"}]}, {"id": "ya", "section": "พื้นฐาน", "label": "ya", "tip": "มีแค่ 3 เสียง (ya-yu-yo) เพราะ yi และ ye ไม่ใช้ในภาษาญี่ปุ่นปัจจุบัน — จำง่ายเพราะสั้น", "chars": [{"hira": "や", "kata": "ヤ", "romaji": "ya", "mnemoHira": "เส้นโค้งพลิ้วมีขีดตัด เหมือนธนูโก่งยิงลูกศร \"ยะ\"", "mnemoKata": "คล้ายหนังสติ๊กสองแฉก"}, {"hira": "ゆ", "kata": "ユ", "romaji": "yu", "mnemoHira": "ห่วงกลมมีขีดพาดผ่าน เหมือนอ่างน้ำร้อนออนเซ็น (湯=yu=น้ำร้อน)", "mnemoKata": "เส้นตรงมีขอเกี่ยวปลาย เหมือนตะขอแขวนถ้วย"}, {"hira": "よ", "kata": "ヨ", "romaji": "yo", "mnemoHira": "ห่วงกลมมีขีดตั้ง เหมือนคนยืนถือห่วงฮูลาฮูป", "mnemoKata": "สามขีดแนวนอนซ้อนกัน เหมือนชั้นวางหนังสือ 3 ชั้น"}]}, {"id": "ra", "section": "พื้นฐาน", "label": "ra", "tip": "เสียง \"r\" ภาษาญี่ปุ่นอยู่กึ่งกลางระหว่าง r และ l ของภาษาไทย/อังกฤษ ฝึกฟังเสียงจริงประกอบจะช่วยได้มาก", "chars": [{"hira": "ら", "kata": "ラ", "romaji": "ra", "mnemoHira": "ห่วงเล็กปลายขีดโค้ง เหมือนช้อนตักซุป \"ระ\"", "mnemoKata": "เส้นหักมุมง่ายๆ เหมือนตะขอแขวนเสื้อกลับด้าน"}, {"hira": "り", "kata": "リ", "romaji": "ri", "mnemoHira": "สองขีดแยกกัน ขีดขวามีหางม้วน เหมือนคนสองคนยืนเอียง", "mnemoKata": "สองขีดตั้งขนานสั้นๆ เหมือนตะเกียบคู่"}, {"hira": "る", "kata": "ル", "romaji": "ru", "mnemoHira": "ห่วงพันซับซ้อนมีหางม้วนปลาย เหมือนลูกอมพันห่อ", "mnemoKata": "สองขีดโค้งง่ายๆ เหมือนขาสองข้างกำลังวิ่ง"}, {"hira": "れ", "kata": "レ", "romaji": "re", "mnemoHira": "คล้าย ね แต่หางสั้นกว่า เหมือนแมวหางสั้น", "mnemoKata": "ขีดเดียวโค้งเรียบง่าย เหมือนสไลเดอร์"}, {"hira": "ろ", "kata": "ロ", "romaji": "ro", "mnemoHira": "ห่วงม้วนเดียวปลายเปิด เหมือนตะขอเบ็ดตกปลา", "mnemoKata": "สี่เหลี่ยมจัตุรัสเรียบ เหมือนกล่อง/ปาก (口=ro/kuchi=ปาก)"}]}, {"id": "wan", "section": "พื้นฐาน", "label": "wa/n", "tip": "わ อ่าน wa, を อ่าน \"o\" (ใช้เป็นคำช่วยกรรมเท่านั้น แทบไม่เจอใช้แบบอื่น), ん อ่าน n เดี่ยวๆ ไม่มีสระตาม", "chars": [{"hira": "わ", "kata": "ワ", "romaji": "wa", "mnemoHira": "ห่วงกลมมีหางสั้น เหมือนห่วงยางว่ายน้ำ \"วะ\"", "mnemoKata": "คล้าย ク มีขีดเพิ่มด้านขวา เหมือนแหวนมีเพชร"}, {"hira": "を", "kata": "ヲ", "romaji": "wo", "mnemoHira": "คล้าย お มีห่วงเพิ่มซับซ้อนกว่า ใช้เฉพาะเป็นคำช่วย (โอะ/wo)", "mnemoKata": "สามขีดตัดกันซับซ้อน พบน้อยมาก มักเห็นในเกม/เพลงเก่า"}, {"hira": "ん", "kata": "ン", "romaji": "n", "mnemoHira": "ขีดโค้งสั้นม้วนปลาย เหมือนหางหนู (ん=n เสียงนาสิกท้าย)", "mnemoKata": "สองจุดวางเฉียงคู่กัน คล้าย ソ แต่มุมชันกว่า (ระวังสับสน)"}]}, {"id": "ga", "section": "Tenten", "label": "ga", "tip": "แถว が-ぎ-ぐ-げ-ご คือ か-แถวบวก゛(tenten) ออกเสียงก้องขึ้น (ka→ga) จำแค่ \"บวกจุดคู่ = ก้อง\" ไม่ต้องท่องใหม่", "chars": [{"hira": "が", "kata": "ガ", "romaji": "ga", "mnemoHira": "รูปเหมือน か บวกจุดคู่ (゛) มุมขวาบน = เสียงก้อง ga", "mnemoKata": "รูปเหมือน カ บวก゛ = ga"}, {"hira": "ぎ", "kata": "ギ", "romaji": "gi", "mnemoHira": "รูปเหมือน き บวก゛ = gi", "mnemoKata": "รูปเหมือน キ บวก゛ = gi"}, {"hira": "ぐ", "kata": "グ", "romaji": "gu", "mnemoHira": "รูปเหมือน く บวก゛ = gu", "mnemoKata": "รูปเหมือน ク บวก゛ = gu"}, {"hira": "げ", "kata": "ゲ", "romaji": "ge", "mnemoHira": "รูปเหมือน け บวก゛ = ge", "mnemoKata": "รูปเหมือน ケ บวก゛ = ge"}, {"hira": "ご", "kata": "ゴ", "romaji": "go", "mnemoHira": "รูปเหมือน こ บวก゛ = go", "mnemoKata": "รูปเหมือน コ บวก゛ = go"}]}, {"id": "za", "section": "Tenten", "label": "za", "tip": "さ-แถวบวก゛ ⚠️ じ อ่าน \"ji\" (ไม่ใช่ zi) ตามข้อยกเว้นเดียวกับ し", "chars": [{"hira": "ざ", "kata": "ザ", "romaji": "za", "mnemoHira": "รูปเหมือน さ บวก゛ = za", "mnemoKata": "รูปเหมือน サ บวก゛ = za"}, {"hira": "じ", "kata": "ジ", "romaji": "ji", "mnemoHira": "รูปเหมือน し บวก゛ = ji (เสียงเดียวกับ ぢ)", "mnemoKata": "รูปเหมือน シ บวก゛ = ji"}, {"hira": "ず", "kata": "ズ", "romaji": "zu", "mnemoHira": "รูปเหมือน す บวก゛ = zu (เสียงเดียวกับ づ)", "mnemoKata": "รูปเหมือน ス บวก゛ = zu"}, {"hira": "ぜ", "kata": "ゼ", "romaji": "ze", "mnemoHira": "รูปเหมือน せ บวก゛ = ze", "mnemoKata": "รูปเหมือน セ บวก゛ = ze"}, {"hira": "ぞ", "kata": "ゾ", "romaji": "zo", "mnemoHira": "รูปเหมือน そ บวก゛ = zo", "mnemoKata": "รูปเหมือน ソ บวก゛ = zo"}]}, {"id": "da", "section": "Tenten", "label": "da", "tip": "た-แถวบวก゛ ⚠️ ぢ กับ づ ออกเสียง ji/zu เหมือน じ/ず ทุกประการ พบใช้น้อยมาก (เจอเฉพาะบางคำ เช่น 鼻血 ぢ)", "chars": [{"hira": "だ", "kata": "ダ", "romaji": "da", "mnemoHira": "รูปเหมือน た บวก゛ = da", "mnemoKata": "รูปเหมือน タ บวก゛ = da"}, {"hira": "ぢ", "kata": "ヂ", "romaji": "ji", "mnemoHira": "รูปเหมือน ち บวก゛ = ji (พบน้อย ใช้แทน ji ในบางคำเท่านั้น)", "mnemoKata": "รูปเหมือน チ บวก゛ = ji (พบน้อยมาก)"}, {"hira": "づ", "kata": "ヅ", "romaji": "zu", "mnemoHira": "รูปเหมือน つ บวก゛ = zu (พบน้อย ใช้แทน zu ในบางคำเท่านั้น)", "mnemoKata": "รูปเหมือน ツ บวก゛ = zu (พบน้อยมาก)"}, {"hira": "で", "kata": "デ", "romaji": "de", "mnemoHira": "รูปเหมือน て บวก゛ = de", "mnemoKata": "รูปเหมือน テ บวก゛ = de"}, {"hira": "ど", "kata": "ド", "romaji": "do", "mnemoHira": "รูปเหมือน と บวก゛ = do", "mnemoKata": "รูปเหมือน ト บวก゛ = do"}]}, {"id": "ba", "section": "Tenten", "label": "ba", "tip": "は-แถวบวก゛ ตรงไปตรงมาทั้งหมด (ba-bi-bu-be-bo)", "chars": [{"hira": "ば", "kata": "バ", "romaji": "ba", "mnemoHira": "รูปเหมือน は บวก゛ = ba", "mnemoKata": "รูปเหมือน ハ บวก゛ = ba"}, {"hira": "び", "kata": "ビ", "romaji": "bi", "mnemoHira": "รูปเหมือน ひ บวก゛ = bi", "mnemoKata": "รูปเหมือน ヒ บวก゛ = bi"}, {"hira": "ぶ", "kata": "ブ", "romaji": "bu", "mnemoHira": "รูปเหมือน ふ บวก゛ = bu", "mnemoKata": "รูปเหมือน フ บวก゛ = bu"}, {"hira": "べ", "kata": "ベ", "romaji": "be", "mnemoHira": "รูปเหมือน へ บวก゛ = be", "mnemoKata": "รูปเหมือน ヘ บวก゛ = be"}, {"hira": "ぼ", "kata": "ボ", "romaji": "bo", "mnemoHira": "รูปเหมือน ほ บวก゛ = bo", "mnemoKata": "รูปเหมือน ホ บวก゛ = bo"}]}, {"id": "pa", "section": "Maru", "label": "pa", "tip": "は-แถวบวกวงกลม゜(handakuten) แทนที่จะก้อง กลับกลายเป็นเสียง p ล้วนๆ จำคู่กับ ba-แถวว่า \"เครื่องหมายต่างกัน เสียงต่างกันคนละแบบ\"", "chars": [{"hira": "ぱ", "kata": "パ", "romaji": "pa", "mnemoHira": "รูปเหมือน は บวกวงกลมเล็ก (゜) = เสียง p: pa", "mnemoKata": "รูปเหมือน ハ บวก゜ = pa"}, {"hira": "ぴ", "kata": "ピ", "romaji": "pi", "mnemoHira": "รูปเหมือน ひ บวก゜ = pi", "mnemoKata": "รูปเหมือน ヒ บวก゜ = pi"}, {"hira": "ぷ", "kata": "プ", "romaji": "pu", "mnemoHira": "รูปเหมือน ふ บวก゜ = pu", "mnemoKata": "รูปเหมือน フ บวก゜ = pu"}, {"hira": "ぺ", "kata": "ペ", "romaji": "pe", "mnemoHira": "รูปเหมือน へ บวก゜ = pe", "mnemoKata": "รูปเหมือน ヘ บวก゜ = pe"}, {"hira": "ぽ", "kata": "ポ", "romaji": "po", "mnemoHira": "รูปเหมือน ほ บวก゜ = po", "mnemoKata": "รูปเหมือน ホ บวก゜ = po"}]}], "strokes": {"あ": {"vb": "0 0 109 109", "strokes": [{"d": "M31.01,33c0.88,0.88,2.75,1.82,5.25,1.75c8.62-0.25,20-2.12,29.5-4.25c1.51-0.34,4.62-0.88,6.62-0.5", "x0": 31.0, "y0": 33.0}, {"d": "M49.76,17.62c0.88,1,1.82,3.26,1.38,5.25c-3.75,16.75-6.25,38.13-5.13,53.63c0.41,5.7,1.88,10.88,3.38,13.62", "x0": 49.8, "y0": 17.6}, {"d": "M65.63,44.12c0.75,1.12,1.16,4.39,0.5,6.12c-4.62,12.26-11.24,23.76-25.37,35.76c-6.86,5.83-15.88,3.75-16.25-8.38c-0.34-10.87,13.38-23.12,32.38-26.74c12.42-2.37,27,1.38,30.5,12.75c4.05,13.18-3.76,26.37-20.88,30.49", "x0": 65.6, "y0": 44.1}]}, "ア": {"vb": "0 0 109 109", "strokes": [{"d": "M23.5,26.25c2.41,1.56,3.98,1.44,8.51,0.75c11.4-1.75,37.77-5.5,48.28-6.78c5.23-0.64,7.99,2.06,2.62,6.04c-6.75,5-13.12,9.5-23.25,16", "x0": 23.5, "y0": 26.2}, {"d": "M53.12,41.12c0.79,1.5,1.02,3.24,0.58,5.28c-4.04,18.48-9.92,31.85-19.92,45.48", "x0": 53.1, "y0": 41.1}]}, "い": {"vb": "0 0 109 109", "strokes": [{"d": "M21.5,29.66c2.01,2.17,2.61,4.68,2.17,7.43c-3.09,19.16-1.03,32.01,7.93,41.45c6.12,6.45,6.26,3.14,7.04-5.21", "x0": 21.5, "y0": 29.7}, {"d": "M72.96,36.51c9.44,8.05,17.79,18.82,18.41,33.83", "x0": 73.0, "y0": 36.5}]}, "イ": {"vb": "0 0 109 109", "strokes": [{"d": "M69.75,16.75c0.12,1.75-0.34,3.86-1.62,5.5c-10.13,12.87-23.75,29.63-45.63,42.87", "x0": 69.8, "y0": 16.8}, {"d": "M56.38,43.88c1,1.12,1.25,3,1.25,4.62c0,1.62,0,32.75,0,34.62c0,1.87-0.13,9.13-0.13,11.76", "x0": 56.4, "y0": 43.9}]}, "う": {"vb": "0 0 109 109", "strokes": [{"d": "M42,15.5c5.62,2.12,9.62,3,12.88,3c8.27,0,8,1.12-0.38,5.5", "x0": 42.0, "y0": 15.5}, {"d": "M33,42.38c2.12,1.12,4.12,2.88,8.5,1.38c4.38-1.5,12.75-7.12,18.5-7c5.75,0.12,10.25,5,10.25,18c0,15.49-8.25,30.24-24.37,41.24", "x0": 33.0, "y0": 42.4}]}, "ウ": {"vb": "0 0 109 109", "strokes": [{"d": "M53.25,14.62c1,1.12,1.25,3,1.25,4.62c0,1.62,0,10.76,0,12.64", "x0": 53.2, "y0": 14.6}, {"d": "M26.5,31.25c1,1.12,1.22,3,1.25,4.62c0.09,4.45,0.29,10.95,0.45,16.37c0.07,2.5,0.14,4.77,0.18,6.5", "x0": 26.5, "y0": 31.2}, {"d": "M29.12,35.88c19.38-2.25,40.25-4.25,49-5.5c8.75-1.25,8.28,0.84,6.25,6.88c-5,14.88-20.12,43.5-41,56.62", "x0": 29.1, "y0": 35.9}]}, "え": {"vb": "0 0 109 109", "strokes": [{"d": "M40.52,13.25c5.62,2.12,10,3,14.12,3c8.27,0,8,1.12-0.38,5.5", "x0": 40.5, "y0": 13.2}, {"d": "M32.52,45.12c1.88,1.25,4.5,1.75,7.38,0.62c3.29-1.29,17-7.88,21.25-9.88c4.25-2,8.32,0.04,4.38,4.62c-12.26,14.27-27.26,31.52-39.51,44.4c-3.26,3.42-0.58,3.54,1.5,1.37c13.5-14.12,18.12-20.12,23.62-20.12c7.13,0,3.5,16.75,6.75,22.38c3.25,5.63,19.12,3.75,26.12,2.12", "x0": 32.5, "y0": 45.1}]}, "エ": {"vb": "0 0 109 109", "strokes": [{"d": "M31.87,35.68c2.32,0.71,5.14,0.66,7.48,0.29c8.57-1.35,22.4-2.85,33.66-3.85c2.26-0.2,4.52-0.19,6.77,0.22", "x0": 31.9, "y0": 35.7}, {"d": "M53.34,38.13c1,1.12,1.31,3,1.25,4.62c-0.18,4.74-0.51,12.89-0.83,22.25c-0.08,2.31-0.16,4.7-0.23,7.12", "x0": 53.3, "y0": 38.1}, {"d": "M19,75.46c3.41,0.94,7.57,0.88,11.01,0.39c17.78-2.48,34.53-3.86,50.55-3.9c3.34-0.01,7.23,0.42,10.46,1.8", "x0": 19.0, "y0": 75.5}]}, "お": {"vb": "0 0 109 109", "strokes": [{"d": "M22.88,35.12c1.38,1,3.62,2.38,6,2.12c2.38-0.26,19.62-5.12,21.12-5.74c1.5-0.62,4-1.25,5.88-2", "x0": 22.9, "y0": 35.1}, {"d": "M41.5,16.12c2.25,1,3.59,4.39,3.12,7.38c-2.5,16.12-3.37,45.53-2.25,58.38c0.75,8.62-0.64,10.45-7.12,7.12c-5.13-2.62-13.75-8-13.75-12.38c0-7.5,24.38-23.62,44.75-23.62c17.25,0,25,8.25,25,17.25c0,8.25-9.38,18.88-26.75,21", "x0": 41.5, "y0": 16.1}, {"d": "M73,22.12c5.38,2.62,8.88,5.88,10.62,8.25c2.27,3.08,0.38,4.5-1.12,5", "x0": 73.0, "y0": 22.1}]}, "オ": {"vb": "0 0 109 109", "strokes": [{"d": "M19.5,37.85c3.91,1.78,7.55,1.55,11.01,1.02c18.03-2.75,34.4-4.5,50.55-5.41c3.34-0.19,6.35,0.17,10.46,1.38", "x0": 19.5, "y0": 37.9}, {"d": "M60.38,16.38c1.32,1.49,1.65,3.97,1.65,6.12c0,8-0.25,46.23-0.25,58.63c0,20.38-5.88,7.5-9.25,5.5", "x0": 60.4, "y0": 16.4}, {"d": "M60.29,36.38c0,1.62-1.64,3.61-3.62,6c-7.88,9.5-21.12,22.75-34.62,33", "x0": 60.3, "y0": 36.4}]}, "か": {"vb": "0 0 109 109", "strokes": [{"d": "M24.62,38.62c1.88,1.62,4.65,2.33,8.62,1c25.5-8.5,29.5-4.13,29.5,7.62c0,9.38-1.24,17.46-4.25,25.25c-7.62,19.76-10.87,17.39-16.12,10.89", "x0": 24.6, "y0": 38.6}, {"d": "M48.5,17.5c1,1.38,1.29,4.7,0.5,7.12c-5,15.25-18.02,40.93-19.62,43.88c-3.12,5.75-6.38,11.88-9.38,16.25", "x0": 48.5, "y0": 17.5}, {"d": "M77.37,31.62c7.5,6.88,13.25,15.75,15,24.88", "x0": 77.4, "y0": 31.6}]}, "カ": {"vb": "0 0 109 109", "strokes": [{"d": "M25.5,40.62c1.88,1.25,4.51,1.87,7.12,1.5c17.88-2.5,32.78-4.51,42.5-5.88c7.12-1,10.59,0.24,8.62,7.88c-2.12,8.25-4.47,17.81-9.25,29.12c-10.49,24.88-14.11,14.51-19.24,11.88", "x0": 25.5, "y0": 40.6}, {"d": "M55.88,17.12c0.88,1.62,1.29,3.83,0.75,6.75c-4.25,22.88-15.88,45.25-30.25,58.88", "x0": 55.9, "y0": 17.1}]}, "き": {"vb": "0 0 109 109", "strokes": [{"d": "M30.5,30.25c1.88,0.75,4.64,1.06,5.88,0.88c6.75-1,22.25-4.5,26.5-6c2.17-0.76,3.5-1.25,4.88-2.12", "x0": 30.5, "y0": 30.2}, {"d": "M36.25,48.7c2.01,0.85,4.97,1.2,6.29,0.99c7.23-1.13,23.82-5.09,28.37-6.79c2.32-0.86,3.75-1.41,5.22-2.4", "x0": 36.2, "y0": 48.7}, {"d": "M42,14.12c1.5,0.88,3.13,2.94,4,5.12c5.5,13.76,16,29.26,26.37,40.76c7.64,8.47,9.12,9.38-6,3.88", "x0": 42.0, "y0": 14.1}, {"d": "M33.75,83.25c10.62,9.75,27.25,8.62,38.12,5", "x0": 33.8, "y0": 83.2}]}, "キ": {"vb": "0 0 109 109", "strokes": [{"d": "M27,40.5c1.75,0.62,4.77,1.09,7.25,0.38c11.75-3.38,30.62-8.13,37.5-9.88c2.62-0.67,6.75-1.12,9-1", "x0": 27.0, "y0": 40.5}, {"d": "M19.5,65.8c2.28,0.84,6.24,1.18,9.46,0.17c17.79-5.59,32.67-9.09,49.17-12.99c3.43-0.81,8.81-1.52,11.74-1.35", "x0": 19.5, "y0": 65.8}, {"d": "M48.87,16.75c2.5,1.75,3.43,3.24,3.88,6.12c2.12,13.62,6.38,45.38,8.25,59.25c0.4,3,1,8.38,1.38,11.12", "x0": 48.9, "y0": 16.8}]}, "く": {"vb": "0 0 109 109", "strokes": [{"d": "M60.66,15c0.5,1.62,0.35,5.44-1,7.38c-6.75,9.62-14.3,19.08-18.62,24.5c-4,5-3.79,7.03-0.88,11c5.5,7.5,12.75,18.75,17.62,27.25c1.48,2.59,2.75,4.75,4.5,8.62", "x0": 60.7, "y0": 15.0}]}, "ク": {"vb": "0 0 109 109", "strokes": [{"d": "M50,19.62c0.38,1.5,0.34,3.48-0.5,5.12c-4.12,8.12-7.88,15.5-16.12,24.12", "x0": 50.0, "y0": 19.6}, {"d": "M51.25,28.62c2.62,0.25,5.67-0.39,7.62-0.88c6-1.5,9.75-2.38,15.12-3.88c5.79-1.62,7.53-0.42,5.12,4.88c-10.36,22.88-26.24,44.14-48.61,60.51", "x0": 51.2, "y0": 28.6}]}, "け": {"vb": "0 0 109 109", "strokes": [{"d": "M24.67,19.75c1.25,1.5,2.62,3.75,2.12,6.38c-3,15.88-6.5,29.5-4.88,44.62c2.02,18.84,2.25,4.75,6.75-3.5", "x0": 24.7, "y0": 19.8}, {"d": "M53.67,38.62c2.12,1.38,4.28,1.89,6.88,1.5c8.25-1.25,15.39-2.57,20.62-4c2.76-0.74,5.26-1.12,6.88-1.12", "x0": 53.7, "y0": 38.6}, {"d": "M71.67,14.38c2.13,1.37,2.88,3.35,2.88,5.12c0,11.62,0.12,20.38,0.12,30.12c0,20.75-0.62,30.88-12.5,42.25", "x0": 71.7, "y0": 14.4}]}, "ケ": {"vb": "0 0 109 109", "strokes": [{"d": "M40.96,17.88c0.44,1.9,0.39,4.42-0.59,6.5c-4.82,10.31-9.21,19.67-18.87,30.62", "x0": 41.0, "y0": 17.9}, {"d": "M37.88,37.62c2.12,0.88,4.15,1.04,6.62,0.5c12.62-2.75,25.5-4.88,35.75-6.5c3.61-0.57,6.25-0.75,9.25-0.5", "x0": 37.9, "y0": 37.6}, {"d": "M64.46,38.88c0.44,1.9,0.5,4.27-0.08,6.5c-3.63,13.75-9.25,31.25-24.63,43.87", "x0": 64.5, "y0": 38.9}]}, "こ": {"vb": "0 0 109 109", "strokes": [{"d": "M34.75,26.75c1.12,0.88,2.91,2.01,6,1.5c7.62-1.25,14.11-2.56,22.38-2.62c15.5-0.12,5.88,5-5.75,9", "x0": 34.8, "y0": 26.8}, {"d": "M30,68.12c2.25,14.5,15.26,17.96,31,16.75c6.5-0.5,11.88-1.25,17.62-2.88", "x0": 30.0, "y0": 68.1}]}, "コ": {"vb": "0 0 109 109", "strokes": [{"d": "M30.13,35c1.75,1,3.01,2.18,6.5,1.62c14.25-2.25,29.62-4.25,37.38-5.5c9.37-1.51,9.88,0.25,8,7.5c-2.77,10.71-5.25,22.12-7,34.88", "x0": 30.1, "y0": 35.0}, {"d": "M27.5,77.38c2.62,1.12,4.38,1.51,8.25,1c11.38-1.5,22.62-3,33.75-3.38c4-0.13,5.88,0,9.62,0.5", "x0": 27.5, "y0": 77.4}]}, "さ": {"vb": "0 0 109 109", "strokes": [{"d": "M27,38.9c2.42,1.33,5.38,1.47,8.32,1.06c8.79-1.24,28.67-7.76,34.15-10.43c2.79-1.36,3.78-1.91,6.28-3.53", "x0": 27.0, "y0": 38.9}, {"d": "M41.5,13.88c1.5,0.88,3.63,2.94,4.5,5.12c5.5,13.75,15.25,27.62,26.87,39.5c7.98,8.15,6.38,10-6,3.12", "x0": 41.5, "y0": 13.9}, {"d": "M35.25,80.5c4.5,11.75,20.88,12.5,38.38,7.5", "x0": 35.2, "y0": 80.5}]}, "サ": {"vb": "0 0 109 109", "strokes": [{"d": "M16.5,44.34c2.84,1.27,4.77,1.91,8.93,1.13c17.2-3.22,40.45-5.35,58.53-5.34c4.33,0,6.92,0.37,10.42,0.82", "x0": 16.5, "y0": 44.3}, {"d": "M36.63,23.38c1.12,1.38,1.19,2.5,1.25,4.75c0.25,9,0.38,20.25,0.75,28.88c0.14,3.25,0.38,7.12,0.38,9.25", "x0": 36.6, "y0": 23.4}, {"d": "M69.63,16.62c1.5,2,1.62,2.87,1.62,6.25c0,8.25-0.16,9-0.16,15.88c0,23.25-9.34,42.5-23.21,53", "x0": 69.6, "y0": 16.6}]}, "し": {"vb": "0 0 109 109", "strokes": [{"d": "M39.12,17.5c1.25,3.12,0.93,6.74,0.38,10.25c-2.12,13.5-3,26.5-3,39.12c0,27.38,19.88,30.12,45.5,17.25", "x0": 39.1, "y0": 17.5}]}, "シ": {"vb": "0 0 109 109", "strokes": [{"d": "M39.87,19.75c5.14,1.57,9.79,6.01,11.5,8.62", "x0": 39.9, "y0": 19.8}, {"d": "M26,42.62c3.25,0.88,10.25,5.5,12.25,8.13", "x0": 26.0, "y0": 42.6}, {"d": "M33,85c3.75,0.88,7.12,0.49,10.38-1.38c17.87-10.24,32.37-23.87,46.12-42.87", "x0": 33.0, "y0": 85.0}]}, "す": {"vb": "0 0 109 109", "strokes": [{"d": "M15.5,37.12c2.88,2.12,6.94,1.51,12.75,0.25c16.12-3.5,36.14-5.38,46.62-6.5c7-0.75,11.88-0.62,17.75,0.12", "x0": 15.5, "y0": 37.1}, {"d": "M57.62,13.38c2,1.5,2.75,3.25,2.75,5.88c0,10.38,0,35.12,0,40.75c0,14.62-15.62,16.38-15.62,1.75c0-14.25,18-14.12,18,6.38c0,13.25-7.75,21.5-16,28.38", "x0": 57.6, "y0": 13.4}]}, "ス": {"vb": "0 0 109 109", "strokes": [{"d": "M30.13,29.38c1.75,1.5,4.15,1.98,6.62,1.38c13.25-3.25,24.25-5.62,31.25-7.38c7-1.76,8.64,1.16,6.5,5.75c-11.24,24.12-28.37,45.87-53.5,57.25", "x0": 30.1, "y0": 29.4}, {"d": "M61,57.25c11,7.38,21,17,28,28.62", "x0": 61.0, "y0": 57.2}]}, "せ": {"vb": "0 0 109 109", "strokes": [{"d": "M16.5,49.93c2.88,2.42,6.86,1.57,12.75,0.53c19-3.34,33-5.72,47.12-7.64c6.99-0.95,11.88-1.21,17.75-0.36", "x0": 16.5, "y0": 49.9}, {"d": "M69.74,17.75c2,1.5,2.75,3.25,2.75,5.88c0,10.38,0,17.88,0,23.5c0,25.62-5.75,23.25-11.88,19", "x0": 69.7, "y0": 17.8}, {"d": "M35.62,26.25c2,1.5,2.75,3.25,2.75,5.88c0,10.38,0,28.38,0,34c0,14.5,6.38,19.55,20.14,19.55c10.24,0,13.74,0.07,22.61-1.68", "x0": 35.6, "y0": 26.2}]}, "セ": {"vb": "0 0 109 109", "strokes": [{"d": "M17,49.38c3.12,1.5,5.04,2.18,8.62,1.38c23.5-5.25,31.24-7.43,50.62-11.62c23.12-5,6.5,7.75-3.25,18.12", "x0": 17.0, "y0": 49.4}, {"d": "M42.38,19.5c2,2.25,2.15,3.5,2.12,6.62c-0.12,17.5-0.88,31.75-0.88,41.12c0,14,3.13,16.99,12.38,17.12c8.38,0.12,14.12,0.12,18,0.12c3.88,0,7.5-0.5,10.5-1.12", "x0": 42.4, "y0": 19.5}]}, "そ": {"vb": "0 0 109 109", "strokes": [{"d": "M38.4,22c1.88,1.25,4.98,1.05,7.5,0.38c6.5-1.75,13.25-3.75,19.38-5.38c4.63-1.23,7.18,2.06,3.62,5.25c-12.12,10.87-31.14,24.4-40,30.25c-6.25,4.12-5.88,5.75,1.38,3.88c17.08-4.42,35.96-8.68,50.12-10.38c9.38-1.12,9.62,0.12,0.5,1.38c-15.82,2.17-34.38,14.25-34.38,26.5c0,12.88,11.62,20.38,31.5,16.62", "x0": 38.4, "y0": 22.0}]}, "ソ": {"vb": "0 0 109 109", "strokes": [{"d": "M23.5,25.5c3.92,4.1,7.71,9.93,10.75,17.88", "x0": 23.5, "y0": 25.5}, {"d": "M83.5,21c1.25,2.5,1.3,4.44,0.12,8.5c-5.87,20.38-26.24,49.5-45.62,61.25", "x0": 83.5, "y0": 21.0}]}, "た": {"vb": "0 0 109 109", "strokes": [{"d": "M24.38,35.38c1.38,0.62,3.88,1.51,6.38,1.12c6.5-1,16.25-2.88,24.88-4.75c2.64-0.57,5.38-1.5,7.62-2.38", "x0": 24.4, "y0": 35.4}, {"d": "M45,16.88c0.75,1.25,0.87,3.62,0.38,5.25c-6.35,20.94-12.75,36.37-18.88,52.37c-1.36,3.56-4.75,11.75-6,14.62", "x0": 45.0, "y0": 16.9}, {"d": "M56.38,53.25c12.38-2.75,18.25-3.7,23.62-3.12c15.12,1.62-1.12,2.25-4.25,4.88", "x0": 56.4, "y0": 53.2}, {"d": "M54.13,82.25c4.38,7,14.25,8.12,34.5,5.62", "x0": 54.1, "y0": 82.2}]}, "タ": {"vb": "0 0 109 109", "strokes": [{"d": "M48.83,19.75c0.43,1.72,0.39,4-0.58,5.89c-4.77,9.34-9.1,17.82-18.63,27.73", "x0": 48.8, "y0": 19.8}, {"d": "M49.75,30.38c2.75,0.5,5,0,7.62-0.62c6.02-1.43,10.5-2.62,15.88-4.12c5.79-1.62,8.22,0.31,5.88,5.62c-10.88,24.62-22.13,43.99-50.13,59.99", "x0": 49.8, "y0": 30.4}, {"d": "M43.38,45.62c6.75,3.5,10.62,7.88,14.75,15.25", "x0": 43.4, "y0": 45.6}]}, "ち": {"vb": "0 0 109 109", "strokes": [{"d": "M24.5,32.62c1.38,0.62,3.88,1.51,6.38,1.12c6.5-1,18.25-4.12,26.88-6c2.64-0.57,5.38-1.5,7.62-2.38", "x0": 24.5, "y0": 32.6}, {"d": "M45.62,15.62c0.75,1.25,0.71,3.58,0.38,5.25c-3,15-4.25,22.59-8.38,38.62c-3.25,12.62-5.38,11.12,3.62,4.38c8.29-6.21,19.75-9.5,28.5-9.5c8.62,0,14.58,5.88,14.5,14.5c-0.12,13.5-16.5,20.62-29.88,23.25", "x0": 45.6, "y0": 15.6}]}, "チ": {"vb": "0 0 109 109", "strokes": [{"d": "M69.76,15.25c-0.38,2.62-2.01,4.37-3.88,5.38c-7.88,4.25-18.62,9.75-35.5,13.25", "x0": 69.8, "y0": 15.2}, {"d": "M18.5,51.5c2.88,0.88,4.39,1.65,7.88,1.25c22-2.5,36.38-4.25,56.12-4.88c4.88-0.15,7.88,0.51,10.88,1.51", "x0": 18.5, "y0": 51.5}, {"d": "M54.88,30.75c0.88,0.75,1.75,2.49,1.75,4.75c0,6.03,0.03,11.25,0.03,18.27c0,14.98-5.03,29.48-16.53,39.23", "x0": 54.9, "y0": 30.8}]}, "つ": {"vb": "0 0 109 109", "strokes": [{"d": "M14,44.75c1.88,1.62,4.68,2.09,8.12,0.62c17.88-7.62,30-11.12,44.88-10.88c12.56,0.21,22.98,7.17,22.87,19.17c-0.18,18.77-24.75,28.71-45.01,32.08", "x0": 14.0, "y0": 44.8}]}, "ツ": {"vb": "0 0 109 109", "strokes": [{"d": "M21.5,31.38c2.38,3,4.5,9.38,4.88,13.88", "x0": 21.5, "y0": 31.4}, {"d": "M45.62,23.75c3.38,3.5,6.62,9.5,7,14.88", "x0": 45.6, "y0": 23.8}, {"d": "M84.62,27.88c0.75,2.25,0.39,5.26-0.75,8c-7.63,18.37-21.25,41.12-46,52.5", "x0": 84.6, "y0": 27.9}]}, "て": {"vb": "0 0 109 109", "strokes": [{"d": "M20.5,26.38c1.87,1.62,4.42,1.97,8.12,1.37c21.75-3.5,33-5.12,50.12-8.38c12.34-2.34,13-0.88,0.38,1.38c-17.89,3.19-33.78,19.12-33.78,37.62c0,20.5,17.91,30.25,35.16,30.25", "x0": 20.5, "y0": 26.4}]}, "テ": {"vb": "0 0 109 109", "strokes": [{"d": "M36.5,21.5c2.12,1.25,4.38,1.59,7.25,1.25c10.62-1.25,16.88-2.25,24.62-3.25c3.73-0.48,5.63-0.5,8.13-0.25", "x0": 36.5, "y0": 21.5}, {"d": "M20,44.12c2.88,1,5.26,1.05,7.5,0.75c22.38-3,37-5.62,54.13-6.12c5.62-0.16,7.75,0,10.38,0.62", "x0": 20.0, "y0": 44.1}, {"d": "M58,43.25c0.88,1,1.32,2.63,1.12,4.38c-1.74,15.37-11.62,34.99-24.62,41.87", "x0": 58.0, "y0": 43.2}]}, "と": {"vb": "0 0 109 109", "strokes": [{"d": "M35.5,18.38c1.74,0.74,3.62,2.62,4.12,5.37c0.5,2.75,4.75,25,5.38,28.12", "x0": 35.5, "y0": 18.4}, {"d": "M78.12,25.5c0.25,1.88,0.04,4.09-2.25,5.75c-6.37,4.63-13.22,8.49-22.75,15.25c-12.88,9.12-21.62,18.38-21.62,27.5c0,10.12,8.5,13.88,26.88,13.88c6.25,0,14.75-0.12,21.62-1.25", "x0": 78.1, "y0": 25.5}]}, "ト": {"vb": "0 0 109 109", "strokes": [{"d": "M44,16.38c1.25,1.12,2.12,3.25,2.12,5.5c0,26.12,0,53.5,0,57.62c0,4.12,0,10.5,0,13.38", "x0": 44.0, "y0": 16.4}, {"d": "M49.24,43.12c11.75,4.12,18.25,10.62,24.5,18.75", "x0": 49.2, "y0": 43.1}]}, "な": {"vb": "0 0 109 109", "strokes": [{"d": "M22.88,28.96c1.18,0.58,3.3,1.1,5.47,1.05c5.53-0.13,10.9-0.98,16.52-2.42c4.82-1.23,9.13-3.12,11.38-4.22", "x0": 22.9, "y0": 29.0}, {"d": "M42.99,14c0.63,0.89,0.56,2.52,0.31,3.72c-2.96,14.16-7.95,26.56-14.25,37.87c-2.05,3.69-4.25,7.24-6.55,10.65", "x0": 43.0, "y0": 14.0}, {"d": "M72.26,23.25c6.88,2.5,12.62,5.62,14.75,9.5c4.06,7.41-0.25,3.38-3.5,3.88", "x0": 72.3, "y0": 23.2}, {"d": "M68.88,44.62c-1,1.88-2.14,5.24-1.88,8.25c0.62,7,1.5,13.12,1.5,20.62c0,20-27.88,19.75-27.88,9.38c0-5.62,8.25-8.25,13.88-8.25c8.75,0,21.5,3.25,29.75,11.5", "x0": 68.9, "y0": 44.6}]}, "ナ": {"vb": "0 0 109 109", "strokes": [{"d": "M18.5,44.12c2.62,1,4.77,1.17,9.12,0.5c19.38-3,37.75-4.75,52.38-5.62c3.75-0.22,8.88-0.25,11.88,0.12", "x0": 18.5, "y0": 44.1}, {"d": "M53.26,14.5c1.75,1.25,2.75,3,2.75,6c0,3,0.12,21.5,0.12,24.25c0,20-6,37.62-18.38,49.12", "x0": 53.3, "y0": 14.5}]}, "に": {"vb": "0 0 109 109", "strokes": [{"d": "M24.53,22.75c1.25,1.5,1.62,3.75,1.12,6.38c-3,15.88-9,32.5-7.38,47.62c2.02,18.84,4.5,5.75,8.5-3.5", "x0": 24.5, "y0": 22.8}, {"d": "M53.2,30.64c0.96,0.79,2.44,1.58,5.1,1.35c6.98-0.61,15.01-3.3,22.04-3.36c13.19-0.11,1.5,3.75-8.39,7.35", "x0": 53.2, "y0": 30.6}, {"d": "M52.53,68c1.76,12.92,11.92,16.01,24.23,14.93c5.08-0.45,8.9-0.8,14.27-2.06", "x0": 52.5, "y0": 68.0}]}, "ニ": {"vb": "0 0 109 109", "strokes": [{"d": "M32.63,34.69c2.5,1.19,4.33,1.6,7.45,1.35c11.55-0.91,18.3-2.41,27.04-3.18c2.64-0.23,6.27-0.16,8.39,0.08", "x0": 32.6, "y0": 34.7}, {"d": "M20,74.88c2.62,1,4.78,1.45,9.12,0.75c20.25-3.25,36.5-3.88,52.38-3.88c3.75,0,8,1,11.12,2.38", "x0": 20.0, "y0": 74.9}]}, "ぬ": {"vb": "0 0 109 109", "strokes": [{"d": "M25.38,28.5c2,1.38,2.97,3.23,3.38,5.88c1.87,12.18,4.12,23.92,8.54,34.67c1.79,4.36,3.96,8.33,6.84,12.46", "x0": 25.4, "y0": 28.5}, {"d": "M57.12,19.25c0.88,2.12,1.06,3.79,0.62,5.88c-3.12,15-13.14,39.81-18.12,48.62c-11.87,21-20.62,1.25-20.62-4.5c0-22.63,43.75-44.25,62.36-29.59c7.66,6.03,9.8,14.58,9.14,23.34c-2,26.75-32.88,28.38-32.88,16.88c0-9.38,17.38-7.12,27.12-1.12c3.1,1.91,7.25,5.25,9.5,7.5", "x0": 57.1, "y0": 19.2}]}, "ヌ": {"vb": "0 0 109 109", "strokes": [{"d": "M33.38,27.62c2.75,1.25,5.38,1.16,8.5,0.62c10.12-1.75,19-3.12,28.62-5c6.67-1.3,7.75-0.12,5.38,5.62c-6.7,16.22-20.63,40.52-48.88,57.89", "x0": 33.4, "y0": 27.6}, {"d": "M44.88,46.38c12,6.75,22.38,15.38,30.62,28.12", "x0": 44.9, "y0": 46.4}]}, "ね": {"vb": "0 0 109 109", "strokes": [{"d": "M33.29,14.5c1.62,1.62,2.1,3.21,1.88,5.88c-1.03,11.93-2.06,31.66-2.53,53.12c-0.1,4.62-0.18,9.31-0.22,14", "x0": 33.3, "y0": 14.5}, {"d": "M17.16,37.88c1.62,0.88,3.25,1.38,5.62,0.75c2.14-0.56,7.8-2.31,12.37-4.03c6.26-2.35,6.88-1.47,3.12,3.63c-5.56,7.53-13.02,17.38-18.48,26.77c-5.6,9.62-3.45,8.3,2,3c19.12-18.62,38.5-39.12,54.12-39.12c11.38,0,12.88,11.25,12.88,32.5c0,28.62-30.18,24.88-30.18,16.26c0-9.63,18.73-7.82,28.06-1.88c2.75,1.75,5.88,4.88,7.5,6.75", "x0": 17.2, "y0": 37.9}]}, "ネ": {"vb": "0 0 109 109", "strokes": [{"d": "M51.38,12.38c3.38,2.12,8,5.88,11,10.88", "x0": 51.4, "y0": 12.4}, {"d": "M26.88,36.16c2.62,1.46,5.45,1.93,8.5,1.19c10.75-2.6,20.75-4.98,30.88-7.5c6.53-1.62,7.81,1.27,4.62,4.68c-11.63,12.47-22.76,23.35-48.88,37.97", "x0": 26.9, "y0": 36.2}, {"d": "M54.38,54.12c1.38,1.75,1.62,3.5,1.62,6c0,2.5,0,27.5,0,29.38c0,1.88,0,4,0,6.88", "x0": 54.4, "y0": 54.1}, {"d": "M65.38,53.62c12.5,6,19.88,11.75,24.88,18.88", "x0": 65.4, "y0": 53.6}]}, "の": {"vb": "0 0 109 109", "strokes": [{"d": "M53.82,28.62c1,1.5,1.34,4.12,0.88,6.62c-1.75,9.5-6.89,25-10.75,33.12c-9.63,20.26-16.55,14.74-24.38-1.98c-9.13-19.5,23.5-48.88,50.63-40.38c32.38,10.15,28,54.62-4.75,60.88", "x0": 53.8, "y0": 28.6}]}, "ノ": {"vb": "0 0 109 109", "strokes": [{"d": "M72.37,25.25c0.75,2,0.92,4.89,0.25,7.25c-7.12,25-25.38,44.75-43.62,56.88", "x0": 72.4, "y0": 25.2}]}, "は": {"vb": "0 0 109 109", "strokes": [{"d": "M24.51,18c1.25,1.5,2.15,4,1.62,6.62c-3.5,17.62-6.98,36.4-4,54.88c2.5,15.5,1.12,2,5.62-6.25", "x0": 24.5, "y0": 18.0}, {"d": "M49.64,37.89c2.41,1.57,4.85,2.16,7.8,1.71c9.36-1.43,17.46-2.94,23.4-4.57c3.12-0.86,5.96-1.29,7.8-1.29", "x0": 49.6, "y0": 37.9}, {"d": "M69.77,16.5c2.25,2.12,2.88,4.12,2.88,6.5c0,2.38,1.5,38.62,1.5,48c0,22.5-30.62,19.62-30.62,10.5c0-9.75,23.88-5.62,29.5-2.88c5.62,2.74,11.98,8.26,13.36,9.38", "x0": 69.8, "y0": 16.5}]}, "ハ": {"vb": "0 0 109 109", "strokes": [{"d": "M39.33,36.88c0.38,1.14,0.46,2.88-0.12,4.14c-6.33,13.73-13.33,23.86-22.21,32.23", "x0": 39.3, "y0": 36.9}, {"d": "M65.5,36.38c13,9.12,23.12,22.62,28,33.38", "x0": 65.5, "y0": 36.4}]}, "ひ": {"vb": "0 0 109 109", "strokes": [{"d": "M20,25.12c1.25,0.88,3.75,2.25,6.5,1.38c2.75-0.87,7.31-2.38,11.38-4.5c6-3.12,8.42-1.01,4.25,4c-27.13,32.62-23.76,58.5-1.52,62.88c18.07,3.56,37.63-16.38,35.63-56.51c-0.72-14.5-0.17-14.78,4.12-1.75c3.76,11.38,10.26,20.76,16.14,26.5", "x0": 20.0, "y0": 25.1}]}, "ヒ": {"vb": "0 0 109 109", "strokes": [{"d": "M35.38,44.5c1.75,1.38,4.51,2.19,6.88,1.88c10.24-1.38,17.24-2.88,24.24-4.26c3.01-0.59,7.12-1,9.38-0.88", "x0": 35.4, "y0": 44.5}, {"d": "M31,17.62c1.38,1.26,1.88,3.38,1.88,6.13c0,2.75-0.88,44-0.88,47.25c0,9.75,4,14.62,13.75,14.62c6,0,16.38,0.12,21.38,0c5-0.12,9.5-0.62,13.5-1.5", "x0": 31.0, "y0": 17.6}]}, "ふ": {"vb": "0 0 109 109", "strokes": [{"d": "M42.63,15.62c3.62,3.38,7.5,5.38,12.74,6.13c9.59,1.37,3.5,3.38-1.88,6.12", "x0": 42.6, "y0": 15.6}, {"d": "M43.63,46.88c1.88,4.62,7.5,9.41,14.25,17.5c10.62,12.74,0.49,30-19.13,21.62", "x0": 43.6, "y0": 46.9}, {"d": "M16.5,73.38c0.75,4,1.88,8.12,5,10.12c1.16,0.74,0.12-3.38,13.25-9.12", "x0": 16.5, "y0": 73.4}, {"d": "M80.13,61.88c5.12,3.38,10.28,7.49,11.38,8.88c6.75,8.5-0.25,4.62-4.62,7.12", "x0": 80.1, "y0": 61.9}]}, "フ": {"vb": "0 0 109 109", "strokes": [{"d": "M24.5,30c1.88,1.88,3.5,2.04,6.5,1.62c14.5-2,29-4.38,43.75-6.88c6.82-1.16,10.58,2.29,6.88,9.12c-10.38,19.14-21.25,39.52-50.01,53.64", "x0": 24.5, "y0": 30.0}]}, "へ": {"vb": "0 0 109 109", "strokes": [{"d": "M15,48.75c2.25,1.62,4.67,1.96,7-0.38c3.62-3.62,7.46-6.54,11.25-10.5c5.5-5.75,8.48-4.75,13.12-0.88c12.12,10.12,30.38,25.12,33.38,27.38c3,2.26,12.37,10.38,13.87,11.63", "x0": 15.0, "y0": 48.8}]}, "ヘ": {"vb": "0 0 109 109", "strokes": [{"d": "M15.5,49.02c2.78,1.55,5.39,0.64,6.95-0.9c4.05-4.01,9.47-8.3,12-10.88c3.16-3.23,7.32-5.26,12.01-1.16c11.25,9.82,25.03,21.45,35.78,30.36c4.28,3.55,7.71,6.85,11.25,9.56", "x0": 15.5, "y0": 49.0}]}, "ほ": {"vb": "0 0 109 109", "strokes": [{"d": "M24.51,18.75c1.25,1.5,2.15,4,1.62,6.62c-3.5,17.63-6.98,37.4-4,55.88c2.5,15.5,1.12,2,5.62-6.25", "x0": 24.5, "y0": 18.8}, {"d": "M53.08,21.13c1.9,1.28,3.82,1.76,6.14,1.4c7.36-1.17,13.73-2.4,18.41-3.73c2.46-0.7,4.69-1.05,6.13-1.05", "x0": 53.1, "y0": 21.1}, {"d": "M53.83,44.3c2.21,1.44,4.46,1.98,7.16,1.57c8.59-1.31,15.78-2.44,21.23-3.94c2.87-0.79,5.72-1.18,7.41-1.18", "x0": 53.8, "y0": 44.3}, {"d": "M72.51,23c1.38,1.62,1.62,4.12,1.62,6.5c0,2.38,2,35.12,2,44.5c0,17.5-29.88,17.12-29.88,8c0-9.75,21.38-7.88,29.5-2.88c5.33,3.28,12,8.25,13.38,9.38", "x0": 72.5, "y0": 23.0}]}, "ホ": {"vb": "0 0 109 109", "strokes": [{"d": "M22.63,40.38c2.62,1,4.75,1.71,9.12,1.25c17.75-1.88,29.25-2.75,45.38-3.88c3.74-0.26,7.38-0.12,11.12,0.62", "x0": 22.6, "y0": 40.4}, {"d": "M53.75,17.12c1.38,1.88,1.38,4.5,1.38,7.38c0,2.88-0.12,46.62-0.12,51.88c0,23.12-6.25,11.25-9.75,9.62", "x0": 53.8, "y0": 17.1}, {"d": "M27.38,59.38c0.5,9.25-1.38,16.62-6.38,21.88", "x0": 27.4, "y0": 59.4}, {"d": "M73.25,52.75c10.88,9.63,15.5,17.63,16.63,24.87", "x0": 73.2, "y0": 52.8}]}, "ま": {"vb": "0 0 109 109", "strokes": [{"d": "M29.83,32.28c2.2,1.15,4.43,1.5,7.14,1.26c11.54-1.04,25.94-3.12,34.66-4.85c2.87-0.57,5.45-0.44,7.13-0.44", "x0": 29.8, "y0": 32.3}, {"d": "M33.83,51.84c2.45,1.61,4.94,1.72,7.94,1.26c9.52-1.46,17.87-3.1,27.03-5.16c3.22-0.72,6.34-1.32,8.21-1.32", "x0": 33.8, "y0": 51.8}, {"d": "M55.81,14c1.52,1.8,1.8,4.57,1.8,7.19c0,2.63,0.46,43.88,0.46,54.25c0,21.3-30.07,19.96-30.07,9.86c0-10.79,25.88-9.93,38.57-3.18c6.12,3.25,11.55,6.38,14.8,9.13", "x0": 55.8, "y0": 14.0}]}, "マ": {"vb": "0 0 109 109", "strokes": [{"d": "M21.5,33.75c1.88,1.88,3.5,1.99,6.5,1.62c19.62-2.38,33.5-4,51.25-6.38c6.85-0.92,9.37,1.67,4.38,7.62c-7.12,8.5-17.88,20-28.75,31.62", "x0": 21.5, "y0": 33.8}, {"d": "M43.38,58.88c8.43,6.5,16.6,15.93,20.25,26.25", "x0": 43.4, "y0": 58.9}]}, "み": {"vb": "0 0 109 109", "strokes": [{"d": "M32.5,26c1.88,1.75,4.06,1.7,6.88,1.25c3.88-0.62,7.62-1.75,11.88-3.12c4.26-1.37,6.25-0.12,4.5,5.12c-1.75,5.24-6.66,17.39-12,30.12c-13.63,32.51-29.26,29.26-29.26,18.63c0-14.25,20.48-15.36,33-13.5c18.5,2.75,30,6.62,44.38,14.25", "x0": 32.5, "y0": 26.0}, {"d": "M79.38,54.75c0.75,2.38,0.49,4.37,0,6.25c-2.12,8.12-7.5,25-22.12,33.75", "x0": 79.4, "y0": 54.8}]}, "ミ": {"vb": "0 0 109 109", "strokes": [{"d": "M41.87,20c10.4,2.57,20.5,6.3,25,10.38", "x0": 41.9, "y0": 20.0}, {"d": "M42,46.88c10.72,2.69,21.11,6.6,25.75,10.88", "x0": 42.0, "y0": 46.9}, {"d": "M36.5,75c15.71,4.49,30.95,11,37.75,18.12", "x0": 36.5, "y0": 75.0}]}, "む": {"vb": "0 0 109 109", "strokes": [{"d": "M19.59,31.65c2.1,1.55,4.24,1.66,6.81,1.21c8.17-1.41,15.33-2.98,23.19-4.96c2.76-0.69,5.44-1.27,7.05-1.27", "x0": 19.6, "y0": 31.6}, {"d": "M37.02,15.5c1.62,1.25,2.31,2.88,2.12,5.25c-0.88,11.12-1.5,20.75-4,34.88c-3.61,20.44-19.25,16.99-18.62,7.37c0.5-7.74,6.25-12.86,12.62-13.5c5-0.5,14.28,1.93,5.88,15c-12.62,19.62-11.42,24.51,5.11,25.54c10.98,0.68,19.26,0.72,28.49-0.92c14.15-2.5,7.4-2.63,7.4-11.13", "x0": 37.0, "y0": 15.5}, {"d": "M78.52,36.25c6.88,3.12,11.71,5.95,14.88,10.12c6.25,8.25-1.38,3.62-4.5,4.5", "x0": 78.5, "y0": 36.2}]}, "ム": {"vb": "0 0 109 109", "strokes": [{"d": "M53.84,22.5c0.88,1.75,0.78,4.57-0.38,6.88c-9.25,18.38-16.19,30.96-25.25,45.75c-3.75,6.12-3,8.38,4.38,7.12c7.38-1.26,46.62-8.12,49.62-8.88", "x0": 53.8, "y0": 22.5}, {"d": "M72.21,60.12c6.88,6.38,13.62,14.88,16,25.38", "x0": 72.2, "y0": 60.1}]}, "め": {"vb": "0 0 109 109", "strokes": [{"d": "M27.48,31.75c1.75,1,2.41,3.09,2.5,5.25c0.5,11.62,2.75,23.5,7.25,31.38c1.39,2.44,5.38,8.5,7.25,10.38", "x0": 27.5, "y0": 31.8}, {"d": "M59.6,19.38c1,1.5,1.35,4.12,0.88,6.62c-2.75,14.62-13.62,37.75-20.1,47.24c-12.28,17.14-16.78,13.14-22.28,0.64c-5.38-15.38,26.4-42.18,53.42-35.28c29.08,8.27,23.96,46.02-7.98,50.15", "x0": 59.6, "y0": 19.4}]}, "メ": {"vb": "0 0 109 109", "strokes": [{"d": "M73.38,19.12c0.88,1.75,0.48,4.44-0.38,6.88c-7.75,22.12-21.75,47.62-45,62.88", "x0": 73.4, "y0": 19.1}, {"d": "M39.51,39.5c16.54,7.76,32.12,18,38.5,30.88", "x0": 39.5, "y0": 39.5}]}, "も": {"vb": "0 0 109 109", "strokes": [{"d": "M49.17,14.75c1.88,1.88,1.86,4.52,1.12,8c-3,14.25-5,26.62-7,42.12c-2.55,19.73-0.75,29.88,17,29.86c20.25-0.02,28.63-13.11,20.01-35.73", "x0": 49.2, "y0": 14.8}, {"d": "M26.54,34.62c1.12,0.88,2.87,2.21,6,2c11.12-0.75,20-2.12,27.74-3.46c3.88-0.67,5.88-1.17,8.88-1.04", "x0": 26.5, "y0": 34.6}, {"d": "M26.42,53.38c-1.5,4,1,6.75,7.75,6.75c8.75,0,17.62-1,22.88-1.88c2.01-0.33,5.38-1,7.5-1.75", "x0": 26.4, "y0": 53.4}]}, "モ": {"vb": "0 0 109 109", "strokes": [{"d": "M27.88,26.19c2.5,1.19,4.33,1.6,7.45,1.35c11.55-0.91,21.93-2.16,32.79-3.93c2.62-0.42,6.27-0.41,8.39-0.17", "x0": 27.9, "y0": 26.2}, {"d": "M17.5,54.38c2.62,1,4.78,1.45,9.12,0.75c20.26-3.25,33.88-5.38,51.64-6.13c3.75-0.16,7.38,0.25,11.12,0.88", "x0": 17.5, "y0": 54.4}, {"d": "M48.76,29.88c1.12,1.62,1.42,3.62,1.42,6.12c0,6.53-0.65,33.56-0.65,35.88c0,7.67,3.09,11.08,10.53,11.76c5.33,0.49,12.31,0.24,16.37,0c4.46-0.26,6.52-0.74,9.59-1.43", "x0": 48.8, "y0": 29.9}]}, "や": {"vb": "0 0 109 109", "strokes": [{"d": "M18,49.38c1.88,1.62,5.25,2.5,8.62,0.88c18.51-8.88,35.76-19.38,50.83-19.26c9.02,0.14,16.01,4.13,15.93,12.29c0,8.33-10.88,16.58-24.5,17.83", "x0": 18.0, "y0": 49.4}, {"d": "M47.13,15.88c5.12,0.88,10.41,4.05,11.5,6.62c2.12,5-1,2.38-2.88,2.62", "x0": 47.1, "y0": 15.9}, {"d": "M30,24.38c2.38,1.88,3.28,2.87,3.88,5.25c2.62,10.5,11.12,41.12,14.75,52.5c0.65,2.04,1.88,6.25,2.88,9.38", "x0": 30.0, "y0": 24.4}]}, "ヤ": {"vb": "0 0 109 109", "strokes": [{"d": "M18,45.75c2.12,1.62,6.15,2.35,10.12,1.38c18.88-4.62,33.39-7.83,48.88-11.88c22-5.75,1.5,14.25-2.75,20", "x0": 18.0, "y0": 45.8}, {"d": "M38.47,19.38c1.65,1.4,2.54,2.67,3.18,5.21c0.64,2.54,11.95,52.9,12.59,55.57c0.64,2.67,2.16,9.16,3.05,12.46", "x0": 38.5, "y0": 19.4}]}, "ゆ": {"vb": "0 0 109 109", "strokes": [{"d": "M21.05,25.38c1.38,1.5,2.02,4.13,1.5,6.25c-2.88,11.75-4,22.25-2.12,35c2.77,18.85,1.12,3.88,3.25-1.5c9-22.75,27.24-34.5,44.38-34.5c16.88,0,21.88,11.38,21.88,20.25c0,27.38-30.88,29.62-43,16.75", "x0": 21.1, "y0": 25.4}, {"d": "M58.42,16.75c2.62,1.75,3.17,3.13,3.5,7.12c0.88,10.5,1.4,18.72,1.62,29.38c0.5,24-6.25,32-12.38,39.25", "x0": 58.4, "y0": 16.8}]}, "ユ": {"vb": "0 0 109 109", "strokes": [{"d": "M29.5,35.38c2.38,1.5,5.14,2.08,9.25,1.5c13.25-1.88,18.02-2.4,27.62-4c6.75-1.12,7.78,0.16,6.5,6.38c-2.38,11.5-4.88,24.5-6.5,34.5", "x0": 29.5, "y0": 35.4}, {"d": "M17,76.88c2.75,1.5,4.76,2.05,9.12,1.5c22.62-2.88,36-3.88,54.12-3.88c3.75,0,7.38,0.5,11.12,1.12", "x0": 17.0, "y0": 76.9}]}, "よ": {"vb": "0 0 109 109", "strokes": [{"d": "M58.24,35.38c7.5-1.28,13.74-2.63,18.5-4.1c2.5-0.77,4.77-1.15,6.25-1.15", "x0": 58.2, "y0": 35.4}, {"d": "M54.62,13.88c2.25,2.12,2.98,4.13,2.88,6.5c-0.75,17-0.12,34.88,1.39,53.5c1.88,23.07-34.89,20.88-34.89,11.5c0-12,26.25-8,35.98-4.12c8.1,3.23,11.52,4.88,18.52,10.38", "x0": 54.6, "y0": 13.9}]}, "ヨ": {"vb": "0 0 109 109", "strokes": [{"d": "M29.13,30.12c2.38,1.5,5.12,1.98,9.25,1.5c14-1.62,26.71-3.04,36.38-4.25c6-0.75,6.88,0.5,6.5,6.38c-1,15.51-1.89,30.63-3.01,42.25", "x0": 29.1, "y0": 30.1}, {"d": "M29.25,52.88c2.38,1.5,5.12,1.98,9.25,1.5c10.5-1.22,22.81-2.29,31.11-3.04c2.77-0.25,5.27,0.04,7.77,0.54", "x0": 29.2, "y0": 52.9}, {"d": "M23.5,78.84c2.75,1.3,4.74,1.68,9.12,1.3c12.5-1.08,29.37-2.9,41.38-2.9c3.38,0,5.62,0,9.38,0.54", "x0": 23.5, "y0": 78.8}]}, "ら": {"vb": "0 0 109 109", "strokes": [{"d": "M35.33,15c3.75,3,9.22,4.41,16.5,4.25c11.12-0.25-0.25,2.38-1.25,3.5", "x0": 35.3, "y0": 15.0}, {"d": "M35.83,35.75c-2.14,4.34-2.79,8.67-3.11,13.24c-0.42,5.84-0.31,12.05-2.14,19.13c-3.16,12.27,1.49,4.77,3,3.5c11.88-10,21.7-12.67,32.61-12.49c9.21,0.15,16.85,5.19,16.76,13.88c-0.12,13.6-14.24,21.49-32.49,22.49", "x0": 35.8, "y0": 35.8}]}, "ラ": {"vb": "0 0 109 109", "strokes": [{"d": "M38.63,21.06c2.07,1.86,4.43,2.53,8.05,2.15c9.2-0.96,14.34-2.01,21.57-2.95c2.41-0.31,4.13-0.53,6.51-0.19", "x0": 38.6, "y0": 21.1}, {"d": "M26,41.89c2.38,1.7,5.12,2.24,9.25,1.7c14-1.84,31.21-4.95,40.88-6.32c6-0.85,8.14,0.62,6.25,5.72c-6.88,18.62-22,38.25-45.25,48.62", "x0": 26.0, "y0": 41.9}]}, "り": {"vb": "0 0 109 109", "strokes": [{"d": "M38.75,25.25c1.25,1.5,2.24,4.03,1.62,6.62c-2.88,12.13-6.29,29.65-4.25,42.38c2,12.5,1.75-0.75,5.62-6.25", "x0": 38.8, "y0": 25.2}, {"d": "M69.37,18.75c2.25,2.12,2.88,4.12,2.88,6.5c0,2.38,0,26.38,0,35.75c0,16.5-5,25.75-12.62,33.12", "x0": 69.4, "y0": 18.8}]}, "リ": {"vb": "0 0 109 109", "strokes": [{"d": "M35,18.38c1.12,1.5,1.62,3,1.62,4.88c0,1.88,0,25,0,27c0,2,0,6.12,0,7.75", "x0": 35.0, "y0": 18.4}, {"d": "M71,15.38c1.5,1.25,2.38,3.12,2.38,5.38c0,2.26-0.12,28.88-0.12,32.88c0,19.62-9.5,32.25-21.75,40.38", "x0": 71.0, "y0": 15.4}]}, "る": {"vb": "0 0 109 109", "strokes": [{"d": "M34.31,20.38c1.75,1.25,4.62,2.62,8.5,1.5c3.88-1.12,9.62-2.5,15.62-4.62c6-2.12,7.5-0.12,4.38,4.25c-3.12,4.37-18.89,24.62-27.75,34c-8.5,9-13.09,11.89,0.75,3.25c15.62-9.75,43-10.88,43,13.38c0,22.5-40.88,24.5-40.88,12.62c0-11.25,18.12-8.75,24.38-0.38", "x0": 34.3, "y0": 20.4}]}, "ル": {"vb": "0 0 109 109", "strokes": [{"d": "M34.38,31.88c1.12,1.5,1.72,3,1.62,4.88c-1.12,22.88-8.88,40.62-17.5,49.5", "x0": 34.4, "y0": 31.9}, {"d": "M56.51,19.62c1.5,1.25,2.38,3.12,2.38,5.38c0,2.26-0.12,47.62-0.12,51.62c0,10.5,0.52,10.21,9.38,2.75c9.5-8,16.5-14.62,26.38-25.62", "x0": 56.5, "y0": 19.6}]}, "れ": {"vb": "0 0 109 109", "strokes": [{"d": "M34.48,13c1.5,1.38,2.83,3.74,2.5,6.38c-0.5,4-2.75,44.5-2.75,52.88c0,8.38,0.12,16.62,0.12,19.5", "x0": 34.5, "y0": 13.0}, {"d": "M16.98,40.75c2.12,1.38,3.74,1.46,7.5,0c4.5-1.75,6.55-2.66,13-5.5c4.25-1.88,4.4,0.24,2.5,3.5c-5.25,9-10.5,16.75-18.88,27.62c-7.55,9.81-6.93,12.85,3.25,3.12c14-13.38,20.34-19.76,33.88-32.5c6.38-6,19.39-12.09,18.14,0.88c-1.02,10.63-1.89,22.13-2.29,30.75c-1.02,21.71,11.53,18,20.15,8.63", "x0": 17.0, "y0": 40.8}]}, "レ": {"vb": "0 0 109 109", "strokes": [{"d": "M34.5,19.75c1.5,1.25,2.38,3.12,2.38,5.38c0,2.26-0.12,50.12-0.12,54.12c-0.02,8.75-0.14,8.63,9.36,3.75c13.23-6.79,33.38-22.5,43.25-33.5", "x0": 34.5, "y0": 19.8}]}, "ろ": {"vb": "0 0 109 109", "strokes": [{"d": "M36.95,21.88c1.5,2,4.62,3.62,8.5,2.5c3.88-1.12,8.12-2.25,14.12-4.38c6-2.13,6.53-0.1,3.38,4.25c-7.88,10.88-18,22.75-27.5,35.25c-7.49,9.86-10.68,11.32,2.88,2.25c17.38-11.62,46.62-14,46.62,8.12c0,15.62-16,22.5-32.12,25.12", "x0": 37.0, "y0": 21.9}]}, "ロ": {"vb": "0 0 109 109", "strokes": [{"d": "M25,33.25c1.5,1.25,2.16,3.14,2.38,5.38c0.96,10.07,2.14,23.67,3.14,34.88c0.31,3.4,0.59,6.58,0.86,9.38", "x0": 25.0, "y0": 33.2}, {"d": "M28.13,36.12c9.25-1,37.62-3.12,45.62-4.25c8-1.13,9.57,0.53,8.38,6.62c-2.13,10.89-4.13,21.89-6.75,34.89", "x0": 28.1, "y0": 36.1}, {"d": "M32,78.12c5.38-0.5,33.62-3,36.5-3c2.88,0,7.88-0.25,11.5,0.25", "x0": 32.0, "y0": 78.1}]}, "わ": {"vb": "0 0 109 109", "strokes": [{"d": "M38.53,14.75c1.5,1.38,2.22,3.73,2,6.38c-1,11.87-2.75,44.49-2.75,52.87c0,8.38-0.62,16.62-0.62,19.5", "x0": 38.5, "y0": 14.8}, {"d": "M17.53,40.75c2.12,1.38,3.68,1.3,7.5,0c5.88-2,9.8-3.16,16.25-6c4.25-1.88,6.12,0,2.75,4c-6.72,7.96-13,16.5-22.12,27.88c-7.75,9.66-7.54,12.21,3,2.88c21.88-19.38,49.75-35.62,63.5-21c14.36,15.27,1.62,36.62-23.38,42.62", "x0": 17.5, "y0": 40.8}]}, "ワ": {"vb": "0 0 109 109", "strokes": [{"d": "M25,23.62c1.5,1.25,2.16,3.14,2.38,5.38c0.96,10.07,0.89,8.17,1.89,19.38c0.31,3.4,0.59,6.58,0.86,9.38", "x0": 25.0, "y0": 23.6}, {"d": "M27.75,26.38c3.12,0.38,5.16,0.22,8.23-0.06c13.77-1.29,27.15-2.32,41.65-3.7c8.04-0.76,9.44,0.51,8.38,6.62c-4.76,27.26-20.64,47.64-43.88,61.51", "x0": 27.8, "y0": 26.4}]}, "を": {"vb": "0 0 109 109", "strokes": [{"d": "M28.56,27.87c1.62,1.13,3.17,1.64,6.01,1.12c10.86-1.99,16.74-3.37,24.71-4.72c3.64-0.62,5.65-0.93,8.4-0.75", "x0": 28.6, "y0": 27.9}, {"d": "M49.93,14.38c0.75,1,1.48,3.22,0.38,5.62c-4.62,10.12-10,20.75-17.12,30.25c-9.25,12.33-9.25,11.19,2.12,2.5c9-6.88,23.75-12.12,22.88,19.88", "x0": 49.9, "y0": 14.4}, {"d": "M83.06,39.88c0.62,1.75,0,4-3,5.75c-3,1.75-49.62,24.16-44.75,38.25c3.28,9.48,17.93,9.12,29.98,7.75c4.48-0.51,9.15-1.12,12.4-1.75", "x0": 83.1, "y0": 39.9}]}, "ヲ": {"vb": "0 0 109 109", "strokes": [{"d": "M30.24,25.14c2.38,1.7,5.11,2.13,9.25,1.7c12.32-1.29,21.94-2.6,30.48-3.64c2.81-0.34,5.51-0.65,8.14-0.93", "x0": 30.2, "y0": 25.1}, {"d": "M29,46.69c2.25,1.44,4.44,1.9,8.05,1.4c8.19-1.15,19.93-2.64,28.56-3.79c2.38-0.31,4.65-0.62,6.75-0.92", "x0": 29.0, "y0": 46.7}, {"d": "M78,22.88c0.88,2,0.62,4.64,0.12,7c-4.88,22.5-23.5,47.12-44.12,60.74", "x0": 78.0, "y0": 22.9}]}, "ん": {"vb": "0 0 109 109", "strokes": [{"d": "M56.35,16.5c0.75,1.75,1.13,5.83-0.38,8.25c-7,11.25-27.22,43.47-33.88,54.37c-9,14.75-7.62,16.25,1.5,1.25c17.86-29.36,32-23.76,32-6.75c0,25,19,26.5,34.25-5", "x0": 56.4, "y0": 16.5}]}, "ン": {"vb": "0 0 109 109", "strokes": [{"d": "M26.5,24.88c5.76,2.15,12.68,8.47,15.75,14.25", "x0": 26.5, "y0": 24.9}, {"d": "M28.62,83.75c2.5,1.62,5.12,0.96,7.75-0.62c20.13-12.13,35-24.63,49.63-41.13", "x0": 28.6, "y0": 83.8}]}, "が": {"vb": "0 0 109 109", "strokes": [{"d": "M24.62,38.62c1.88,1.62,4.65,2.33,8.62,1c25.5-8.5,29.5-4.13,29.5,7.62c0,9.38-1.24,17.46-4.25,25.25c-7.62,19.76-10.87,17.39-16.12,10.89", "x0": 24.6, "y0": 38.6}, {"d": "M48.5,17.5c1,1.38,1.29,4.7,0.5,7.12c-5,15.25-18.02,40.93-19.62,43.88c-3.12,5.75-6.38,11.88-9.38,16.25", "x0": 48.5, "y0": 17.5}, {"d": "M77.37,31.62c7.5,6.88,13.25,15.75,15,24.88", "x0": 77.4, "y0": 31.6}, {"d": "M80.5,18.25c2.75,1.75,6,5.38,7.75,8.5", "x0": 80.5, "y0": 18.2}, {"d": "M86.87,13.38c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 86.9, "y0": 13.4}]}, "ガ": {"vb": "0 0 109 109", "strokes": [{"d": "M25.5,40.62c1.88,1.25,4.51,1.87,7.12,1.5c17.88-2.5,32.78-4.51,42.5-5.88c7.12-1,10.59,0.24,8.62,7.88c-2.12,8.25-4.47,17.81-9.25,29.12c-10.49,24.88-14.11,14.51-19.24,11.88", "x0": 25.5, "y0": 40.6}, {"d": "M55.88,17.12c0.88,1.62,1.29,3.83,0.75,6.75c-4.25,22.88-15.88,45.25-30.25,58.88", "x0": 55.9, "y0": 17.1}, {"d": "M83,19.75c2.75,1.75,6,5.38,7.75,8.5", "x0": 83.0, "y0": 19.8}, {"d": "M89.38,14.88c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 89.4, "y0": 14.9}]}, "ぎ": {"vb": "0 0 109 109", "strokes": [{"d": "M30.5,30.5c1.88,0.75,4.64,1.06,5.88,0.88c6.75-1,22.25-4.5,26.5-6c2.17-0.76,3.5-1.25,4.88-2.12", "x0": 30.5, "y0": 30.5}, {"d": "M36.25,48.95c2.01,0.85,4.97,1.2,6.29,0.99c7.23-1.13,23.82-5.09,28.37-6.79c2.32-0.86,3.75-1.41,5.22-2.4", "x0": 36.2, "y0": 49.0}, {"d": "M42,14.38c1.5,0.88,3.13,2.94,4,5.12c5.5,13.75,16,29.25,26.38,40.75c7.64,8.47,9.12,9.38-6,3.88", "x0": 42.0, "y0": 14.4}, {"d": "M33.75,83.5c10.62,9.75,27.25,8.62,38.12,5", "x0": 33.8, "y0": 83.5}, {"d": "M77.37,19c2.75,1.75,6,5.38,7.75,8.5", "x0": 77.4, "y0": 19.0}, {"d": "M83.75,14.12c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 83.8, "y0": 14.1}]}, "ギ": {"vb": "0 0 109 109", "strokes": [{"d": "M27,40.5c1.75,0.62,4.77,1.09,7.25,0.38c11.75-3.38,30.62-8.13,37.5-9.88c2.62-0.67,6.75-1.12,9-1", "x0": 27.0, "y0": 40.5}, {"d": "M19.5,65.8c2.28,0.84,6.24,1.18,9.46,0.17c17.79-5.59,32.67-9.09,49.17-12.99c3.43-0.81,8.81-1.52,11.74-1.35", "x0": 19.5, "y0": 65.8}, {"d": "M48.87,16.75c2.5,1.75,3.43,3.24,3.88,6.12c2.12,13.62,6.38,45.38,8.25,59.25c0.4,3,1,8.38,1.38,11.12", "x0": 48.9, "y0": 16.8}, {"d": "M81.87,15.13c2.75,1.93,6,5.93,7.75,9.37", "x0": 81.9, "y0": 15.1}, {"d": "M88.25,10c2.71,1.73,5.9,5.32,7.62,8.41", "x0": 88.2, "y0": 10.0}]}, "ぐ": {"vb": "0 0 109 109", "strokes": [{"d": "M60.66,15c0.5,2.12,0.75,5-1,7.38c-6.97,9.46-14.29,19.09-18.62,24.5c-4,5-3.79,7.03-0.88,11c5.5,7.5,12.75,18.75,17.62,27.25c1.48,2.59,2.75,4.75,4.5,8.62", "x0": 60.7, "y0": 15.0}, {"d": "M73.54,30c2.75,1.75,6,5.38,7.75,8.5", "x0": 73.5, "y0": 30.0}, {"d": "M79.91,25.12c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 79.9, "y0": 25.1}]}, "グ": {"vb": "0 0 109 109", "strokes": [{"d": "M50,19.62c0.38,1.5,0.34,3.48-0.5,5.12c-4.12,8.12-7.88,15.5-16.12,24.12", "x0": 50.0, "y0": 19.6}, {"d": "M51.25,28.62c2.62,0.25,5.67-0.39,7.62-0.88c6-1.5,9.75-2.38,15.12-3.88c5.79-1.62,7.53-0.42,5.12,4.88c-10.36,22.88-26.24,44.14-48.61,60.51", "x0": 51.2, "y0": 28.6}, {"d": "M83.75,13.5c2.75,1.75,6,5.38,7.75,8.5", "x0": 83.8, "y0": 13.5}, {"d": "M90.13,8.62c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 90.1, "y0": 8.6}]}, "げ": {"vb": "0 0 109 109", "strokes": [{"d": "M24.91,20.25c1.25,1.5,2.37,3.75,1.88,6.38c-3,15.88-6.5,29.5-4.88,44.62c2.02,18.84,2.25,4.75,6.75-3.5", "x0": 24.9, "y0": 20.2}, {"d": "M53.67,39.12c2.12,1.38,4.28,1.89,6.88,1.5c8.25-1.25,15.39-2.57,20.62-4c2.75-0.75,5.25-1.12,6.88-1.12", "x0": 53.7, "y0": 39.1}, {"d": "M71.67,14.62c2.12,1.38,2.87,3.61,2.87,5.38c0,11.62,0.12,20.38,0.12,30.12c0,20.75-0.62,30.88-12.5,42.25", "x0": 71.7, "y0": 14.6}, {"d": "M86.17,13c2.75,1.75,6,5.38,7.75,8.5", "x0": 86.2, "y0": 13.0}, {"d": "M92.54,8.12c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 92.5, "y0": 8.1}]}, "ゲ": {"vb": "0 0 109 109", "strokes": [{"d": "M40.96,17.88c0.44,1.9,0.39,4.42-0.59,6.5c-4.82,10.31-9.21,19.67-18.87,30.62", "x0": 41.0, "y0": 17.9}, {"d": "M37.88,37.62c2.12,0.88,4.15,1.04,6.62,0.5c12.62-2.75,25.5-4.88,35.75-6.5c3.61-0.57,6.25-0.75,9.25-0.5", "x0": 37.9, "y0": 37.6}, {"d": "M64.46,38.88c0.44,1.9,0.5,4.27-0.08,6.5c-3.63,13.75-9.25,31.25-24.63,43.87", "x0": 64.5, "y0": 38.9}, {"d": "M83.62,13.94c2.95,1.81,6.43,5.57,8.3,8.81", "x0": 83.6, "y0": 13.9}, {"d": "M90.12,9.12c3.02,1.63,6.58,5,8.5,7.9", "x0": 90.1, "y0": 9.1}]}, "ご": {"vb": "0 0 109 109", "strokes": [{"d": "M34.75,27c1.12,0.88,2.91,2.01,6,1.5c7.62-1.25,14.11-2.56,22.38-2.62c15.5-0.12,5.88,5-5.75,9", "x0": 34.8, "y0": 27.0}, {"d": "M30,68.38c2.25,14.5,15.26,17.96,31,16.75c6.5-0.5,11.88-1.25,17.62-2.88", "x0": 30.0, "y0": 68.4}, {"d": "M80.37,16.25c2.75,1.75,6,5.38,7.75,8.5", "x0": 80.4, "y0": 16.2}, {"d": "M86.75,11.38c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 86.8, "y0": 11.4}]}, "ゴ": {"vb": "0 0 109 109", "strokes": [{"d": "M30.13,35c1.75,1,3.01,2.18,6.5,1.62c14.25-2.25,29.62-4.25,37.38-5.5c9.37-1.51,9.88,0.25,8,7.5c-2.77,10.71-5.25,22.12-7,34.88", "x0": 30.1, "y0": 35.0}, {"d": "M27.5,77.38c2.62,1.12,4.38,1.51,8.25,1c11.38-1.5,22.62-3,33.75-3.38c4-0.13,5.88,0,9.62,0.5", "x0": 27.5, "y0": 77.4}, {"d": "M84.75,15.5c2.75,1.75,6,5.38,7.75,8.5", "x0": 84.8, "y0": 15.5}, {"d": "M90.87,10.38c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 90.9, "y0": 10.4}]}, "ざ": {"vb": "0 0 109 109", "strokes": [{"d": "M27,39.15c2.42,1.33,5.38,1.47,8.32,1.06c8.79-1.24,28.67-8.01,34.15-10.68c2.79-1.36,3.78-1.91,6.28-3.53", "x0": 27.0, "y0": 39.1}, {"d": "M41.5,14.12c1.5,0.88,3.63,2.95,4.5,5.13c5.5,13.75,15.25,27.63,26.88,39.5c7.98,8.15,6.38,10-6,3.12", "x0": 41.5, "y0": 14.1}, {"d": "M35.25,80.75c4.5,11.75,20.88,12.5,38.38,7.5", "x0": 35.2, "y0": 80.8}, {"d": "M79.88,14.25c2.75,1.75,6,5.38,7.75,8.5", "x0": 79.9, "y0": 14.2}, {"d": "M86.25,9.38c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 86.2, "y0": 9.4}]}, "ザ": {"vb": "0 0 109 109", "strokes": [{"d": "M16.5,44.34c2.84,1.27,4.77,1.91,8.93,1.13c17.2-3.22,40.45-5.35,58.53-5.34c4.33,0,6.92,0.37,10.42,0.82", "x0": 16.5, "y0": 44.3}, {"d": "M36.63,23.38c1.12,1.38,1.19,2.5,1.25,4.75c0.25,9,0.38,20.25,0.75,28.88c0.14,3.25,0.38,7.12,0.38,9.25", "x0": 36.6, "y0": 23.4}, {"d": "M69.63,16.62c1.5,2,1.62,2.87,1.62,6.25c0,8.25-0.16,9-0.16,15.88c0,23.25-9.34,42.5-23.21,53", "x0": 69.6, "y0": 16.6}, {"d": "M82.75,18.73c2.85,1.78,6.21,5.47,8.03,8.65", "x0": 82.8, "y0": 18.7}, {"d": "M89.5,14.12c2.93,1.57,6.39,4.83,8.25,7.63", "x0": 89.5, "y0": 14.1}]}, "じ": {"vb": "0 0 109 109", "strokes": [{"d": "M39.12,17.25c1.25,3.12,0.93,6.74,0.38,10.25c-2.12,13.5-3,26.5-3,39.12c0,27.38,19.88,30.12,45.5,17.25", "x0": 39.1, "y0": 17.2}, {"d": "M64.24,27c2.75,1.75,6,5.38,7.75,8.5", "x0": 64.2, "y0": 27.0}, {"d": "M70.62,22.12c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 70.6, "y0": 22.1}]}, "ジ": {"vb": "0 0 109 109", "strokes": [{"d": "M39.87,19.75c5.14,1.57,9.79,6.01,11.5,8.62", "x0": 39.9, "y0": 19.8}, {"d": "M26,42.62c3.25,0.88,10.25,5.5,12.25,8.13", "x0": 26.0, "y0": 42.6}, {"d": "M33,85c3.62,1.62,6.5,0.88,10.38-1.38c17.81-10.34,32.37-23.87,46.12-42.87", "x0": 33.0, "y0": 85.0}, {"d": "M78.5,18.98c2.85,1.78,6.21,5.47,8.03,8.65", "x0": 78.5, "y0": 19.0}, {"d": "M85.25,14.38c2.93,1.57,6.39,4.83,8.25,7.63", "x0": 85.2, "y0": 14.4}]}, "ず": {"vb": "0 0 109 109", "strokes": [{"d": "M15.5,37.12c2.88,2.12,6.94,1.51,12.75,0.25c16.12-3.5,36.14-5.38,46.62-6.5c7-0.75,11.88-0.62,17.75,0.12", "x0": 15.5, "y0": 37.1}, {"d": "M57.62,13.38c2,1.5,2.75,3.25,2.75,5.88c0,10.38,0,35.12,0,40.75c0,14.62-15.62,16.38-15.62,1.75c0-14.25,18-14.12,18,6.38c0,13.25-7.75,21.5-16,28.38", "x0": 57.6, "y0": 13.4}, {"d": "M77,13c2.75,1.75,6,5.38,7.75,8.5", "x0": 77.0, "y0": 13.0}, {"d": "M83.37,8.12c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 83.4, "y0": 8.1}]}, "ズ": {"vb": "0 0 109 109", "strokes": [{"d": "M30.13,29.38c1.75,1.5,4.15,1.98,6.62,1.38c13.25-3.25,24.25-5.62,31.25-7.38c7-1.76,8.64,1.16,6.5,5.75c-11.24,24.12-28.37,45.87-53.5,57.25", "x0": 30.1, "y0": 29.4}, {"d": "M61,57.25c11,7.38,21,17,28,28.62", "x0": 61.0, "y0": 57.2}, {"d": "M85.38,16.5c2.75,1.75,6,5.38,7.75,8.5", "x0": 85.4, "y0": 16.5}, {"d": "M91.76,11.62c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 91.8, "y0": 11.6}]}, "ぜ": {"vb": "0 0 109 109", "strokes": [{"d": "M16.5,49.93c2.88,2.42,6.86,1.57,12.75,0.53c19-3.34,32.5-5.34,47.12-7.64c6.97-1.1,11.88-1.21,17.75-0.36", "x0": 16.5, "y0": 49.9}, {"d": "M69.74,17.75c2,1.5,2.75,3.25,2.75,5.88c0,10.38,0,17.88,0,23.5c0,25.62-5.75,23.25-11.88,19", "x0": 69.7, "y0": 17.8}, {"d": "M35.62,26.25c2,1.5,2.75,3.25,2.75,5.88c0,10.38,0,28.38,0,34c0,14.5,6.38,19.55,20.14,19.55c10.24,0,13.74,0.07,22.61-1.68", "x0": 35.6, "y0": 26.2}, {"d": "M84.5,17.25c2.75,1.75,6,5.38,7.75,8.5", "x0": 84.5, "y0": 17.2}, {"d": "M90.87,12.38c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 90.9, "y0": 12.4}]}, "ゼ": {"vb": "0 0 109 109", "strokes": [{"d": "M17,49.38c3.12,1.5,5.04,2.18,8.62,1.38c23.5-5.25,31.24-7.43,50.62-11.62c23.12-5,6.5,7.75-3.25,18.12", "x0": 17.0, "y0": 49.4}, {"d": "M42.38,19.5c2,2.25,2.15,3.5,2.12,6.62c-0.12,17.5-0.88,31.75-0.88,41.12c0,14,3.13,16.99,12.38,17.12c8.38,0.12,14.12,0.12,18,0.12c3.88,0,7.5-0.5,10.5-1.12", "x0": 42.4, "y0": 19.5}, {"d": "M83.38,20.25c2.75,1.75,6,5.38,7.75,8.5", "x0": 83.4, "y0": 20.2}, {"d": "M89.76,15.38c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 89.8, "y0": 15.4}]}, "ぞ": {"vb": "0 0 109 109", "strokes": [{"d": "M38.4,22c1.88,1.25,4.98,1.05,7.5,0.38c6.5-1.75,13.25-3.75,19.38-5.38c4.63-1.23,7.18,2.06,3.62,5.25c-12.12,10.87-31.14,24.4-40,30.25c-6.25,4.12-5.88,5.75,1.38,3.88c17.08-4.42,35.96-8.68,50.12-10.38c9.38-1.12,9.62,0.12,0.5,1.38c-15.82,2.17-34.38,14.25-34.38,26.5c0,12.88,11.62,20.38,31.5,16.62", "x0": 38.4, "y0": 22.0}, {"d": "M81.78,26.75c2.75,1.75,6,5.38,7.75,8.5", "x0": 81.8, "y0": 26.8}, {"d": "M88.15,21.88c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 88.2, "y0": 21.9}]}, "ゾ": {"vb": "0 0 109 109", "strokes": [{"d": "M23.5,26.65c3.83,4.02,7.54,9.72,10.5,17.5", "x0": 23.5, "y0": 26.6}, {"d": "M83,21.9c1.25,2.5,1.3,4.44,0.12,8.5c-5.87,20.37-26.24,49-45.62,60.75", "x0": 83.0, "y0": 21.9}, {"d": "M86.25,10.65c2.75,1.75,6,5.38,7.75,8.5", "x0": 86.2, "y0": 10.7}, {"d": "M92.62,5.77c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 92.6, "y0": 5.8}]}, "だ": {"vb": "0 0 109 109", "strokes": [{"d": "M24.38,35.38c1.38,0.62,3.88,1.51,6.38,1.12c6.5-1,16.25-2.88,24.88-4.75c2.64-0.57,5.38-1.5,7.62-2.38", "x0": 24.4, "y0": 35.4}, {"d": "M45,16.88c0.75,1.25,0.87,3.62,0.38,5.25c-6.35,20.94-12.75,36.37-18.88,52.37c-1.36,3.56-4.75,11.75-6,14.62", "x0": 45.0, "y0": 16.9}, {"d": "M56.38,53.25c12.38-2.75,18.25-3.7,23.62-3.12c15.12,1.62-1.12,2.25-4.25,4.88", "x0": 56.4, "y0": 53.2}, {"d": "M54.13,82.25c4.38,7,14.25,8.12,34.5,5.62", "x0": 54.1, "y0": 82.2}, {"d": "M76,22.5c2.75,1.75,6,5.38,7.75,8.5", "x0": 76.0, "y0": 22.5}, {"d": "M82.38,17.62c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 82.4, "y0": 17.6}]}, "ダ": {"vb": "0 0 109 109", "strokes": [{"d": "M48.83,19.75c0.43,1.72,0.39,4-0.58,5.89c-4.77,9.34-9.1,17.82-18.63,27.73", "x0": 48.8, "y0": 19.8}, {"d": "M49.75,30.38c2.5,0.62,5.67-0.14,7.62-0.62c6-1.5,10.5-2.62,15.88-4.12c5.79-1.62,8.22,0.31,5.88,5.62c-10.88,24.62-22.13,43.99-50.13,59.99", "x0": 49.8, "y0": 30.4}, {"d": "M43.38,45.62c6.75,3.5,10.62,7.88,14.75,15.25", "x0": 43.4, "y0": 45.6}, {"d": "M83.62,14.19c2.95,1.81,6.43,5.57,8.3,8.81", "x0": 83.6, "y0": 14.2}, {"d": "M90.12,9.38c3.02,1.63,6.58,5,8.5,7.9", "x0": 90.1, "y0": 9.4}]}, "ぢ": {"vb": "0 0 109 109", "strokes": [{"d": "M24.5,32.88c1.38,0.62,3.88,1.51,6.38,1.12c6.5-1,18.25-4.12,26.88-6c2.64-0.57,5.38-1.5,7.62-2.38", "x0": 24.5, "y0": 32.9}, {"d": "M45.63,15.88c0.75,1.25,0.71,3.58,0.38,5.25c-3,15-4.25,22.59-8.38,38.62c-3.26,12.63-5.38,11.13,3.62,4.37c8.29-6.21,19.75-9.5,28.5-9.5c8.62,0,14.58,5.88,14.5,14.5c-0.12,13.5-16.5,20.62-29.88,23.25", "x0": 45.6, "y0": 15.9}, {"d": "M74.63,21.75c2.75,1.75,6,5.38,7.75,8.5", "x0": 74.6, "y0": 21.8}, {"d": "M81,16.88c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 81.0, "y0": 16.9}]}, "ヂ": {"vb": "0 0 109 109", "strokes": [{"d": "M70,15.25c-0.38,2.62-2.26,4.37-4.12,5.38c-7.88,4.25-18.62,9.75-35.5,13.25", "x0": 70.0, "y0": 15.2}, {"d": "M18.5,51.5c2.88,0.88,4.39,1.65,7.88,1.25c22-2.5,36.38-4.25,56.12-4.88c4.88-0.15,7.88,0.51,10.88,1.51", "x0": 18.5, "y0": 51.5}, {"d": "M54.88,30.75c0.88,0.75,1.75,2.49,1.75,4.75c0,6.03,0.03,11.25,0.03,18.27c0,14.98-5.03,29.48-16.53,39.23", "x0": 54.9, "y0": 30.8}, {"d": "M79.88,25.73c2.85,1.78,6.21,5.47,8.03,8.65", "x0": 79.9, "y0": 25.7}, {"d": "M86.63,21.12c2.93,1.57,6.39,4.83,8.25,7.63", "x0": 86.6, "y0": 21.1}]}, "づ": {"vb": "0 0 109 109", "strokes": [{"d": "M14,44.75c1.88,1.62,4.68,2.09,8.12,0.62c17.88-7.62,30-11.12,44.88-10.88c12.56,0.21,22.98,7.17,22.87,19.17c-0.18,18.77-24.75,28.71-45.01,32.08", "x0": 14.0, "y0": 44.8}, {"d": "M81,18c2.75,1.75,6,5.38,7.75,8.5", "x0": 81.0, "y0": 18.0}, {"d": "M87.38,13.12c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 87.4, "y0": 13.1}]}, "ヅ": {"vb": "0 0 109 109", "strokes": [{"d": "M21.5,30.62c2.38,3,5,9.38,5.38,13.88", "x0": 21.5, "y0": 30.6}, {"d": "M45.87,23c3.38,3.5,6.62,9.5,7,14.88", "x0": 45.9, "y0": 23.0}, {"d": "M84.62,27.62c0.75,2.25,0.39,5.26-0.75,8c-7.63,18.38-21.25,41.38-46,52.76", "x0": 84.6, "y0": 27.6}, {"d": "M86.5,14.58c2.61,1.91,5.7,5.88,7.36,9.3", "x0": 86.5, "y0": 14.6}, {"d": "M92.68,9.62c2.73,1.8,5.95,5.53,7.69,8.75", "x0": 92.7, "y0": 9.6}]}, "で": {"vb": "0 0 109 109", "strokes": [{"d": "M20.5,26.38c1.87,1.62,4.42,1.97,8.12,1.37c21.75-3.5,33-5.12,50.12-8.38c12.34-2.34,13-0.88,0.38,1.38c-17.89,3.19-33.78,19.12-33.78,37.62c0,20.5,17.91,30.25,35.16,30.25", "x0": 20.5, "y0": 26.4}, {"d": "M75,41.75c2.75,1.75,6,5.38,7.75,8.5", "x0": 75.0, "y0": 41.8}, {"d": "M81.37,36.88c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 81.4, "y0": 36.9}]}, "デ": {"vb": "0 0 109 109", "strokes": [{"d": "M36.5,21.5c2.12,1.25,4.38,1.59,7.25,1.25c10.62-1.25,16.88-2.25,24.62-3.25c3.73-0.48,5.63-0.5,8.13-0.25", "x0": 36.5, "y0": 21.5}, {"d": "M20,44.12c2.88,1,5.26,1.05,7.5,0.75c22.38-3,37-5.62,54.13-6.12c5.62-0.16,7.75,0,10.38,0.62", "x0": 20.0, "y0": 44.1}, {"d": "M58,43.25c0.88,1,1.32,2.63,1.12,4.38c-1.74,15.37-11.62,34.99-24.62,41.87", "x0": 58.0, "y0": 43.2}, {"d": "M84.25,16.98c2.85,1.78,6.21,5.47,8.03,8.65", "x0": 84.2, "y0": 17.0}, {"d": "M91,12.38c2.93,1.57,6.39,4.83,8.25,7.63", "x0": 91.0, "y0": 12.4}]}, "ど": {"vb": "0 0 109 109", "strokes": [{"d": "M35.5,18.38c1.74,0.74,3.62,2.62,4.12,5.37c0.5,2.75,4.75,25,5.38,28.12", "x0": 35.5, "y0": 18.4}, {"d": "M78.12,25.5c0.25,1.88,0.04,4.09-2.25,5.75c-6.37,4.63-13.21,8.49-22.75,15.25c-12.88,9.12-21.62,18.38-21.62,27.5c0,10.12,8.5,13.88,26.88,13.88c6.25,0,14.75-0.12,21.62-1.25", "x0": 78.1, "y0": 25.5}, {"d": "M84.24,14.5c2.75,1.75,6,5.38,7.75,8.5", "x0": 84.2, "y0": 14.5}, {"d": "M90.62,9.62c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 90.6, "y0": 9.6}]}, "ド": {"vb": "0 0 109 109", "strokes": [{"d": "M44,16.38c1.25,1.12,2.12,3.25,2.12,5.5c0,26.12,0,53.5,0,57.62c0,4.12,0,10.5,0,13.38", "x0": 44.0, "y0": 16.4}, {"d": "M49.24,43.12c11.75,4.12,18.25,10.62,24.5,18.75", "x0": 49.2, "y0": 43.1}, {"d": "M66.87,26.75c2.75,1.75,6,5.38,7.75,8.5", "x0": 66.9, "y0": 26.8}, {"d": "M73.24,21.88c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 73.2, "y0": 21.9}]}, "ば": {"vb": "0 0 109 109", "strokes": [{"d": "M24.75,17.75c1.25,1.5,1.9,4.25,1.38,6.88c-3.5,17.62-6.98,36.4-4,54.88c2.5,15.5,1.12,2,5.62-6.25", "x0": 24.8, "y0": 17.8}, {"d": "M49.88,37.89c2.41,1.57,4.85,2.41,7.8,1.96c9.36-1.43,17.21-3.19,23.15-4.82c3.12-0.86,5.96-1.29,7.8-1.29", "x0": 49.9, "y0": 37.9}, {"d": "M69.75,16.5c2.26,2.12,2.88,4.12,2.88,6.5c0,2.38,1.5,38.62,1.5,48c0,22.5-30.62,19.62-30.62,10.5c0-9.75,23.88-5.62,29.5-2.88c5.62,2.74,12,8.25,13.38,9.38", "x0": 69.8, "y0": 16.5}, {"d": "M84.75,15.25c2.75,1.75,6,5.38,7.75,8.5", "x0": 84.8, "y0": 15.2}, {"d": "M91.13,10.38c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 91.1, "y0": 10.4}]}, "バ": {"vb": "0 0 109 109", "strokes": [{"d": "M39.08,36.62c0.38,1.14,0.38,2.84-0.12,4.14c-5.46,13.99-13.08,24.12-21.96,32.49", "x0": 39.1, "y0": 36.6}, {"d": "M65.5,36.38c13,9.12,23.12,22.62,28,33.38", "x0": 65.5, "y0": 36.4}, {"d": "M81.13,21c2.75,1.75,6,5.38,7.75,8.5", "x0": 81.1, "y0": 21.0}, {"d": "M87.5,16.12c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 87.5, "y0": 16.1}]}, "び": {"vb": "0 0 109 109", "strokes": [{"d": "M20,25.12c1.25,0.88,3.75,2.25,6.5,1.38c2.75-0.87,7.31-2.38,11.38-4.5c6-3.12,8.42-1.01,4.25,4c-27.13,32.62-23.76,58.5-1.52,62.88c18.07,3.56,37.63-16.38,35.63-56.51c-0.72-14.5-0.17-14.78,4.12-1.75c3.76,11.38,10.26,20.76,16.14,26.5", "x0": 20.0, "y0": 25.1}, {"d": "M86.5,13.5c2.75,1.75,6,5.38,7.75,8.5", "x0": 86.5, "y0": 13.5}, {"d": "M92.87,8.62c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 92.9, "y0": 8.6}]}, "ビ": {"vb": "0 0 109 109", "strokes": [{"d": "M35.38,44.5c1.75,1.38,4.51,2.19,6.88,1.88c10.24-1.38,17.24-2.88,24.24-4.26c3.01-0.59,7.12-1,9.38-0.88", "x0": 35.4, "y0": 44.5}, {"d": "M31,17.62c1.38,1.26,1.88,3.38,1.88,6.13c0,2.75-0.88,44-0.88,47.25c0,9.75,4,14.62,13.75,14.62c6,0,16.38,0.12,21.38,0c5-0.12,9.5-0.62,13.5-1.5", "x0": 31.0, "y0": 17.6}, {"d": "M78.13,26.25c2.75,1.75,6,5.38,7.75,8.5", "x0": 78.1, "y0": 26.2}, {"d": "M84.5,21.38c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 84.5, "y0": 21.4}]}, "ぶ": {"vb": "0 0 109 109", "strokes": [{"d": "M42.12,15.62c3.62,3.38,7.5,5.38,12.75,6.12c9.59,1.37,3.5,3.38-1.88,6.12", "x0": 42.1, "y0": 15.6}, {"d": "M43.12,46.88c1.88,4.62,7.5,9.41,14.25,17.5c10.62,12.75,0.5,30-19.12,21.62", "x0": 43.1, "y0": 46.9}, {"d": "M16.5,73.88c0.75,4,1.88,8.12,5,10.12c1.16,0.74,0.12-3.38,13.25-9.12", "x0": 16.5, "y0": 73.9}, {"d": "M79.62,61.88c5.5,3.38,10.28,7.49,11.38,8.88c6.75,8.5-0.25,4.62-4.62,7.12", "x0": 79.6, "y0": 61.9}, {"d": "M73.62,16.25c2.75,1.75,6,5.38,7.75,8.5", "x0": 73.6, "y0": 16.2}, {"d": "M80,11.38c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 80.0, "y0": 11.4}]}, "ブ": {"vb": "0 0 109 109", "strokes": [{"d": "M24.5,30c1.88,1.88,3.5,2.04,6.5,1.62c14.5-2,29-4.38,43.75-6.88c6.82-1.16,10.58,2.29,6.88,9.12c-10.38,19.14-21.25,39.52-50.01,53.64", "x0": 24.5, "y0": 30.0}, {"d": "M86,15.63c2.61,1.93,5.7,5.93,7.36,9.37", "x0": 86.0, "y0": 15.6}, {"d": "M92.06,10.5c2.82,1.78,6.15,5.48,7.94,8.66", "x0": 92.1, "y0": 10.5}]}, "べ": {"vb": "0 0 109 109", "strokes": [{"d": "M15,48.75c2.25,1.62,5,1.38,7.62-1c3.89-3.52,6.12-5.75,10.62-9.88c5.88-5.37,8.49-4.75,13.14-0.87c12.12,10.12,30.38,25.12,33.38,27.38c3,2.26,12.37,10.37,13.87,11.62", "x0": 15.0, "y0": 48.8}, {"d": "M66.76,26.75c2.75,1.75,6,5.38,7.75,8.5", "x0": 66.8, "y0": 26.8}, {"d": "M73.13,21.88c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 73.1, "y0": 21.9}]}, "ベ": {"vb": "0 0 109 109", "strokes": [{"d": "M15.5,49c2.75,1.5,5.33,0.62,6.88-0.88c4-3.88,9.38-8.5,11.88-11c3.12-3.12,7.23-5.08,11.87-1.12c11.13,9.5,26.25,22.5,36.87,31.12c4.23,3.43,7.62,6.62,11.12,9.25", "x0": 15.5, "y0": 49.0}, {"d": "M66.88,27c2.75,1.75,6,5.38,7.75,8.5", "x0": 66.9, "y0": 27.0}, {"d": "M73.26,22.12c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 73.3, "y0": 22.1}]}, "ぼ": {"vb": "0 0 109 109", "strokes": [{"d": "M24.51,18.75c1.25,1.5,2.15,4,1.62,6.62c-3.5,17.63-6.98,37.4-4,55.88c2.5,15.5,1.12,2,5.62-6.25", "x0": 24.5, "y0": 18.8}, {"d": "M53.08,21.13c1.9,1.28,3.82,1.76,6.14,1.4c7.36-1.17,13.73-2.4,18.41-3.73c2.46-0.7,4.69-1.05,6.13-1.05", "x0": 53.1, "y0": 21.1}, {"d": "M53.83,44.3c2.21,1.44,4.46,1.98,7.16,1.57c8.59-1.31,15.78-2.44,21.23-3.94c2.87-0.79,5.72-1.18,7.41-1.18", "x0": 53.8, "y0": 44.3}, {"d": "M72.51,23c1.38,1.62,1.62,4.12,1.62,6.5c0,2.38,2,35.12,2,44.5c0,17.5-29.88,17.12-29.88,8c0-9.75,21.38-7.88,29.5-2.88c5.33,3.28,12,8.25,13.38,9.38", "x0": 72.5, "y0": 23.0}, {"d": "M87.51,26c2.75,1.75,6,5.38,7.75,8.5", "x0": 87.5, "y0": 26.0}, {"d": "M93.88,21.12c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 93.9, "y0": 21.1}]}, "ボ": {"vb": "0 0 109 109", "strokes": [{"d": "M22.63,40.38c2.62,1,4.75,1.71,9.12,1.25c17.75-1.88,29.25-2.75,45.38-3.88c3.74-0.26,7.38-0.12,11.12,0.62", "x0": 22.6, "y0": 40.4}, {"d": "M53.75,17.12c1.38,1.88,1.38,4.5,1.38,7.38c0,2.88-0.12,46.62-0.12,51.88c0,23.12-6.25,11.25-9.75,9.62", "x0": 53.8, "y0": 17.1}, {"d": "M27.38,59.38c0.5,9.25-1.38,16.62-6.38,21.88", "x0": 27.4, "y0": 59.4}, {"d": "M73.51,53c10.87,9.62,15.5,17.62,16.62,24.88", "x0": 73.5, "y0": 53.0}, {"d": "M72.63,17.5c2.75,1.75,6,5.38,7.75,8.5", "x0": 72.6, "y0": 17.5}, {"d": "M79.01,12.62c3.06,1.57,6.68,4.82,8.62,7.62", "x0": 79.0, "y0": 12.6}]}, "ぱ": {"vb": "0 0 109 109", "strokes": [{"d": "M24.51,18c1.25,1.5,2.15,4,1.62,6.62c-3.5,17.62-6.98,36.4-4,54.88c2.5,15.5,1.12,2,5.62-6.25", "x0": 24.5, "y0": 18.0}, {"d": "M49.64,37.89c2.41,1.57,4.85,2.16,7.8,1.71c9.36-1.43,17.46-2.94,23.4-4.57c3.12-0.86,5.96-1.29,7.8-1.29", "x0": 49.6, "y0": 37.9}, {"d": "M69.77,16.5c2.25,2.12,2.88,4.12,2.88,6.5c0,2.38,1.5,38.62,1.5,48c0,22.5-30.62,19.62-30.62,10.5c0-9.75,23.88-5.62,29.5-2.88c5.62,2.74,11.98,8.26,13.36,9.38", "x0": 69.8, "y0": 16.5}, {"d": "M91.01,24.38c-9.62,0-9.25-14.25,0-14.25c9.76-0.01,9.5,14.25,0,14.25", "x0": 91.0, "y0": 24.4}]}, "パ": {"vb": "0 0 109 109", "strokes": [{"d": "M39.08,36.62c0.38,1.14,0.38,2.84-0.12,4.14c-5.46,13.99-13.08,24.12-21.96,32.49", "x0": 39.1, "y0": 36.6}, {"d": "M65.5,36.38c13,9.12,23.12,22.62,28,33.38", "x0": 65.5, "y0": 36.4}, {"d": "M86,30.12c-9.62,0-9.25-14.25,0-14.25c9.76,0.01,9.5,14.25,0,14.25", "x0": 86.0, "y0": 30.1}]}, "ぴ": {"vb": "0 0 109 109", "strokes": [{"d": "M20,25.12c1.25,0.88,3.75,2.25,6.5,1.38c2.75-0.87,7.31-2.38,11.38-4.5c6-3.12,8.42-1.01,4.25,4c-27.13,32.62-23.76,58.5-1.52,62.88c18.07,3.56,37.63-16.38,35.63-56.51c-0.72-14.5-0.17-14.78,4.12-1.75c3.76,11.38,10.26,20.76,16.14,26.5", "x0": 20.0, "y0": 25.1}, {"d": "M93.87,22.12c-9.62,0-9.25-14.25,0-14.25c9.75,0.01,9.5,14.25,0,14.25", "x0": 93.9, "y0": 22.1}]}, "ピ": {"vb": "0 0 109 109", "strokes": [{"d": "M35.38,44.5c1.75,1.38,4.51,2.19,6.88,1.88c10.24-1.38,17.24-2.88,24.24-4.26c3.01-0.59,7.12-1,9.38-0.88", "x0": 35.4, "y0": 44.5}, {"d": "M31,17.62c1.38,1.26,1.88,3.38,1.88,6.13c0,2.75-0.88,44-0.88,47.25c0,9.75,4,14.62,13.75,14.62c6,0,16.38,0.12,21.38,0c5-0.12,9.5-0.62,13.5-1.5", "x0": 31.0, "y0": 17.6}, {"d": "M83,32.88c-9.62,0-9.25-14.25,0-14.25c9.76-0.01,9.5,14.25,0,14.25", "x0": 83.0, "y0": 32.9}]}, "ぷ": {"vb": "0 0 109 109", "strokes": [{"d": "M42.13,15.62c3.62,3.38,7.5,5.38,12.74,6.13c9.59,1.37,3.5,3.38-1.88,6.12", "x0": 42.1, "y0": 15.6}, {"d": "M43.13,46.88c1.88,4.62,7.5,9.41,14.25,17.5c10.62,12.74,0.49,30-19.13,21.62", "x0": 43.1, "y0": 46.9}, {"d": "M16.5,73.88c0.75,4,1.88,8.12,5,10.12c1.16,0.74,0.12-3.38,13.25-9.12", "x0": 16.5, "y0": 73.9}, {"d": "M79.63,61.88c5.5,3.38,10.28,7.49,11.38,8.88c6.75,8.5-0.25,4.62-4.62,7.12", "x0": 79.6, "y0": 61.9}, {"d": "M80.87,26.62c-9.62,0-9.25-14.25,0-14.25c9.76,0.01,9.5,14.25,0,14.25", "x0": 80.9, "y0": 26.6}]}, "プ": {"vb": "0 0 109 109", "strokes": [{"d": "M24.5,30c1.88,1.88,3.5,2.04,6.5,1.62c14.5-2,29-4.38,43.75-6.88c6.82-1.16,10.58,2.29,6.88,9.12c-10.38,19.14-21.25,39.52-50.01,53.64", "x0": 24.5, "y0": 30.0}, {"d": "M92.62,23.88c-9.62,0-9.25-14.25,0-14.25c9.76-0.01,9.5,14.25,0,14.25", "x0": 92.6, "y0": 23.9}]}, "ぺ": {"vb": "0 0 109 109", "strokes": [{"d": "M15,48.75c2.25,1.62,4.67,1.96,7-0.38c3.62-3.62,7.46-6.54,11.25-10.5c5.5-5.75,8.48-4.75,13.12-0.88c12.12,10.12,30.38,25.12,33.38,27.38c3,2.26,12.38,10.38,13.88,11.63", "x0": 15.0, "y0": 48.8}, {"d": "M73.63,36.75c-9.62,0-9.25-14.25,0-14.25c9.75,0,9.5,14.25,0,14.25", "x0": 73.6, "y0": 36.8}]}, "ペ": {"vb": "0 0 109 109", "strokes": [{"d": "M15.5,49.25c2.75,1.5,5.33,0.62,6.88-0.88c4-3.88,9.12-8.75,11.62-11.25c3.12-3.12,7.23-5.08,11.87-1.12c11.13,9.5,26.25,22,36.87,30.62c4.23,3.43,7.62,6.62,11.12,9.25", "x0": 15.5, "y0": 49.2}, {"d": "M72.74,36.12c-9.62,0-9.25-14.25,0-14.25c9.76,0.01,9.5,14.25,0,14.25", "x0": 72.7, "y0": 36.1}]}, "ぽ": {"vb": "0 0 109 109", "strokes": [{"d": "M24.51,19c1.25,1.5,2.15,4,1.62,6.62c-3.5,17.62-6.98,37.4-4,55.88c2.5,15.5,1.12,2,5.62-6.25", "x0": 24.5, "y0": 19.0}, {"d": "M53.08,21.38c1.9,1.28,3.82,1.76,6.14,1.4c7.36-1.17,13.73-2.4,18.41-3.73c2.46-0.7,4.69-1.05,6.13-1.05", "x0": 53.1, "y0": 21.4}, {"d": "M53.83,44.55c2.21,1.44,4.46,1.98,7.16,1.57c8.59-1.31,15.78-2.44,21.23-3.94c2.87-0.79,5.72-1.18,7.41-1.18", "x0": 53.8, "y0": 44.5}, {"d": "M72.51,23.25c1.38,1.62,1.62,4.12,1.62,6.5c0,2.38,2,35.12,2,44.5c0,17.5-29.88,17.12-29.88,8c0-9.75,21.38-7.88,29.5-2.88c5.33,3.28,12,8.25,13.38,9.38", "x0": 72.5, "y0": 23.2}, {"d": "M95.13,34.5c-9.62,0-9.25-14.25,0-14.25c9.75,0,9.5,14.25,0,14.25", "x0": 95.1, "y0": 34.5}]}, "ポ": {"vb": "0 0 109 109", "strokes": [{"d": "M22.63,40.38c2.62,1,4.75,1.71,9.12,1.25c17.75-1.88,29.25-2.75,45.38-3.88c3.74-0.26,7.38-0.12,11.12,0.62", "x0": 22.6, "y0": 40.4}, {"d": "M53.75,17.12c1.38,1.88,1.38,4.5,1.38,7.38c0,2.88-0.12,46.62-0.12,51.88c0,23.12-6.25,11.25-9.75,9.62", "x0": 53.8, "y0": 17.1}, {"d": "M27.38,59.38c0.5,9.25-1.38,16.62-6.38,21.88", "x0": 27.4, "y0": 59.4}, {"d": "M73.51,53c10.87,9.62,15.5,17.62,16.62,24.88", "x0": 73.5, "y0": 53.0}, {"d": "M79.75,25.62c-9.62,0-9.25-14.25,0-14.25c9.76,0.01,9.5,14.25,0,14.25", "x0": 79.8, "y0": 25.6}]}}, "confusables": {"katakana": [["シ", "ツ"], ["ソ", "ン"], ["ワ", "ヲ"], ["ク", "タ"], ["チ", "テ"], ["フ", "ワ"], ["メ", "ヌ"], ["エ", "キ"]], "hiragana": [["ぬ", "め", "ね", "わ"], ["さ", "き"], ["る", "ろ"], ["は", "ほ"], ["わ", "れ"], ["こ", "い"]]}};
+
+function escapeHtml(s){
+  return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function pickDistractors(pool, exclude, n){
+  const uniq = Array.from(new Set(pool));
+  const candidates = uniq.filter(x=>x!==exclude);
+  return shuffleArray(candidates).slice(0,n);
+}
+
+function buildQuestions(script){
+  const questions = [];
+  const isHira = script === "hiragana";
+  const allRomaji = [];
+  const allChars = [];
+  KANA.rows.forEach(row=>{
+    row.chars.forEach(c=>{
+      allRomaji.push(c.romaji);
+      allChars.push(isHira ? c.hira : c.kata);
+    });
+  });
+
+  let flatIdx = 0;
+  KANA.rows.forEach(row=>{
+    row.chars.forEach(c=>{
+      const char = isHira ? c.hira : c.kata;
+      const mnemo = isHira ? c.mnemoHira : c.mnemoKata;
+      const formula = "เทคนิคจำแถวนี้ ("+row.label+"): "+row.tip+"\n\nเทคนิคจำตัวนี้: "+mnemo;
+      const typeA = (flatIdx % 2 === 0);
+      if(typeA){
+        const options = shuffleArray([c.romaji].concat(pickDistractors(allRomaji, c.romaji, 5)));
+        questions.push({
+          prompt: 'ตัวอักษรนี้อ่านว่าอย่างไร: <span class="kanji-big">「'+char+'」</span>',
+          subs: [{label:"เลือกคำตอบที่ถูกต้อง", options:options, correctAnswer:c.romaji}],
+          formula: formula, mnemo: mnemo,
+          steps: '「'+char+'」 อยู่ในแถว '+row.label+'-row จึงอ่านว่า "'+c.romaji+'"',
+          char: char, reading: c.romaji, cat: row.id, qtype:"read"
+        });
+      } else {
+        const options = shuffleArray([char].concat(pickDistractors(allChars, char, 5)));
+        questions.push({
+          prompt: 'เสียงอ่าน "'+c.romaji+'" ตรงกับตัวอักษรตัวใด',
+          subs: [{label:"เลือกคำตอบที่ถูกต้อง", options:options, correctAnswer:char}],
+          formula: formula, mnemo: mnemo,
+          steps: 'เสียง "'+c.romaji+'" ตรงกับตัวอักษร 「'+char+'」 ในแถว '+row.label+'-row',
+          char: char, reading: c.romaji, cat: row.id, qtype:"recognize"
+        });
+      }
+      flatIdx++;
+    });
+  });
+
+  const groups = KANA.confusables[script] || [];
+  groups.forEach(group=>{
+    const target = group[Math.floor(Math.random()*group.length)];
+    let targetReading = null, targetCat = null;
+    KANA.rows.forEach(row=>{
+      row.chars.forEach(c=>{
+        const ch = isHira ? c.hira : c.kata;
+        if(ch === target){ targetReading = c.romaji; targetCat = row.id; }
+      });
+    });
+    if(!targetReading) return;
+    const others = group.filter(x=>x!==target);
+    const need = Math.max(0, 4-others.length);
+    const extra = pickDistractors(allChars, target, need+2).filter(x=>group.indexOf(x)===-1).slice(0,need);
+    const options = shuffleArray([target].concat(others, extra)).slice(0,Math.min(6, group.length+extra.length+1));
+    questions.push({
+      prompt: '⚠️ ตัวที่หน้าตาคล้ายกัน — เสียง "'+targetReading+'" ตรงกับตัวอักษรตัวใด',
+      subs: [{label:"สังเกตรายละเอียดให้ดี", options:options, correctAnswer:target}],
+      formula: "จุดสังเกต: "+group.join(" / ")+" หน้าตาคล้ายกันมาก ต้องดูรายละเอียดปลายเส้น/มุมให้ชัด",
+      mnemo: "", steps: 'เสียง "'+targetReading+'" ตรงกับ 「'+target+'」',
+      char: target, reading: targetReading, cat: targetCat, qtype:"confusable"
+    });
+  });
+
+  return questions;
+}
+
+function buildCatMeta(script){
+  const isHira = script === "hiragana";
+  return KANA.rows.map(row=>({
+    id: row.id, section: row.section, label: row.label,
+    chars: row.chars.map(c=> isHira ? c.hira : c.kata)
+  }));
+}
+
+function renderStrokeAnim(char, uid, hidden){
+  const data = KANA.strokes[char];
+  if(!data) return "";
+  let inner = "";
+  data.strokes.forEach((s,i)=>{
+    inner += '<path id="'+uid+'_s'+i+'" class="kv-stroke" d="'+s.d+'"></path>';
+  });
+  data.strokes.forEach((s,i)=>{
+    const mid = uid+"_m"+i;
+    inner += '<circle class="kv-num-bg" cx="'+s.x0+'" cy="'+s.y0+'" r="6.5"></circle>';
+    inner += '<text class="kv-num-text" x="'+s.x0+'" y="'+s.y0+'">'+(i+1)+'</text>';
+    inner += '<circle id="'+mid+'d" class="kv-dot" r="3">'
+           + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.5s" fill="freeze" path="'+s.d+'"></animateMotion>'
+           + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+           + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.4s" from="1" to="0" fill="freeze"></animate>'
+           + '</circle>';
+  });
+  return '<div class="stroke-anim-wrap" id="'+uid+'"'+(hidden?' style="display:none"':'')+'>'
+       + '<svg viewBox="'+data.vb+'" class="stroke-anim-svg">'+inner+'</svg>'
+       + '<button class="stroke-play-btn" data-target="'+uid+'">&#9654; เล่นลำดับขีด ('+data.strokes.length+' ขีด)</button>'
+       + '</div>';
+}
+
+function playStrokeAnim(uid){
+  const box = document.getElementById(uid);
+  if(!box) return;
+  const svg = box.querySelector("svg");
+  const paths = svg.querySelectorAll(".kv-stroke");
+  const dots = svg.querySelectorAll(".kv-dot");
+  paths.forEach(p=>{
+    const len = p.getTotalLength();
+    p.style.transition = "none";
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+  void svg.getBoundingClientRect();
+  const stepDur = 550;
+  paths.forEach((p,i)=>{
+    setTimeout(()=>{
+      p.style.transition = "stroke-dashoffset "+(stepDur-100)+"ms ease";
+      p.style.strokeDashoffset = 0;
+      const anim = dots[i] ? dots[i].querySelector("animateMotion") : null;
+      if(anim){ try{ anim.beginElement(); }catch(e){} }
+    }, i*stepDur);
+  });
+}
+
+function wireStrokeButtons(root){
+  root.querySelectorAll(".stroke-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const box = document.getElementById(btn.dataset.box);
+      if(box) box.style.display = box.style.display==="none" ? "flex" : "none";
+    });
+  });
+  root.querySelectorAll(".stroke-play-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=> playStrokeAnim(btn.dataset.target));
+  });
+}
+
+let currentScript = "katakana";
+let mode = "exercise";
+let QUESTIONS = buildQuestions(currentScript);
+let CAT_META = buildCatMeta(currentScript);
+let selectedCats = new Set(CAT_META.map(c=>c.id));
+let order = "original";
+let flashPos = 0;
+let flashFlipped = false;
+
+let progressState = { katakana:{userAnswers:{}, checked:{}}, hiragana:{userAnswers:{}, checked:{}} };
+let userAnswers = progressState.katakana.userAnswers;
+let checked = progressState.katakana.checked;
+
+let masteryWrong = {};
+try{ masteryWrong = JSON.parse(localStorage.getItem("kana_mastery_wrong")||"{}"); }catch(e){}
+function saveMastery(){ try{ localStorage.setItem("kana_mastery_wrong", JSON.stringify(masteryWrong)); }catch(e){} }
+function masteryKey(script, char){ return script+"_"+char; }
+function recordResult(qIdx, correct){
+  const q = QUESTIONS[qIdx];
+  const key = masteryKey(currentScript, q.char);
+  if(!correct){ masteryWrong[key] = (masteryWrong[key]||0) + 1; saveMastery(); }
+}
+
+function filteredIndexes(){
+  const arr=[];
+  QUESTIONS.forEach((q,i)=>{ if(selectedCats.has(q.cat)) arr.push(i); });
+  return arr;
+}
+function computeDisplayIndexes(){
+  const base = filteredIndexes();
+  if(order==="shuffle") return shuffleArray(base);
+  if(order==="weak"){
+    return base.slice().sort((a,b)=>{
+      const wa = masteryWrong[masteryKey(currentScript, QUESTIONS[a].char)] || 0;
+      const wb = masteryWrong[masteryKey(currentScript, QUESTIONS[b].char)] || 0;
+      return wb - wa;
+    });
+  }
+  return base;
+}
+let displayIndexes = computeDisplayIndexes();
+
+let timerMode = "stopwatch";
+let timerSeconds = 0;
+let timerLimit = 0;
+let timerInterval = null;
+let timerRunning = false;
+
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,"0");
+  const s = Math.floor(sec%60).toString().padStart(2,"0");
+  return m+":"+s;
+}
+function updateTimerDisplay(){
+  const displaySec = timerMode==="countdown" ? Math.max(timerLimit - timerSeconds, 0) : timerSeconds;
+  document.getElementById("timerDisplay").textContent = formatTime(displaySec);
+  if(timerMode==="countdown" && timerLimit>0 && timerSeconds>=timerLimit){
+    stopTimer();
+    document.getElementById("timerDisplay").textContent = "หมดเวลา";
+  }
+}
+function startTimer(){
+  if(timerRunning) return;
+  if(timerMode==="countdown"){
+    const mins = parseFloat(document.getElementById("countdownMinutes").value);
+    if(mins>0 && timerLimit===0) timerLimit = mins*60;
+  }
+  timerRunning = true;
+  timerInterval = setInterval(()=>{ timerSeconds++; updateTimerDisplay(); },1000);
+}
+function stopTimer(){ timerRunning = false; clearInterval(timerInterval); }
+function resetTimer(){
+  stopTimer(); timerSeconds = 0; timerLimit = 0;
+  document.getElementById("countdownMinutes").value = "";
+  updateTimerDisplay();
+}
+document.getElementById("timerStartBtn").onclick = startTimer;
+document.getElementById("timerPauseBtn").onclick = stopTimer;
+document.getElementById("timerResetBtn").onclick = resetTimer;
+document.getElementById("timerModeSelect").onchange = (e)=>{ timerMode = e.target.value; resetTimer(); };
+
+function subKey(qIdx, subIdx){ return qIdx+"_"+subIdx; }
+function checkSubAnswer(q, subIdx, value){
+  return String(value) === String(q.subs[subIdx].correctAnswer);
+}
+function questionStatus(qIdx){
+  const q = QUESTIONS[qIdx];
+  const total = q.subs.length;
+  let answeredCount = 0, correctCount = 0;
+  for(let s=0;s<total;s++){
+    const key = subKey(qIdx,s);
+    if(userAnswers[key] !== undefined && userAnswers[key] !== ""){
+      answeredCount++;
+      if(checked[qIdx] && checkSubAnswer(q,s,userAnswers[key])) correctCount++;
+    }
+  }
+  if(!checked[qIdx]) return answeredCount===0 ? "unanswered" : "partial";
+  return correctCount===total ? "correct" : "incorrect";
+}
+function isFullyCorrect(qIdx){ return questionStatus(qIdx) === "correct"; }
+
+function renderNavGrid(){
+  const nav = document.getElementById("navGrid");
+  nav.innerHTML = "";
+  displayIndexes.forEach((qIdx, pos)=>{
+    const cell = document.createElement("div");
+    cell.className = "nav-cell";
+    if(mode==="flashcard"){
+      if(pos===flashPos) cell.classList.add("current");
+    } else {
+      const status = questionStatus(qIdx);
+      if(status==="partial") cell.classList.add("answered");
+      if(status==="correct") cell.classList.add("correct");
+      if(status==="incorrect") cell.classList.add("incorrect");
+    }
+    cell.textContent = pos+1;
+    cell.onclick = ()=>{
+      if(mode==="flashcard"){
+        flashPos = pos; flashFlipped = false; renderFlashcard();
+      } else {
+        const target = document.getElementById("qcard_"+qIdx);
+        if(target) target.scrollIntoView({behavior:"smooth", block:"start"});
+      }
+    };
+    nav.appendChild(cell);
+  });
+}
+
+function renderCatPanel(){
+  const body = document.getElementById("catPanelBody");
+  if(!body) return;
+  let html = "";
+  let lastSection = null;
+  CAT_META.forEach(cat=>{
+    if(cat.section !== lastSection){
+      html += '<div class="cat-section-label">'+cat.section+'</div>';
+      lastSection = cat.section;
+    }
+    const isChecked = selectedCats.has(cat.id) ? "checked" : "";
+    html += '<label class="cat-item"><input type="checkbox" data-cat="'+cat.id+'" '+isChecked+'> '
+          + cat.label + ' <span class="cat-chars">'+cat.chars.join("")+'</span></label>';
+  });
+  body.innerHTML = html;
+  body.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', (e)=>{
+      const cid = e.target.getAttribute('data-cat');
+      if(e.target.checked) selectedCats.add(cid); else selectedCats.delete(cid);
+      onCatFilterChanged();
+    });
+  });
+}
+function onCatFilterChanged(){
+  if(selectedCats.size===0){
+    CAT_META.forEach(c=>selectedCats.add(c.id));
+    renderCatPanel();
+  }
+  displayIndexes = computeDisplayIndexes();
+  flashPos = 0; flashFlipped = false;
+  render();
+}
+document.getElementById("catSelectAllBtn").addEventListener('click', ()=>{
+  CAT_META.forEach(c=>selectedCats.add(c.id));
+  renderCatPanel();
+  onCatFilterChanged();
+});
+document.getElementById("catSelectNoneBtn").addEventListener('click', ()=>{
+  selectedCats.clear();
+  selectedCats.add(CAT_META[0].id);
+  renderCatPanel();
+  onCatFilterChanged();
+});
+
+function rowBanner(q){
+  const rowMeta = CAT_META.find(c=>c.id===q.cat);
+  const rowFull = KANA.rows.find(r=>r.id===q.cat);
+  if(!rowMeta || !rowFull) return "";
+  const banner = document.createElement("div");
+  banner.className = "row-tip-banner";
+  banner.innerHTML = "<strong>วรรค "+rowMeta.label+"</strong> ("+rowMeta.chars.join(" ")+")<br>"+escapeHtml(rowFull.tip);
+  return banner;
+}
+
+function renderExercise(){
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  let lastCat = null;
+  displayIndexes.forEach((qIdx, pos)=>{
+    const q = QUESTIONS[qIdx];
+    if(q.cat !== lastCat && order==="original"){
+      const b = rowBanner(q);
+      if(b) main.appendChild(b);
+      lastCat = q.cat;
+    }
+    const isChecked = !!checked[qIdx];
+    const card = document.createElement("div");
+    card.className = "q-card";
+    card.id = "qcard_"+qIdx;
+    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
+    html += '<div class="q-prompt">'+q.prompt+'</div>';
+    q.subs.forEach((sub, subIdx)=>{
+      const key = subKey(qIdx, subIdx);
+      const lockedClass = isChecked ? " locked" : "";
+      let stateClass = "";
+      if(isChecked && userAnswers[key] !== undefined && userAnswers[key] !== ""){
+        stateClass = checkSubAnswer(q, subIdx, userAnswers[key]) ? " correct" : " incorrect";
+      }
+      html += '<div class="sub-item'+lockedClass+stateClass+'" id="sitem_'+key+'"><label>'+sub.label+'</label>';
+      const disabledAttr = isChecked ? "disabled" : "";
+      html += '<select data-key="'+key+'" '+disabledAttr+'><option value="">-- เลือก --</option>';
+      sub.options.forEach(opt=>{
+        const selectedAttr = userAnswers[key]===opt ? "selected" : "";
+        html += '<option value="'+escapeHtml(opt)+'" '+selectedAttr+'>'+escapeHtml(opt)+'</option>';
+      });
+      html += '</select></div>';
+    });
+    html += '<div class="footer-actions">';
+    if(!isChecked) html += '<button class="check-btn" data-qidx="'+qIdx+'">ตรวจคำตอบข้อนี้</button>';
+    html += '<button class="secondary hint-btn" data-qidx="'+qIdx+'">💡 เทคนิคจำ</button>';
+    html += '<button class="secondary stroke-btn" data-box="strokebox_'+qIdx+'">✍️ ลำดับขีด</button>';
+    html += '</div>';
+    html += '<div class="hint-box" id="hintbox_'+qIdx+'" style="display:none">'+escapeHtml(q.formula)+'</div>';
+    html += renderStrokeAnim(q.char, "strokebox_"+qIdx, true);
+    if(isChecked && !isFullyCorrect(qIdx)){
+      html += '<div class="reveal-box"><span class="reveal-title">เฉลยคำตอบที่ถูกต้อง</span>';
+      q.subs.forEach(sub=>{
+        html += '<div class="reveal-line"><b>'+sub.label+':</b> '+escapeHtml(sub.correctAnswer)+'</div>';
+      });
+      html += '</div>';
+    }
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+
+  main.querySelectorAll("select").forEach(el=>{
+    el.addEventListener("change", (e)=>{
+      const key = e.target.getAttribute("data-key");
+      userAnswers[key] = e.target.value;
+      renderNavGrid();
+    });
+  });
+  main.querySelectorAll(".check-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = parseInt(e.target.getAttribute("data-qidx"));
+      checked[qIdx] = true;
+      recordResult(qIdx, isFullyCorrect(qIdx));
+      renderExercise();
+    });
+  });
+  main.querySelectorAll(".hint-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = e.target.getAttribute("data-qidx");
+      const box = document.getElementById("hintbox_"+qIdx);
+      box.style.display = box.style.display==="none" ? "block" : "none";
+    });
+  });
+  wireStrokeButtons(main);
+  renderNavGrid();
+  updateScore();
+}
+
+function renderAnswers(){
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  let lastCat = null;
+  displayIndexes.forEach((qIdx, pos)=>{
+    const q = QUESTIONS[qIdx];
+    if(q.cat !== lastCat && order==="original"){
+      const b = rowBanner(q);
+      if(b) main.appendChild(b);
+      lastCat = q.cat;
+    }
+    const card = document.createElement("div");
+    card.className = "q-card";
+    card.id = "qcard_"+qIdx;
+    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
+    html += '<div class="q-prompt">'+q.prompt+'</div>';
+    q.subs.forEach(sub=>{
+      html += '<div class="sub-item"><label>'+sub.label+'</label>';
+      html += '<div class="answer-block"><strong>คำตอบ:</strong> '+escapeHtml(sub.correctAnswer)+'</div></div>';
+    });
+    html += '<div class="explain-block"><h4>วิธีจำ</h4>';
+    html += '<div class="formula">'+escapeHtml(q.formula)+'</div>';
+    html += '<div class="steps">'+escapeHtml(q.steps)+'</div></div>';
+    html += renderStrokeAnim(q.char, "ansstroke_"+qIdx, false);
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+  document.getElementById("scoreBox").style.display = "none";
+  wireStrokeButtons(main);
+  renderNavGrid();
+}
+
+function renderFlashcard(){
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  if(displayIndexes.length===0){
+    main.innerHTML = '<div class="q-card">ไม่มีตัวอักษรในหมวดที่เลือก กรุณาเลือกอย่างน้อย 1 หมวด</div>';
+    renderNavGrid();
+    return;
+  }
+  if(flashPos >= displayIndexes.length) flashPos = 0;
+  const qIdx = displayIndexes[flashPos];
+  const q = QUESTIONS[qIdx];
+  const card = document.createElement("div");
+  card.className = "flash-card";
+  let html = '<div class="flash-progress">บัตรที่ '+(flashPos+1)+' / '+displayIndexes.length+'</div>';
+  html += '<div id="flashFace" style="display:flex;flex-direction:column;align-items:center;width:100%;">';
+  if(!flashFlipped){
+    html += '<div class="flash-char">'+q.char+'</div>';
+    html += '<div class="flash-hint">แตะเพื่อดูเฉลย</div>';
+  } else {
+    html += '<div class="flash-char small">'+q.char+'</div>';
+    html += '<div class="flash-reading">อ่านว่า "'+q.reading+'"</div>';
+    if(q.mnemo) html += '<div class="flash-mnemo">'+escapeHtml(q.mnemo)+'</div>';
+    html += renderStrokeAnim(q.char, "flashstroke_"+qIdx, false);
+  }
+  html += '</div>';
+  card.innerHTML = html;
+  card.querySelector('#flashFace').addEventListener('click', (e)=>{
+    if(e.target.closest('.stroke-play-btn')) return;
+    flashFlipped = !flashFlipped;
+    renderFlashcard();
+  });
+  main.appendChild(card);
+  wireStrokeButtons(main);
+
+  const controls = document.createElement('div');
+  controls.className = 'flash-controls';
+  controls.innerHTML = '<button id="flashPrevBtn">← ก่อนหน้า</button>'
+    + '<button id="flashFlipBtn">พลิกบัตร</button>'
+    + '<button id="flashNextBtn">ถัดไป →</button>'
+    + '<button id="flashShuffleBtn" class="secondary">🔀 สุ่มลำดับ</button>';
+  main.appendChild(controls);
+  document.getElementById('flashPrevBtn').onclick = ()=>{ flashPos=(flashPos-1+displayIndexes.length)%displayIndexes.length; flashFlipped=false; renderFlashcard(); };
+  document.getElementById('flashNextBtn').onclick = ()=>{ flashPos=(flashPos+1)%displayIndexes.length; flashFlipped=false; renderFlashcard(); };
+  document.getElementById('flashFlipBtn').onclick = ()=>{ flashFlipped=!flashFlipped; renderFlashcard(); };
+  document.getElementById('flashShuffleBtn').onclick = ()=>{ displayIndexes=shuffleArray(displayIndexes); flashPos=0; flashFlipped=false; renderFlashcard(); };
+
+  document.getElementById("scoreBox").style.display = "none";
+  renderNavGrid();
+}
+
+function updateScore(){
+  const scoreBox = document.getElementById("scoreBox");
+  const scoreText = document.getElementById("scoreText");
+  let correctCount = 0;
+  QUESTIONS.forEach((q, qIdx)=>{ if(checked[qIdx] && isFullyCorrect(qIdx)) correctCount++; });
+  scoreText.textContent = correctCount + "/" + QUESTIONS.length;
+  scoreBox.style.display = "block";
+}
+
+function resetAll(){
+  progressState[currentScript].userAnswers = {};
+  progressState[currentScript].checked = {};
+  userAnswers = progressState[currentScript].userAnswers;
+  checked = progressState[currentScript].checked;
+  render();
+}
+document.getElementById("resetAllBtn").addEventListener("click", resetAll);
+
+function render(){
+  if(mode==="exercise") renderExercise();
+  else if(mode==="answer") renderAnswers();
+  else renderFlashcard();
+}
+
+function setActiveModeBtn(id){
+  ["btnExerciseMode","btnAnswerMode","btnFlashcardMode"].forEach(btnId=>{
+    document.getElementById(btnId).classList.toggle("active", btnId===id);
+  });
+}
+document.getElementById("btnExerciseMode").onclick = ()=>{ mode="exercise"; setActiveModeBtn("btnExerciseMode"); render(); };
+document.getElementById("btnAnswerMode").onclick = ()=>{ mode="answer"; setActiveModeBtn("btnAnswerMode"); render(); };
+document.getElementById("btnFlashcardMode").onclick = ()=>{ mode="flashcard"; flashPos=0; flashFlipped=false; setActiveModeBtn("btnFlashcardMode"); render(); };
+
+function updateScriptLabel(){
+  document.getElementById("scriptLabel").textContent = currentScript==="hiragana" ? "— ひらがな Hiragana" : "— カタカナ Katakana";
+}
+function switchScript(script){
+  if(script === currentScript) return;
+  currentScript = script;
+  QUESTIONS = buildQuestions(currentScript);
+  CAT_META = buildCatMeta(currentScript);
+  userAnswers = progressState[currentScript].userAnswers;
+  checked = progressState[currentScript].checked;
+  displayIndexes = computeDisplayIndexes();
+  flashPos = 0; flashFlipped = false;
+  updateScriptLabel();
+  document.getElementById("btnKatakana").classList.toggle("active", script==="katakana");
+  document.getElementById("btnHiragana").classList.toggle("active", script==="hiragana");
+  renderCatPanel();
+  render();
+}
+document.getElementById("btnKatakana").onclick = ()=> switchScript("katakana");
+document.getElementById("btnHiragana").onclick = ()=> switchScript("hiragana");
+
+document.getElementById("orderSelect").onchange = (e)=>{
+  order = e.target.value;
+  displayIndexes = computeDisplayIndexes();
+  flashPos = 0;
+  render();
+};
+
+updateScriptLabel();
+renderCatPanel();
+displayIndexes = computeDisplayIndexes();
+render();
+updateTimerDisplay();
+
+</script>
+</body>
+</html>
