@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>The 7 Habits of Highly Effective People — สรุปเพื่อทบทวน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+
+:root{
+  color-scheme: light dark;
+  --paper:#F6F4EE;
+  --bg:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --accent:#1B3A5C;
+  --accent2:#2B6CB0;
+  --accent-soft:#EAF1FA;
+  --correct:#256D46;
+  --correct-soft:#E7F3EB;
+  --incorrect:#B3341F;
+  --incorrect-soft:#FBEAE6;
+  --flag:#B7862C;
+  --flag-soft:#FBF1DA;
+  --unanswered:#9A9486;
+  --cream:#F4F2E8;
+  --diagram-bg:#FBFAF6;
+  --fontScale:1;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12161d;
+    --panel:#1b212b;
+    --border:#333c48;
+    --text:#e4e7ec;
+    --text-soft:#9aa5b3;
+    --navy:#7fb0e0;
+    --accent:#7fb0e0;
+    --accent2:#8ec1f2;
+    --accent-soft:#1c2b3d;
+    --correct:#7fd0a0;
+    --correct-soft:#173323;
+    --incorrect:#f0958a;
+    --incorrect-soft:#33201d;
+    --flag:#e3bd74;
+    --flag-soft:#332a17;
+    --unanswered:#8b93a0;
+    --cream:#232922;
+    --diagram-bg:#181e27;
+  }
+  .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Sarabun',"Segoe UI",sans-serif;
+  background:var(--paper);
+  color:var(--text);
+}
+header{
+  background:var(--navy-deep);
+  border-bottom:4px solid var(--flag);
+  box-shadow:0 2px 10px rgba(15,39,64,0.25);
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+header h1{
+  font-size:18px;
+  margin:0;
+  color:#F2EFE6;
+  font-weight:700;
+}
+header .subtitle{
+  font-size:12.5px;
+  color:#C9C2AE;
+  margin-top:2px;
+}
+.back-to-index{
+  display:inline-block;
+  font-size:12px;
+  color:#C9DCF0;
+  text-decoration:none;
+  margin-bottom:6px;
+  opacity:0.85;
+}
+.back-to-index:hover{opacity:1;text-decoration:underline;}
+@media print{.back-to-index{display:none;}}
+.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.layout{
+  display:flex;
+  max-width:1200px;
+  margin:0 auto;
+  gap:20px;
+  padding:20px;
+}
+.sidebar{width:250px;flex-shrink:0;}
+.sidebar-panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:16px;
+  position:sticky;
+  top:80px;
+  box-shadow:0 2px 8px rgba(15,39,64,0.06);
+  max-height:calc(100vh - 100px);
+  overflow-y:auto;
+}
+.sidebar-panel summary{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-soft);
+  margin:0 0 10px 0;
+  font-weight:600;
+  cursor:pointer;
+  user-select:none;
+}
+.toc-list{list-style:none;margin:0;padding:0;}
+.toc-list li{margin-bottom:2px;}
+.toc-list a{
+  display:block;
+  padding:7px 10px;
+  border-radius:4px;
+  color:var(--text);
+  text-decoration:none;
+  font-size:13px;
+  border-left:3px solid transparent;
+}
+.toc-list a:hover{background:var(--accent-soft);color:var(--accent2);}
+.toc-list a.active{background:var(--accent-soft);color:var(--navy);border-left:3px solid var(--navy);font-weight:600;}
+main{flex:1;min-width:0;}
+.section-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:0 2px 10px rgba(15,39,64,0.06);
+  scroll-margin-top:80px;
+}
+.section-card h2{
+  margin:0 0 14px 0;
+  font-size:18px;
+  color:var(--navy-deep);
+  padding-bottom:10px;
+  border-bottom:2px solid var(--border);
+}
+.section-card h3{
+  font-size:15px;
+  color:var(--navy);
+  margin:20px 0 10px 0;
+}
+.section-card .body-text{
+  font-size:14.5px;
+  line-height:1.9;
+  white-space:pre-wrap;
+}
+.callout{
+  margin:16px 0;
+  padding:14px 16px;
+  border-radius:6px;
+  border-left:4px solid;
+  font-size:14px;
+  line-height:1.8;
+  white-space:pre-wrap;
+}
+.callout-note{background:var(--accent-soft);border-color:var(--accent2);}
+.callout-example{background:var(--cream);border-color:var(--flag);}
+.callout-warning{background:var(--incorrect-soft);border-color:var(--incorrect);}
+.callout-formula{
+  background:var(--navy-deep);
+  color:#EAF1FA;
+  border-color:var(--flag);
+  font-family:'JetBrains Mono',monospace;
+  overflow-x:auto;
+}
+.callout-title{
+  font-weight:700;
+  font-size:12.5px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:8px;
+  display:block;
+  white-space:normal;
+}
+.callout code, .body-text code{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.92em;
+  background:rgba(127,127,127,0.16);
+  padding:1px 5px;
+  border-radius:3px;
+}
+.callout-note .callout-title{color:var(--accent2);}
+.callout-example .callout-title{color:var(--flag);}
+.callout-warning .callout-title{color:var(--incorrect);}
+.callout-formula .callout-title{color:#C9DCF0;}
+.image-block{
+  margin:18px 0;
+  text-align:center;
+}
+.image-block img{
+  max-width:100%;
+  height:auto;
+  border-radius:6px;
+  border:1px solid var(--border);
+  box-shadow:0 2px 10px rgba(15,39,64,0.08);
+}
+.image-block .image-caption{
+  font-size:12.5px;
+  color:var(--text-soft);
+  margin-top:8px;
+  font-style:italic;
+}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13.5px;}
+table th{background:var(--navy-deep);color:#F2EFE6;padding:9px 12px;text-align:left;}
+table td{padding:8px 12px;border-bottom:1px solid var(--border);}
+table tr:nth-child(even) td{background:var(--cream);}
+@media (max-width:800px){
+  .layout{flex-direction:column;}
+  .sidebar{width:100%;}
+  .sidebar-panel{position:static;max-height:none;}
+}
+@media print{
+  header .header-actions, .sidebar, #readProgress, #backToTop, .diagram-play-btn{display:none !important;}
+  .layout{display:block;padding:0;max-width:100%;}
+  main{width:100%;}
+  header{position:static;box-shadow:none;}
+  .section-card{opacity:1 !important;transform:none !important;box-shadow:none;border:1px solid #ccc;break-inside:avoid;}
+  body{background:#fff;}
+}
+
+</style>
+<style>
+
+/* ===== Readability & diagram enhancements ===== */
+#readProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--flag),var(--accent2));width:0%;z-index:999;transition:width .12s ease;}
+
+#backToTop{
+  position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;
+  background:var(--navy-deep);color:#F2EFE6;border:none;cursor:pointer;font-size:18px;
+  box-shadow:0 4px 14px rgba(15,39,64,0.3);display:none;align-items:center;justify-content:center;
+  z-index:998;opacity:0;transition:opacity .2s ease, transform .2s ease;
+}
+#backToTop:hover{transform:translateY(-2px);}
+#backToTop.show{display:flex;opacity:1;}
+
+#fontCtrl{display:flex;gap:6px;align-items:center;}
+#fontCtrl button{
+  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
+  width:32px;height:32px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:700;
+  font-family:'Sarabun',sans-serif;
+}
+#fontCtrl button:hover{background:#fff;}
+
+.read-time-badge{
+  font-size:11.5px;color:#C9C2AE;background:rgba(255,255,255,0.08);padding:5px 10px;border-radius:20px;
+  border:1px solid rgba(242,239,230,0.25);white-space:nowrap;
+}
+
+.section-card{opacity:0;transform:translateY(14px);transition:opacity .55s ease, transform .55s ease;}
+.section-card.revealed{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion: reduce){
+  .section-card{opacity:1;transform:none;transition:none;}
+}
+
+.section-card .body-text{font-size:calc(14.5px * var(--fontScale)) !important;}
+.section-card h2{font-size:calc(18px * var(--fontScale)) !important;}
+.section-card h3{font-size:calc(15px * var(--fontScale)) !important;}
+.callout{font-size:calc(14px * var(--fontScale)) !important;}
+table{font-size:calc(13.5px * var(--fontScale)) !important;}
+
+.callout-note .callout-title::before{content:"📝 ";}
+.callout-example .callout-title::before{content:"💡 ";}
+.callout-warning .callout-title::before{content:"⚠️ ";}
+.callout-formula .callout-title::before{content:"∑ ";}
+
+/* ==== Animated sequence / flow diagrams ==== */
+.diagram-block{
+  margin:20px 0;padding:16px 18px 14px;background:var(--diagram-bg);border:1px solid var(--border);
+  border-radius:8px;
+}
+.diagram-block h4{
+  margin:0 0 12px 0;font-size:calc(14.5px * var(--fontScale));color:var(--navy-deep);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.diagram-play-btn{
+  border:1.5px solid var(--accent2);background:#fff;color:var(--accent2);padding:5px 12px;
+  border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;
+  flex-shrink:0;
+}
+.diagram-play-btn:hover{background:var(--accent-soft);}
+.diagram-svg-wrap{overflow-x:auto;}
+.diagram-svg{display:block;margin:0 auto;min-width:420px;}
+.diagram-actor-label{font-family:'Sarabun',sans-serif;font-size:11.5px;font-weight:600;fill:var(--navy-deep);}
+.diagram-lifeline{stroke:var(--border);stroke-width:1.5;stroke-dasharray:3,3;}
+.diagram-node-box{fill:var(--panel);stroke:var(--navy);stroke-width:1.3;}
+.diagram-arrow-path{fill:none;stroke:var(--accent2);stroke-width:2;marker-end:url(#arrowhead);}
+.diagram-arrow-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;fill:var(--navy-deep);}
+.diagram-glow-dot{fill:var(--flag);filter:url(#glowFilter);opacity:0;}
+.diagram-steps-list{list-style:none;margin:12px 0 0;padding:0;font-size:calc(13px * var(--fontScale));line-height:1.7;}
+.diagram-steps-list li{padding:6px 10px;border-left:3px solid transparent;border-radius:4px;transition:background .3s ease, border-color .3s ease;}
+.diagram-steps-list li.step-active{background:var(--accent-soft);border-left-color:var(--flag);}
+.diagram-steps-list .step-num{
+  display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;
+  text-align:center;line-height:20px;font-size:11px;margin-right:8px;font-family:'JetBrains Mono',monospace;
+}
+
+</style>
+</head>
+<body>
+<div id="readProgress"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#2B6CB0"></path></marker>
+<filter id="glowFilter" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+</defs>
+</svg>
+
+<header>
+  <div>
+    <a class="back-to-index" href="../index.html">&larr; ทุกเล่ม / All Books</a>
+    <h1>The 7 Habits of Highly Effective People — สรุปเพื่อทบทวน</h1>
+    <div class="subtitle">Stephen R. Covey (1989) · เรียบเรียงจากรายงานค้นคว้าฉบับภาษาอังกฤษที่แนบมา</div>
+  </div>
+  <div class="header-actions">
+    <span class="read-time-badge" id="readTimeBadge"></span>
+    <div id="fontCtrl">
+      <button id="fontMinus" title="ลดขนาดตัวอักษร / Decrease font size">A&minus;</button>
+      <button id="fontPlus" title="เพิ่มขนาดตัวอักษร / Increase font size">A+</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="sidebar">
+    <details class="sidebar-panel" id="tocPanel" open>
+      <summary>สารบัญ / Contents</summary>
+      <ul class="toc-list" id="tocList"></ul>
+    </details>
+  </div>
+  <main id="mainArea"></main>
+</div>
+
+<button id="backToTop" title="กลับขึ้นด้านบน / Back to top">&uarr;</button>
+
+<script>
+const SECTIONS = [{"title": "1. ภาพรวม: หนังสือเล่มนี้คืออะไร", "body": "The 7 Habits of Highly Effective People ของ Stephen R. Covey ตีพิมพ์ครั้งแรก 15 สิงหาคม 1989 โดยสำนักพิมพ์ Simon & Schuster (สำนักพิมพ์ย่อย Free Press) เป็นกรอบแนวคิดแบบ principle-based (ยึดหลักการ) และ inside-out (จากภายในสู่ภายนอก) ประกอบด้วย habit (นิสัย) 7 ข้อที่เรียงลำดับกันอย่างมีเหตุผล ไม่ใช่รายการเคล็ดลับที่หยิบใช้สลับกันได้\n\nโครงสร้างของหนังสือวางอยู่บน Maturity Continuum (เส้นทางการเติบโตทางวุฒิภาวะ) คือ Dependence (การพึ่งพิงผู้อื่น) → Independence (การพึ่งพาตนเอง) → Interdependence (การพึ่งพาอาศัยกัน) และแบ่ง habit ออกเป็น 3 กลุ่ม: Private Victory (ชัยชนะส่วนตัว, ข้อ 1–3), Public Victory (ชัยชนะสาธารณะ, ข้อ 4–6) และ Renewal (การฟื้นฟูตนเอง, ข้อ 7)", "blocks": [{"type": "note", "content": "วิธีอ่านหน้านี้: อ่านหัวข้อ 4 (แนวคิดพื้นฐาน) ให้จบก่อนเสมอ เพราะ habit ทั้ง 7 ข้อ ถูกสร้างขึ้นบนแนวคิดเหล่านั้น ถ้าข้ามไปอ่านเฉพาะ habit จะได้แค่คำแนะนำ 7 ข้อที่ไม่เชื่อมกัน"}, {"type": "warning", "content": "จุดอ่อนหลักของกรอบแนวคิดนี้คือมันตั้งอยู่บน anecdote (เรื่องเล่าประสบการณ์), นิทานสอนใจ และ \"หลักการที่ไม่แปรตามกาลเวลา\" ไม่ใช่งานวิจัยเชิงประจักษ์ (empirical research) จึงควรถือเป็นภูมิปัญญาเชิงปฏิบัติที่ใช้ได้จริง ไม่ใช่ทฤษฎีที่ผ่านการพิสูจน์ทางวิทยาศาสตร์ รายละเอียดอยู่ในหัวข้อ 14"}]}, {"title": "2. ผู้เขียนและประวัติการตีพิมพ์", "body": "ผู้เขียน — Stephen Richards Covey เกิด 24 ตุลาคม 1932 ที่ Salt Lake City รัฐ Utah เสียชีวิต 16 กรกฎาคม 2012 ที่ Idaho Falls รัฐ Idaho อายุ 79 ปี จากผลข้างเคียงของอุบัติเหตุจักรยานเมื่อเมษายน 2012\n\nวุฒิการศึกษา: ปริญญาตรีบริหารธุรกิจจาก University of Utah, MBA จาก Harvard Business School และปริญญาเอกจาก Brigham Young University ซึ่งเขาสอนอยู่ที่นั่นด้วย ปี 1996 นิตยสาร Time จัดให้เขาเป็นหนึ่งใน \"25 ชาวอเมริกันผู้ทรงอิทธิพลที่สุด\" และเขาก่อตั้ง Covey Leadership Center ในปี 1983\n\nประวัติการตีพิมพ์ — subtitle (ชื่อรอง) เดิมคือ Restoring the Character Ethic ฉบับหลัง ๆ เปลี่ยนเป็น Powerful Lessons in Personal Change ฉบับครบรอบ 25 ปี (2014) เพิ่มคำนำโดย Jim Collins ฉบับครบรอบ 30 ปี ออกวันที่ 19 พฤษภาคม 2020 โดย FranklinCovey ร่วมกับ Simon & Schuster คงเนื้อหาเดิมไว้ทั้งหมดและเพิ่มข้อคิดท้ายบทโดย Sean Covey ลูกชายของผู้เขียน ความหนาอยู่ราว 380–440 หน้าแล้วแต่ฉบับ", "blocks": [{"type": "warning", "content": "ตัวเลขยอดขายและรางวัลต้องระบุว่าเป็น \"คำกล่าวอ้างของแหล่งข้อมูล\" เสมอ ไม่ใช่ข้อเท็จจริงที่ตรวจสอบอิสระแล้ว: Simon & Schuster ระบุว่าหนังสือของ Covey ขายรวมกันเกิน 40 ล้านเล่มใน 50 กว่าภาษา (เป็นตัวเลขรวมทุกเล่ม ไม่ใช่เล่มนี้เล่มเดียว) ขณะที่ประวัติผู้เขียนฉบับเก่ากว่าระบุ 25 ล้านเล่มใน 38 ภาษา และ NBC News ปี 2014 อ้าง 25 ล้านเล่ม, 220 สัปดาห์บนรายการขายดีของ New York Times, แปล 52 ภาษา ส่วนตำแหน่ง \"หนังสือธุรกิจทรงอิทธิพลที่สุดอันดับ 1 แห่งศตวรรษที่ 20\" มาจากการสำรวจของนิตยสาร Chief Executive ไม่ใช่รางวัลที่มีคณะกรรมการตัดสิน"}]}, {"title": "3. FranklinCovey: องค์กรที่เติบโตจากหนังสือเล่มนี้", "body": "Franklin Covey Co. ก่อตั้งวันที่ 30 พฤษภาคม 1997 จากการควบรวมกิจการระหว่าง Franklin Quest Co. ของ Hyrum W. Smith กับ Covey Leadership Center ของ Stephen Covey ทั้งสองฝ่ายประกาศดีลเมื่อ 22 มกราคม 1997 มูลค่าดีลราว 160 ล้านดอลลาร์สหรัฐ\n\nปัจจุบันจดทะเบียนในตลาดหลักทรัพย์ NYSE ด้วย ticker (สัญลักษณ์หลักทรัพย์) \"FC\" สำนักงานใหญ่อยู่ที่ Salt Lake City รัฐ Utah รายงาน consolidated net revenue (รายได้สุทธิรวมกิจการ) ปีงบประมาณสิ้นสุด 31 สิงหาคม 2025 ที่ 267.1 ล้านดอลลาร์สหรัฐ ลดลงราว 7% จากปีงบประมาณ 2024\n\nหลักสูตรเรือธงได้แก่ The 7 Habits, Leading at the Speed of Trust, The 4 Disciplines of Execution และ Leader in Me ซึ่งเป็นโปรแกรมปรับเปลี่ยนทั้งโรงเรียน", "blocks": [{"type": "note", "content": "ทำไมต้องรู้เรื่ององค์กร: เพราะแหล่งข้อมูลออนไลน์ที่ \"เป็นทางการ\" ที่สุดเรื่องชื่อและหลักการของแต่ละ habit คือหน้าหลักสูตรของ FranklinCovey เอง แต่แหล่งเดียวกันนี้ก็เป็นผู้ได้ประโยชน์ทางการค้าจากหนังสือด้วย จึงควรแยกใช้: ใช้ FranklinCovey สำหรับนิยามภายในกรอบแนวคิด และใช้แหล่งอื่นสำหรับบริบทภายนอกและคำวิจารณ์"}]}, {"title": "4. แนวคิดพื้นฐาน 6 อย่างก่อนเข้า 7 habits", "body": "ส่วนนี้คือโครงกระดูกทางความคิดของทั้งเล่ม habit ทั้ง 7 ข้อแขวนอยู่บนแนวคิดเหล่านี้", "blocks": [{"type": "subheading", "content": "4.1 Character Ethic เทียบกับ Personality Ethic"}, {"type": "note", "content": "Covey บอกว่าเขาไล่อ่านวรรณกรรมแนว \"ความสำเร็จ\" ของสหรัฐฯ ย้อนหลังราว 200 ปี แล้วพบว่า ช่วง 150 ปีแรก (1776 ถึงราวสงครามโลกครั้งที่ 1) เน้น Character Ethic (จริยธรรมด้านอุปนิสัย) ได้แก่ ความซื่อตรง ความถ่อมตน ความซื่อสัตย์ การรู้ประมาณ ความกล้า ความยุติธรรม ความอดทน ความขยัน ความเรียบง่าย ความสุภาพ และหลักปฏิบัติต่อผู้อื่นอย่างที่อยากให้เขาปฏิบัติต่อเรา หลังสงครามโลกครั้งที่ 1 วรรณกรรมเปลี่ยนไปเน้น Personality Ethic (จริยธรรมด้านบุคลิกภาพ) คือมองความสำเร็จเป็นเรื่องของภาพลักษณ์ ทัศนคติ พฤติกรรม ทักษะ และเทคนิค — ทางลัด, การคิดบวกเข้าไว้, และการชักจูงคน Covey มองว่า Personality Ethic เป็นเปลือกที่ไม่มีแก่น แก้ปัญหาได้ชั่วคราวแต่ปล่อยให้ปัญหาเรื้อรังลุกลาม"}, {"type": "subheading", "content": "4.2 Paradigm และ paradigm shift"}, {"type": "note", "content": "paradigm (กระบวนทัศน์) คือ \"แผนที่\" ในหัวเรา — วิธีที่เรามอง เข้าใจ และตีความโลก ซึ่งไม่ใช่ตัวโลกจริง เหมือนแผนที่ไม่ใช่ผืนดินจริง เนื่องจากทัศนคติและพฤติกรรมงอกออกมาจาก paradigm การไปแก้แค่ทัศนคติ/พฤติกรรม (แบบ Personality Ethic) จึงเปลี่ยนได้แค่เล็กน้อย ส่วนการเปลี่ยน paradigm ทำให้เกิดการเปลี่ยนแปลงแบบก้าวกระโดด หลักคือ: อยากเปลี่ยนเล็กน้อยให้แก้ที่พฤติกรรม อยากเปลี่ยนแบบพลิกให้แก้ที่ paradigm"}, {"type": "subheading", "content": "4.3 วงจร See-Do-Get"}, {"type": "example", "content": "Covey (ทำงานร่วมกับ Roger และ Rebecca Merrill) อธิบายการเปลี่ยนแปลงเป็นวงจร: วิธีที่เรา see (มอง — คือ paradigm/ทัศนคติ) กำหนดสิ่งที่เรา do (ทำ — คือพฤติกรรม) ซึ่งกำหนดสิ่งที่เรา get (ได้รับ — คือผลลัพธ์) ถ้าอยากเปลี่ยนผลลัพธ์ ต้องย้อนไปเปลี่ยนวิธีมอง ไม่ใช่ดันที่พฤติกรรมอย่างเดียว FranklinCovey ยังสอนโมเดลนี้อยู่จนถึงปัจจุบัน"}, {"type": "subheading", "content": "4.4 นิยามของ habit"}, {"type": "note", "content": "Covey นิยาม habit ว่าเป็นจุดตัดของสามอย่าง: knowledge (ความรู้ — รู้ว่าต้องทำอะไรและทำไม), skill (ทักษะ — รู้ว่าทำอย่างไร) และ desire (ความปรารถนา — แรงจูงใจ, อยากทำ) ต้องมีครบทั้งสามอย่างเท่านั้นสิ่งนั้นจึงจะกลายเป็น habit ขาดข้อใดข้อหนึ่งก็ไม่เกิด"}, {"type": "subheading", "content": "4.5 Maturity Continuum"}, {"type": "note", "content": "habit ทั้ง 7 พาคนเดินผ่าน 3 ขั้น: Dependence — กระบวนทัศน์แบบ \"คุณ\" คือคุณต้องดูแลฉัน ฉันโทษคุณ; Independence — กระบวนทัศน์แบบ \"ฉัน\" คือฉันทำเองได้ ฉันรับผิดชอบตัวเอง; Interdependence — กระบวนทัศน์แบบ \"เรา\" คือเราร่วมมือกันแล้วสร้างสิ่งที่ใหญ่กว่าที่ต่างคนต่างทำได้ ประเด็นสำคัญ: Independence เป็นความสำเร็จที่ใหญ่ แต่ไม่ใช่จุดสูงสุด Interdependence เป็นขั้นที่สูงกว่าและเข้าถึงได้เฉพาะคนที่พึ่งพาตนเองได้จริงแล้วเท่านั้น คนที่ปฏิเสธการพึ่งพากันเพราะยึดความเป็นอิสระอย่างสุดโต่ง มักเป็นภาวะ counter-dependent (ไม่มีคำแปลไทยมาตรฐาน — หมายถึงการต่อต้านการพึ่งพาจนกลายเป็นการถูกกำหนดโดยผู้อื่นอีกรูปแบบหนึ่ง) ซึ่งก็คือ Dependence อีกแบบ"}, {"type": "subheading", "content": "4.6 P/PC Balance และนิทานห่านทองคำ"}, {"type": "example", "content": "effectiveness (ประสิทธิผล) อยู่ที่ความสมดุลระหว่าง P = Production (ผลลัพธ์ที่ต้องการ เปรียบเป็น \"ไข่ทองคำ\") กับ PC = Production Capability (ความสามารถในการผลิต คือสุขภาพของ \"ห่าน\" ที่ออกไข่) Covey ใช้นิทานอีสปเรื่องชาวนาที่ฆ่าห่านเพื่อเอาทองทั้งหมดทีเดียว ผลคือทำลายตัวสินทรัพย์ทิ้ง การทุ่มไปที่ P จนละเลย PC จึงเป็นการทำลายตัวเองในระยะยาว หลักนี้ใช้ได้กับสินทรัพย์ทางกายภาพ ทางการเงิน และทางมนุษย์/ความสัมพันธ์"}, {"type": "subheading", "content": "4.7 Inside-Out และ principles เทียบกับ values"}, {"type": "note", "content": "Inside-Out — เริ่มจากตัวเองก่อน จากส่วนที่อยู่ข้างในที่สุด คือ paradigm อุปนิสัย และแรงจูงใจ ชัยชนะส่วนตัวต้องมาก่อนชัยชนะสาธารณะ การให้สัญญากับตัวเองและรักษามันได้ ต้องมาก่อนการให้สัญญากับผู้อื่น Covey ระบุว่าเขาไม่เคยเห็นทางออกที่ยั่งยืนเกิดจากการแก้จากภายนอกเข้ามาข้างใน"}, {"type": "note", "content": "principles (หลักการ) เป็นสิ่งภายนอกตัวเรา ประจักษ์ในตัวเอง และไม่แปรตามกาลเวลา เช่น ความเป็นธรรม ความซื่อตรง ความซื่อสัตย์ ศักดิ์ศรีความเป็นมนุษย์ เปรียบเหมือนเข็มทิศที่ชี้ทิศเหนือจริงเสมอ ส่วน values (ค่านิยม) เป็นสิ่งภายในและขึ้นกับตัวบุคคล ประโยคสรุปของ Covey: values กำหนดพฤติกรรม แต่ principles กำหนดผลที่ตามมาจากพฤติกรรมนั้น การใช้ชีวิตอย่างมีประสิทธิผลคือการปรับ values ของตัวเองให้ตรงกับ principles ที่ถูกต้อง"}, {"type": "diagram", "layout": "lifeline", "title": "วงจร See → Do → Get", "actors": ["See\n(มุมมอง/Paradigm)", "Do\n(พฤติกรรม)", "Get\n(ผลลัพธ์)"], "steps": [{"from": 0, "to": 1, "label": "มุมมองกำหนดการกระทำ", "note": "paradigm ที่เรามีกำหนดว่าเราจะทำอะไร"}, {"from": 1, "to": 2, "label": "การกระทำกำหนดผลลัพธ์", "note": "พฤติกรรมนำไปสู่ผลที่ได้รับ"}, {"from": 2, "to": 0, "label": "อยากเปลี่ยนผล ต้องย้อนไปเปลี่ยนมุมมอง", "note": "แก้ที่พฤติกรรมอย่างเดียวเปลี่ยนได้แค่เล็กน้อย"}]}, {"type": "diagram", "layout": "flow", "title": "Maturity Continuum: เส้นทางการเติบโต", "actors": ["Dependence\n(พึ่งพิงผู้อื่น)", "Independence\n(พึ่งพาตนเอง)", "Interdependence\n(พึ่งพาอาศัยกัน)"], "steps": [{"from": 0, "to": 1, "label": "\"คุณ\" → \"ฉัน\"", "note": "รับผิดชอบตัวเอง ทำเองได้"}, {"from": 1, "to": 2, "label": "\"ฉัน\" → \"เรา\"", "note": "ระดับสูงสุด เข้าถึงได้เฉพาะคนที่พึ่งตนเองได้จริงแล้ว"}]}]}, {"title": "5. โครงสร้าง 3 กลุ่มของ habit", "body": "Private Victory = habit 1–3 พาจาก Dependence ไปสู่ Independence เป็นเรื่องของการควบคุมตนเอง\nPublic Victory = habit 4–6 พาจาก Independence ไปสู่ Interdependence เป็นเรื่องของความสัมพันธ์\nRenewal = habit 7 หล่อเลี้ยงอีก 6 ข้อให้ทำงานต่อไปได้\n\nลำดับนี้เป็นตัวรับน้ำหนักของทั้งกรอบแนวคิด ไม่ใช่แค่การจัดเรียงให้สวย — จะทำ Win-Win หรือฟังอย่างเข้าอกเข้าใจ (ส่วนสาธารณะ) ได้จริงก็ต่อเมื่อชนะชัยชนะส่วนตัวมาก่อนแล้ว นี่คือเหตุผลที่คำแนะนำแบบ \"จงเป็นนักสื่อสารที่ดีขึ้น\" มักไม่ได้ผลกับคนทั่วไป", "blocks": [{"type": "diagram", "layout": "flow", "title": "โครงสร้าง Habit ทั้ง 7 ข้อ", "actors": ["Private Victory\n(Habit 1-3)", "Public Victory\n(Habit 4-6)", "Renewal\n(Habit 7)"], "steps": [{"from": 0, "to": 1, "label": "ชนะตัวเองก่อน จึงชนะร่วมกับผู้อื่นได้", "note": "ควบคุมตนเอง → ความสัมพันธ์"}, {"from": 1, "to": 2, "label": "Renewal หล่อเลี้ยงอีก 6 ข้อ", "note": "ถ้าไม่ฟื้นฟู habit อื่นจะค่อยๆ อ่อนแรงลง"}]}]}, {"title": "6. Habit 1 — Be Proactive (หลักการเรื่องวิสัยทัศน์และความรับผิดชอบส่วนบุคคล)", "body": "หลักการแกน: ระหว่าง stimulus (สิ่งเร้า) กับ response (การตอบสนอง) มีช่องว่างของเสรีภาพในการเลือก เราจึงเป็นผู้ \"response-able\" คือสามารถเลือกการตอบสนองของตัวเองได้ และด้วยเหตุนั้นจึงรับผิดชอบมันด้วย Covey อ้างข้อค้นพบของจิตแพทย์ Viktor Frankl จากค่ายกักกันว่า เสรีภาพสุดท้ายของมนุษย์คือการเลือกวิธีตอบสนองต่อสิ่งที่เกิดขึ้น", "blocks": [{"type": "subheading", "content": "โมเดลสำคัญ"}, {"type": "note", "content": "ภาษาเชิงรุกเทียบภาษาเชิงรับ — เชิงรุก: \"ฉันทำได้\", \"ฉันจะ\", \"ฉันเลือกที่จะ\"; เชิงรับ (reactive): \"ฉันทำไม่ได้\", \"ฉันจำเป็นต้อง\", \"ถ้าเพียงแต่...\", \"ไม่มีอะไรที่ฉันทำได้\""}, {"type": "example", "content": "Circle of Concern เทียบ Circle of Influence — Circle of Concern (วงของสิ่งที่เรากังวล) บรรจุทุกอย่างที่เราเป็นห่วง ส่วน Circle of Influence (วงของสิ่งที่เรามีอิทธิพลถึง) เป็นวงย่อยข้างใน บรรจุเฉพาะสิ่งที่เราทำอะไรกับมันได้จริง คนเชิงรุกลงแรงในวงอิทธิพล ผลคือวงนั้นขยายใหญ่ขึ้น คนเชิงรับหมกมุ่นกับวงความกังวล เช่น หนี้สาธารณะ การก่อการร้าย สภาพอากาศ ผลคือวงอิทธิพลหดลง"}, {"type": "note", "content": "การแยกประเภทปัญหา 3 แบบ: direct control (ควบคุมได้โดยตรง — พฤติกรรมของเราเอง แก้ด้วยการฝึก habit); indirect control (ควบคุมได้โดยอ้อม — พฤติกรรมของคนอื่น แก้ด้วยการเปลี่ยนวิธีสร้างอิทธิพล); no control (ควบคุมไม่ได้ — อดีตและความจริงที่เปลี่ยนไม่ได้ แก้ด้วยการเปลี่ยนทัศนคติของเราเอง)"}, {"type": "note", "content": "\"Have's\" เทียบ \"Be's\" — คนเชิงรับเติมวงความกังวลด้วยประโยคแบบ \"ถ้าฉันมี...\" เช่น ถ้าฉันมีหัวหน้าที่ดีกว่านี้ ถ้าฉันมีเงินมากกว่านี้ ส่วนคนเชิงรุกโฟกัสที่ \"ฉันเป็น...ได้\" เช่น ฉันอดทนกว่านี้ได้ ฉันฉลาดขึ้นได้ ฉันรักได้มากกว่านี้"}, {"type": "example", "content": "การทดลอง 30 วัน — ลองเป็นคนเชิงรุกต่อเนื่อง 30 วัน โดยลงแรงเฉพาะในวงอิทธิพล ให้คำมั่นเล็ก ๆ แล้วรักษามัน เป็นแสงสว่างไม่ใช่ผู้ตัดสิน เป็นแบบอย่างไม่ใช่นักวิจารณ์ แล้วสังเกตความเปลี่ยนแปลง"}, {"type": "warning", "content": "ความเข้าใจผิดที่พบบ่อย: proactive ไม่ได้แปลว่าแค่ \"ชิงลงมือก่อน\" หรือทำตัวก้าวร้าวดันทุรัง แต่หมายถึงการรับผิดชอบต่อการตอบสนองของตัวเอง แทนที่จะโทษสถานการณ์หรือการถูกหล่อหลอมมา"}, {"type": "diagram", "layout": "flow", "title": "Habit 1: ช่องว่างระหว่าง Stimulus กับ Response", "actors": ["Stimulus\n(สิ่งเร้า)", "ช่องว่าง\n(เสรีภาพในการเลือก)", "Response\n(การตอบสนอง)"], "steps": [{"from": 0, "to": 1, "label": "สิ่งเร้ามากระทบ", "note": "เหตุการณ์ คำพูด สถานการณ์ที่เกิดขึ้น"}, {"from": 1, "to": 2, "label": "เราเลือกวิธีตอบสนองได้", "note": "Viktor Frankl: เสรีภาพสุดท้ายของมนุษย์คือการเลือกการตอบสนอง"}]}]}, {"title": "7. Habit 2 — Begin with the End in Mind (หลักการเรื่องภาวะผู้นำส่วนบุคคล)", "body": "หลักการแกน: \"ทุกสิ่งถูกสร้างขึ้นสองครั้ง\" — ครั้งแรกคือ mental creation (การสร้างในความคิด) ครั้งที่สองคือ physical creation (การสร้างในความเป็นจริง) habit 2 คือการสร้างครั้งแรก: ตัดสินใจปลายทางก่อนลงมือ เพื่อไม่ให้ปีนบันไดความสำเร็จจนถึงยอด แล้วพบว่าบันไดพาดผิดกำแพงมาตลอด", "blocks": [{"type": "subheading", "content": "โมเดลสำคัญ"}, {"type": "example", "content": "การจินตนาการถึงงานศพของตัวเอง — ลองนึกภาพงานศพตัวเอง แล้วถามว่าอยากให้คนสี่กลุ่มพูดถึงเราว่าอย่างไร: คนในครอบครัว, เพื่อน, เพื่อนร่วมงาน และคนในชุมชน/ศาสนสถาน โดยพูดถึงอุปนิสัยและสิ่งที่เราสร้างไว้ การทำงานย้อนกลับจากภาพนั้นจะบอกว่าอะไรสำคัญจริง"}, {"type": "note", "content": "personal mission statement (คำแถลงพันธกิจส่วนบุคคล) — เอกสารที่เขียนขึ้นเองเปรียบเป็น \"รัฐธรรมนูญส่วนตัว\" ระบุว่าอยากเป็นคนแบบไหน (อุปนิสัย) อยากทำอะไร (ผลงาน/การมีส่วนร่วม) และตั้งอยู่บนหลักการ/ค่านิยมใด"}, {"type": "note", "content": "Centers of life (ศูนย์กลางของชีวิต) — สิ่งที่อยู่ตรงศูนย์กลางจะกลายเป็นแหล่งของความมั่นคง การชี้นำ ปัญญา และพลังของเรา Covey ไล่ตรวจศูนย์กลางที่คนมักใช้ ได้แก่ คู่สมรส ครอบครัว เงิน งาน ทรัพย์สิน ความสุขสบาย เพื่อน ศัตรู ศาสนา และตัวเอง แล้วแสดงว่าแต่ละอันไม่มั่นคงหรือครอบคลุมไม่พอ ข้อเสนอของเขาคือชีวิตแบบ principle-centered (มีหลักการเป็นศูนย์กลาง) เป็นศูนย์กลางเดียวที่มั่นคง"}, {"type": "note", "content": "Roles and goals — ระบุบทบาทหลักในชีวิต เช่น ปัจเจกบุคคล คู่สมรส พ่อแม่ ผู้จัดการ แล้วตั้งเป้าหมายในแต่ละบทบาทเพื่อให้ชีวิตสมดุล ไม่ทุ่มบทบาทเดียวจนบทบาทอื่นพัง"}, {"type": "note", "content": "การใช้สมองซีกขวา — สมองซีกขวาทำงานด้านความคิดสร้างสรรค์ ภาพ และสัญชาตญาณ Covey แนะนำ visualization (การสร้างภาพในใจ) และ affirmation (การกล่าวยืนยันกับตัวเอง) เพื่อขยายและฝังการสร้างในความคิดให้ลึกขึ้น affirmation ที่ดีต้องเป็นเรื่องส่วนตัว เป็นเชิงบวก ใช้กาลปัจจุบัน มีภาพ และมีอารมณ์ร่วม"}, {"type": "diagram", "layout": "flow", "title": "Habit 2: ทุกสิ่งถูกสร้างขึ้นสองครั้ง", "actors": ["Mental Creation\n(สร้างในความคิด)", "Physical Creation\n(สร้างในความจริง)"], "steps": [{"from": 0, "to": 1, "label": "ตัดสินใจปลายทางก่อนลงมือ", "note": "เพื่อไม่ให้ปีนบันไดจนถึงยอด แล้วพบว่าพาดผิดกำแพง"}]}]}, {"title": "8. Habit 3 — Put First Things First (หลักการเรื่องการจัดการตนเอง)", "body": "หลักการแกน: คือการสร้างครั้งที่สอง (physical creation) — ลงมือทำวิสัยทัศน์จาก habit 2 อย่างมีวินัย โดยจัดลำดับสิ่งที่ \"สำคัญ\" ไว้เหนือสิ่งที่แค่ \"เร่งด่วน\" คำสรุปของ Covey คือ จัดการที่เข็มทิศ ไม่ใช่ที่นาฬิกา", "blocks": [{"type": "subheading", "content": "Time-Management Matrix (ตารางบริหารเวลา 4 ช่อง)"}, {"type": "table", "content": "<table><thead><tr><th></th><th>Urgent (เร่งด่วน)</th><th>Not Urgent (ไม่เร่งด่วน)</th></tr></thead><tbody><tr><th>Important<br>(สำคัญ)</th><td><strong>Q1</strong> — วิกฤต, ปัญหาเร่งด่วน, งานใกล้เส้นตาย</td><td><strong>Q2</strong> — การป้องกัน, การวางแผน, การสร้างความสัมพันธ์, การพัฒนาตนเอง, สุขภาพ <em>(ช่องที่คนมีประสิทธิผลขยายให้ใหญ่ขึ้น)</em></td></tr><tr><th>Not Important<br>(ไม่สำคัญ)</th><td><strong>Q3</strong> — การขัดจังหวะ, สายโทรเข้า/อีเมลจำนวนมาก <em>(ช่องหลอกตา เพราะความเร่งด่วนทำให้รู้สึกว่าสำคัญ)</em></td><td><strong>Q4</strong> — เรื่องไร้สาระ, กิจกรรมฆ่าเวลา</td></tr></tbody></table>"}, {"type": "subheading", "content": "โมเดลสำคัญอื่น ๆ"}, {"type": "note", "content": "สี่ยุคของการบริหารเวลา: (1) โน้ต/เช็คลิสต์ (2) ปฏิทิน/การนัดหมาย (3) การจัดลำดับความสำคัญ ตั้งเป้าหมาย และวางแผนรายวัน — มีประสิทธิภาพแต่ทำให้ตารางแน่นเกิน (4) กระบวนทัศน์ของ Covey คือจัดการ <em>ตัวเรา</em> รอบ ๆ บทบาทและความสัมพันธ์ในช่อง Q2 โดยวางแผนแบบ <em>รายสัปดาห์</em> ไม่ใช่รายวัน"}, {"type": "example", "content": "\"Big rocks\" — ต้องใส่ก้อนหินใหญ่ (เรื่องสำคัญ) ลงในโหลก่อน แล้วกรวดและทรายจึงจะแทรกลงไปรอบ ๆ ได้ ถ้าเทกรวดทรายลงก่อน ก้อนหินใหญ่จะไม่มีที่ให้ใส่อีกเลย"}, {"type": "note", "content": "การมอบหมายงาน 2 แบบ — gofer delegation (มอบหมายแบบเด็กรับใช้) คือสั่งทีละอย่างและควบคุมวิธีการทุกขั้น ส่วน stewardship delegation (มอบหมายแบบมอบความรับผิดชอบ) คือมอบหมายที่ผลลัพธ์ แล้วปล่อยให้คนเลือกวิธีเอง โดยตกลงกัน 5 เรื่องไว้ล่วงหน้า: (1) desired results ผลลัพธ์ที่ต้องการ (2) guidelines ขอบเขต/แนวปฏิบัติ (3) resources ทรัพยากรที่ใช้ได้ (4) accountability วิธีวัดและรายงานผล (5) consequences ผลที่จะตามมาทั้งดีและไม่ดี"}, {"type": "warning", "content": "ความเข้าใจผิดที่พบบ่อย: habit 3 ไม่ใช่การยัดงานให้ได้มากขึ้นต่อวัน (efficiency ประสิทธิภาพ) แต่คือการใช้ชีวิตไปกับความสำคัญในช่อง Q2 (effectiveness ประสิทธิผล) ซึ่งจะทำให้วิกฤตในช่อง Q1 ลดลงเองเมื่อเวลาผ่านไป"}, {"type": "diagram", "layout": "flow", "title": "Stewardship Delegation: มอบหมายที่ผลลัพธ์", "actors": ["Desired Results\n(ผลลัพธ์ที่ต้องการ)", "Guidelines\n(ขอบเขต)", "Resources\n(ทรัพยากร)", "Accountability\n(วิธีวัดผล)", "Consequences\n(ผลตามมา)"], "steps": [{"from": 0, "to": 1, "label": "ตกลงกันไว้ล่วงหน้า", "note": ""}, {"from": 1, "to": 2, "label": "ระบุทรัพยากรที่ใช้ได้", "note": ""}, {"from": 2, "to": 3, "label": "ตกลงวิธีวัดและรายงาน", "note": ""}, {"from": 3, "to": 4, "label": "ทั้งผลดีและไม่ดี", "note": ""}]}, {"type": "diagram", "layout": "lifeline", "title": "วิวัฒนาการของการบริหารเวลา 4 ยุค", "actors": ["ยุค 1\nโน้ต/เช็คลิสต์", "ยุค 2\nปฏิทิน/นัดหมาย", "ยุค 3\nจัดลำดับความสำคัญ", "ยุค 4\nวางแผนรอบบทบาท (Q2)"], "steps": [{"from": 0, "to": 1, "label": "เพิ่มการนัดหมายล่วงหน้า", "note": ""}, {"from": 1, "to": 2, "label": "ตั้งเป้าหมาย วางแผนรายวัน (แต่ตารางแน่นเกิน)", "note": ""}, {"from": 2, "to": 3, "label": "Covey: จัดการตัวเรารอบบทบาท วางแผนรายสัปดาห์", "note": ""}]}]}, {"title": "9. Habit 4 — Think Win-Win (หลักการเรื่องภาวะผู้นำระหว่างบุคคล)", "body": "หลักการแกน: Win-Win ไม่ใช่เทคนิคเจรจา แต่เป็นปรัชญาทั้งชุดของการปฏิสัมพันธ์ระหว่างมนุษย์ ตั้งอยู่บนความเชื่อว่าของมีพอสำหรับทุกคน และความสำเร็จของคนหนึ่งไม่จำเป็นต้องแลกมาด้วยความล้มเหลวของอีกคน", "blocks": [{"type": "subheading", "content": "6 กระบวนทัศน์ของการปฏิสัมพันธ์"}, {"type": "note", "content": "(1) Win-Win — ชนะทั้งคู่; (2) Win-Lose — ฉันชนะคุณแพ้ แบบใช้อำนาจ; (3) Lose-Win — ยอมทุกอย่าง เป็นพรมเช็ดเท้า; (4) Lose-Lose — ดื้อหรือแค้นกันจนพังทั้งคู่; (5) Win — สนใจแค่ว่าตัวเองได้ ไม่สนว่าอีกฝ่ายเป็นอย่างไร; (6) Win-Win or No Deal — ถ้าหาทางที่ชนะทั้งคู่ไม่ได้ ก็ตกลงกันว่าจะไม่ตกลง แล้วแยกย้ายอย่างเป็นมิตร ในโลกที่ต้องพึ่งพากัน Win-Win เป็นทางเลือกเดียวที่ยั่งยืนในระยะยาว"}, {"type": "subheading", "content": "โมเดลสำคัญ"}, {"type": "note", "content": "Abundance Mentality เทียบ Scarcity Mentality — Scarcity Mentality (กระบวนทัศน์แบบขาดแคลน) มองชีวิตเป็นเกมผลรวมศูนย์ คือความสำเร็จของคนอื่นเท่ากับความสูญเสียของฉัน ส่วน Abundance Mentality (กระบวนทัศน์แบบมีเหลือเฟือ) เกิดจากความมั่นคงภายใน มองว่ามีพอสำหรับทุกคน จึงแบ่งปันการยอมรับ ผลกำไร และอำนาจตัดสินใจได้"}, {"type": "example", "content": "Emotional Bank Account (EBA, บัญชีเงินฝากทางอารมณ์) — ความไว้วางใจในความสัมพันธ์ทำงานเหมือนบัญชีธนาคาร ที่มีการฝากและการถอน การฝากหลัก 6 อย่างของ Covey: (1) เข้าใจตัวบุคคลนั้นจริง ๆ (2) ใส่ใจเรื่องเล็ก ๆ (3) รักษาคำมั่นสัญญา (4) ทำความคาดหวังให้ชัดเจน (5) แสดงความซื่อตรงส่วนบุคคล (6) ขอโทษอย่างจริงใจเมื่อเผลอถอนออกไป"}, {"type": "note", "content": "5 มิติของ Win-Win: (1) Character อุปนิสัย ซึ่งเป็นฐานราก (2) Relationships ความสัมพันธ์ที่สร้างบน EBA (3) Agreements ข้อตกลงด้านผลงาน/ความร่วมมือที่ทำความคาดหวังให้ชัด (4) Supporting systems ระบบสนับสนุน โดยเฉพาะระบบให้รางวัลที่ต้องส่งเสริม Win-Win ไม่ใช่ให้แข่งกันเอง (5) Processes กระบวนการ"}, {"type": "note", "content": "3 คุณลักษณะทางอุปนิสัยที่จำเป็นต่อ Win-Win: Integrity (ความซื่อตรง — คุณค่าที่เราให้กับตัวเองและการรักษาคำมั่น), Maturity (วุฒิภาวะ — ความสมดุลระหว่างความกล้าแสดงออกกับความเกรงใจผู้อื่น) และ Abundance Mentality"}, {"type": "diagram", "layout": "lifeline", "title": "Emotional Bank Account: ฝาก-ถอนความไว้วางใจ", "actors": ["บุคคล A", "บัญชี EBA", "บุคคล B"], "steps": [{"from": 0, "to": 1, "label": "ฝาก: รักษาคำมั่นสัญญา", "note": "การฝากหลัก 6 อย่างของ Covey"}, {"from": 0, "to": 1, "label": "ฝาก: เข้าใจอีกฝ่ายจริงๆ", "note": ""}, {"from": 1, "to": 2, "label": "ยอดในบัญชีสูงขึ้น → ความไว้วางใจเพิ่ม", "note": "การสื่อสารไต่ระดับขึ้นได้ง่ายขึ้น"}, {"from": 0, "to": 1, "label": "ถอน: ผิดคำมั่น/คาดหวังไม่ชัด", "note": "ต้องขอโทษอย่างจริงใจเพื่อฟื้นยอด"}]}]}, {"title": "10. Habit 5 — Seek First to Understand, Then to Be Understood (หลักการเรื่องการสื่อสารด้วยความเข้าใจ)", "body": "หลักการแกน: คนส่วนใหญ่ฟังเพื่อจะตอบ ไม่ได้ฟังเพื่อจะเข้าใจ การสื่อสารที่มีประสิทธิผลต้องเข้าใจอีกฝ่ายอย่างแท้จริงก่อน แล้วจึงค่อยทำให้ตัวเองถูกเข้าใจ คำเปรียบของ Covey คือ ต้องวินิจฉัยก่อนจ่ายยา", "blocks": [{"type": "subheading", "content": "5 ระดับของการฟัง"}, {"type": "note", "content": "(1) ignoring ไม่ฟังเลย (2) pretending ทำเป็นฟัง (3) selective listening ฟังแบบเลือกฟังเฉพาะบางส่วน (4) attentive listening ฟังอย่างตั้งใจ (5) empathic listening (การฟังอย่างเข้าอกเข้าใจ) — ฟังจากภายในกรอบอ้างอิงของอีกฝ่าย เป็นการให้ \"อากาศทางจิตใจ\" แก่เขา"}, {"type": "subheading", "content": "4 การตอบสนองแบบเอาตัวเองเป็นศูนย์กลาง"}, {"type": "warning", "content": "autobiographical responses (การตอบสนองจากอัตชีวประวัติของตัวเอง) 4 แบบที่ทำลายความเข้าใจ: evaluate ตัดสินว่าเห็นด้วยหรือไม่เห็นด้วย, probe ซักถามจากกรอบความคิดของเราเอง, advise ให้คำแนะนำจากประสบการณ์ของเราเอง, interpret ตีความแรงจูงใจของเขาด้วยกระบวนทัศน์ของเรา"}, {"type": "subheading", "content": "Ethos / Pathos / Logos"}, {"type": "note", "content": "แนวคิดจากปรัชญากรีก ใช้เป็นลำดับของการทำให้ตัวเองถูกเข้าใจ: Ethos = ความน่าเชื่อถือส่วนบุคคล อุปนิสัย ความซื่อตรง (ผูกกับยอดใน EBA); Pathos = ความเข้าอกเข้าใจและการเชื่อมโยงทางอารมณ์; Logos = ตรรกะและเหตุผล Covey ย้ำว่าลำดับสำคัญมาก คนส่วนใหญ่กระโดดไปที่ logos ทันที แต่อิทธิพลจริงเริ่มที่ ethos และ pathos"}, {"type": "warning", "content": "ความเข้าใจผิดที่พบบ่อย: habit 5 คือข้อที่คนคิดว่าตัวเองทำได้ดีที่สุด แต่จริง ๆ ทำได้แย่ที่สุด empathic listening ไม่ใช่การเห็นด้วย ไม่ใช่การเลียนแบบเทคนิคการฟัง และไม่ใช่การเล่าเรื่องตัวเองสวนกลับ"}, {"type": "diagram", "layout": "lifeline", "title": "5 ระดับของการฟัง", "actors": ["1. Ignoring\n(ไม่ฟังเลย)", "2. Pretending\n(ทำเป็นฟัง)", "3. Selective\n(ฟังเลือกฟัง)", "4. Attentive\n(ฟังตั้งใจ)", "5. Empathic\n(ฟังเข้าอกเข้าใจ)"], "steps": [{"from": 0, "to": 1, "label": "เริ่มมีปฏิกิริยาตอบ", "note": ""}, {"from": 1, "to": 2, "label": "เริ่มจับใจความบางส่วน", "note": ""}, {"from": 2, "to": 3, "label": "ตั้งใจฟังทุกคำ", "note": ""}, {"from": 3, "to": 4, "label": "ฟังจากกรอบอ้างอิงของอีกฝ่าย — ให้ \"อากาศทางใจ\"", "note": ""}]}, {"type": "diagram", "layout": "flow", "title": "ลำดับการทำให้ตัวเองถูกเข้าใจ: Ethos → Pathos → Logos", "actors": ["Ethos\n(ความน่าเชื่อถือ)", "Pathos\n(ความเข้าอกเข้าใจ)", "Logos\n(ตรรกะเหตุผล)"], "steps": [{"from": 0, "to": 1, "label": "อุปนิสัย+ความซื่อตรงมาก่อน", "note": "ผูกกับยอดใน EBA"}, {"from": 1, "to": 2, "label": "เชื่อมโยงอารมณ์ก่อนเหตุผล", "note": "คนส่วนใหญ่กระโดดไปที่ logos ทันที ซึ่งผิดลำดับ"}]}]}, {"title": "11. Habit 6 — Synergize (หลักการเรื่องความร่วมมือเชิงสร้างสรรค์)", "body": "หลักการแกน: synergy (การผนึกกำลัง) คือผลรวมที่ใหญ่กว่าผลบวกของแต่ละส่วน — 1 + 1 = 3 หรือมากกว่า ผลลัพธ์คือ third alternative (ทางเลือกที่สาม) ที่ดีกว่าข้อเสนอเดิมของทั้งสองฝ่าย ไม่ใช่การประนีประนอม ซึ่งเท่ากับ 1 + 1 = 1.5 คือทั้งคู่ต่างยอมตัดของตัวเองทิ้ง", "blocks": [{"type": "note", "content": "การให้คุณค่ากับความต่าง — หัวใจของ synergy คือการให้คุณค่ากับความแตกต่างทางความคิด อารมณ์ และจิตใจอย่างแท้จริง ไม่ใช่แค่ \"ทน\" ให้มันมีอยู่ ต้องมีความถ่อมตนที่จะยอมรับว่าการรับรู้ของเราเองมีขีดจำกัด"}, {"type": "subheading", "content": "3 ระดับของการสื่อสาร"}, {"type": "note", "content": "(1) defensive ตั้งป้อมป้องกันตัว — ความไว้วางใจต่ำ เป็น win-lose หรือ lose-win, 1 + 1 = 0.5; (2) respectful สุภาพให้เกียรติกัน — คนมีวุฒิภาวะประนีประนอมกันอย่างสุภาพ, 1 + 1 = 1.5; (3) synergistic ผนึกกำลัง — ความไว้วางใจสูง ร่วมกันสร้างสิ่งใหม่, 1 + 1 = 3 ขึ้นไป ยิ่งยอดใน EBA สูง การสื่อสารยิ่งไต่จากระดับล่างขึ้นบน ความไว้วางใจต่ำจะขังเราไว้ที่ระดับ 1 หรือ 2 เท่านั้น"}, {"type": "example", "content": "Force Field Analysis ของ Kurt Lewin (Covey นำมาปรับใช้ ไม่ใช่โมเดลของ Covey เอง) — ระดับผลงานใด ๆ คือจุดสมดุลระหว่าง driving forces (แรงผลักดัน ซึ่งเป็นบวกและเป็นเหตุเป็นผล) กับ restraining forces (แรงต้าน ซึ่งเป็นลบและเป็นเรื่องอารมณ์) การเร่งแรงผลักดันให้หนักขึ้นมีแต่จะเพิ่มแรงตึงและทำให้ดีดกลับ synergy เลือกอีกทาง คือเข้าไปจัดการแรงต้านให้คลายตัว แล้วเปลี่ยนมันให้กลายเป็นแรงผลักดันแทน"}, {"type": "warning", "content": "ความเข้าใจผิดที่พบบ่อย: synergy ไม่ใช่การประนีประนอม และไม่ใช่แค่การทำงานเป็นทีม มันต้องการการเปิดใจ การให้คุณค่ากับความต่าง และความมั่นคงภายในที่ได้มาจาก Private Victory มาก่อนแล้ว"}, {"type": "diagram", "layout": "flow", "title": "3 ระดับของการสื่อสาร (1+1 = ?)", "actors": ["Defensive\n(ตั้งป้อม) 1+1=0.5", "Respectful\n(สุภาพ) 1+1=1.5", "Synergistic\n(ผนึกกำลัง) 1+1=3+"], "steps": [{"from": 0, "to": 1, "label": "ความไว้วางใจเพิ่มขึ้น", "note": "จากตั้งป้อมสู่การประนีประนอมอย่างสุภาพ"}, {"from": 1, "to": 2, "label": "เปิดใจรับความต่างอย่างแท้จริง", "note": "เกิดทางเลือกที่สาม (third alternative) ที่ดีกว่าเดิมทั้งคู่"}]}]}, {"title": "12. Habit 7 — Sharpen the Saw (หลักการเรื่องการฟื้นฟูตนเองอย่างสมดุล)", "body": "หลักการแกน: ฟื้นฟู \"สินทรัพย์ที่ยิ่งใหญ่ที่สุด คือตัวคุณเอง\" ใน 4 มิติ เพื่อให้ habit 1–6 ทำงานต่อไปได้อย่างยั่งยืน ภาพเปรียบเทียบคือคนตัดไม้ที่ยุ่งกับการเลื่อยจนไม่ยอมหยุดลับเลื่อยที่ทื่อแล้ว สอดคล้องกับคำที่มักถูกยกให้ Lincoln ว่าถ้ามีหกชั่วโมงตัดต้นไม้ เขาจะใช้สี่ชั่วโมงลับขวานก่อน", "blocks": [{"type": "subheading", "content": "4 มิติของการฟื้นฟู"}, {"type": "table", "content": "<table><thead><tr><th>มิติ</th><th>กิจกรรม</th><th>เชื่อมกับ habit</th></tr></thead><tbody><tr><td><strong>Physical</strong> (ร่างกาย)</td><td>ออกกำลังกาย โภชนาการ การพักผ่อน/จัดการความเครียด</td><td>Habit 1</td></tr><tr><td><strong>Spiritual</strong> (จิตวิญญาณ)</td><td>ทำค่านิยมให้กระจ่าง ความมุ่งมั่น การศึกษาใคร่ครวญ การทำสมาธิ — เป็นแกนกลาง/ศูนย์กลางของเรา</td><td>Habit 2</td></tr><tr><td><strong>Mental</strong> (จิตใจ/ปัญญา)</td><td>การอ่าน การสร้างภาพในใจ การวางแผน การเขียน</td><td>Habit 3</td></tr><tr><td><strong>Social/Emotional</strong> (สังคม/อารมณ์)</td><td>การบริการผู้อื่น ความเข้าอกเข้าใจ การผนึกกำลัง ความมั่นคงภายใน — ฝึกได้ในการปฏิสัมพันธ์ประจำวัน ไม่ต้องปลีกวิเวก</td><td>Habit 4–6</td></tr></tbody></table>"}, {"type": "note", "content": "Daily Private Victory — Covey แนะนำให้ใช้เวลาอย่างน้อยวันละหนึ่งชั่วโมงฟื้นฟูสามมิติแรก (ร่างกาย จิตวิญญาณ และจิตใจ)"}, {"type": "example", "content": "upward spiral (เกลียวขึ้น) ของ learn → commit → do (เรียนรู้ → ให้คำมั่น → ลงมือทำ) วนซ้ำในระดับที่สูงขึ้นเรื่อย ๆ คือกลไกที่ทำให้การฟื้นฟูกลายเป็นการเติบโตต่อเนื่อง และการฟื้นฟูมิติใดมิติหนึ่งจะส่งผลบวกต่อมิติอื่นด้วย"}, {"type": "note", "content": "การเขียน \"บท\" ให้ผู้อื่น — เราสามารถ \"เขียนบท\" เชิงบวกให้คนอื่นได้ คือมองเห็นศักยภาพที่เขายังไม่เห็นในตัวเอง แล้วปฏิบัติต่อเขาตามศักยภาพนั้น นี่คือการฝากเงินก้อนใหญ่เข้า EBA และช่วยให้เขาเติบโตไปเป็นคนแบบนั้นจริง"}, {"type": "diagram", "layout": "lifeline", "title": "Upward Spiral: เกลียวขึ้นของการฟื้นฟู", "actors": ["Learn\n(เรียนรู้)", "Commit\n(ให้คำมั่น)", "Do\n(ลงมือทำ)"], "steps": [{"from": 0, "to": 1, "label": "นำความรู้มาตั้งเจตนา", "note": ""}, {"from": 1, "to": 2, "label": "ปฏิบัติจริง", "note": ""}, {"from": 2, "to": 0, "label": "วนกลับไปเรียนรู้ในระดับที่สูงขึ้น", "note": "แต่ละรอบยกระดับขึ้นเรื่อยๆ ไม่ใช่วนที่เดิม"}]}]}, {"title": "13. The 8th Habit (2004)", "body": "The 8th Habit: From Effectiveness to Greatness (Free Press/Simon & Schuster, 2004) เป็นภาคต่อของเล่มแรก ไม่ใช่การเพิ่มข้อที่ 8 เข้าไปในชุดเดิมย้อนหลัง\n\nสารหลัก: \"ค้นหาเสียงของคุณ และช่วยให้ผู้อื่นค้นพบเสียงของเขา\" คำว่า voice (เสียง) ในความหมายของ Covey คือความสำคัญเฉพาะตัวของแต่ละคน อยู่ตรงจุดตัดของสี่วง: talent (พรสวรรค์), passion (สิ่งที่ทำแล้วมีไฟ), need (ความต้องการของโลก) และ conscience (มโนธรรมที่บอกว่าสิ่งนั้นถูกต้อง) ตรงกลางคือ \"Voice\"\n\nหนังสือแบ่งเป็นสองภาค: ภาคแรก \"Find Your Voice\" ภาคสอง \"Inspire Others to Find Their Voice\" ข้อโต้แย้งหลักคือในยุค knowledge worker (แรงงานความรู้) การมีประสิทธิผลอย่างเดียวไม่พออีกต่อไป ต้องขยับจาก effectiveness ไปสู่ greatness (ความยิ่งใหญ่) เล่มนี้เสริมเล่มเดิม ไม่ได้แทนที่ และย้ำอีกครั้งว่า Interdependence มีค่าสูงกว่า Independence", "blocks": []}, {"title": "14. คำวิจารณ์และข้อจำกัด", "body": "ส่วนนี้จำเป็นต่อการอ่านเล่มนี้อย่างมีวิจารณญาณ ไม่ใช่ส่วนเสริม", "blocks": [{"type": "warning", "content": "ขาดฐานเชิงประจักษ์ — คำวิจารณ์ที่หนักแน่นที่สุดคือหนังสือพึ่งพาเรื่องเล่า นิทาน ประสบการณ์ส่วนตัว และ \"ภูมิปัญญาที่ผ่านการทดสอบของกาลเวลา\" มากกว่างานวิจัยเชิงวิทยาศาสตร์ ทั้ง MindBooks และ Shortform ตั้งข้อสังเกตว่าประสิทธิผลของ habit เหล่านี้ตั้งอยู่บนคำบอกเล่าเชิงอัตวิสัย ไม่ใช่การศึกษาที่เข้มงวด และโมเดลของ Covey ไม่ได้เชื่อมกับกรอบทฤษฎีจิตวิทยาที่ยอมรับกันอยู่แล้ว เช่น cognitive-behavioral theory (ทฤษฎีพฤติกรรมทางปัญญา) หรือ personality psychology (จิตวิทยาบุคลิกภาพ) นักจิตวิทยาที่ให้ความเห็นในบทความของ Parade ปี 2025 เสนอให้ปรับปรุงและผสาน habit เข้ากับแนวทางที่มีหลักฐานรองรับ เช่น Acceptance and Commitment Therapy (ACT), positive psychology และแนวคิด psychological safety"}, {"type": "warning", "content": "การเน้นความรับผิดชอบส่วนบุคคลมากเกินไป — นักวิจารณ์แย้งว่าหนังสือที่โฟกัสความรับผิดชอบของปัจเจกเกือบทั้งหมด อาจให้โทษได้ เพราะเมื่อชีวิตไม่เป็นไปตามแผน กรอบแนวคิดนี้กลาย ๆ ว่าความล้มเหลวเป็นความผิดของคุณเอง ที่ทำตามกระบวนทัศน์ไม่ดีพอ โดยไม่มองปัจจัยเชิงโครงสร้าง คำวิจารณ์ที่แรงกว่านั้นมองว่า habit เหล่านี้สอนให้คนเป็น \"ผู้จัดการที่ดีสำหรับคณะกรรมการบริษัท\" มากกว่าจะเป็นผู้ตั้งคำถามและผลักดันการเปลี่ยนแปลง"}, {"type": "warning", "content": "ฐานทางศาสนาที่ไม่ได้เปิดเผย — ผู้วิจารณ์ทั้งจาก Walton College (University of Arkansas) และผู้เขียนคำวิจารณ์เชิงโลกวิสัย ตั้งข้อสังเกตว่า \"หลักการที่ถูกต้อง\" ของ Covey และการให้ความสำคัญกับ mission statement มีรากมาจากศรัทธาแบบมอร์มอนของเขา และถูกนำเสนอในลักษณะยืนยันมากกว่าการให้เหตุผลรองรับ"}, {"type": "warning", "content": "การวางกฎแบบครอบจักรวาลและความล้าสมัย — นักวิจารณ์ชี้ว่าการนำเสนอแบบสากลใช้ได้กับทุกสถานการณ์อาจไม่จริง และหนังสือจากปี 1989 ให้น้ำหนักกับความเป็นจริงด้านเทคโนโลยีและความเชื่อมโยงถึงกันของโลกยุคใหม่น้อยเกินไป"}, {"type": "note", "content": "ข้อสรุปที่สมดุล — แม้แต่นักวิจารณ์เองก็มักยอมรับคุณค่าเชิงปฏิบัติของหนังสือ โดยเฉพาะลำดับที่ให้ชัยชนะส่วนตัวมาก่อนชัยชนะสาธารณะ, ตัวกรอง Circle of Influence/Concern และข้อเสนอว่าอุปนิสัยต้องมาก่อนเทคนิค — สามอย่างนี้คือเหตุผลที่หนังสือยังอยู่ได้ถึงทุกวันนี้"}]}, {"title": "15. การนำไปใช้จริงและเครื่องมือประเมินอย่างเป็นทางการ", "body": "FranklinCovey มีเครื่องมือประเมินหลายตัวที่ผูกกับกรอบแนวคิดนี้โดยตรง", "blocks": [{"type": "subheading", "content": "เครื่องมือประเมิน"}, {"type": "note", "content": "The 7 Habits Assessment / 7 Habits Benchmark — เป็นการประเมินแบบ 360 องศา เก็บข้อมูลจากตัวผู้เข้าร่วมเอง บวกกับลูกน้อง เพื่อนร่วมงาน และหัวหน้า ให้คะแนนราย habit บวกกับ Emotional Bank Account แล้วรวบเป็นคะแนน Private Victory, Public Victory และคะแนนประสิทธิผลโดยรวม (ICMA จัดให้อยู่ในรายการเครื่องมือประเมินหลายผู้ประเมินที่รับรอง)"}, {"type": "note", "content": "Personal Effectiveness Quotient (pEQ) — เวอร์ชันให้คะแนนตัวเอง ประเมินข้อคำถามครอบคลุมทั้ง 7 habit และ EBA เพื่อให้ผู้อ่านหาว่าควรโฟกัส habit ไหนก่อน"}, {"type": "note", "content": "The Seven Habits Profile — แบบประเมินตนเองบนกระดาษ โดยทั่วไปมี 27 ข้อความใน 9 หมวด ใช้เป็นงานเตรียมก่อนเข้าอบรม"}, {"type": "subheading", "content": "การใช้ในระดับองค์กร"}, {"type": "note", "content": "habit เหล่านี้เป็นฐานของหลักสูตรเรือธง The 7 Habits ของ FranklinCovey และโปรแกรม Leader in Me ที่ปรับเปลี่ยนทั้งโรงเรียน ซึ่ง FranklinCovey ระบุว่าอยู่ในโรงเรียนกว่า 5,000 แห่งใน 50 ประเทศ องค์กรนำ habit ไปใช้กับการบริหารเวลา (โฟกัส Q2), การมอบหมายงาน (stewardship), วัฒนธรรมการประชุม (synergy/ทางเลือกที่สาม), การให้ฟีดแบ็ก (empathic listening) และการสร้างความไว้วางใจ (EBA)"}, {"type": "subheading", "content": "แบบฝึกปฏิบัติที่ใช้กันบ่อย"}, {"type": "example", "content": "Habit 1: เขียนรายการสิ่งที่อยู่ใน Circle of Influence และทำการทดลอง 30 วัน · Habit 2: จินตนาการงานศพตัวเองและร่าง personal mission statement · Habit 3: วางแผนรายสัปดาห์รอบบทบาทและเป้าหมายในช่อง Q2 พร้อมแบบฝึก \"big rocks\" · Habit 4: ทำบัญชีว่าฝากอะไรเข้า EBA ของแต่ละความสัมพันธ์ไปบ้าง · Habit 5: ฝึกสะท้อนความรู้สึกอีกฝ่ายและจับให้ได้เวลาตัวเองเผลอตอบแบบ autobiographical · Habit 7: ทำ Daily Private Victory ชั่วโมงฟื้นฟูประจำวัน"}]}, {"title": "16. ตัวช่วยจำ: โมเดลต้นไม้และการจัดกลุ่ม", "body": "The 7 Habits Tree — ภาพที่ใช้กันแพร่หลายในสื่อของ FranklinCovey/Leader in Me และในหนังสือ 7 Habits of Highly Effective Teens วาด habit เป็นต้นไม้:\n\n• ราก = Private Victory (habit 1–3) เป็นฐานที่หล่อเลี้ยงชีวิตทั้งต้น แต่มักมองไม่เห็น\n• ลำต้น กิ่ง ใบ = Public Victory (habit 4–6) เป็นส่วนที่มองเห็นและคนอื่นสัมผัสได้\n• ดวงอาทิตย์ = Habit 7 (Sharpen the Saw) เป็นพลังงานที่ฟื้นฟู ถ้าไม่มี ต้นไม้ก็ตาย\n• บางเวอร์ชันเพิ่ม ดิน/หลักการ ไว้ใต้ราก", "blocks": [{"type": "example", "content": "ตัวช่วยจำอื่น ๆ: Habit 1 = เป็น \"programmer\" (คนเขียนโปรแกรม), Habit 2 = \"เขียนโปรแกรม\", Habit 3 = \"รันโปรแกรม\" · สูตรกระบวนทัศน์ See-Do-Get · เลขคณิตของการสื่อสาร (0.5, 1.5, 3 ขึ้นไป) · Win-Win \"หรือไม่ตกลงกัน\" · \"วินิจฉัยก่อนจ่ายยา\" · \"ลับเลื่อยก่อน\""}, {"type": "note", "content": "การจัดกลุ่มเป็นตัวช่วยจำที่รับน้ำหนักจริง: Private Victory (1–3) คือการพึ่งพาตนเองและควบคุมตนเอง, Public Victory (4–6) คือการพึ่งพาอาศัยกัน, Renewal (7) ห่อหุ้มและหล่อเลี้ยงทั้งหกข้อ ลำดับนี้ข้ามไม่ได้"}]}, {"title": "17. ข้อควรระวังเรื่องความน่าเชื่อถือของข้อมูล", "body": "ส่วนนี้คัดมาจากหัวข้อ Caveats ของไฟล์ต้นฉบับโดยตรง ควรอ่านก่อนนำเนื้อหาไปอ้างอิงต่อ", "blocks": [{"type": "warning", "content": "เครื่องหมายการค้า — ชื่อ \"The 7 Habits of Highly Effective People\", \"Circle of Influence\", \"Circle of Concern\", \"Be Proactive\", \"Synergize\", \"3rd Alternative\" และชื่อทำนองเดียวกัน เป็นเครื่องหมายการค้าของ FranklinCovey ให้อธิบายด้วยคำพูดของตัวเอง อย่าคัดลอกภาพกราฟิกที่จดเครื่องหมายการค้าไว้"}, {"type": "warning", "content": "ตัวเลขยอดขายและรางวัลไม่แน่นอน — เป็นตัวเลขที่บริษัทรายงานเอง และแหล่งต่าง ๆ ไม่ตรงกัน (ประวัติเก่าของ Simon & Schuster ระบุ 25 ล้านเล่ม 38 ภาษา; ปัจจุบันระบุ 40 ล้านเล่ม 50 กว่าภาษา; NBC ระบุ 25 ล้านเล่ม 52 ภาษา) ให้นำเสนอเป็นช่วง ไม่ใช่ตัวเลขเดียวที่ฟันธง"}, {"type": "warning", "content": "รายละเอียดบางส่วนไม่ได้มาจากตัวหนังสือต้นฉบับ — ถ้อยคำของการทดลอง 30 วัน, องค์ประกอบ 5 ข้อของการมอบหมายงาน และรายชื่อผู้พูดในงานศพ ถูกถ่ายทอดมาจากบทสรุปทุติยภูมิที่น่าเชื่อถือ ไม่ใช่จากตัวเล่มโดยตรง หากต้องการความแม่นยำ ให้ตรวจสอบกับหนังสือฉบับจริง"}, {"type": "warning", "content": "จำนวนหน้าและสำนักพิมพ์ต่างกันตามฉบับพิมพ์ (Simon & Schuster กับ Free Press; ราว 380–440 หน้า) · วุฒิปริญญาเอกแบบ D.R.E. (Doctor of Religious Education) ของ Covey มีระบุใน Wikipedia ขณะที่ประวัติจากสำนักพิมพ์ระบุเพียงว่า \"ปริญญาเอกจาก Brigham Young University\" · Force Field Analysis เป็นโมเดลของ Kurt Lewin ต้องอ้างชื่อ Lewin ไม่ใช่ Covey · สำนักงานใหญ่ FranklinCovey ให้ใช้ Salt Lake City ตามเอกสารทางการ แม้บางหน้าโฆษณาจะระบุ Draper รัฐ Utah"}]}, {"title": "18. ที่มาของเนื้อหาหน้านี้", "body": "หน้าสรุปนี้เรียบเรียงจากไฟล์แนบ Stephen_R__Covey_s_The_7_Habits_of_Highly_Effective_People__A_Co.md ทั้งฉบับ (รายงานค้นคว้าภาษาอังกฤษ 338 บรรทัด) โดยอ้างอิงตำแหน่งตามหัวข้อในไฟล์ ดังนี้\n\n• หัวข้อ 1 ของหน้านี้ ← TL;DR และ Key Findings\n• หัวข้อ 2–3 ← Details ส่วนที่ 1 \"Background: Covey, the book, and FranklinCovey\"\n• หัวข้อ 4 ← Details ส่วนที่ 2 \"Foundational concepts (before the habits)\"\n• หัวข้อ 5–12 ← Details ส่วนที่ 3 \"The Seven Habits in detail\"\n• หัวข้อ 13 ← Details ส่วนที่ 4 \"The 8th Habit (2004)\"\n• หัวข้อ 14 ← Details ส่วนที่ 5 \"Criticisms and limitations\"\n• หัวข้อ 15 ← Details ส่วนที่ 6 \"Practical application and official assessments\"\n• หัวข้อ 16 ← Details ส่วนที่ 7 \"Mnemonics, the tree model, and the Victory grouping\"\n• หัวข้อ 17 ← ส่วน \"Caveats\"\n\nไฟล์ต้นฉบับมีรายการอ้างอิงแบบ IEEE จำนวน 91 รายการ (หมายเลข [1]–[91]) พร้อม URL และวันที่เข้าถึง 3 กันยายน 2026 อยู่ในส่วน \"References (IEEE-style)\" บรรทัดที่ 156–338 ถ้าต้องการอ้างอิงระดับแหล่งข้อมูลปฐมภูมิ ให้ย้อนไปดูรายการนั้นในไฟล์ต้นฉบับ", "blocks": [{"type": "note", "content": "หน้านี้เป็นแหล่งข้อมูลชั้นที่สาม (สรุปจากรายงานที่สรุปมาจากแหล่งทุติยภูมิอีกที) เหมาะสำหรับการทบทวนและทำความเข้าใจโครงสร้าง ไม่เหมาะสำหรับการอ้างอิงเชิงวิชาการโดยตรง ถ้าจะอ้างอิงจริง ให้ตามไปที่แหล่งเดิมใน References ของไฟล์ต้นฉบับ หรือที่ตัวหนังสือฉบับจริง"}]}];
+
+function renderTOC(){
+  const toc = document.getElementById("tocList");
+  toc.innerHTML = "";
+  SECTIONS.forEach((sec, idx)=>{
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#section_"+idx;
+    const hasDiagram = (sec.blocks||[]).some(function(b){ return b.type === "diagram"; });
+    a.textContent = (hasDiagram ? "🔀 " : "") + sec.title;
+    a.dataset.idx = idx;
+    li.appendChild(a);
+    toc.appendChild(li);
+  });
+}
+
+function setupTocPanel(){
+  const panel = document.getElementById("tocPanel");
+  if(panel && window.matchMedia("(max-width:800px)").matches){
+    panel.removeAttribute("open");
+  }
+}
+
+function escapeXml(s){
+  return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function mdFormat(s){
+  let t = escapeXml(s);
+  t = t.replace(/`([^`\n]+?)`/g, "<code>$1</code>");
+  t = t.replace(/\*\*([^*\n]+?)\*\*/g, "<strong>$1</strong>");
+  return t;
+}
+function computeReadingTime(){
+  const main = document.getElementById("mainArea");
+  const chars = (main.textContent || "").replace(/\s+/g, "").length;
+  return Math.max(1, Math.round(chars / 900));
+}
+function fmtTspans(text, x){
+  return String(text==null?"":text).split("\n").map(function(line,i){
+    return '<tspan x="'+x+'" dy="'+(i===0?0:15)+'">'+escapeXml(line)+'</tspan>';
+  }).join("");
+}
+
+function renderDiagramBlock(block, secIdx, blockIdx){
+  const uid = "dg_"+secIdx+"_"+blockIdx;
+  const layout = block.layout || "lifeline";
+  const actors = block.actors || [];
+  const steps = block.steps || [];
+  const n = actors.length;
+  const W = 680;
+  const margin = 76;
+  const nodesX = [];
+  for(let i=0;i<n;i++){ nodesX.push(n===1 ? W/2 : margin + i*((W-2*margin)/Math.max(1,n-1))); }
+  let inner = "";
+  let H = 0;
+
+  if(layout === "flow"){
+    const boxY = 50, boxH = 46;
+    const boxW = Math.min(128, Math.max(70,(W-2*margin)/Math.max(1,n-1)-14));
+    H = 168;
+    actors.forEach(function(a,i){
+      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+boxY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
+      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(boxY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
+    });
+    steps.forEach(function(st,i){
+      const x1 = nodesX[st.from]+boxW/2+3, x2 = nodesX[st.to]-boxW/2-3;
+      const y = boxY+boxH/2;
+      const pid = uid+"_p"+i, mid = uid+"_m"+i;
+      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
+      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(boxY-12)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
+      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
+             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
+             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
+             + '</circle>';
+    });
+  } else {
+    const rowH = 64, topY = 12, boxH = 38;
+    H = topY + boxH + steps.length*rowH + 26;
+    const boxW = Math.min(160, Math.max(80,(W-2*margin)/Math.max(1,n-1)-10));
+    actors.forEach(function(a,i){
+      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+topY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
+      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(topY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
+      inner += '<line class="diagram-lifeline" x1="'+nodesX[i]+'" y1="'+(topY+boxH)+'" x2="'+nodesX[i]+'" y2="'+(H-8)+'"></line>';
+    });
+    steps.forEach(function(st,i){
+      const y = topY+boxH+22 + i*rowH;
+      const x1 = nodesX[st.from], x2 = nodesX[st.to];
+      const pid = uid+"_p"+i, mid = uid+"_m"+i;
+      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
+      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(y-9)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
+      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
+             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
+             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
+             + '</circle>';
+    });
+  }
+
+  const svg = '<svg class="diagram-svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" preserveAspectRatio="xMidYMid meet">'+inner+'</svg>';
+
+  let stepsHtml = '<ol class="diagram-steps-list">';
+  steps.forEach(function(st,i){
+    stepsHtml += '<li><span class="step-num">'+(i+1)+'</span><strong>'+escapeXml(st.label||"")+'</strong>'+(st.note?(' — '+escapeXml(st.note)):'')+'</li>';
+  });
+  stepsHtml += '</ol>';
+
+  return '<div class="diagram-block" id="'+uid+'">'
+       + '<h4><span>🔀 '+escapeXml(block.title||"")+'</span><button class="diagram-play-btn" data-diagram-id="'+uid+'">&#9654; เล่นแอนิเมชัน / Play animation</button></h4>'
+       + '<div class="diagram-svg-wrap">'+svg+'</div>'
+       + stepsHtml
+       + '</div>';
+}
+
+function diagramPlay(containerId){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  const svg = wrap.querySelector('svg');
+  const paths = svg.querySelectorAll('.diagram-arrow-path');
+  const dots = svg.querySelectorAll('.diagram-glow-dot');
+  const items = wrap.querySelectorAll('.diagram-steps-list li');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  items.forEach(function(li){ li.classList.remove('step-active'); });
+  if(reduced){ return; }
+  const stepDur = 850;
+  paths.forEach(function(p){
+    const len = p.getTotalLength();
+    p.style.transition = 'none';
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+  void svg.getBoundingClientRect();
+  paths.forEach(function(p,i){
+    setTimeout(function(){
+      p.style.transition = 'stroke-dashoffset '+(stepDur-100)+'ms ease';
+      p.style.strokeDashoffset = 0;
+      const anim = dots[i] ? dots[i].querySelector('animateMotion') : null;
+      if(anim){ try{ anim.beginElement(); }catch(e){} }
+      if(items[i]) items[i].classList.add('step-active');
+    }, i*stepDur);
+  });
+}
+
+function wireDiagramButtons(){
+  document.querySelectorAll('.diagram-play-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ diagramPlay(btn.dataset.diagramId); });
+  });
+}
+
+function renderContent(){
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  SECTIONS.forEach((sec, idx)=>{
+    const card = document.createElement("div");
+    card.className = "section-card";
+    card.id = "section_"+idx;
+    let html = "<h2>"+sec.title+"</h2>";
+    if(sec.body){
+      html += '<div class="body-text">'+mdFormat(sec.body)+'</div>';
+    }
+    (sec.blocks || []).forEach((block, bi)=>{
+      if(block.type === "note"){
+        html += '<div class="callout callout-note"><span class="callout-title">หมายเหตุ / Note</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "example"){
+        html += '<div class="callout callout-example"><span class="callout-title">ตัวอย่าง / Example</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "warning"){
+        html += '<div class="callout callout-warning"><span class="callout-title">ข้อควรระวัง / Warning</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "formula"){
+        html += '<div class="callout callout-formula"><span class="callout-title">'+(block.label || "สูตร / Formula")+'</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "subheading"){
+        html += '<h3>'+mdFormat(block.content)+'</h3>';
+      } else if(block.type === "table"){
+        html += block.content;
+      } else if(block.type === "image"){
+        html += '<div class="image-block"><img src="'+block.src+'" alt="'+(block.alt || "")+'" loading="lazy">';
+        if(block.caption){
+          html += '<div class="image-caption">'+block.caption+'</div>';
+        }
+        html += '</div>';
+      } else if(block.type === "diagram"){
+        html += renderDiagramBlock(block, idx, bi);
+      }
+    });
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+
+  if(window.renderMathInElement){
+    renderMathInElement(main, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  }
+}
+
+function setupScrollSpy(){
+  const links = document.querySelectorAll(".toc-list a");
+  const sections = document.querySelectorAll(".section-card");
+  window.addEventListener("scroll", ()=>{
+    let currentIdx = 0;
+    sections.forEach((sec, idx)=>{
+      const rect = sec.getBoundingClientRect();
+      if(rect.top <= 100) currentIdx = idx;
+    });
+    links.forEach(l=>l.classList.remove("active"));
+    if(links[currentIdx]) links[currentIdx].classList.add("active");
+  });
+}
+
+function setupReveal(){
+  const cards = document.querySelectorAll('.section-card');
+  if(!('IntersectionObserver' in window)){
+    cards.forEach(function(c){ c.classList.add('revealed'); });
+    return;
+  }
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.08, rootMargin:'0px 0px -60px 0px'});
+  cards.forEach(function(c){ io.observe(c); });
+}
+
+let fontScale = parseFloat(localStorage.getItem('netbook_fontScale')||'1');
+function setFontScale(v){
+  fontScale = Math.min(1.3, Math.max(0.85, Math.round(v*10)/10));
+  try{ localStorage.setItem('netbook_fontScale', fontScale); }catch(e){}
+  document.documentElement.style.setProperty('--fontScale', fontScale);
+}
+
+function updateProgress(){
+  const el = document.documentElement;
+  const max = el.scrollHeight - el.clientHeight;
+  const pct = max>0 ? (el.scrollTop/max*100) : 0;
+  const bar = document.getElementById('readProgress');
+  if(bar) bar.style.width = pct+'%';
+  const btt = document.getElementById('backToTop');
+  if(btt){ if(el.scrollTop>420){ btt.classList.add('show'); } else { btt.classList.remove('show'); } }
+}
+
+renderTOC();
+renderContent();
+setupScrollSpy();
+setupReveal();
+setupTocPanel();
+wireDiagramButtons();
+setFontScale(fontScale);
+const readTimeBadge = document.getElementById('readTimeBadge');
+if(readTimeBadge){ readTimeBadge.textContent = '⏱ ~' + computeReadingTime() + ' นาทีในการอ่าน / min read'; }
+
+window.addEventListener('scroll', updateProgress);
+const backToTopBtn = document.getElementById('backToTop');
+if(backToTopBtn){ backToTopBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); }); }
+const fontMinusBtn = document.getElementById('fontMinus');
+if(fontMinusBtn){ fontMinusBtn.addEventListener('click', function(){ setFontScale(fontScale-0.1); }); }
+const fontPlusBtn = document.getElementById('fontPlus');
+if(fontPlusBtn){ fontPlusBtn.addEventListener('click', function(){ setFontScale(fontScale+0.1); }); }
+
+</script>
+</body>
+</html>
