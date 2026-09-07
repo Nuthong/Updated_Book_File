@@ -1,0 +1,2643 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>IC Quiz 8: Testing the Difference Between Means & Proportions (รวม 4 ชุด)</title>
+<style>
+:root{
+  --paper:#F6F4EE;
+  --bg:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --accent:#1B3A5C;
+  --accent2:#2B6CB0;
+  --accent-soft:#EAF1FA;
+  --correct:#256D46;
+  --correct-soft:#E7F3EB;
+  --incorrect:#B3341F;
+  --incorrect-soft:#FBEAE6;
+  --flag:#B7862C;
+  --flag-soft:#FBF1DA;
+  --unanswered:#9A9486;
+  --line:#DCD6C7;
+  --ink:#2A2A26;
+  --muted:#6B6558;
+  --blue:#2B6CB0;
+  --blue-soft:#EAF1FA;
+  --good:#256D46;
+  --good-bg:#E7F3EB;
+  --bad:#B3341F;
+  --bad-bg:#FBEAE6;
+  --gold:#B7862C;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Sarabun',"Segoe UI",sans-serif;
+  background:var(--paper);
+  color:var(--text);
+}
+header{
+  background:var(--navy-deep);
+  border-bottom:4px solid var(--flag);
+  box-shadow:0 2px 10px rgba(15,39,64,0.25);
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+header h1{
+  font-size:18px;
+  margin:0;
+  color:#F2EFE6;
+  font-weight:700;
+}
+.mode-toggle{
+  display:flex;
+  border:1px solid rgba(242,239,230,0.4);
+  border-radius:6px;
+  overflow:hidden;
+  background:rgba(242,239,230,0.08);
+}
+.mode-toggle button{
+  border:none;
+  background:transparent;
+  color:#F2EFE6;
+  padding:8px 16px;
+  cursor:pointer;
+  font-size:14px;
+  font-family:'Sarabun',sans-serif;
+}
+.mode-toggle button.active{
+  background:var(--flag);
+  color:#1B1300;
+  font-weight:700;
+}
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.toolbar select, .toolbar button{
+  border:1.5px solid var(--border);
+  background:#FFFFFF;
+  border-radius:4px;
+  padding:6px 10px;
+  font-size:13px;
+  color:var(--text);
+  cursor:pointer;
+  font-family:'Sarabun',sans-serif;
+}
+.timer-box{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  border:1.5px solid rgba(242,239,230,0.4);
+  border-radius:4px;
+  padding:6px 10px;
+  background:rgba(255,255,255,0.95);
+  font-variant-numeric:tabular-nums;
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  color:var(--navy-deep);
+}
+.layout{
+  display:flex;
+  max-width:1200px;
+  margin:0 auto;
+  gap:20px;
+  padding:20px;
+}
+.sidebar{
+  width:220px;
+  flex-shrink:0;
+}
+.sidebar-panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:16px;
+  position:sticky;
+  top:80px;
+  box-shadow:0 2px 8px rgba(15,39,64,0.06);
+}
+.sidebar-panel h3{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-soft);
+  margin:0 0 10px 0;
+  font-weight:600;
+}
+.nav-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+}
+.nav-cell{
+  aspect-ratio:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:4px;
+  border:1.5px solid var(--border);
+  background:#ffffff;
+  color:var(--text-soft);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  cursor:pointer;
+}
+.nav-cell:hover{border-color:var(--navy);}
+.nav-cell.current{outline:2px solid var(--navy);}
+.nav-cell.answered{background:var(--accent-soft);color:var(--accent2);border-color:var(--accent2);}
+.nav-cell.correct{background:var(--correct-soft);color:var(--correct);border-color:var(--correct);}
+.nav-cell.incorrect{background:var(--incorrect-soft);color:var(--incorrect);border-color:var(--incorrect);}
+.legend{
+  margin-top:12px;
+  font-size:11px;
+  color:var(--text-soft);
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
+.score-box{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid var(--border);
+  font-size:13px;
+}
+.score-box .big{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--navy);}
+main{flex:1;min-width:0;}
+.q-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 2px 10px rgba(15,39,64,0.06);
+}
+.q-card .q-index{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-soft);
+  margin-bottom:6px;
+}
+.q-card .q-prompt{
+  font-size:15px;
+  margin-bottom:14px;
+  white-space:pre-wrap;
+  line-height:1.6;
+}
+.q-card .q-prompt img{
+  display:block;
+  max-width:100%;
+  height:auto;
+  border-radius:6px;
+  border:1px solid var(--border);
+  margin:12px 0;
+}
+.q-card .q-prompt .img-caption{
+  font-size:12.5px;
+  color:var(--text-soft);
+  text-align:center;
+  margin-top:-6px;
+  margin-bottom:12px;
+  font-style:italic;
+}
+.sub-item{margin-bottom:14px;}
+.sub-item label{display:block;font-size:13px;color:var(--text-soft);margin-bottom:6px;font-weight:600;}
+.sub-item select, .sub-item input[type=text]{
+  width:100%;
+  max-width:360px;
+  padding:9px 10px;
+  border:1.5px solid var(--border);
+  border-radius:4px;
+  font-size:14px;
+  font-family:'JetBrains Mono',monospace;
+  background:var(--panel);
+  color:var(--text);
+}
+.sub-item select{font-family:'Sarabun',sans-serif;}
+.sub-item select:focus, .sub-item input[type=text]:focus{
+  outline:none;
+  border-color:var(--accent2);
+}
+.sub-item.correct select, .sub-item.correct input{border-color:var(--correct);background:var(--correct-soft);}
+.sub-item.incorrect select, .sub-item.incorrect input{border-color:var(--incorrect);background:var(--incorrect-soft);}
+.sub-item.locked select, .sub-item.locked input{opacity:0.75;cursor:not-allowed;}
+.reveal-box{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:4px;
+  border-left:3px solid var(--incorrect);
+  background:var(--incorrect-soft);
+  font-size:13px;
+  line-height:1.9;
+}
+.reveal-box .reveal-title{
+  font-weight:700;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--incorrect);
+  display:block;
+  margin-bottom:6px;
+}
+.reveal-box .reveal-line{margin-bottom:2px;}
+.reveal-box .reveal-line b{color:var(--navy-deep);}
+.calc-open-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border:1.5px solid var(--border);
+  background:#fff;
+  color:var(--navy);
+  padding:6px 12px;
+  border-radius:4px;
+  font-size:12.5px;
+  cursor:pointer;
+  margin-left:8px;
+  font-family:'Sarabun',sans-serif;
+  font-weight:600;
+}
+.calc-open-btn:hover{background:var(--accent-soft);}
+.hint-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border:1.5px solid var(--flag);
+  background:#fff;
+  color:var(--flag);
+  padding:6px 12px;
+  border-radius:4px;
+  font-size:12.5px;
+  cursor:pointer;
+  margin-left:8px;
+  font-family:'Sarabun',sans-serif;
+  font-weight:600;
+}
+.hint-btn:hover{background:var(--flag-soft);}
+.hint-box{
+  margin-top:10px;
+  padding:12px 14px;
+  border-radius:4px;
+  border-left:3px solid var(--flag);
+  background:var(--flag-soft);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+  white-space:pre-wrap;
+  line-height:1.8;
+  color:var(--navy-deep);
+}
+.calc-slot{width:100%;}
+.answer-block{
+  margin-top:6px;
+  padding:12px 14px;
+  border-radius:4px;
+  border-left:3px solid var(--accent2);
+  background:var(--accent-soft);
+  font-size:13px;
+}
+.answer-block.flagged{background:var(--flag-soft);border-left:3px solid var(--flag);}
+.flag-badge{
+  display:inline-block;
+  font-size:11px;
+  color:var(--flag);
+  border:1px solid var(--flag);
+  border-radius:12px;
+  padding:2px 8px;
+  margin-bottom:6px;
+  font-family:'JetBrains Mono',monospace;
+}
+.explain-block{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
+.explain-block h4{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin:0 0 6px 0;
+  color:var(--text-soft);
+}
+.explain-block .formula{
+  background:var(--navy-deep);
+  color:#EAF1FA;
+  border-radius:4px;
+  padding:12px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+  white-space:pre-wrap;
+  margin-bottom:10px;
+  line-height:1.8;
+}
+.explain-block .steps{font-size:13px;line-height:1.8;white-space:pre-wrap;}
+.step-list{display:block;}
+.step-item{display:flex;gap:12px;margin-bottom:14px;width:100%;box-sizing:border-box;}
+.step-item:last-child{margin-bottom:0;}
+.step-num{
+  flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:700;
+}
+.step-body{flex:1;min-width:0;}
+.step-label{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.step-content{font-size:13.5px;line-height:1.8;white-space:pre-wrap;color:var(--text);}
+.step-item.step-why .step-num{background:var(--flag);}
+.step-item.step-why .step-label{color:var(--flag);}
+.footer-actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:8px;}
+.footer-actions button{
+  border:none;
+  background:var(--navy);
+  color:#fff;
+  padding:10px 20px;
+  border-radius:4px;
+  font-size:14px;
+  cursor:pointer;
+  font-family:'Sarabun',sans-serif;
+  font-weight:600;
+}
+.footer-actions button:hover{background:var(--accent2);}
+.footer-actions button.secondary{background:transparent;color:var(--navy);border:1.5px solid var(--border);}
+@media (max-width:800px){
+  .layout{flex-direction:column;}
+  .sidebar{width:100%;}
+  .sidebar-panel{position:static;}
+  .nav-grid{grid-template-columns:repeat(8,1fr);}
+}
+#calcModal{
+  display:none;
+  background:var(--paper);
+  width:100%;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 2px 10px rgba(15,39,64,0.1);
+  margin-top:14px;
+  border:1px solid var(--line);
+}
+#calcModal.open{display:block;}
+#calcModal .calcmodal-head{
+  background:var(--navy-deep);
+  color:#F2EFE6;
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:4px solid var(--flag);
+}
+#calcModal .calcmodal-head h2{margin:0;font-size:15px;}
+#calcModal .calcmodal-close{
+  background:transparent;
+  border:1px solid rgba(242,239,230,0.5);
+  color:#F2EFE6;
+  border-radius:4px;
+  padding:4px 10px;
+  cursor:pointer;
+  font-size:13px;
+}
+#calcModal .calcmodal-body{padding:18px;max-height:none;overflow-y:visible;}
+#calcModal .tabbar{display:flex;gap:4px;margin:20px 0 0;border-bottom:2px solid var(--line)}
+#calcModal .tabbtn{
+  font-family:'Sarabun',sans-serif;font-weight:600;font-size:14.5px;
+  background:transparent;border:none;padding:12px 20px;cursor:pointer;
+  color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;
+}
+#calcModal .tabbtn.active{color:var(--navy);border-bottom-color:var(--blue)}
+#calcModal .panel{display:none;padding-top:22px}
+#calcModal .panel.active{display:block}
+#calcModal .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:20px;margin-bottom:20px}
+#calcModal .row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+#calcModal .field{display:flex;flex-direction:column;gap:6px;min-width:130px}
+#calcModal .field label{font-size:12.5px;color:var(--muted);font-weight:600}
+#calcModal .field select, #calcModal .field input{
+  font-family:'JetBrains Mono',monospace;font-size:14px;
+  padding:8px 10px;border:1.5px solid var(--line);border-radius:4px;background:#fff;
+}
+#calcModal .field select{font-family:'Sarabun',sans-serif}
+#calcModal .field input:focus, #calcModal .field select:focus{outline:none;border-color:var(--blue)}
+#calcModal .btngroup{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+#calcModal .chipbtn{
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+  background:#fff;border:1.5px solid var(--line);color:var(--navy);
+  padding:7px 14px;border-radius:20px;cursor:pointer;
+}
+#calcModal .chipbtn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+#calcModal button.primary{
+  font-family:'Sarabun',sans-serif;font-weight:600;font-size:14px;
+  background:var(--navy);color:#fff;border:none;padding:10px 20px;
+  border-radius:4px;cursor:pointer;
+}
+#calcModal button.primary:hover{background:var(--blue)}
+#calcModal button.ghost{
+  font-family:'Sarabun',sans-serif;font-weight:600;font-size:13px;
+  background:transparent;color:var(--navy);border:1.5px solid var(--line);
+  padding:8px 16px;border-radius:4px;cursor:pointer;
+}
+#calcModal svg.chart{width:100%;height:230px;background:#FBFAF6;border:1px solid var(--line);border-radius:4px}
+#calcModal .axislabel{font-family:'JetBrains Mono',monospace;font-size:11px;fill:var(--muted)}
+#calcModal .resultbox{
+  margin-top:16px;padding:14px 16px;background:var(--blue-soft);
+  border-left:3px solid var(--blue);border-radius:4px;
+  font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--navy-deep);
+}
+#calcModal .resultbox .big{font-size:20px;font-weight:700;margin-bottom:4px}
+#calcModal .resultbox .line{display:flex;justify-content:space-between;padding:3px 0;font-size:13px}
+#calcModal .resultbox .decision{
+  margin-top:8px;padding:6px 10px;border-radius:4px;font-weight:700;display:inline-block;
+}
+#calcModal .resultbox .decision.reject{background:var(--bad-bg);color:var(--bad)}
+#calcModal .resultbox .decision.fail{background:var(--good-bg);color:var(--good)}
+#calcModal .formula-box{
+  margin-top:14px;padding:12px 14px;background:var(--navy-deep);color:#EAF1FA;
+  border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  line-height:1.8;white-space:pre-wrap;display:none;
+}
+#calcModal .formula-box.show{display:block}
+#calcModal .calc{max-width:420px;margin:0 auto}
+#calcModal .calc-screen{
+  background:var(--navy-deep);color:#fff;font-family:'JetBrains Mono',monospace;
+  font-size:24px;text-align:right;padding:20px 16px;border-radius:6px 6px 0 0;
+  min-height:60px;overflow-x:auto;white-space:nowrap;
+}
+#calcModal .calc-sub{font-size:13px;color:#9FB3C8;text-align:right;padding:0 16px;margin-top:-6px;margin-bottom:8px;min-height:16px}
+#calcModal .calc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+#calcModal .calc-grid button{
+  font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;
+  padding:14px 4px;border:1px solid var(--line);border-radius:4px;background:#fff;
+  cursor:pointer;color:var(--ink);
+}
+#calcModal .calc-grid button:hover{background:var(--blue-soft)}
+#calcModal .calc-grid button.op{background:#F0EEE6;color:var(--navy)}
+#calcModal .calc-grid button.eq{background:var(--navy);color:#fff;grid-column:span 1}
+#calcModal .linecalc-history{
+  max-height:280px;overflow-y:auto;background:var(--navy-deep);border-radius:6px;
+  padding:14px 16px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:14px;
+}
+#calcModal .linecalc-line{color:#EAF1FA;margin-bottom:10px;line-height:1.6;cursor:pointer;padding:4px 6px;border-radius:4px;transition:background .1s ease;}
+#calcModal .linecalc-line:hover{background:rgba(255,255,255,0.08);}
+#calcModal .linecalc-line .lc-input{color:#9FB3C8;}
+#calcModal .linecalc-line .lc-result{color:#fff;font-weight:700;}
+#calcModal .linecalc-line.lc-error .lc-result{color:#F2A6A6;}
+#calcModal .linecalc-empty{color:#6B7F94;font-style:italic;}
+#calcModal .linecalc-toprow{display:flex;justify-content:flex-end;margin-bottom:8px;}
+#calcModal .lc-mode-toggle{font-size:12px;padding:5px 10px;}
+#calcModal .linecalc-inputrow{display:flex;gap:8px;}
+#calcModal .lc-mathfield{
+  flex:1;padding:10px 12px;border:1.5px solid var(--line);border-radius:4px;
+  font-family:'JetBrains Mono',monospace;font-size:15px;background:#fff;color:var(--ink);
+  min-height:44px;display:flex;align-items:center;flex-wrap:wrap;cursor:text;
+  outline:none;line-height:1.3;
+}
+#calcModal .lc-mathfield:focus{outline:none;border-color:var(--blue);}
+#calcModal .lc-placeholder{color:#9A9486;}
+#calcModal .lc-char{white-space:pre;}
+#calcModal .lc-frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;font-size:13px;}
+#calcModal .lc-frac-num, #calcModal .lc-frac-den{
+  display:flex;align-items:center;min-height:1.3em;min-width:0.8em;padding:0 3px;
+}
+#calcModal .lc-frac-num{border-bottom:1.5px solid var(--ink);}
+#calcModal .lc-cursor{
+  display:inline-block;width:1.5px;height:1.1em;background:var(--navy);
+  animation:lc-blink 1s step-start infinite;vertical-align:middle;
+}
+@keyframes lc-blink{50%{opacity:0;}}
+#calcModal .linecalc-hint{font-size:12px;color:var(--muted);margin-top:8px;}
+#calcModal .notes-textarea{
+  width:100%;min-height:280px;padding:14px 16px;border:1.5px solid var(--line);border-radius:6px;
+  font-family:'Sarabun',sans-serif;font-size:14px;color:var(--ink);resize:vertical;line-height:1.7;
+}
+#calcModal .notes-textarea:focus{outline:none;border-color:var(--blue);}
+#calcModal .lc-kbtabbar{display:flex;gap:4px;margin-bottom:8px;border-bottom:1.5px solid var(--line);}
+#calcModal .lc-kbtab{
+  border:none;background:transparent;padding:8px 14px;font-size:12.5px;cursor:pointer;
+  color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1.5px;font-family:'Sarabun',sans-serif;
+}
+#calcModal .lc-kbtab.active{color:var(--navy);border-bottom-color:var(--blue);font-weight:600;}
+#calcModal .lc-kbpanel{display:none;margin-bottom:12px;}
+#calcModal .lc-kbpanel.active{display:block;}
+#calcModal .lc-kb-row{display:flex;gap:8px;}
+#calcModal .lc-kb-block{display:grid;gap:5px;}
+#calcModal .lc-kb-block3{grid-template-columns:repeat(3,1fr);flex:3;}
+#calcModal .lc-kb-block4{grid-template-columns:repeat(4,1fr);flex:4;}
+#calcModal .lc-kb-block2{grid-template-columns:repeat(2,1fr);flex:2;}
+#calcModal .lc-kb-row button{
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+  padding:9px 4px;border:1px solid var(--line);border-radius:4px;background:#fff;
+  cursor:pointer;color:var(--ink);
+}
+#calcModal .lc-kb-row button:hover{background:var(--blue-soft);}
+#calcModal .lc-kb-wide{grid-column:span 2;}
+#calcModal .lc-kb-enter{background:var(--navy);color:#fff;}
+#calcModal .lc-kb-enter:hover{background:var(--blue);}
+#calcModal .lc-kb-abcrow{margin-bottom:5px;}
+#calcModal .lc-kb-abcrow button{flex:1;}
+#calcModal .lc-kb-abcrow-indent{padding-left:14px;}
+#calcModal .calc-grid button.fn{color:var(--blue)}
+#calcModal .calc-grid button.wide{grid-column:span 2}
+#calcModal .deg-toggle{display:flex;justify-content:flex-end;gap:6px;margin-bottom:8px}
+#calcModal .deg-toggle button{
+  font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 10px;
+  border:1.5px solid var(--line);border-radius:4px;background:#fff;cursor:pointer;
+}
+#calcModal .deg-toggle button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+</style>
+
+<style>
+:root{ color-scheme: light dark; }
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
+    --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0;
+    --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
+    --correct:#7fd0a0; --correct-soft:#173323;
+    --incorrect:#f0958a; --incorrect-soft:#33201d;
+    --flag:#e3bd74; --flag-soft:#332a17; --unanswered:#8b93a0;
+    --line:#333c48; --ink:#e4e7ec; --muted:#9aa5b3;
+    --blue:#8ec1f2; --blue-soft:#1c2b3d;
+    --good:#7fd0a0; --good-bg:#173323;
+    --bad:#f0958a; --bad-bg:#33201d;
+    --gold:#e3bd74;
+  }
+}
+.back-to-index{
+  display:inline-block;font-size:12px;color:#C9DCF0;text-decoration:none;
+  margin-bottom:6px;opacity:0.85;
+}
+.back-to-index:hover{opacity:1;text-decoration:underline;}
+@media print{.back-to-index{display:none;}}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back-to-index" href="../index.html">&larr; สารบัญทั้งหมด / All Chapters</a>
+  <h1>IC Quiz 8: Testing the Difference Between Means & Proportions (รวม 4 ชุด)</h1>
+  <div class="toolbar">
+    <div class="mode-toggle">
+      <button id="btnExerciseMode" class="active">แบบฝึกหัด</button>
+      <button id="btnAnswerMode">เฉลย</button>
+    </div>
+    <button id="resetAllBtn" style="border:1.5px solid var(--flag);color:var(--flag);">↺ ทำใหม่ทั้งชุด</button>
+    <select id="orderSelect">
+      <option value="original">เรียงตามต้นฉบับ</option>
+      <option value="shuffle">สลับข้อ</option>
+    </select>
+    <select id="timerModeSelect">
+      <option value="stopwatch">นับขึ้น</option>
+      <option value="countdown">นับถอยหลัง</option>
+    </select>
+    <input type="number" id="countdownMinutes" placeholder="นาที" min="1" style="width:70px;padding:6px;border:1px solid var(--border);border-radius:6px;">
+    <div class="timer-box">
+      <span id="timerDisplay">00:00</span>
+      <button id="timerStartBtn">เริ่ม</button>
+      <button id="timerPauseBtn">พัก</button>
+      <button id="timerResetBtn">รีเซ็ต</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-panel">
+      <h3>สารบัญข้อ</h3>
+      <div class="nav-grid" id="navGrid"></div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--unanswered)"></span>ยังไม่ตอบ</span>
+        <span><span class="dot" style="background:var(--accent)"></span>ตอบบางส่วน</span>
+        <span><span class="dot" style="background:var(--correct)"></span>ถูกต้อง</span>
+        <span><span class="dot" style="background:var(--incorrect)"></span>ไม่ถูกต้อง</span>
+      </div>
+      <div class="score-box" id="scoreBox" style="display:none;">
+        <div>คะแนน</div>
+        <div class="big" id="scoreText">0/0</div>
+      </div>
+    </div>
+  </div>
+  <main id="mainArea"></main>
+</div>
+
+<div id="calcModal">
+<div class="calcmodal-head"><h2>Statistics Calculator</h2><button class="calcmodal-close" id="calcModalClose">✕ ซ่อน</button></div>
+<div class="calcmodal-body">
+<div class="tabbar">
+    <button class="tabbtn active" data-tab="dist">Distribution</button>
+    <button class="tabbtn" data-tab="stat">Statistics</button>
+    <button class="tabbtn" data-tab="calc">Calculator</button>
+    <button class="tabbtn" data-tab="linecalc">Line Calc</button>
+    <button class="tabbtn" data-tab="notes">Notes</button>
+  </div>
+
+  <div class="panel active" id="panel-dist">
+    <div class="card">
+      <div class="row">
+        <div class="field">
+          <label>Distribution</label>
+          <select id="distSelect">
+            <option value="normal">Normal</option>
+            <option value="student">Student (t)</option>
+            <option value="chisq">Chi-Squared</option>
+            <option value="binomial">Binomial</option>
+            <option value="poisson">Poisson</option>
+          </select>
+        </div>
+        <div id="distParams" class="row" style="margin-bottom:0"></div>
+      </div>
+
+      <svg class="chart" id="distChart" viewBox="0 0 680 230"></svg>
+
+      <div class="btngroup" id="modeGroup"></div>
+      <div class="row" id="boundInputs"></div>
+
+      <div style="display:flex;gap:10px">
+        <button class="primary" id="computeDist">คำนวณ</button>
+      </div>
+
+      <div class="resultbox" id="distResult" style="display:none"></div>
+      <div class="formula-box show" id="distFormula"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-stat">
+    <div class="card">
+      <div class="row">
+        <div class="field" style="min-width:260px">
+          <label>Statistical Test / Estimate</label>
+          <select id="statSelect">
+            <option value="ztest">Z Test of a Mean (σ known)</option>
+            <option value="ttest">T Test of a Mean (σ unknown)</option>
+            <option value="zpropt">Z Test of a Proportion</option>
+            <option value="chitest">Chi-Squared Test (Variance)</option>
+            <option value="zest">Z Estimate of a Mean (CI)</option>
+            <option value="test">T Estimate of a Mean (CI)</option>
+            <option value="zpropest">Z Estimate of a Proportion (CI)</option>
+            <option value="chiest">Chi-Squared Estimate of σ (CI)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" id="statParams"></div>
+      <div class="btngroup" id="tailGroup"></div>
+
+      <div style="display:flex;gap:10px">
+        <button class="primary" id="computeStat">คำนวณ</button>
+      </div>
+
+      <div class="resultbox" id="statResult" style="display:none"></div>
+      <div class="formula-box show" id="statFormula"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-calc">
+    <div class="card calc">
+      <div class="deg-toggle">
+        <button id="degBtn" class="active">DEG</button>
+        <button id="radBtn">RAD</button>
+      </div>
+      <div class="calc-screen" id="calcScreen">0</div>
+      <div class="calc-sub" id="calcSub">&nbsp;</div>
+      <div class="calc-grid" id="calcGrid"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-linecalc">
+    <div class="card">
+      <div class="linecalc-toprow">
+        <button id="linecalcModeToggle" class="ghost lc-mode-toggle">แสดงผล: เศษส่วน</button>
+      </div>
+      <div class="linecalc-history" id="linecalcHistory"></div>
+
+      <div class="lc-kbtabbar">
+        <button class="lc-kbtab active" data-kb="main">เมนูหลัก</button>
+        <button class="lc-kbtab" data-kb="abc">abc</button>
+        <button class="lc-kbtab" data-kb="func">ฟังก์ชัน</button>
+      </div>
+
+      <div class="lc-kbpanel active" id="lc-kb-main">
+        <div class="lc-kb-row">
+          <div class="lc-kb-block lc-kb-block3">
+            <button data-ins="^2">a²</button>
+            <button data-ins-cursor="^" data-cursor="1">a^b</button>
+            <button data-func="abs">|a|</button>
+            <button data-func="sqrt">√</button>
+            <button data-nfunc="nthroot">ⁿ√</button>
+            <button data-ins="pi">π</button>
+            <button data-func="sin">sin</button>
+            <button data-func="cos">cos</button>
+            <button data-func="tan">tan</button>
+            <button data-ins="(">(</button>
+            <button data-ins=")">)</button>
+            <button data-ins=",">,</button>
+          </div>
+          <div class="lc-kb-block lc-kb-block4">
+            <button data-ins="7">7</button>
+            <button data-ins="8">8</button>
+            <button data-ins="9">9</button>
+            <button data-ins="÷">÷</button>
+            <button data-ins="4">4</button>
+            <button data-ins="5">5</button>
+            <button data-ins="6">6</button>
+            <button data-ins="×">×</button>
+            <button data-ins="1">1</button>
+            <button data-ins="2">2</button>
+            <button data-ins="3">3</button>
+            <button data-minus>−</button>
+            <button data-ins="0">0</button>
+            <button data-ins=".">.</button>
+            <button data-ins="ans">ans</button>
+            <button data-ins="+">+</button>
+          </div>
+          <div class="lc-kb-block lc-kb-block2">
+            <button data-frac="true" title="สร้างกล่องเศษส่วน">a/b</button>
+            <button data-ins="!">!</button>
+            <button data-cursor-left>←</button>
+            <button data-cursor-right>→</button>
+            <button data-backspace class="lc-kb-wide">⌫</button>
+            <button data-enter class="lc-kb-enter lc-kb-wide">⏎</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lc-kbpanel" id="lc-kb-abc">
+        <div class="lc-kb-row lc-kb-abcrow">
+          <button data-ins="q">q</button><button data-ins="w">w</button><button data-ins="e">e</button><button data-ins="r">r</button><button data-ins="t">t</button><button data-ins="y">y</button><button data-ins="u">u</button><button data-ins="i">i</button><button data-ins="o">o</button><button data-ins="p">p</button>
+        </div>
+        <div class="lc-kb-row lc-kb-abcrow lc-kb-abcrow-indent">
+          <button data-ins="a">a</button><button data-ins="s">s</button><button data-ins="d">d</button><button data-ins="f">f</button><button data-ins="g">g</button><button data-ins="h">h</button><button data-ins="j">j</button><button data-ins="k">k</button><button data-ins="l">l</button>
+        </div>
+        <div class="lc-kb-row lc-kb-abcrow">
+          <button data-ins="=">=</button><button data-ins="z">z</button><button data-ins="x">x</button><button data-ins="c">c</button><button data-ins="v">v</button><button data-ins="b">b</button><button data-ins="n">n</button><button data-ins="m">m</button><button data-backspace>⌫</button>
+        </div>
+        <div class="lc-kb-row lc-kb-abcrow">
+          <button data-ins="(">(</button><button data-ins=")">)</button><button data-ins=",">,</button><button data-ins="!">!</button><button data-ins="pi">π</button><button data-ins="ans">ans</button><button data-enter class="lc-kb-enter">⏎</button>
+        </div>
+      </div>
+
+      <div class="lc-kbpanel" id="lc-kb-func">
+        <div class="lc-kb-row">
+          <div class="lc-kb-block lc-kb-block3">
+            <button data-func="sin">sin</button>
+            <button data-func="cos">cos</button>
+            <button data-func="tan">tan</button>
+            <button data-func="asin">sin⁻¹</button>
+            <button data-func="acos">cos⁻¹</button>
+            <button data-func="atan">tan⁻¹</button>
+            <button data-func="mean">mean</button>
+            <button data-func="stdev">stdev</button>
+            <button data-func="stdevp">stdevp</button>
+            <button data-nfunc="npr">nPr</button>
+            <button data-nfunc="ncr">nCr</button>
+            <button data-ins="!">!</button>
+          </div>
+          <div class="lc-kb-block lc-kb-block3">
+            <button data-ins-cursor="^" data-cursor="1">a^b</button>
+            <button data-func="sqrt">√</button>
+            <button data-nfunc="nthroot">ⁿ√</button>
+            <button data-ins-cursor="e^" data-cursor="2">eˣ</button>
+            <button data-func="abs">abs</button>
+            <button data-func="round">round</button>
+            <button data-func="ln">ln</button>
+            <button data-func="log">log</button>
+            <button data-backspace>⌫</button>
+            <button data-ins="e">e</button>
+            <button data-ins="pi">π</button>
+            <button data-enter class="lc-kb-enter">⏎</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="linecalc-inputrow">
+        <div id="linecalcInput" class="lc-mathfield" tabindex="0"></div>
+        <button id="linecalcClearBtn" class="ghost">ล้าง</button>
+      </div>
+      <div class="linecalc-hint">พิมพ์แล้วกด Enter คำนวณเป็นเศษส่วนไม่ทอน รองรับ + − × / ( ) และทศนิยม · กด a/b เพื่อสร้างกล่องเศษส่วนจริง · คลิกบรรทัดเก่าเพื่อดึงกลับมาแก้ไข</div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-notes">
+    <div class="card">
+      <textarea id="notesArea" class="notes-textarea" placeholder="จดค่าที่คำนวณได้ไว้ตรงนี้..."></textarea>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const QUESTIONS = [{"prompt": "Quiz 8-1 ข้อ 1\nสำหรับการทดสอบ H0: μ1 ≥ μ2, Ha: μ1 &lt; μ2\nระดับนัยสำคัญ α = 0.1\nx̄1 = 2424, n1 = 35\nx̄2 = 2468, n2 = 50\nสมมติว่าตัวอย่างสุ่มและอิสระต่อกัน ประชากรแจกแจงแบบปรกติ และ σ1 = 99, σ2 = 86", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["z-test", "t-test"], "correctAnswer": "z-test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Left-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": -1.28, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": -2.1269480670065, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Reject Null Hypothesis", "uncertain": false}], "formula": "$$z = \\dfrac{(\\bar{x}_1 - \\bar{x}_2)}{\\sqrt{\\dfrac{\\sigma_1^2}{n_1} + \\dfrac{\\sigma_2^2}{n_2}}}$$", "steps": {"given": "x̄1=2424, n1=35, σ1=99; x̄2=2468, n2=50, σ2=86; α=0.1; H0: μ1≥μ2, Ha: μ1&lt;μ2", "why": "ทราบค่า σ1 และ σ2 ของประชากรทั้งสองกลุ่ม (ไม่ใช่ค่าประมาณจากตัวอย่าง) จึงใช้ z-test สำหรับผลต่างค่าเฉลี่ยสองกลุ่มอิสระ และเป็นการทดสอบด้านเดียว (Left-Tailed) เพราะ Ha ระบุทิศทาง μ1&lt;μ2", "substitute": "z = (2424-2468) / √(99²/35 + 86²/50) = -44 / √(280.0286 + 147.92)", "calculate": "z = -44 / √427.9486 = -44 / 20.6871 ≈ -2.1269", "conclude": "z = -2.1269 น้อยกว่าค่าวิกฤต -1.28 (ตกในเขตปฏิเสธของ Left-Tailed Test) → Reject H0"}}, {"prompt": "Quiz 8-1 ข้อ 2\nสำหรับการทดสอบ H0: μ1 ≤ μ2, Ha: μ1 > μ2\nระดับนัยสำคัญ α = 0.05\nx̄1 = 4.5, n1 = 80\nx̄2 = 4.3, n2 = 90\nสมมติว่าตัวอย่างสุ่มและอิสระต่อกัน ประชากรแจกแจงแบบปรกติ และ σ1 = 0.1, σ2 = 0.2", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["z-test", "t-test"], "correctAnswer": "z-test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Right-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 1.645, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 8.3811635492349, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Reject Null Hypothesis", "uncertain": false}], "formula": "$$z = \\dfrac{(\\bar{x}_1 - \\bar{x}_2)}{\\sqrt{\\dfrac{\\sigma_1^2}{n_1} + \\dfrac{\\sigma_2^2}{n_2}}}$$", "steps": {"given": "x̄1=4.5, n1=80, σ1=0.1; x̄2=4.3, n2=90, σ2=0.2; α=0.05; H0: μ1≤μ2, Ha: μ1&gt;μ2", "why": "ทราบ σ1, σ2 ของประชากรจึงใช้ z-test และเป็น Right-Tailed Test เพราะ Ha ระบุ μ1&gt;μ2", "substitute": "z = (4.5-4.3) / √(0.1²/80 + 0.2²/90) = 0.2 / √(0.000125 + 0.0004444)", "calculate": "z = 0.2 / √0.0005694 = 0.2 / 0.023863 ≈ 8.3812", "conclude": "z = 8.3812 มากกว่าค่าวิกฤต 1.645 (ตกในเขตปฏิเสธ) → Reject H0"}}, {"prompt": "Quiz 8-1 ข้อ 3\nสำหรับการทดสอบ H0: μ1 = μ2, Ha: μ1 ≠ μ2\nระดับนัยสำคัญ α = 0.05\nx̄1 = 17, n1 = 90\nx̄2 = 15, n2 = 65\nสมมติว่าตัวอย่างสุ่มและอิสระต่อกัน ประชากรแจกแจงแบบปรกติ และ σ1 = 2.8, σ2 = 4.8", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["z-test", "t-test"], "correctAnswer": "z-test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Two-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 1.96, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 3.0097395324624, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Reject Null Hypothesis", "uncertain": false}], "formula": "$$z = \\dfrac{(\\bar{x}_1 - \\bar{x}_2)}{\\sqrt{\\dfrac{\\sigma_1^2}{n_1} + \\dfrac{\\sigma_2^2}{n_2}}}$$", "steps": {"given": "x̄1=17, n1=90, σ1=2.8; x̄2=15, n2=65, σ2=4.8; α=0.05; H0: μ1=μ2, Ha: μ1≠μ2", "why": "ทราบ σ1, σ2 จึงใช้ z-test และเป็น Two-Tailed Test เพราะ Ha ไม่ระบุทิศทาง (μ1≠μ2) จึงต้องแบ่งพื้นที่ปฏิเสธเป็นสองด้าน α/2 = 0.025 ต่อด้าน", "substitute": "z = (17-15) / √(2.8²/90 + 4.8²/65) = 2 / √(0.08711 + 0.35446)", "calculate": "z = 2 / √0.44157 = 2 / 0.66451 ≈ 3.0097", "conclude": "z = 3.0097 มากกว่าค่าวิกฤต 1.96 (ตกในเขตปฏิเสธด้านขวา) → Reject H0"}}, {"prompt": "Quiz 8-1 ข้อ 4\nสมมติว่าประชากรมีการแจกแจงแบบปรกติ และตัวอย่างเป็นอิสระและสุ่ม บริษัทพลังงานต้องการเลือกระหว่างสองพื้นที่ในรัฐเพื่อติดตั้งกังหันลมผลิตพลังงาน นักวิจัยอ้างว่าความเร็วลมในพื้นที่ A น้อยกว่าความเร็วลมในพื้นที่ B โดยคำนวณความเร็วลมเฉลี่ยจาก 35 วันในแต่ละพื้นที่\nพื้นที่ A: ความเร็วลมเฉลี่ย 14.4 ไมล์/ชม. (σ = 3.5)\nพื้นที่ B: ความเร็วลมเฉลี่ย 15.1 ไมล์/ชม. (σ = 3.1)\nที่ α = 0.01 บริษัทสามารถสนับสนุนข้ออ้างของนักวิจัยได้หรือไม่", "subs": [{"label": "Identify null hypothesis (H0: μ1-μ2 __ 0)", "type": "text", "correctAnswer": "μ1-μ2 ≥ 0", "uncertain": false}, {"label": "Identify alternative hypothesis (Ha: μ1-μ2 __ 0)", "type": "text", "correctAnswer": "μ1-μ2 &lt; 0", "uncertain": false}, {"label": "Identify statistical test", "type": "select", "options": ["z-test", "t-test"], "correctAnswer": "z-test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Left-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": -2.33, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": -0.88574147971796, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$z = \\dfrac{(\\bar{x}_1 - \\bar{x}_2)}{\\sqrt{\\dfrac{\\sigma_1^2}{n_1} + \\dfrac{\\sigma_2^2}{n_2}}}$$", "steps": {"given": "พื้นที่ A: x̄1=14.4, σ1=3.5, n1=35; พื้นที่ B: x̄2=15.1, σ2=3.1, n2=35; α=0.01; ข้ออ้าง μ1&lt;μ2", "why": "ข้ออ้างของนักวิจัยที่ต้องการพิสูจน์ (μ1&lt;μ2) ต้องถูกวางไว้เป็น Ha เสมอ จึงได้ H0: μ1-μ2≥0, Ha: μ1-μ2&lt;0 เป็น Left-Tailed Test ทราบ σ1, σ2 จึงใช้ z-test", "substitute": "z = (14.4-15.1) / √(3.5²/35 + 3.1²/35) = -0.7 / √(0.35 + 0.27457)", "calculate": "z = -0.7 / √0.62457 = -0.7 / 0.79036 ≈ -0.8857", "conclude": "z = -0.8857 มากกว่าค่าวิกฤต -2.33 (ไม่ตกในเขตปฏิเสธ) → Fail to reject H0 (ยังไม่มีหลักฐานเพียงพอสนับสนุนข้ออ้าง)"}}, {"prompt": "Quiz 8-1 ข้อ 5\nสมมติว่าประชากรมีการแจกแจงแบบปรกติ และตัวอย่างเป็นอิสระและสุ่ม เพื่อเปรียบเทียบระยะเบรกของยางรถยนต์สองชนิด วิศวกรความปลอดภัยทำการทดสอบเบรก 90 ครั้งต่อชนิด\nยาง A: ระยะเบรกเฉลี่ย 42 ฟุต (σ = 4.4)\nยาง B: ระยะเบรกเฉลี่ย 45 ฟุต (σ = 4.4)\nที่ α = 0.05 วิศวกรสามารถสนับสนุนข้ออ้างที่ว่าระยะเบรกเฉลี่ยของยางทั้งสองชนิดแตกต่างกันได้หรือไม่", "subs": [{"label": "Identify null hypothesis (H0: μ1-μ2 __ 0)", "type": "text", "correctAnswer": "μ1-μ2 = 0", "uncertain": false}, {"label": "Identify alternative hypothesis (Ha: μ1-μ2 __ 0)", "type": "text", "correctAnswer": "μ1-μ2 ≠ 0", "uncertain": false}, {"label": "Identify statistical test", "type": "select", "options": ["z-test", "t-test"], "correctAnswer": "z-test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Two-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 1.96, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": -4.5737754085223, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Reject Null Hypothesis", "uncertain": false}], "formula": "$$z = \\dfrac{(\\bar{x}_1 - \\bar{x}_2)}{\\sqrt{\\dfrac{\\sigma_1^2}{n_1} + \\dfrac{\\sigma_2^2}{n_2}}}$$", "steps": {"given": "ยาง A: x̄1=42, σ1=4.4, n1=90; ยาง B: x̄2=45, σ2=4.4, n2=90; α=0.05; ข้ออ้าง 'แตกต่างกัน' (ไม่ระบุทิศทาง)", "why": "ข้ออ้าง 'แตกต่างกัน' ไม่ระบุทิศทาง จึงเป็น Two-Tailed Test (H0: μ1=μ2, Ha: μ1≠μ2) ทราบ σ1, σ2 จึงใช้ z-test", "substitute": "z = (42-45) / √(4.4²/90 + 4.4²/90) = -3 / √(0.21511 + 0.21511)", "calculate": "z = -3 / √0.43022 = -3 / 0.65592 ≈ -4.5738", "conclude": "|z| = 4.5738 มากกว่าค่าวิกฤต 1.96 (ตกในเขตปฏิเสธ) → Reject H0 (สนับสนุนข้ออ้างว่าระยะเบรกต่างกัน)"}}, {"prompt": "Quiz 8-2 ข้อ 1\nสำหรับการทดสอบ H0: μ1 ≤ μ2, Ha: μ1 > μ2\nระดับนัยสำคัญ α = 0.05\nx̄1 = 192, n1 = 26, s1 = 43\nx̄2 = 195, n2 = 21, s2 = 35\nสมมติว่าตัวอย่างสุ่มและอิสระต่อกัน ประชากรแจกแจงแบบปรกติ และความแปรปรวนของประชากรเท่ากัน", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["z-test", "t-test"], "correctAnswer": "t-test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Right-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 1.645, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": -0.25792202265518, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$s_p^2 = \\dfrac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2} \\qquad t = \\dfrac{\\bar{x}_1-\\bar{x}_2}{\\sqrt{s_p^2\\left(\\dfrac{1}{n_1}+\\dfrac{1}{n_2}\\right)}}, \\; df=n_1+n_2-2$$", "steps": {"given": "x̄1=192,n1=26,s1=43; x̄2=195,n2=21,s2=35; α=0.05; สมมติความแปรปรวนเท่ากัน", "why": "ไม่ทราบ σ ของประชากร (มีแต่ s จากตัวอย่าง) จึงใช้ t-test และเนื่องจากสมมติความแปรปรวนเท่ากัน จึงใช้ pooled-variance t-test เป็น Right-Tailed Test เพราะ Ha: μ1&gt;μ2", "substitute": "sp² = [25(43²)+20(35²)]/45 = (46225+24500)/45 = 1571.67\nt = (192-195) / √(1571.67(1/26+1/21))", "calculate": "t = -3 / √(1571.67×0.086081) = -3 / √135.29 = -3 / 11.632 ≈ -0.2579", "conclude": "t = -0.2579 มากกว่าค่าวิกฤต 1.645 (ไม่ตกในเขตปฏิเสธด้านขวา) → Fail to reject H0"}}, {"prompt": "Quiz 8-2 ข้อ 2\nในการทดสอบการชนด้วยความเร็วต่ำ ค่าซ่อมกันชนเฉลี่ยของรถยนต์ขนาดเล็กที่สุ่มมา 18 คัน คือ 1567 ดอลลาร์ (s = 596) ค่าซ่อมกันชนเฉลี่ยของรถยนต์ขนาดกลางที่สุ่มมา 25 คัน คือ 1667 ดอลลาร์ (s = 599) ที่ α = 0.01 สามารถสรุปได้หรือไม่ว่าค่าซ่อมกันชนเฉลี่ยสำหรับรถยนต์ขนาดเล็กถูกกว่ารถยนต์ขนาดกลาง สมมติว่าตัวอย่างสุ่มจากประชากรที่มีการแจกแจงแบบปรกติและความแปรปรวนของประชากรเท่ากัน", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["Two-Sample t-Test for the Difference Between Means", "Two-Sample z-Test for the Difference Between Means"], "correctAnswer": "Two-Sample t-Test for the Difference Between Means", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Left-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": -2.326, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": -0.54118616621082, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$s_p^2 = \\dfrac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2} \\qquad t = \\dfrac{\\bar{x}_1-\\bar{x}_2}{\\sqrt{s_p^2\\left(\\dfrac{1}{n_1}+\\dfrac{1}{n_2}\\right)}}, \\; df=n_1+n_2-2$$", "steps": {"given": "รถเล็ก: x̄1=1567,s1=596,n1=18; รถกลาง: x̄2=1667,s2=599,n2=25; α=0.01; ข้ออ้าง 'รถเล็กถูกกว่า' → μ1&lt;μ2", "why": "ไม่ทราบ σ จึงใช้ t-test สมมติความแปรปรวนเท่ากันจึงใช้ pooled-variance t-test เป็น Left-Tailed Test เพราะข้ออ้างระบุทิศทาง (ค่าซ่อมรถเล็กน้อยกว่า)", "substitute": "sp² = [17(596²)+24(599²)]/41 = (6038672+8611224)/41 = 357314.5\nt = (1567-1667) / √(357314.5(1/18+1/25))", "calculate": "t = -100 / √(357314.5×0.095556) = -100 / √34146.5 = -100 / 184.79 ≈ -0.5412", "conclude": "t = -0.5412 มากกว่าค่าวิกฤต -2.326 (ไม่ตกในเขตปฏิเสธ) → Fail to reject H0 (ยังไม่มีหลักฐานเพียงพอ)"}}, {"prompt": "Quiz 8-2 ข้อ 3\nสำหรับการทดสอบ H0: μ1 ≤ μ2, Ha: μ1 > μ2\nระดับนัยสำคัญ α = 0.1\nx̄1 = 2422, n1 = 20, s1 = 87\nx̄2 = 2460, n2 = 18, s2 = 95\nสมมติว่าตัวอย่างสุ่มและอิสระต่อกัน ประชากรแจกแจงแบบปรกติ และความแปรปรวนของประชากรไม่เท่ากัน", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["z-test", "t-test"], "correctAnswer": "t-test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Right-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 1.333, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": -1.2810970161867, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$t = \\dfrac{\\bar{x}_1-\\bar{x}_2}{\\sqrt{\\dfrac{s_1^2}{n_1}+\\dfrac{s_2^2}{n_2}}} \\quad \\text{(Welch, ไม่ pool variance)}$$", "steps": {"given": "x̄1=2422,n1=20,s1=87; x̄2=2460,n2=18,s2=95; α=0.1; สมมติความแปรปรวนไม่เท่ากัน", "why": "ไม่ทราบ σ จึงใช้ t-test และเนื่องจากสมมติความแปรปรวนไม่เท่ากัน จึงใช้ Welch's t-test (ไม่รวม variance เป็น pooled) เป็น Right-Tailed Test เพราะ Ha: μ1&gt;μ2 ค่า df คำนวณจากสูตร Welch-Satterthwaite ทำให้ได้ critical value=1.333", "substitute": "t = (2422-2460) / √(87²/20 + 95²/18) = -38 / √(378.45 + 501.39)", "calculate": "t = -38 / √879.84 = -38 / 29.661 ≈ -1.2811", "conclude": "t = -1.2811 มากกว่าค่าวิกฤต 1.333 (ไม่ตกในเขตปฏิเสธด้านขวา) → Fail to reject H0"}}, {"prompt": "Quiz 8-2 ข้อ 4\nสมมติว่าประชากรมีการแจกแจงแบบปรกติและตัวอย่างเป็นอิสระและสุ่ม สมาคมสัตว์เลี้ยงอ้างว่าค่าใช้จ่ายเฉลี่ยต่อปีของการเข้ารับการตรวจโดยสัตวแพทย์สำหรับสุนัขและแมวมีค่าใช้จ่ายเท่ากัน\nสุนัข: x̄1 = 225, s1 = 28, n1 = 23\nแมว: x̄2 = 203, s2 = 15, n2 = 10\nที่ α = 0.01 สามารถปฏิเสธการอ้างของสมาคมสัตว์เลี้ยงได้หรือไม่ สมมติว่าความแปรปรวนของประชากรไม่เท่ากัน", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["Two-Sample t-Test for the Difference Between Means", "Two-Sample z-Test for the Difference Between Means"], "correctAnswer": "Two-Sample t-Test for the Difference Between Means", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Two-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 3.25, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 2.9245867805745, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$t = \\dfrac{\\bar{x}_1-\\bar{x}_2}{\\sqrt{\\dfrac{s_1^2}{n_1}+\\dfrac{s_2^2}{n_2}}} \\quad \\text{(Welch, ไม่ pool variance)}$$", "steps": {"given": "สุนัข: x̄1=225,s1=28,n1=23; แมว: x̄2=203,s2=15,n2=10; α=0.01; ข้ออ้าง 'เท่ากัน' → H0: μ1=μ2", "why": "ไม่ทราบ σ จึงใช้ t-test สมมติความแปรปรวนไม่เท่ากันจึงใช้ Welch's t-test ข้ออ้าง 'เท่ากัน' ไม่ระบุทิศทางจึงเป็น Two-Tailed Test", "substitute": "t = (225-203) / √(28²/23 + 15²/10) = 22 / √(34.087 + 22.5)", "calculate": "t = 22 / √56.587 = 22 / 7.5225 ≈ 2.9246", "conclude": "|t| = 2.9246 น้อยกว่าค่าวิกฤต 3.25 (ไม่ตกในเขตปฏิเสธ) → Fail to reject H0 (ไม่สามารถปฏิเสธข้ออ้างของสมาคมได้)"}}, {"prompt": "Quiz 8-3 ข้อ 1\nสำหรับการทดสอบ H0: μd ≥ 0, Ha: μd &lt; 0\nระดับนัยสำคัญ α = 0.05\nd̄ = 3.2, n = 28, sd = 1.5\nสมมติว่าตัวอย่างสุ่มและอิสระต่อกัน ประชากรแจกแจงแบบปรกติ", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["z-test", "t-test"], "correctAnswer": "t-test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Left-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": -1.703, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 11.288538927209, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$t = \\dfrac{\\bar{d}}{s_d/\\sqrt{n}}, \\quad df = n-1$$", "steps": {"given": "d̄=3.2, n=28, sd=1.5; α=0.05; df=27", "why": "เป็นข้อมูลคู่ (dependent samples) จึงใช้ paired t-test บนผลต่าง d เป็น Left-Tailed Test เพราะ Ha: μd&lt;0", "substitute": "t = 3.2 / (1.5/√28) = 3.2 / (1.5/5.2915)", "calculate": "t = 3.2 / 0.28347 ≈ 11.2885", "conclude": "t = 11.2885 มากกว่าค่าวิกฤต -1.703 (ไม่ตกในเขตปฏิเสธด้านซ้าย) → Fail to reject H0"}}, {"prompt": "Quiz 8-3 ข้อ 2\nสำหรับการทดสอบ H0: μd ≤ 0, Ha: μd > 0\nระดับนัยสำคัญ α = 0.1\nd̄ = 3, n = 6, sd = 1.6\nสมมติว่าตัวอย่างสุ่มและอิสระต่อกัน ประชากรแจกแจงแบบปรกติ", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["z-test", "t-test"], "correctAnswer": "t-test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Right-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 1.476, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 4.5927932677185, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Reject Null Hypothesis", "uncertain": false}], "formula": "$$t = \\dfrac{\\bar{d}}{s_d/\\sqrt{n}}, \\quad df = n-1$$", "steps": {"given": "d̄=3, n=6, sd=1.6; α=0.1; df=5", "why": "เป็นข้อมูลคู่จึงใช้ paired t-test เป็น Right-Tailed Test เพราะ Ha: μd&gt;0", "substitute": "t = 3 / (1.6/√6) = 3 / (1.6/2.4495)", "calculate": "t = 3 / 0.6532 ≈ 4.5928", "conclude": "t = 4.5928 มากกว่าค่าวิกฤต 1.476 (ตกในเขตปฏิเสธ) → Reject H0"}}, {"prompt": "Quiz 8-3 ข้อ 3\nสำหรับการทดสอบ H0: μd = 0, Ha: μd ≠ 0\nระดับนัยสำคัญ α = 0.05\nd̄ = 0.7, n = 24, sd = 1.35\nสมมติว่าตัวอย่างสุ่มและอิสระต่อกัน ประชากรแจกแจงแบบปรกติ", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["z-test", "t-test"], "correctAnswer": "t-test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Two-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 2.069, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 2.5402115851085, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Reject Null Hypothesis", "uncertain": false}], "formula": "$$t = \\dfrac{\\bar{d}}{s_d/\\sqrt{n}}, \\quad df = n-1$$", "steps": {"given": "d̄=0.7, n=24, sd=1.35; α=0.05; df=23", "why": "เป็นข้อมูลคู่จึงใช้ paired t-test เป็น Two-Tailed Test เพราะ Ha: μd≠0", "substitute": "t = 0.7 / (1.35/√24) = 0.7 / (1.35/4.899)", "calculate": "t = 0.7 / 0.27556 ≈ 2.5402", "conclude": "t = 2.5402 มากกว่าค่าวิกฤต 2.069 (ตกในเขตปฏิเสธ) → Reject H0"}}, {"prompt": "Quiz 8-3 ข้อ 4\nสมมติว่าประชากรมีการแจกแจงแบบปรกติและตัวอย่างถูกเลือกอย่างสุ่มและอิสระต่อกัน บริษัทต้องการทราบว่าความนิยมของผลิตภัณฑ์จากผู้บริโภค (0-10) มีการเปลี่ยนแปลงจากปีที่แล้วหรือไม่ สุ่มเลือกผู้บริโภค 8 ราย ที่ให้คะแนนความนิยมของผลิตภัณฑ์ในปีที่แล้วและในปีนี้ ที่ α = 0.05 มีหลักฐานเพียงพอที่จะสรุปว่าการให้คะแนนความนิยมของผลิตภัณฑ์มีการเปลี่ยนแปลงหรือไม่\n\nผู้บริโภคคนที่:      1   2   3   4   5   6   7   8\nคะแนนปีที่แล้ว:     3  10   9   8   5   2   7   7\nคะแนนปีนี้:          9   6   9   9   9   5   4   8", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["Two-Sample t-Test for the Difference Between Means", "Two-Sample z-Test for the Difference Between Means"], "correctAnswer": "Two-Sample t-Test for the Difference Between Means", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Two-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 2.365, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics (ค่าสัมบูรณ์)", "type": "number", "correctAnswer": 0.83666002653408, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$d = x_{\\text{ปีที่แล้ว}} - x_{\\text{ปีนี้}} \\qquad t = \\dfrac{\\bar{d}}{s_d/\\sqrt{n}}, \\quad df = n-1$$", "steps": {"given": "ผลต่างรายคน (ปีที่แล้ว-ปีนี้): -6,4,0,-1,-4,-3,3,-1 → d̄=-1, n=8; α=0.05", "why": "เป็นข้อมูลคู่ (ผู้บริโภคคนเดียวกันให้คะแนน 2 ครั้ง) จึงใช้ paired t-test 'เปลี่ยนแปลงหรือไม่' ไม่ระบุทิศทางจึงเป็น Two-Tailed Test", "substitute": "sd จากผลต่างทั้ง 8 ค่า ≈ 3.3806\nt = -1 / (3.3806/√8) = -1 / 1.1953", "calculate": "t ≈ -0.8367 (ระบบให้กรอกเฉพาะค่าบวกสำหรับการทดสอบสองทาง จึงกรอก 0.8367)", "conclude": "|t| = 0.8367 น้อยกว่าค่าวิกฤต 2.365 (ไม่ตกในเขตปฏิเสธ) → Fail to reject H0 (ยังไม่มีหลักฐานเพียงพอว่าคะแนนเปลี่ยนแปลง)"}}, {"prompt": "Quiz 8-4 ข้อ 1\nสำหรับการทดสอบ H0: p1 ≥ p2, Ha: p1 &lt; p2\nระดับนัยสำคัญ α = 0.1\nx1 = 578000, n1 = 875000\nx2 = 590000, n2 = 901000", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["Two-Sample z-Test for the Difference Between Proportions", "Two-Sample t-Test for the Difference Between Means"], "correctAnswer": "Two-Sample z-Test for the Difference Between Proportions", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Left-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": -1.28, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 8.0647009143178, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$\\hat{p} = \\dfrac{x_1+x_2}{n_1+n_2} \\qquad z = \\dfrac{\\hat{p}_1-\\hat{p}_2}{\\sqrt{\\hat{p}(1-\\hat{p})\\left(\\dfrac{1}{n_1}+\\dfrac{1}{n_2}\\right)}}$$", "steps": {"given": "x1=578000,n1=875000 → p̂1=0.660571; x2=590000,n2=901000 → p̂2=0.654828; α=0.1", "why": "เป็นการเปรียบเทียบสัดส่วนสองกลุ่มอิสระ จึงใช้ Two-Sample z-Test for the Difference Between Proportions เป็น Left-Tailed Test เพราะ Ha: p1&lt;p2", "substitute": "p̂ = (578000+590000)/(875000+901000) = 0.657658\nz = (0.660571-0.654828) / √(0.657658×0.342342×(1/875000+1/901000))", "calculate": "z = 0.005743 / √(5.0736×10⁻⁷) = 0.005743 / 0.00071229 ≈ 8.0647", "conclude": "z = 8.0647 มากกว่าค่าวิกฤต -1.28 (ไม่ตกในเขตปฏิเสธด้านซ้าย) → Fail to reject H0"}}, {"prompt": "Quiz 8-4 ข้อ 2\nสำหรับการทดสอบ H0: p1 ≤ p2, Ha: p1 > p2\nระดับนัยสำคัญ α = 0.01\nx1 = 397, n1 = 600\nx2 = 329, n2 = 500", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["Two-Sample z-Test for the Difference Between Proportions", "Two-Sample t-Test for the Difference Between Means"], "correctAnswer": "Two-Sample z-Test for the Difference Between Proportions", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Right-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 2.33, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 0.12782749814123, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$\\hat{p} = \\dfrac{x_1+x_2}{n_1+n_2} \\qquad z = \\dfrac{\\hat{p}_1-\\hat{p}_2}{\\sqrt{\\hat{p}(1-\\hat{p})\\left(\\dfrac{1}{n_1}+\\dfrac{1}{n_2}\\right)}}$$", "steps": {"given": "x1=397,n1=600 → p̂1=0.661667; x2=329,n2=500 → p̂2=0.658; α=0.01", "why": "เปรียบเทียบสัดส่วนสองกลุ่มอิสระ ใช้ z-test for proportions เป็น Right-Tailed Test เพราะ Ha: p1&gt;p2", "substitute": "p̂ = (397+329)/(600+500) = 0.66\nz = (0.661667-0.658) / √(0.66×0.34×(1/600+1/500))", "calculate": "z = 0.003667 / √0.00082281 = 0.003667 / 0.028685 ≈ 0.1278", "conclude": "z = 0.1278 น้อยกว่าค่าวิกฤต 2.33 (ไม่ตกในเขตปฏิเสธ) → Fail to reject H0"}}, {"prompt": "Quiz 8-4 ข้อ 3\nสำหรับการทดสอบ H0: p1 = p2, Ha: p1 ≠ p2\nระดับนัยสำคัญ α = 0.1\nx1 = 17, n1 = 54\nx2 = 15, n2 = 41", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["Two-Sample z-Test for the Difference Between Proportions", "Two-Sample t-Test for the Difference Between Means"], "correctAnswer": "Two-Sample z-Test for the Difference Between Proportions", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Two-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 1.645, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": -0.52132214555021, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$\\hat{p} = \\dfrac{x_1+x_2}{n_1+n_2} \\qquad z = \\dfrac{\\hat{p}_1-\\hat{p}_2}{\\sqrt{\\hat{p}(1-\\hat{p})\\left(\\dfrac{1}{n_1}+\\dfrac{1}{n_2}\\right)}}$$", "steps": {"given": "x1=17,n1=54 → p̂1=0.314815; x2=15,n2=41 → p̂2=0.365854; α=0.1", "why": "เปรียบเทียบสัดส่วนสองกลุ่มอิสระ ใช้ z-test for proportions เป็น Two-Tailed Test เพราะ Ha: p1≠p2", "substitute": "p̂ = (17+15)/(54+41) = 0.336842\nz = (0.314815-0.365854) / √(0.336842×0.663158×(1/54+1/41))", "calculate": "z = -0.051039 / √0.0095860 = -0.051039 / 0.097908 ≈ -0.5213", "conclude": "|z| = 0.5213 น้อยกว่าค่าวิกฤต 1.645 (ไม่ตกในเขตปฏิเสธ) → Fail to reject H0"}}, {"prompt": "Quiz 8-4 ข้อ 4\nในการสำรวจผู้ขับขี่รถจักรยานยนต์ 600 คนในปีนี้ มี 406 คนสวมหมวกนิรภัย และผลการสำรวจผู้ขับขี่รถจักรยานยนต์ 500 คนในปีที่แล้ว มี 329 คนสวมหมวกนิรภัย ที่ α = 0.01 สามารถสรุปได้หรือไม่ว่าสัดส่วนของผู้ขับขี่รถจักรยานยนต์ที่สวมหมวกกันน็อคในปีนี้มีมากขึ้น", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["Two-Sample z-Test for the Difference Between Proportions", "Two-Sample t-Test for the Difference Between Means"], "correctAnswer": "Two-Sample z-Test for the Difference Between Proportions", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["Left-Tailed Test", "Right-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Right-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 2.33, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 0.65468688415619, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "$$\\hat{p} = \\dfrac{x_1+x_2}{n_1+n_2} \\qquad z = \\dfrac{\\hat{p}_1-\\hat{p}_2}{\\sqrt{\\hat{p}(1-\\hat{p})\\left(\\dfrac{1}{n_1}+\\dfrac{1}{n_2}\\right)}}$$", "steps": {"given": "ปีนี้: x1=406,n1=600 → p̂1=0.676667; ปีที่แล้ว: x2=329,n2=500 → p̂2=0.658; α=0.01; ข้ออ้าง 'ปีนี้มากขึ้น' → p1&gt;p2", "why": "ข้ออ้างระบุทิศทาง (สัดส่วนปีนี้มากกว่าปีที่แล้ว) จึงเป็น Right-Tailed Test ใช้ z-test for proportions เพราะเปรียบเทียบสัดส่วนสองกลุ่มอิสระ", "substitute": "p̂ = (406+329)/(600+500) = 0.668182\nz = (0.676667-0.658) / √(0.668182×0.331818×(1/600+1/500))", "calculate": "z = 0.018667 / √0.00081308 = 0.018667 / 0.028515 ≈ 0.6547", "conclude": "z = 0.6547 น้อยกว่าค่าวิกฤต 2.33 (ไม่ตกในเขตปฏิเสธ) → Fail to reject H0 (ยังไม่มีหลักฐานเพียงพอสนับสนุนว่ามากขึ้น)"}}];
+const INCLUDE_CALC = true;
+
+function escHtml(str){
+  if(str === undefined || str === null) return "";
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function renderMathIn(el){
+  if(typeof renderMathInElement !== "function") return;
+  renderMathInElement(el, {
+    delimiters: [
+      {left:"$$", right:"$$", display:true},
+      {left:"$", right:"$", display:false}
+    ],
+    throwOnError: false
+  });
+}
+window.addEventListener("load", function(){
+  renderMathIn(document.body);
+});
+
+function sanitizePromptHtml(str){
+  if(str === undefined || str === null) return "";
+  str = String(str);
+  const placeholders = [];
+  let out = str.replace(/<img\b[^>]*>/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = out.replace(/<div class="img-caption">[\s\S]*?<\/div>/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = out.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  out = out.replace(/\u0000IMG(\d+)\u0000/g, (_, idx)=>placeholders[parseInt(idx)]);
+  return out;
+}
+
+let mode = "exercise";
+let calcCurrentSlotId = null;
+let order = "original";
+let displayIndexes = QUESTIONS.map((q,i)=>i);
+let userAnswers = {};
+let checked = {};
+
+let timerMode = "stopwatch";
+let timerSeconds = 0;
+let timerLimit = 0;
+let timerInterval = null;
+let timerRunning = false;
+
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,"0");
+  const s = Math.floor(sec%60).toString().padStart(2,"0");
+  return m+":"+s;
+}
+
+function updateTimerDisplay(){
+  const displaySec = timerMode==="countdown" ? Math.max(timerLimit - timerSeconds, 0) : timerSeconds;
+  document.getElementById("timerDisplay").textContent = formatTime(displaySec);
+  if(timerMode==="countdown" && timerLimit>0 && timerSeconds>=timerLimit){
+    stopTimer();
+    document.getElementById("timerDisplay").textContent = "หมดเวลา";
+  }
+}
+
+function startTimer(){
+  if(timerRunning) return;
+  if(timerMode==="countdown"){
+    const mins = parseFloat(document.getElementById("countdownMinutes").value);
+    if(mins>0 && timerLimit===0) timerLimit = mins*60;
+  }
+  timerRunning = true;
+  timerInterval = setInterval(()=>{
+    timerSeconds++;
+    updateTimerDisplay();
+  },1000);
+}
+
+function stopTimer(){
+  timerRunning = false;
+  clearInterval(timerInterval);
+}
+
+function resetTimer(){
+  stopTimer();
+  timerSeconds = 0;
+  timerLimit = 0;
+  document.getElementById("countdownMinutes").value = "";
+  updateTimerDisplay();
+}
+
+document.getElementById("timerStartBtn").onclick = startTimer;
+document.getElementById("timerPauseBtn").onclick = stopTimer;
+document.getElementById("timerResetBtn").onclick = resetTimer;
+document.getElementById("timerModeSelect").onchange = (e)=>{
+  timerMode = e.target.value;
+  resetTimer();
+};
+
+function subKey(qIdx, subIdx){
+  return qIdx+"_"+subIdx;
+}
+
+function checkSubAnswer(q, subIdx, value){
+  const sub = q.subs[subIdx];
+  if(sub.type==="number"){
+    const val = parseFloat(value);
+    const tol = sub.tolerance !== undefined ? sub.tolerance : 0.01;
+    return !isNaN(val) && Math.abs(val - sub.correctAnswer) <= tol;
+  }
+  return String(value).trim() === String(sub.correctAnswer).trim();
+}
+
+function questionStatus(qIdx){
+  const q = QUESTIONS[qIdx];
+  const total = q.subs.length;
+  let answeredCount = 0;
+  let correctCount = 0;
+  for(let s=0;s<total;s++){
+    const key = subKey(qIdx,s);
+    if(userAnswers[key] !== undefined && userAnswers[key] !== ""){
+      answeredCount++;
+      if(checked[qIdx] && checkSubAnswer(q,s,userAnswers[key])) correctCount++;
+    }
+  }
+  if(!checked[qIdx]){
+    if(answeredCount===0) return "unanswered";
+    return "partial";
+  }
+  if(correctCount===total) return "correct";
+  return "incorrect";
+}
+
+function renderNavGrid(){
+  const nav = document.getElementById("navGrid");
+  nav.innerHTML = "";
+  displayIndexes.forEach((qIdx, pos)=>{
+    const cell = document.createElement("div");
+    cell.className = "nav-cell";
+    const status = questionStatus(qIdx);
+    if(status==="partial") cell.classList.add("answered");
+    if(status==="correct") cell.classList.add("correct");
+    if(status==="incorrect") cell.classList.add("incorrect");
+    cell.textContent = pos+1;
+    cell.onclick = ()=>{
+      const target = document.getElementById("qcard_"+qIdx);
+      if(target) target.scrollIntoView({behavior:"smooth", block:"start"});
+    };
+    nav.appendChild(cell);
+  });
+}
+
+function calcParkOutsideMain(){
+  const modal = document.getElementById("calcModal");
+  const main = document.getElementById("mainArea");
+  if(modal && main.contains(modal)){
+    modal.classList.remove("open");
+    document.body.appendChild(modal);
+    calcCurrentSlotId = null;
+  }
+}
+
+function isFullyCorrect(qIdx){
+  return questionStatus(qIdx) === "correct";
+}
+
+function updateScore(){
+  const scoreBox = document.getElementById("scoreBox");
+  const scoreText = document.getElementById("scoreText");
+  let correctCount = 0;
+  QUESTIONS.forEach((q, qIdx)=>{
+    if(checked[qIdx] && isFullyCorrect(qIdx)) correctCount++;
+  });
+  scoreText.textContent = correctCount + "/" + QUESTIONS.length;
+  scoreBox.style.display = "block";
+}
+
+function resetAll(){
+  userAnswers = {};
+  checked = {};
+  render();
+}
+
+document.getElementById("resetAllBtn").addEventListener("click", ()=>{
+  resetAll();
+});
+
+function renderExercise(){
+  calcParkOutsideMain();
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  displayIndexes.forEach((qIdx, pos)=>{
+    const q = QUESTIONS[qIdx];
+    const isChecked = !!checked[qIdx];
+    const card = document.createElement("div");
+    card.className = "q-card";
+    card.id = "qcard_"+qIdx;
+    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
+    html += '<div class="q-prompt">'+sanitizePromptHtml(q.prompt)+'</div>';
+    q.subs.forEach((sub, subIdx)=>{
+      const key = subKey(qIdx, subIdx);
+      const lockedClass = isChecked ? " locked" : "";
+      let stateClass = "";
+      if(isChecked && userAnswers[key] !== undefined && userAnswers[key] !== ""){
+        stateClass = checkSubAnswer(q, subIdx, userAnswers[key]) ? " correct" : " incorrect";
+      }
+      html += '<div class="sub-item'+lockedClass+stateClass+'" id="sitem_'+key+'">';
+      html += '<label>'+escHtml(sub.label)+'</label>';
+      const disabledAttr = isChecked ? "disabled" : "";
+      if(sub.type==="select"){
+        html += '<select data-key="'+key+'" '+disabledAttr+'>';
+        html += '<option value="">-- เลือก --</option>';
+        sub.options.forEach(opt=>{
+          const selectedAttr = userAnswers[key]===opt ? "selected" : "";
+          html += '<option value="'+escHtml(opt)+'" '+selectedAttr+'>'+escHtml(opt)+'</option>';
+        });
+        html += '</select>';
+      } else {
+        const val = userAnswers[key] !== undefined ? userAnswers[key] : "";
+        html += '<input type="text" data-key="'+key+'" placeholder="กรอกคำตอบ" value="'+val+'" '+disabledAttr+'>';
+      }
+      html += '</div>';
+    });
+    html += '<div class="footer-actions">';
+    if(!isChecked){
+      html += '<button class="check-btn" data-qidx="'+qIdx+'">ตรวจคำตอบข้อนี้</button>';
+    }
+    if(q.formula){
+      html += '<button class="secondary hint-btn" data-qidx="'+qIdx+'">💡 คำใบ้</button>';
+    }
+    if(INCLUDE_CALC){
+      html += '<button class="secondary calc-open-btn" data-qidx="'+qIdx+'">🧮 เครื่องคิดเลข</button>';
+    }
+    html += '</div>';
+    if(q.formula){
+      html += '<div class="hint-box" id="hintbox_'+qIdx+'" style="display:none">'+escHtml(q.formula)+'</div>';
+    }
+    if(isChecked && !isFullyCorrect(qIdx)){
+      html += '<div class="reveal-box"><span class="reveal-title">เฉลยคำตอบที่ถูกต้อง</span>';
+      q.subs.forEach(sub=>{
+        html += '<div class="reveal-line"><b>'+escHtml(sub.label)+':</b> '+escHtml(sub.correctAnswer)+'</div>';
+      });
+      html += '</div>';
+    }
+    if(INCLUDE_CALC){
+      html += '<div class="calc-slot" id="calcslot_'+qIdx+'"></div>';
+    }
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+
+  main.querySelectorAll("select,input").forEach(el=>{
+    el.addEventListener("input", (e)=>{
+      const key = e.target.getAttribute("data-key");
+      userAnswers[key] = e.target.value;
+      renderNavGrid();
+    });
+  });
+
+  main.querySelectorAll(".check-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = parseInt(e.target.getAttribute("data-qidx"));
+      checked[qIdx] = true;
+      renderExercise();
+    });
+  });
+
+  main.querySelectorAll(".hint-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = e.target.getAttribute("data-qidx");
+      const box = document.getElementById("hintbox_"+qIdx);
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    });
+  });
+
+  main.querySelectorAll(".calc-open-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = parseInt(e.target.getAttribute("data-qidx"));
+      const tabs = QUESTIONS[qIdx].calcTabs || ["calc"];
+      calcOpenInline(tabs, "calcslot_"+qIdx);
+    });
+  });
+
+  renderNavGrid();
+  updateScore();
+  renderMathIn(main);
+}
+
+function renderStepList(steps){
+  const stepDefs = [
+    {key:'given', label:'1. โจทย์ให้อะไรมา', cls:''},
+    {key:'why', label:'2. ทำไมต้องใช้สูตร/วิธีนี้', cls:'step-why'},
+    {key:'substitute', label:'3. แทนค่า', cls:''},
+    {key:'calculate', label:'4. คำนวณ', cls:''},
+    {key:'conclude', label:'5. สรุปผล', cls:''}
+  ];
+  let html = '<div class="step-list">';
+  stepDefs.forEach((def, i)=>{
+    const content = steps[def.key];
+    if(!content) return;
+    html += '<div class="step-item '+def.cls+'"><div class="step-num">'+(i+1)+'</div><div class="step-body">';
+    html += '<div class="step-label">'+def.label+'</div>';
+    html += '<div class="step-content">'+escHtml(content)+'</div>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderAnswers(){
+  calcParkOutsideMain();
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  let correctTotal = 0;
+  let subTotal = 0;
+  displayIndexes.forEach((qIdx, pos)=>{
+    const q = QUESTIONS[qIdx];
+    const card = document.createElement("div");
+    card.className = "q-card";
+    card.id = "qcard_"+qIdx;
+    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
+    html += '<div class="q-prompt">'+sanitizePromptHtml(q.prompt)+'</div>';
+    q.subs.forEach(sub=>{
+      subTotal++;
+      const blockClass = sub.uncertain ? "answer-block flagged" : "answer-block";
+      html += '<div class="sub-item"><label>'+escHtml(sub.label)+'</label>';
+      html += '<div class="'+blockClass+'">';
+      if(sub.uncertain){
+        html += '<div class="flag-badge">⚠ ไม่มั่นใจ 100%</div><br>';
+      }
+      html += '<strong>คำตอบ:</strong> '+escHtml(sub.correctAnswer);
+      html += '</div></div>';
+    });
+    if(q.formula || q.steps){
+      html += '<div class="explain-block">';
+      html += '<h4>วิธีทำ</h4>';
+      if(q.formula) html += '<div class="formula">'+escHtml(q.formula)+'</div>';
+      if(q.steps && typeof q.steps === "object"){
+        html += renderStepList(q.steps);
+      } else if(q.steps){
+        html += '<div class="steps">'+q.steps+'</div>';
+      }
+      html += '</div>';
+    }
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+  document.getElementById("scoreBox").style.display = "none";
+  renderNavGrid();
+  renderMathIn(main);
+}
+
+function render(){
+  if(mode==="exercise") renderExercise();
+  else renderAnswers();
+}
+
+document.getElementById("btnExerciseMode").onclick = ()=>{
+  mode = "exercise";
+  document.getElementById("btnExerciseMode").classList.add("active");
+  document.getElementById("btnAnswerMode").classList.remove("active");
+  render();
+};
+document.getElementById("btnAnswerMode").onclick = ()=>{
+  mode = "answer";
+  document.getElementById("btnAnswerMode").classList.add("active");
+  document.getElementById("btnExerciseMode").classList.remove("active");
+  render();
+};
+document.getElementById("orderSelect").onchange = (e)=>{
+  order = e.target.value;
+  displayIndexes = order==="shuffle" ? shuffleArray(QUESTIONS.map((q,i)=>i)) : QUESTIONS.map((q,i)=>i);
+  render();
+};
+
+displayIndexes = QUESTIONS.map((q,i)=>i);
+render();
+updateTimerDisplay();
+
+function erf(x){
+  const sign = x<0?-1:1; x=Math.abs(x);
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const t=1/(1+p*x);
+  const y=1-((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+  return sign*y;
+}
+function normalCDF(x,mu=0,sigma=1){return 0.5*(1+erf((x-mu)/(sigma*Math.SQRT2)));}
+function normalPDF(x,mu=0,sigma=1){return (1/(sigma*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*Math.pow((x-mu)/sigma,2));}
+function normalInv(p){
+  if(p<=0) return -Infinity;
+  if(p>=1) return Infinity;
+  const a=[-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00];
+  const b=[-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01];
+  const c=[-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00];
+  const d=[7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];
+  const p_low=0.02425, p_high=1-p_low;
+  let q,r;
+  if(p<p_low){
+    q=Math.sqrt(-2*Math.log(p));
+    return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  } else if(p<=p_high){
+    q=p-0.5; r=q*q;
+    return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+  } else {
+    q=Math.sqrt(-2*Math.log(1-p));
+    return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+}
+function gammaln(x){
+  const g=7;
+  const p=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(x<0.5) return Math.log(Math.PI/Math.sin(Math.PI*x)) - gammaln(1-x);
+  x-=1;
+  let a=p[0];
+  const t=x+g+0.5;
+  for(let i=1;i<g+2;i++) a+=p[i]/(x+i);
+  return 0.5*Math.log(2*Math.PI)+(x+0.5)*Math.log(t)-t+Math.log(a);
+}
+function gammaP(a,x){
+  if(x<0||a<=0) return 0;
+  if(x===0) return 0;
+  if(x<a+1){
+    let sum=1/a, term=sum, ap=a;
+    for(let n=1;n<300;n++){
+      ap+=1; term*=x/ap; sum+=term;
+      if(Math.abs(term)<Math.abs(sum)*1e-15) break;
+    }
+    return sum*Math.exp(-x+a*Math.log(x)-gammaln(a));
+  } else {
+    let b=x+1-a, c=1e300, d=1/b, h=d;
+    for(let i=1;i<300;i++){
+      const an=-i*(i-a);
+      b+=2;
+      d=an*d+b; if(Math.abs(d)<1e-300) d=1e-300;
+      c=b+an/c; if(Math.abs(c)<1e-300) c=1e-300;
+      d=1/d;
+      const del=d*c;
+      h*=del;
+      if(Math.abs(del-1)<1e-15) break;
+    }
+    const Q=Math.exp(-x+a*Math.log(x)-gammaln(a))*h;
+    return 1-Q;
+  }
+}
+function chiSquaredCDF(x,df){return gammaP(df/2,x/2);}
+function chiSquaredPDF(x,df){
+  if(x<=0) return 0;
+  return Math.exp((df/2-1)*Math.log(x)-x/2-(df/2)*Math.log(2)-gammaln(df/2));
+}
+function betacf(x,a,b){
+  const MAXIT=300, EPS=1e-15, FPMIN=1e-300;
+  let qab=a+b, qap=a+1, qam=a-1;
+  let c=1, d=1-qab*x/qap;
+  if(Math.abs(d)<FPMIN) d=FPMIN;
+  d=1/d;
+  let h=d;
+  for(let m=1;m<=MAXIT;m++){
+    const m2=2*m;
+    let aa=m*(b-m)*x/((qam+m2)*(a+m2));
+    d=1+aa*d; if(Math.abs(d)<FPMIN) d=FPMIN;
+    c=1+aa/c; if(Math.abs(c)<FPMIN) c=FPMIN;
+    d=1/d; h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));
+    d=1+aa*d; if(Math.abs(d)<FPMIN) d=FPMIN;
+    c=1+aa/c; if(Math.abs(c)<FPMIN) c=FPMIN;
+    d=1/d;
+    const del=d*c; h*=del;
+    if(Math.abs(del-1)<EPS) break;
+  }
+  return h;
+}
+function betai(x,a,b){
+  if(x<=0) return 0;
+  if(x>=1) return 1;
+  const bt=Math.exp(gammaln(a+b)-gammaln(a)-gammaln(b)+a*Math.log(x)+b*Math.log(1-x));
+  if(x<(a+1)/(a+b+2)) return bt*betacf(x,a,b)/a;
+  else return 1-bt*betacf(1-x,b,a)/b;
+}
+function tCDF(t,df){
+  const x=df/(df+t*t);
+  const ib=betai(x,df/2,0.5);
+  return t>0 ? 1-0.5*ib : 0.5*ib;
+}
+function tPDF(t,df){
+  return Math.exp(gammaln((df+1)/2)-gammaln(df/2)-0.5*Math.log(df*Math.PI)-((df+1)/2)*Math.log(1+t*t/df));
+}
+function invCDF(cdfFn,p,lo,hi){
+  for(let i=0;i<100;i++){
+    const mid=(lo+hi)/2;
+    if(cdfFn(mid)<p) lo=mid; else hi=mid;
+  }
+  return (lo+hi)/2;
+}
+function tInv(p,df){return invCDF(x=>tCDF(x,df),p,-200,200);}
+function chiInv(p,df){return invCDF(x=>chiSquaredCDF(x,df),p,0,Math.max(200,df*10));}
+function binomPMF(k,n,p){
+  return Math.exp(gammaln(n+1)-gammaln(k+1)-gammaln(n-k+1)+k*Math.log(p)+(n-k)*Math.log(1-p));
+}
+function binomCDF(k,n,p){let s=0;for(let i=0;i<=k;i++) s+=binomPMF(i,n,p);return s;}
+function poissonPMF(k,lambda){return Math.exp(-lambda+k*Math.log(lambda)-gammaln(k+1));}
+function poissonCDF(k,lambda){let s=0;for(let i=0;i<=k;i++) s+=poissonPMF(i,lambda);return s;}
+
+const distSelect=document.getElementById('distSelect');
+const distParamsEl=document.getElementById('distParams');
+const modeGroupEl=document.getElementById('modeGroup');
+const boundInputsEl=document.getElementById('boundInputs');
+const distChart=document.getElementById('distChart');
+const distResult=document.getElementById('distResult');
+const distFormula=document.getElementById('distFormula');
+
+let distMode='between';
+
+const DIST_DEFS={
+  normal:{
+    label:'Normal',
+    params:[{id:'mu',label:'μ',def:0},{id:'sigma',label:'σ',def:1}],
+    continuous:true,
+    pdf:p=>x=>normalPDF(x,p.mu,p.sigma),
+    cdf:p=>x=>normalCDF(x,p.mu,p.sigma),
+    range:p=>[p.mu-4*p.sigma,p.mu+4*p.sigma],
+    formula:'z = (x − μ) / σ\nPDF: f(x) = 1/(σ√2π) · e^(−(x−μ)²/2σ²)'
+  },
+  student:{
+    label:'Student (t)',
+    params:[{id:'df',label:'df',def:10}],
+    continuous:true,
+    pdf:p=>x=>tPDF(x,p.df),
+    cdf:p=>x=>tCDF(x,p.df),
+    range:p=>[-4-20/p.df,4+20/p.df],
+    formula:'t = (x̄ − μ) / (s/√n) , df = n − 1'
+  },
+  chisq:{
+    label:'Chi-Squared',
+    params:[{id:'df',label:'df',def:10}],
+    continuous:true,
+    pdf:p=>x=>chiSquaredPDF(x,p.df),
+    cdf:p=>x=>chiSquaredCDF(x,p.df),
+    range:p=>[0,p.df+4*Math.sqrt(2*p.df)+5],
+    formula:'χ² = (n−1)s² / σ² , df = n − 1'
+  },
+  binomial:{
+    label:'Binomial',
+    params:[{id:'n',label:'n',def:10},{id:'p',label:'p',def:0.5}],
+    continuous:false,
+    pmf:p=>k=>binomPMF(k,p.n,p.p),
+    cdf:p=>k=>binomCDF(k,p.n,p.p),
+    range:p=>[0,p.n],
+    formula:'P(x) = n!/[(n−x)!x!] · pˣqⁿ⁻ˣ , μ=np , σ²=npq'
+  },
+  poisson:{
+    label:'Poisson',
+    params:[{id:'lambda',label:'λ',def:4}],
+    continuous:false,
+    pmf:p=>k=>poissonPMF(k,p.lambda),
+    cdf:p=>k=>poissonCDF(k,p.lambda),
+    range:p=>[0,Math.max(10,Math.ceil(p.lambda+4*Math.sqrt(p.lambda)+3))],
+    formula:'P(x) = e^(−λ)λˣ / x!'
+  }
+};
+
+function getDistParams(){
+  const def=DIST_DEFS[distSelect.value];
+  const p={};
+  def.params.forEach(pr=>{
+    const el=document.getElementById('dp-'+pr.id);
+    p[pr.id]=parseFloat(el.value);
+  });
+  return p;
+}
+
+function renderDistParams(){
+  const def=DIST_DEFS[distSelect.value];
+  distParamsEl.innerHTML=def.params.map(pr=>`
+    <div class="field">
+      <label>${pr.label}</label>
+      <input type="number" id="dp-${pr.id}" value="${pr.def}" step="any">
+    </div>
+  `).join('');
+  distParamsEl.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',renderDistChart));
+
+  const def2=DIST_DEFS[distSelect.value];
+  if(def2.continuous){
+    modeGroupEl.innerHTML=`
+      <button class="chipbtn active" data-mode="between">a ≤ X ≤ b</button>
+      <button class="chipbtn" data-mode="less">X ≤ b</button>
+      <button class="chipbtn" data-mode="greater">X ≥ a</button>
+    `;
+  } else {
+    modeGroupEl.innerHTML=`
+      <button class="chipbtn active" data-mode="exact">X = k</button>
+      <button class="chipbtn" data-mode="atmost">X ≤ k</button>
+      <button class="chipbtn" data-mode="atleast">X ≥ k</button>
+      <button class="chipbtn" data-mode="between">k1 ≤ X ≤ k2</button>
+    `;
+  }
+  distMode=def2.continuous?'between':'exact';
+  modeGroupEl.querySelectorAll('.chipbtn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      modeGroupEl.querySelectorAll('.chipbtn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      distMode=b.dataset.mode;
+      renderBoundInputs();
+      renderDistChart();
+    });
+  });
+  renderBoundInputs();
+  renderDistChart();
+}
+
+function renderBoundInputs(){
+  const def=DIST_DEFS[distSelect.value];
+  const rng=def.range(getDistParams());
+  if(def.continuous){
+    if(distMode==='between'){
+      boundInputsEl.innerHTML=`
+        <div class="field"><label>a</label><input type="number" id="bnd-a" value="${(rng[0]/2).toFixed(2)}" step="any"></div>
+        <div class="field"><label>b</label><input type="number" id="bnd-b" value="${(rng[1]/2).toFixed(2)}" step="any"></div>
+      `;
+    } else if(distMode==='less'){
+      boundInputsEl.innerHTML=`<div class="field"><label>b</label><input type="number" id="bnd-b" value="0" step="any"></div>`;
+    } else {
+      boundInputsEl.innerHTML=`<div class="field"><label>a</label><input type="number" id="bnd-a" value="0" step="any"></div>`;
+    }
+  } else {
+    if(distMode==='exact'||distMode==='atmost'||distMode==='atleast'){
+      boundInputsEl.innerHTML=`<div class="field"><label>k</label><input type="number" id="bnd-k" value="0" step="1" min="0"></div>`;
+    } else {
+      boundInputsEl.innerHTML=`
+        <div class="field"><label>k1</label><input type="number" id="bnd-k1" value="0" step="1" min="0"></div>
+        <div class="field"><label>k2</label><input type="number" id="bnd-k2" value="2" step="1" min="0"></div>
+      `;
+    }
+  }
+  boundInputsEl.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',renderDistChart));
+}
+
+function renderDistChart(){
+  const def=DIST_DEFS[distSelect.value];
+  const p=getDistParams();
+  const rng=def.range(p);
+  const W=680,H=230,pad=34;
+
+  let shadeLo=null, shadeHi=null;
+  if(def.continuous){
+    if(distMode==='between'){
+      shadeLo=parseFloat(document.getElementById('bnd-a')?.value ?? rng[0]);
+      shadeHi=parseFloat(document.getElementById('bnd-b')?.value ?? rng[1]);
+    } else if(distMode==='less'){
+      shadeLo=rng[0]; shadeHi=parseFloat(document.getElementById('bnd-b')?.value ?? 0);
+    } else {
+      shadeLo=parseFloat(document.getElementById('bnd-a')?.value ?? 0); shadeHi=rng[1];
+    }
+  }
+
+  if(def.continuous){
+    const pdf=def.pdf(p);
+    const N=220;
+    let pts=[],ymax=0;
+    for(let i=0;i<=N;i++){
+      const x=rng[0]+(rng[1]-rng[0])*i/N;
+      const y=pdf(x);
+      pts.push([x,y]);
+      if(y>ymax && isFinite(y)) ymax=y;
+    }
+    const sx=x=>pad+(x-rng[0])/(rng[1]-rng[0])*(W-2*pad);
+    const sy=y=>H-pad-(y/ymax)*(H-2*pad-10);
+    const path='M'+pts.map(pt=>sx(pt[0])+','+sy(pt[1])).join(' L');
+    const shadePts=pts.filter(pt=>pt[0]>=shadeLo && pt[0]<=shadeHi);
+    let shadePath='';
+    if(shadePts.length>1){
+      shadePath='M'+sx(shadePts[0][0])+','+sy(0)+' L'+shadePts.map(pt=>sx(pt[0])+','+sy(pt[1])).join(' L')+' L'+sx(shadePts[shadePts.length-1][0])+','+sy(0)+' Z';
+    }
+    const labels=[rng[0],(rng[0]+rng[1])/2,rng[1]].map(v=>v.toFixed(1));
+    distChart.innerHTML=`
+      <path d="${shadePath}" fill="#2B6CB0" fill-opacity="0.35" stroke="none"></path>
+      <path d="${path}" fill="none" stroke="#1B3A5C" stroke-width="2"></path>
+      <line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#999"></line>
+      <text class="axislabel" x="${pad}" y="${H-10}">${labels[0]}</text>
+      <text class="axislabel" x="${W/2-10}" y="${H-10}">${labels[1]}</text>
+      <text class="axislabel" x="${W-pad-25}" y="${H-10}">${labels[2]}</text>
+    `;
+  } else {
+    const pmf=def.pmf(p);
+    const kmax=rng[1];
+    let bars=[],ymax=0;
+    for(let k=0;k<=kmax;k++){
+      const y=pmf(k);
+      bars.push([k,y]);
+      if(y>ymax) ymax=y;
+    }
+    const bw=(W-2*pad)/(kmax+1);
+    const sy=y=>H-pad-(y/ymax)*(H-2*pad-10);
+    let selected=new Set();
+    if(distMode==='exact'){const k=parseInt(document.getElementById('bnd-k')?.value ?? 0);selected.add(k);}
+    else if(distMode==='atmost'){const k=parseInt(document.getElementById('bnd-k')?.value ?? 0);for(let i=0;i<=k;i++) selected.add(i);}
+    else if(distMode==='atleast'){const k=parseInt(document.getElementById('bnd-k')?.value ?? 0);for(let i=k;i<=kmax;i++) selected.add(i);}
+    else {const k1=parseInt(document.getElementById('bnd-k1')?.value ?? 0);const k2=parseInt(document.getElementById('bnd-k2')?.value ?? 0);for(let i=k1;i<=k2;i++) selected.add(i);}
+    let rects=bars.map(b=>{
+      const x=pad+b[0]*bw;
+      const y=sy(b[1]);
+      const h=(H-pad)-y;
+      const fill=selected.has(b[0])?'#2B6CB0':'#B9C9DB';
+      return `<rect x="${x+2}" y="${y}" width="${bw-4}" height="${h}" fill="${fill}"></rect>`;
+    }).join('');
+    distChart.innerHTML=`
+      ${rects}
+      <line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#999"></line>
+      <text class="axislabel" x="${pad}" y="${H-10}">0</text>
+      <text class="axislabel" x="${W-pad-20}" y="${H-10}">${kmax}</text>
+    `;
+  }
+  distFormula.textContent=def.formula;
+}
+
+document.getElementById('computeDist').addEventListener('click',()=>{
+  const def=DIST_DEFS[distSelect.value];
+  const p=getDistParams();
+  let result, label;
+  if(def.continuous){
+    const cdf=def.cdf(p);
+    if(distMode==='between'){
+      const a=parseFloat(document.getElementById('bnd-a').value);
+      const b=parseFloat(document.getElementById('bnd-b').value);
+      result=cdf(b)-cdf(a);
+      label=`P(${a} ≤ X ≤ ${b})`;
+    } else if(distMode==='less'){
+      const b=parseFloat(document.getElementById('bnd-b').value);
+      result=cdf(b);
+      label=`P(X ≤ ${b})`;
+    } else {
+      const a=parseFloat(document.getElementById('bnd-a').value);
+      result=1-cdf(a);
+      label=`P(X ≥ ${a})`;
+    }
+  } else {
+    const pmf=def.pmf(p), cdf=def.cdf(p);
+    if(distMode==='exact'){
+      const k=parseInt(document.getElementById('bnd-k').value);
+      result=pmf(k); label=`P(X = ${k})`;
+    } else if(distMode==='atmost'){
+      const k=parseInt(document.getElementById('bnd-k').value);
+      result=cdf(k); label=`P(X ≤ ${k})`;
+    } else if(distMode==='atleast'){
+      const k=parseInt(document.getElementById('bnd-k').value);
+      result=1-cdf(k-1); label=`P(X ≥ ${k})`;
+    } else {
+      const k1=parseInt(document.getElementById('bnd-k1').value);
+      const k2=parseInt(document.getElementById('bnd-k2').value);
+      result=cdf(k2)-cdf(k1-1); label=`P(${k1} ≤ X ≤ ${k2})`;
+    }
+  }
+  distResult.style.display='block';
+  distResult.innerHTML=`<div class="line"><span>${label}</span><span class="big">${result.toFixed(6)}</span></div>`;
+});
+
+distSelect.addEventListener('change',renderDistParams);
+renderDistParams();
+
+const statSelect=document.getElementById('statSelect');
+const statParamsEl=document.getElementById('statParams');
+const tailGroupEl=document.getElementById('tailGroup');
+const statResult=document.getElementById('statResult');
+const statFormula=document.getElementById('statFormula');
+let tailMode='right';
+
+const STAT_DEFS={
+  ztest:{
+    label:'Z Test of a Mean',
+    fields:[{id:'xbar',label:'x̄',def:0},{id:'mu0',label:'μ₀',def:0},{id:'sigma',label:'σ',def:1},{id:'n',label:'n',def:30},{id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true,
+    formula:'z = (x̄ − μ₀) / (σ/√n)'
+  },
+  ttest:{
+    label:'T Test of a Mean',
+    fields:[{id:'xbar',label:'x̄',def:0},{id:'mu0',label:'μ₀',def:0},{id:'s',label:'s',def:1},{id:'n',label:'n',def:30},{id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true,
+    formula:'t = (x̄ − μ₀) / (s/√n) , df = n − 1'
+  },
+  zpropt:{
+    label:'Z Test of a Proportion',
+    fields:[{id:'phat',label:'p̂',def:0.5},{id:'p0',label:'p₀',def:0.5},{id:'n',label:'n',def:30},{id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true,
+    formula:'z = (p̂ − p₀) / √(p₀q₀/n)'
+  },
+  chitest:{
+    label:'Chi-Squared Test (Variance)',
+    fields:[{id:'s',label:'s',def:1},{id:'sigma0',label:'σ₀',def:1},{id:'n',label:'n',def:20},{id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true,
+    formula:'χ² = (n−1)s² / σ₀² , df = n − 1'
+  },
+  zest:{
+    label:'Z Estimate of a Mean',
+    fields:[{id:'xbar',label:'x̄',def:0},{id:'sigma',label:'σ',def:1},{id:'n',label:'n',def:30},{id:'conf',label:'confidence',def:0.95}],
+    hasTail:false, isTest:false,
+    formula:'E = z·σ/√n , CI: x̄ − E < μ < x̄ + E'
+  },
+  test:{
+    label:'T Estimate of a Mean',
+    fields:[{id:'xbar',label:'x̄',def:0},{id:'s',label:'s',def:1},{id:'n',label:'n',def:30},{id:'conf',label:'confidence',def:0.95}],
+    hasTail:false, isTest:false,
+    formula:'E = t·s/√n , df=n−1 , CI: x̄ − E < μ < x̄ + E'
+  },
+  zpropest:{
+    label:'Z Estimate of a Proportion',
+    fields:[{id:'phat',label:'p̂',def:0.5},{id:'n',label:'n',def:30},{id:'conf',label:'confidence',def:0.95}],
+    hasTail:false, isTest:false,
+    formula:'E = z·√(p̂q̂/n) , CI: p̂ − E < p < p̂ + E'
+  },
+  chiest:{
+    label:'Chi-Squared Estimate of σ',
+    fields:[{id:'s',label:'s',def:1},{id:'n',label:'n',def:20},{id:'conf',label:'confidence',def:0.90}],
+    hasTail:false, isTest:false,
+    formula:'√[(n−1)s²/χ²ᴿ] < σ < √[(n−1)s²/χ²ᴸ] , df = n − 1'
+  }
+};
+
+function renderStatParams(){
+  const def=STAT_DEFS[statSelect.value];
+  statParamsEl.innerHTML=def.fields.map(f=>`
+    <div class="field"><label>${f.label}</label><input type="number" id="sp-${f.id}" value="${f.def}" step="any"></div>
+  `).join('');
+  if(def.hasTail){
+    tailGroupEl.style.display='flex';
+    tailGroupEl.innerHTML=`
+      <button class="chipbtn" data-tail="left">Left-tailed</button>
+      <button class="chipbtn active" data-tail="right">Right-tailed</button>
+      <button class="chipbtn" data-tail="two">Two-tailed</button>
+    `;
+    tailMode='right';
+    tailGroupEl.querySelectorAll('.chipbtn').forEach(b=>{
+      b.addEventListener('click',()=>{
+        tailGroupEl.querySelectorAll('.chipbtn').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        tailMode=b.dataset.tail;
+      });
+    });
+  } else {
+    tailGroupEl.style.display='none';
+    tailGroupEl.innerHTML='';
+  }
+  statFormula.textContent=def.formula;
+  statResult.style.display='none';
+}
+
+function getVal(id){return parseFloat(document.getElementById('sp-'+id).value);}
+
+document.getElementById('computeStat').addEventListener('click',()=>{
+  const key=statSelect.value;
+  const def=STAT_DEFS[key];
+  let html='';
+
+  if(key==='ztest'){
+    const xbar=getVal('xbar'),mu0=getVal('mu0'),sigma=getVal('sigma'),n=getVal('n'),alpha=getVal('alpha');
+    const se=sigma/Math.sqrt(n);
+    const z=(xbar-mu0)/se;
+    let crit,pval,reject;
+    if(tailMode==='left'){crit=normalInv(alpha);pval=normalCDF(z);reject=z<crit;}
+    else if(tailMode==='right'){crit=normalInv(1-alpha);pval=1-normalCDF(z);reject=z>crit;}
+    else {crit=normalInv(1-alpha/2);pval=2*(1-normalCDF(Math.abs(z)));reject=Math.abs(z)>crit;}
+    html=statLine('Test statistic z',z)+statLine('Critical value',crit)+statLine('p-value',pval)+decisionTag(reject);
+  }
+  else if(key==='ttest'){
+    const xbar=getVal('xbar'),mu0=getVal('mu0'),s=getVal('s'),n=getVal('n'),alpha=getVal('alpha');
+    const df=n-1;
+    const se=s/Math.sqrt(n);
+    const t=(xbar-mu0)/se;
+    let crit,pval,reject;
+    if(tailMode==='left'){crit=tInv(alpha,df);pval=tCDF(t,df);reject=t<crit;}
+    else if(tailMode==='right'){crit=tInv(1-alpha,df);pval=1-tCDF(t,df);reject=t>crit;}
+    else {crit=tInv(1-alpha/2,df);pval=2*(1-tCDF(Math.abs(t),df));reject=Math.abs(t)>crit;}
+    html=statLine('df',df)+statLine('Test statistic t',t)+statLine('Critical value',crit)+statLine('p-value',pval)+decisionTag(reject);
+  }
+  else if(key==='zpropt'){
+    const phat=getVal('phat'),p0=getVal('p0'),n=getVal('n'),alpha=getVal('alpha');
+    const se=Math.sqrt(p0*(1-p0)/n);
+    const z=(phat-p0)/se;
+    let crit,pval,reject;
+    if(tailMode==='left'){crit=normalInv(alpha);pval=normalCDF(z);reject=z<crit;}
+    else if(tailMode==='right'){crit=normalInv(1-alpha);pval=1-normalCDF(z);reject=z>crit;}
+    else {crit=normalInv(1-alpha/2);pval=2*(1-normalCDF(Math.abs(z)));reject=Math.abs(z)>crit;}
+    html=statLine('Test statistic z',z)+statLine('Critical value',crit)+statLine('p-value',pval)+decisionTag(reject);
+  }
+  else if(key==='chitest'){
+    const s=getVal('s'),sigma0=getVal('sigma0'),n=getVal('n'),alpha=getVal('alpha');
+    const df=n-1;
+    const chi=(df*s*s)/(sigma0*sigma0);
+    let reject,critText;
+    if(tailMode==='left'){const c=chiInv(alpha,df);reject=chi<c;critText=statLine('Critical value',c);}
+    else if(tailMode==='right'){const c=chiInv(1-alpha,df);reject=chi>c;critText=statLine('Critical value',c);}
+    else {const cl=chiInv(alpha/2,df),cr=chiInv(1-alpha/2,df);reject=(chi<cl)||(chi>cr);critText=statLine('Critical value (L)',cl)+statLine('Critical value (R)',cr);}
+    html=statLine('df',df)+statLine('Test statistic χ²',chi)+critText+decisionTag(reject);
+  }
+  else if(key==='zest'){
+    const xbar=getVal('xbar'),sigma=getVal('sigma'),n=getVal('n'),conf=getVal('conf');
+    const alpha=1-conf;
+    const z=normalInv(1-alpha/2);
+    const E=z*sigma/Math.sqrt(n);
+    html=statLine('Critical value z',z)+statLine('Margin of error',E)+statLine('Lower bound',xbar-E)+statLine('Upper bound',xbar+E);
+  }
+  else if(key==='test'){
+    const xbar=getVal('xbar'),s=getVal('s'),n=getVal('n'),conf=getVal('conf');
+    const df=n-1,alpha=1-conf;
+    const t=tInv(1-alpha/2,df);
+    const E=t*s/Math.sqrt(n);
+    html=statLine('df',df)+statLine('Critical value t',t)+statLine('Margin of error',E)+statLine('Lower bound',xbar-E)+statLine('Upper bound',xbar+E);
+  }
+  else if(key==='zpropest'){
+    const phat=getVal('phat'),n=getVal('n'),conf=getVal('conf');
+    const alpha=1-conf;
+    const z=normalInv(1-alpha/2);
+    const E=z*Math.sqrt(phat*(1-phat)/n);
+    html=statLine('Critical value z',z)+statLine('Margin of error',E)+statLine('Lower bound',phat-E)+statLine('Upper bound',phat+E);
+  }
+  else if(key==='chiest'){
+    const s=getVal('s'),n=getVal('n'),conf=getVal('conf');
+    const df=n-1,alpha=1-conf;
+    const cl=chiInv(alpha/2,df),cr=chiInv(1-alpha/2,df);
+    const lo=Math.sqrt((df*s*s)/cr);
+    const hi=Math.sqrt((df*s*s)/cl);
+    html=statLine('df',df)+statLine('χ²ᴸ',cl)+statLine('χ²ᴿ',cr)+statLine('Lower bound (σ)',lo)+statLine('Upper bound (σ)',hi);
+  }
+
+  statResult.style.display='block';
+  statResult.innerHTML=html;
+});
+
+function statLine(label,val){
+  return `<div class="line"><span>${label}</span><span>${(+val).toFixed(6)}</span></div>`;
+}
+function decisionTag(reject){
+  return `<div class="decision ${reject?'reject':'fail'}">${reject?'Reject H₀':'Fail to Reject H₀'}</div>`;
+}
+
+statSelect.addEventListener('change',renderStatParams);
+renderStatParams();
+
+let isDeg=true;
+let calcExpr='';
+let calcAns=0;
+const calcScreen=document.getElementById('calcScreen');
+const calcSub=document.getElementById('calcSub');
+document.getElementById('degBtn').addEventListener('click',()=>{isDeg=true;document.getElementById('degBtn').classList.add('active');document.getElementById('radBtn').classList.remove('active');});
+document.getElementById('radBtn').addEventListener('click',()=>{isDeg=false;document.getElementById('radBtn').classList.add('active');document.getElementById('degBtn').classList.remove('active');});
+
+const CALC_BUTTONS=[
+  {t:'C',cls:'op',act:'clear'},{t:'(',act:'ins',v:'('},{t:')',act:'ins',v:')'},{t:'⌫',cls:'op',act:'back'},{t:'÷',cls:'op',act:'ins',v:'/'},
+  {t:'sin',cls:'fn',act:'ins',v:'sin('},{t:'cos',cls:'fn',act:'ins',v:'cos('},{t:'tan',cls:'fn',act:'ins',v:'tan('},{t:'√',cls:'fn',act:'ins',v:'sqrt('},{t:'×',cls:'op',act:'ins',v:'*'},
+  {t:'7',act:'ins',v:'7'},{t:'8',act:'ins',v:'8'},{t:'9',act:'ins',v:'9'},{t:'xʸ',cls:'fn',act:'ins',v:'^'},{t:'−',cls:'op',act:'ins',v:'-'},
+  {t:'4',act:'ins',v:'4'},{t:'5',act:'ins',v:'5'},{t:'6',act:'ins',v:'6'},{t:'x²',cls:'fn',act:'ins',v:'^2'},{t:'+',cls:'op',act:'ins',v:'+'},
+  {t:'1',act:'ins',v:'1'},{t:'2',act:'ins',v:'2'},{t:'3',act:'ins',v:'3'},{t:'π',cls:'fn',act:'ins',v:'pi'},{t:'Ans',cls:'fn',act:'ins',v:'Ans'},
+  {t:'0',act:'ins',v:'0',cls:'wide'},{t:'.',act:'ins',v:'.'},{t:'%',act:'ins',v:'/100'},{t:'=',cls:'eq',act:'eval'},
+];
+const calcGrid=document.getElementById('calcGrid');
+CALC_BUTTONS.forEach(b=>{
+  const btn=document.createElement('button');
+  btn.textContent=b.t;
+  if(b.cls) btn.className=b.cls;
+  btn.addEventListener('click',()=>{
+    if(b.act==='clear'){calcExpr='';calcSub.textContent='\u00A0';}
+    else if(b.act==='back'){calcExpr=calcExpr.slice(0,-1);}
+    else if(b.act==='ins'){calcExpr+=b.v;}
+    else if(b.act==='eval'){
+      try{
+        let open=(calcExpr.match(/\(/g)||[]).length;
+        let close=(calcExpr.match(/\)/g)||[]).length;
+        let fixed=calcExpr+')'.repeat(Math.max(0,open-close));
+        const val=evalExpr(fixed);
+        calcSub.textContent=calcExpr+' =';
+        calcAns=val;
+        calcExpr=String(Math.round(val*1e10)/1e10);
+      }catch(e){
+        calcSub.textContent='รูปแบบไม่ถูกต้อง';
+      }
+    }
+    calcScreen.textContent=calcExpr===''?'0':calcExpr;
+  });
+  calcGrid.appendChild(btn);
+});
+
+function evalExpr(expr){
+  const tokens=expr.match(/(\d+\.?\d*|\.\d+|sin|cos|tan|sqrt|pi|Ans|[+\-*/^()])/g)||[];
+  let pos=0;
+  function peek(){return tokens[pos];}
+  function next(){return tokens[pos++];}
+  function parseExpr(){
+    let node=parseTerm();
+    while(peek()==='+'||peek()==='-'){
+      const op=next();const rhs=parseTerm();
+      node=op==='+'?node+rhs:node-rhs;
+    }
+    return node;
+  }
+  function parseTerm(){
+    let node=parseUnary();
+    while(peek()==='*'||peek()==='/'){
+      const op=next();const rhs=parseUnary();
+      node=op==='*'?node*rhs:node/rhs;
+    }
+    return node;
+  }
+  function parseUnary(){
+    if(peek()==='-'){next();return -parseUnary();}
+    return parsePow();
+  }
+  function parsePow(){
+    let base=parseAtom();
+    if(peek()==='^'){
+      next();
+      const exp=parseUnary();
+      return Math.pow(base,exp);
+    }
+    return base;
+  }
+  function parseAtom(){
+    const t=next();
+    if(t==='('){
+      const v=parseExpr();
+      if(peek()===')') next();
+      return v;
+    }
+    if(t==='sin'||t==='cos'||t==='tan'){
+      next();
+      const v=parseExpr();
+      if(peek()===')') next();
+      const rad=isDeg?v*Math.PI/180:v;
+      return t==='sin'?Math.sin(rad):t==='cos'?Math.cos(rad):Math.tan(rad);
+    }
+    if(t==='sqrt'){
+      next();
+      const v=parseExpr();
+      if(peek()===')') next();
+      return Math.sqrt(v);
+    }
+    if(t==='pi') return Math.PI;
+    if(t==='Ans') return calcAns;
+    return parseFloat(t);
+  }
+  return parseExpr();
+}
+
+function calcSetAllowedTabs(tabs){
+  const allowed = (tabs && tabs.length) ? tabs : ["dist","stat","calc"];
+  const alwaysOn = ["linecalc","notes"];
+  document.querySelectorAll('#calcModal .tabbtn').forEach(btn=>{
+    const t = btn.getAttribute('data-tab');
+    btn.style.display = (allowed.includes(t) || alwaysOn.includes(t)) ? "" : "none";
+  });
+  const activeBtn = document.querySelector('#calcModal .tabbtn.active');
+  const activeHidden = !activeBtn || activeBtn.style.display === "none";
+  if(activeHidden){
+    const firstAllowedBtn = document.querySelector('#calcModal .tabbtn[data-tab="'+allowed[0]+'"]');
+    if(firstAllowedBtn) firstAllowedBtn.click();
+  }
+}
+
+function calcOpenInline(tabs, slotId){
+  const modal = document.getElementById("calcModal");
+  const slot = document.getElementById(slotId);
+  if(calcCurrentSlotId === slotId && modal.classList.contains("open")){
+    modal.classList.remove("open");
+    calcCurrentSlotId = null;
+    return;
+  }
+  calcSetAllowedTabs(tabs);
+  slot.appendChild(modal);
+  modal.classList.add("open");
+  calcCurrentSlotId = slotId;
+  if(typeof modal.scrollIntoView === "function"){
+    modal.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+}
+
+document.querySelectorAll('#calcModal .tabbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#calcModal .tabbtn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('#calcModal .panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+document.getElementById("calcModalClose").addEventListener("click", ()=>{
+  document.getElementById("calcModal").classList.remove("open");
+  calcCurrentSlotId = null;
+});
+
+function fracGCD(a,b){
+  a = a<0n ? -a : a;
+  b = b<0n ? -b : b;
+  while(b){ const t = a % b; a = b; b = t; }
+  return a === 0n ? 1n : a;
+}
+
+class Frac{
+  constructor(n, d=1n){
+    if(d === 0n) throw new Error("หารด้วยศูนย์");
+    if(d < 0n){ n = -n; d = -d; }
+    const g = fracGCD(n,d);
+    this.n = n / g;
+    this.d = d / g;
+  }
+  toNumber(){ return Number(this.n) / Number(this.d); }
+  isInt(){ return this.d === 1n; }
+}
+
+function isqrtBig(n){
+  if(n < 0n) throw new Error("negative");
+  if(n < 2n) return n;
+  let x = n, y = (x + 1n) / 2n;
+  while(y < x){ x = y; y = (x + n / x) / 2n; }
+  return x;
+}
+
+// Value: {kind:'frac', frac:Frac} or {kind:'float', v:number}
+function VF(frac){ return {kind:'frac', frac}; }
+function VN(v){ return {kind:'float', v}; }
+function toNum(val){ return val.kind === 'frac' ? val.frac.toNumber() : val.v; }
+
+function fracFromDecimalToken(tok){
+  if(tok.indexOf(".") === -1){
+    return new Frac(BigInt(tok), 1n);
+  }
+  const [intPart, fracPart] = tok.split(".");
+  const denom = 10n ** BigInt(fracPart.length);
+  const numer = BigInt((intPart === "" ? "0" : intPart) + fracPart);
+  return new Frac(numer, denom);
+}
+
+function vAdd(a,b){
+  if(a.kind==='frac' && b.kind==='frac') return VF(new Frac(a.frac.n*b.frac.d + b.frac.n*a.frac.d, a.frac.d*b.frac.d));
+  return VN(toNum(a)+toNum(b));
+}
+function vSub(a,b){
+  if(a.kind==='frac' && b.kind==='frac') return VF(new Frac(a.frac.n*b.frac.d - b.frac.n*a.frac.d, a.frac.d*b.frac.d));
+  return VN(toNum(a)-toNum(b));
+}
+function vMul(a,b){
+  if(a.kind==='frac' && b.kind==='frac') return VF(new Frac(a.frac.n*b.frac.n, a.frac.d*b.frac.d));
+  return VN(toNum(a)*toNum(b));
+}
+function vDiv(a,b){
+  if(a.kind==='frac' && b.kind==='frac'){
+    if(b.frac.n === 0n) throw new Error("หารด้วยศูนย์");
+    return VF(new Frac(a.frac.n*b.frac.d, a.frac.d*b.frac.n));
+  }
+  const bn = toNum(b);
+  if(bn === 0) throw new Error("หารด้วยศูนย์");
+  return VN(toNum(a)/bn);
+}
+function vNeg(a){
+  if(a.kind==='frac') return VF(new Frac(-a.frac.n, a.frac.d));
+  return VN(-a.v);
+}
+
+function vSqrt(a){
+  if(a.kind==='frac' && a.frac.n >= 0n){
+    const sn = isqrtBig(a.frac.n);
+    const sd = isqrtBig(a.frac.d);
+    if(sn*sn === a.frac.n && sd*sd === a.frac.d){
+      return VF(new Frac(sn, sd));
+    }
+  }
+  const num = toNum(a);
+  if(num < 0) throw new Error("ไม่สามารถถอดรากที่สองของจำนวนติดลบได้");
+  return VN(Math.sqrt(num));
+}
+
+function vNthRoot(n, a){
+  const nNum = toNum(n);
+  if(!Number.isInteger(nNum) || nNum <= 0) throw new Error("ลำดับรากต้องเป็นจำนวนเต็มบวก");
+  if(a.kind==='frac' && a.frac.n >= 0n){
+    // try exact integer nth root of numerator and denominator
+    const tryRoot = (val)=>{
+      if(val === 0n) return 0n;
+      let lo=0n, hi=val;
+      while(lo<=hi){
+        const mid=(lo+hi)/2n;
+        let p=1n;
+        for(let i=0;i<nNum;i++) p*=mid;
+        if(p===val) return mid;
+        if(p<val) lo=mid+1n; else hi=mid-1n;
+      }
+      return null;
+    };
+    const rn = tryRoot(a.frac.n);
+    const rd = tryRoot(a.frac.d);
+    if(rn !== null && rd !== null){
+      return VF(new Frac(rn, rd));
+    }
+  }
+  const num = toNum(a);
+  return VN(Math.sign(num) * Math.pow(Math.abs(num), 1/nNum));
+}
+
+function vPow(base, exp){
+  if(base.kind==='frac' && exp.kind==='frac' && exp.frac.isInt()){
+    let e = exp.frac.n;
+    const neg = e < 0n;
+    if(neg) e = -e;
+    let resultN = 1n, resultD = 1n;
+    let bn = base.frac.n, bd = base.frac.d;
+    for(let i=0n;i<e;i++){ resultN *= bn; resultD *= bd; }
+    if(neg){
+      if(resultN === 0n) throw new Error("หารด้วยศูนย์");
+      return VF(new Frac(resultD, resultN));
+    }
+    return VF(new Frac(resultN, resultD));
+  }
+  if(exp.kind==='frac' && exp.frac.d === 2n && exp.frac.n === 1n){
+    return vSqrt(base);
+  }
+  const b = toNum(base), e = toNum(exp);
+  return VN(Math.pow(b,e));
+}
+
+function vFactorial(a){
+  if(a.kind!=='frac' || !a.frac.isInt() || a.frac.n < 0n) throw new Error("ต้องเป็นจำนวนเต็มไม่ติดลบ");
+  let n = a.frac.n, result = 1n;
+  for(let i=2n;i<=n;i++) result *= i;
+  return VF(new Frac(result,1n));
+}
+
+function bigFactorial(n){
+  let result = 1n;
+  for(let i=2n;i<=n;i++) result *= i;
+  return result;
+}
+
+function vNPr(n,r){
+  if(n.kind!=='frac'||!n.frac.isInt()||r.kind!=='frac'||!r.frac.isInt()) throw new Error("ต้องเป็นจำนวนเต็ม");
+  const N=n.frac.n, R=r.frac.n;
+  if(R<0n||R>N||N<0n) throw new Error("ค่าพารามิเตอร์ไม่ถูกต้อง");
+  return VF(new Frac(bigFactorial(N)/bigFactorial(N-R),1n));
+}
+function vNCr(n,r){
+  if(n.kind!=='frac'||!n.frac.isInt()||r.kind!=='frac'||!r.frac.isInt()) throw new Error("ต้องเป็นจำนวนเต็ม");
+  const N=n.frac.n, R=r.frac.n;
+  if(R<0n||R>N||N<0n) throw new Error("ค่าพารามิเตอร์ไม่ถูกต้อง");
+  return VF(new Frac(bigFactorial(N)/(bigFactorial(R)*bigFactorial(N-R)),1n));
+}
+
+function vAbs(a){
+  if(a.kind==='frac') return VF(new Frac(a.frac.n<0n?-a.frac.n:a.frac.n, a.frac.d));
+  return VN(Math.abs(a.v));
+}
+function vRound(a){
+  const num = toNum(a);
+  return VF(new Frac(BigInt(Math.round(num)),1n));
+}
+
+function vMean(list){
+  if(list.length===0) throw new Error("ต้องมีอย่างน้อย 1 ค่า");
+  let sum = list[0];
+  for(let i=1;i<list.length;i++) sum = vAdd(sum, list[i]);
+  return vDiv(sum, VF(new Frac(BigInt(list.length),1n)));
+}
+function vVariance(list, sample){
+  const m = vMean(list);
+  let sumSq = VF(new Frac(0n,1n));
+  list.forEach(x=>{
+    const d = vSub(x,m);
+    sumSq = vAdd(sumSq, vMul(d,d));
+  });
+  const denom = sample ? list.length-1 : list.length;
+  if(denom<=0) throw new Error("ข้อมูลไม่พอสำหรับคำนวณ sample stdev");
+  return vDiv(sumSq, VF(new Frac(BigInt(denom),1n)));
+}
+function vStdev(list){ return vSqrt(vVariance(list, true)); }
+function vStdevp(list){ return vSqrt(vVariance(list, false)); }
+
+function formatFloat(x){
+  if(!isFinite(x)) return x > 0 ? "Infinity" : (x < 0 ? "-Infinity" : "NaN");
+  if(Number.isInteger(x) && Math.abs(x) < 1e15) return x.toString();
+  let s = x.toPrecision(10);
+  if(s.indexOf('e') === -1 && s.indexOf('.') !== -1){
+    s = s.replace(/0+$/,'').replace(/\.$/,'');
+  }
+  return s;
+}
+
+function valueToDisplayString(val){
+  if(val.kind==='frac') return val.frac.isInt() ? val.frac.n.toString() : val.frac.n.toString()+"/"+val.frac.d.toString();
+  return formatFloat(val.v);
+}
+
+let lcDisplayMode = 'frac';
+
+function valueToModeString(val, mode){
+  if(mode === 'decimal'){
+    const num = val.kind==='frac' ? val.frac.toNumber() : val.v;
+    return formatFloat(num);
+  }
+  return valueToDisplayString(val);
+}
+
+let lcHistoryEntries = [];
+
+const RESERVED_FUNCS = new Set(["sin","cos","tan","asin","acos","atan","sqrt","nthroot","abs","round","ln","log","mean","stdev","stdevp","npr","ncr"]);
+const RESERVED_CONSTS = new Set(["pi","e","ans"]);
+
+let lineCalcVars = {};
+let lineCalcAns = null;
+
+
+function lcTokenize(str){
+  const tokens = [];
+  let i = 0;
+  while(i < str.length){
+    const c = str[i];
+    if(c === " " || c === "\t"){ i++; continue; }
+    if("+-*/^!(),=".indexOf(c) !== -1){
+      tokens.push(c);
+      i++;
+      continue;
+    }
+    if("×÷".indexOf(c) !== -1){
+      tokens.push(c === "×" ? "*" : "/");
+      i++;
+      continue;
+    }
+    if(/[0-9.]/.test(c)){
+      let j = i;
+      while(j < str.length && /[0-9.]/.test(str[j])) j++;
+      tokens.push({type:"num", val:str.slice(i,j)});
+      i = j;
+      continue;
+    }
+    if(/[a-zA-Z_]/.test(c)){
+      let j = i;
+      while(j < str.length && /[a-zA-Z0-9_]/.test(str[j])) j++;
+      tokens.push({type:"id", val:str.slice(i,j)});
+      i = j;
+      continue;
+    }
+    throw new Error("อักขระไม่ถูกต้อง: " + c);
+  }
+  return tokens;
+}
+
+function lcParse(tokens){
+  let pos = 0;
+  function peek(){ return tokens[pos]; }
+  function isOp(t, s){ return t === s; }
+  function next(){ return tokens[pos++]; }
+
+  function parseExpr(){
+    let left = parseTerm();
+    while(isOp(peek(),"+") || isOp(peek(),"-")){
+      const op = next();
+      const right = parseTerm();
+      left = op === "+" ? vAdd(left,right) : vSub(left,right);
+    }
+    return left;
+  }
+  function parseTerm(){
+    let left = parseSigned();
+    while(isOp(peek(),"*") || isOp(peek(),"/")){
+      const op = next();
+      const right = parseSigned();
+      left = op === "*" ? vMul(left,right) : vDiv(left,right);
+    }
+    return left;
+  }
+  function parseSigned(){
+    if(isOp(peek(),"-")){ next(); return vNeg(parseSigned()); }
+    if(isOp(peek(),"+")){ next(); return parseSigned(); }
+    return parsePower();
+  }
+  function parsePower(){
+    let base = parsePostfix();
+    if(isOp(peek(),"^")){
+      next();
+      const exp = parseSigned();
+      base = vPow(base, exp);
+    }
+    return base;
+  }
+  function parsePostfix(){
+    let val = parsePrimary();
+    while(isOp(peek(),"!")){
+      next();
+      val = vFactorial(val);
+    }
+    return val;
+  }
+  function parseArgs(){
+    const args = [parseExpr()];
+    while(isOp(peek(),",")){
+      next();
+      args.push(parseExpr());
+    }
+    return args;
+  }
+  function parsePrimary(){
+    const tok = peek();
+    if(tok === undefined) throw new Error("รูปแบบสมการไม่ถูกต้อง");
+    if(isOp(tok,"(")){
+      next();
+      const val = parseExpr();
+      if(!isOp(peek(),")")) throw new Error("วงเล็บไม่ครบ");
+      next();
+      return val;
+    }
+    if(typeof tok === "object" && tok.type === "num"){
+      next();
+      return VF(fracFromDecimalToken(tok.val));
+    }
+    if(typeof tok === "object" && tok.type === "id"){
+      next();
+      const name = tok.val.toLowerCase();
+      if(RESERVED_FUNCS.has(name)){
+        if(!isOp(peek(),"(")) throw new Error("ต้องมีวงเล็บหลังฟังก์ชัน "+name);
+        next();
+        const args = parseArgs();
+        if(!isOp(peek(),")")) throw new Error("วงเล็บไม่ครบ");
+        next();
+        return applyFunc(name, args);
+      }
+      if(name === "pi") return VN(Math.PI);
+      if(name === "e") return VN(Math.E);
+      if(name === "ans"){
+        if(lineCalcAns === null) throw new Error("ยังไม่มีผลลัพธ์ก่อนหน้า");
+        return lineCalcAns;
+      }
+      if(Object.prototype.hasOwnProperty.call(lineCalcVars, name)){
+        return lineCalcVars[name];
+      }
+      throw new Error("ไม่พบตัวแปร "+tok.val);
+    }
+    throw new Error("รูปแบบสมการไม่ถูกต้อง");
+  }
+
+  const result = parseExpr();
+  if(pos !== tokens.length) throw new Error("รูปแบบสมการไม่ถูกต้อง");
+  return result;
+}
+
+function toRad(val){
+  const n = toNum(val);
+  return isDeg ? n*Math.PI/180 : n;
+}
+function fromRad(rad){
+  return isDeg ? rad*180/Math.PI : rad;
+}
+
+function applyFunc(name, args){
+  switch(name){
+    case "sin": return VN(Math.sin(toRad(args[0])));
+    case "cos": return VN(Math.cos(toRad(args[0])));
+    case "tan": return VN(Math.tan(toRad(args[0])));
+    case "asin": return VN(fromRad(Math.asin(toNum(args[0]))));
+    case "acos": return VN(fromRad(Math.acos(toNum(args[0]))));
+    case "atan": return VN(fromRad(Math.atan(toNum(args[0]))));
+    case "sqrt": return vSqrt(args[0]);
+    case "nthroot": return vNthRoot(args[0], args[1]);
+    case "abs": return vAbs(args[0]);
+    case "round": return vRound(args[0]);
+    case "ln": {
+      const v = toNum(args[0]);
+      if(v<=0) throw new Error("ln ต้องรับค่าบวก");
+      return VN(Math.log(v));
+    }
+    case "log": {
+      const v = toNum(args[0]);
+      if(v<=0) throw new Error("log ต้องรับค่าบวก");
+      return VN(Math.log10(v));
+    }
+    case "mean": return vMean(args);
+    case "stdev": return vStdev(args);
+    case "stdevp": return vStdevp(args);
+    case "npr": return vNPr(args[0],args[1]);
+    case "ncr": return vNCr(args[0],args[1]);
+    default: throw new Error("ไม่รู้จักฟังก์ชัน "+name);
+  }
+}
+
+function lineCalcEvaluate(str){
+  str = str.trim();
+  const assignMatch = str.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
+  if(assignMatch && !RESERVED_FUNCS.has(assignMatch[1].toLowerCase()) && !RESERVED_CONSTS.has(assignMatch[1].toLowerCase())){
+    const varName = assignMatch[1].toLowerCase();
+    const tokens = lcTokenize(assignMatch[2]);
+    if(tokens.length===0) throw new Error("กรุณาพิมพ์สมการ");
+    const val = lcParse(tokens);
+    lineCalcVars[varName] = val;
+    lineCalcAns = val;
+    return {display: varName+" = "+valueToDisplayString(val), val, prefix: varName+" = "};
+  }
+  const tokens = lcTokenize(str);
+  if(tokens.length===0) throw new Error("กรุณาพิมพ์สมการ");
+  const val = lcParse(tokens);
+  lineCalcAns = val;
+  return {display: valueToDisplayString(val), val, prefix: ""};
+}
+
+function lineCalcRenderEmpty(){
+  const hist = document.getElementById("linecalcHistory");
+  if(hist.children.length === 0){
+    hist.innerHTML = '<div class="linecalc-empty">ยังไม่มีการคำนวณ พิมพ์สมการแล้วกด Enter</div>';
+  }
+}
+
+let lcRoot = [];
+let lcCursor = {container: lcRoot, index: 0};
+
+function lcCharTok(ch){ return {type:'char', ch}; }
+function lcFracTok(){ return {type:'frac', num:[], den:[]}; }
+
+function lcFindParent(root, target){
+  for(let i=0;i<root.length;i++){
+    const tok = root[i];
+    if(tok.type==='frac'){
+      if(tok.num === target) return {parentContainer:root, parentIndex:i, slot:'num', fracToken:tok};
+      if(tok.den === target) return {parentContainer:root, parentIndex:i, slot:'den', fracToken:tok};
+      const r1 = lcFindParent(tok.num, target);
+      if(r1) return r1;
+      const r2 = lcFindParent(tok.den, target);
+      if(r2) return r2;
+    }
+  }
+  return null;
+}
+
+function lcSerializeContainer(container){
+  let s = "";
+  container.forEach(tok=>{
+    if(tok.type==='char') s += tok.ch;
+    else if(tok.type==='frac'){
+      const numStr = lcSerializeContainer(tok.num) || "0";
+      const denStr = lcSerializeContainer(tok.den) || "1";
+      s += "(" + numStr + ")/(" + denStr + ")";
+    }
+  });
+  return s;
+}
+
+function lcEscapeHtml(ch){
+  if(ch === "<") return "&lt;";
+  if(ch === ">") return "&gt;";
+  if(ch === "&") return "&amp;";
+  return ch;
+}
+
+function lcRenderContainer(container){
+  let html = "";
+  for(let i=0;i<=container.length;i++){
+    if(container === lcCursor.container && i === lcCursor.index){
+      html += '<span class="lc-cursor"></span>';
+    }
+    if(i < container.length){
+      const tok = container[i];
+      if(tok.type==='char'){
+        html += '<span class="lc-char">'+lcEscapeHtml(tok.ch)+'</span>';
+      } else if(tok.type==='frac'){
+        html += '<span class="lc-frac"><span class="lc-frac-num">'+lcRenderContainer(tok.num)+'</span><span class="lc-frac-den">'+lcRenderContainer(tok.den)+'</span></span>';
+      }
+    }
+  }
+  return html;
+}
+
+function lcRender(){
+  const field = document.getElementById("linecalcInput");
+  if(lcRoot.length === 0){
+    field.innerHTML = '<span class="lc-placeholder">เช่น 1/3 + 1/6</span><span class="lc-cursor"></span>';
+  } else {
+    field.innerHTML = lcRenderContainer(lcRoot);
+  }
+}
+
+function lcInsertText(text, cursorOffset){
+  const {container, index} = lcCursor;
+  const toks = [...text].map(lcCharTok);
+  container.splice(index, 0, ...toks);
+  const off = cursorOffset !== undefined ? cursorOffset : text.length;
+  lcCursor = {container, index: index+off};
+  lcRender();
+}
+
+function lcInsertFunc(name){
+  lcInsertText(name+"()", name.length+1);
+}
+function lcInsertNFunc(name){
+  lcInsertText(name+"(,)", name.length+1);
+}
+function lcInsertFrac(){
+  const frac = lcFracTok();
+  const {container, index} = lcCursor;
+  container.splice(index, 0, frac);
+  lcCursor = {container: frac.num, index: 0};
+  lcRender();
+}
+function lcBackspace(){
+  const {container, index} = lcCursor;
+  if(index > 0){
+    container.splice(index-1, 1);
+    lcCursor = {container, index: index-1};
+    lcRender();
+    return;
+  }
+  const info = lcFindParent(lcRoot, container);
+  if(info){
+    if(info.fracToken.num.length===0 && info.fracToken.den.length===0){
+      info.parentContainer.splice(info.parentIndex,1);
+      lcCursor = {container: info.parentContainer, index: info.parentIndex};
+    } else {
+      lcCursor = {container: info.parentContainer, index: info.parentIndex};
+    }
+    lcRender();
+  }
+}
+function lcMoveCursor(dir){
+  dir = dir < 0 ? -1 : 1;
+  const {container, index} = lcCursor;
+  if(dir === -1){
+    if(index > 0){
+      const prevTok = container[index-1];
+      if(prevTok.type==='frac'){
+        lcCursor = {container: prevTok.den, index: prevTok.den.length};
+      } else {
+        lcCursor = {container, index: index-1};
+      }
+    } else {
+      const info = lcFindParent(lcRoot, container);
+      if(info){
+        if(info.slot === 'den'){
+          lcCursor = {container: info.fracToken.num, index: info.fracToken.num.length};
+        } else {
+          lcCursor = {container: info.parentContainer, index: info.parentIndex};
+        }
+      }
+    }
+  } else {
+    if(index < container.length){
+      const curTok = container[index];
+      if(curTok.type==='frac'){
+        lcCursor = {container: curTok.num, index:0};
+      } else {
+        lcCursor = {container, index: index+1};
+      }
+    } else {
+      const info = lcFindParent(lcRoot, container);
+      if(info){
+        if(info.slot === 'num'){
+          lcCursor = {container: info.fracToken.den, index:0};
+        } else {
+          lcCursor = {container: info.parentContainer, index: info.parentIndex+1};
+        }
+      }
+    }
+  }
+  lcRender();
+}
+function lcLoadFlatString(str){
+  lcRoot.length = 0;
+  [...str].forEach(ch=>lcRoot.push(lcCharTok(ch)));
+  lcCursor = {container: lcRoot, index: lcRoot.length};
+  lcRender();
+}
+function lcClear(){
+  lcRoot.length = 0;
+  lcCursor = {container: lcRoot, index: 0};
+  lcRender();
+}
+
+function lineCalcSubmit(){
+  const str = lcSerializeContainer(lcRoot).trim();
+  if(str === "") return;
+  const hist = document.getElementById("linecalcHistory");
+  const emptyMsg = hist.querySelector(".linecalc-empty");
+  if(emptyMsg) emptyMsg.remove();
+  const line = document.createElement("div");
+  line.setAttribute("data-raw", str);
+  line.title = "คลิกเพื่อแก้ไขบรรทัดนี้";
+  let entry = {rawStr: str, val: null, prefix: "", lineEl: line};
+  try{
+    const result = lineCalcEvaluate(str);
+    line.className = "linecalc-line";
+    line.innerHTML = '<span class="lc-input">'+str+'</span> <span class="lc-result">'+result.prefix+valueToModeString(result.val, lcDisplayMode)+'</span>';
+    entry.val = result.val;
+    entry.prefix = result.prefix;
+  } catch(e){
+    line.className = "linecalc-line lc-error";
+    line.innerHTML = '<span class="lc-input">'+str+'</span> <span class="lc-result">ผิดพลาด: '+e.message+'</span>';
+  }
+  line.addEventListener("click", ()=>{
+    lcLoadFlatString(line.getAttribute("data-raw"));
+    document.getElementById("linecalcInput").focus();
+  });
+  hist.appendChild(line);
+  lcHistoryEntries.push(entry);
+  hist.scrollTop = hist.scrollHeight;
+  lcClear();
+}
+
+function lcRefreshHistoryDisplay(){
+  lcHistoryEntries.forEach(entry=>{
+    if(entry.val === null) return;
+    const resultEl = entry.lineEl.querySelector(".lc-result");
+    if(resultEl) resultEl.textContent = entry.prefix + valueToModeString(entry.val, lcDisplayMode);
+  });
+}
+
+const LC_ALLOWED_CHARS = "0123456789+-*/^!(),.=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+
+document.getElementById("linecalcInput").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter"){
+    e.preventDefault();
+    lineCalcSubmit();
+  } else if(e.key === "Backspace"){
+    e.preventDefault();
+    lcBackspace();
+  } else if(e.key === "ArrowLeft"){
+    e.preventDefault();
+    lcMoveCursor(-1);
+  } else if(e.key === "ArrowRight"){
+    e.preventDefault();
+    lcMoveCursor(1);
+  } else if(e.key.length === 1 && LC_ALLOWED_CHARS.indexOf(e.key) !== -1){
+    e.preventDefault();
+    lcInsertText(e.key);
+  } else if(e.key === "×" || e.key === "÷"){
+    e.preventDefault();
+    lcInsertText(e.key);
+  }
+});
+
+document.getElementById("linecalcClearBtn").addEventListener("click", ()=>{
+  document.getElementById("linecalcHistory").innerHTML = "";
+  lineCalcVars = {};
+  lineCalcAns = null;
+  lcHistoryEntries = [];
+  lcClear();
+  lineCalcRenderEmpty();
+});
+
+document.getElementById("linecalcModeToggle").addEventListener("click", ()=>{
+  lcDisplayMode = lcDisplayMode === 'frac' ? 'decimal' : 'frac';
+  const btn = document.getElementById("linecalcModeToggle");
+  btn.textContent = lcDisplayMode === 'frac' ? "แสดงผล: เศษส่วน" : "แสดงผล: ทศนิยม";
+  lcRefreshHistoryDisplay();
+});
+
+document.querySelectorAll(".lc-kbtab").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".lc-kbtab").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".lc-kbpanel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("lc-kb-"+btn.getAttribute("data-kb")).classList.add("active");
+  });
+});
+
+document.querySelectorAll(".lc-kbpanel button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    if(btn.hasAttribute("data-ins")){
+      lcInsertText(btn.getAttribute("data-ins"));
+    } else if(btn.hasAttribute("data-ins-cursor")){
+      const text = btn.getAttribute("data-ins-cursor");
+      const cur = parseInt(btn.getAttribute("data-cursor"));
+      lcInsertText(text, cur);
+    } else if(btn.hasAttribute("data-func")){
+      lcInsertFunc(btn.getAttribute("data-func"));
+    } else if(btn.hasAttribute("data-nfunc")){
+      lcInsertNFunc(btn.getAttribute("data-nfunc"));
+    } else if(btn.hasAttribute("data-frac")){
+      lcInsertFrac();
+    } else if(btn.hasAttribute("data-minus")){
+      lcInsertText("-");
+    } else if(btn.hasAttribute("data-backspace")){
+      lcBackspace();
+    } else if(btn.hasAttribute("data-cursor-left")){
+      lcMoveCursor(-1);
+    } else if(btn.hasAttribute("data-cursor-right")){
+      lcMoveCursor(1);
+    } else if(btn.hasAttribute("data-enter")){
+      lineCalcSubmit();
+    }
+    document.getElementById("linecalcInput").focus();
+  });
+});
+
+lcRender();
+lineCalcRenderEmpty();
+</script>
+
+
+</body>
+</html>
