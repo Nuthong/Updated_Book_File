@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<title>สถิติ 300-1211 — สารบัญแบบฝึกหัดทั้งหมด</title>
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --flag:#B7862C;
+  --flag-soft:#FBF1DA;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#12161d; --panel:#1b212b; --border:#333c48;
+    --text:#e4e7ec; --text-soft:#9aa5b3; --flag:#e3bd74; --flag-soft:#332a17;
+  }
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Sarabun',"Segoe UI",sans-serif;
+  background:var(--paper);
+  color:var(--text);
+}
+header{
+  background:var(--navy-deep);
+  border-bottom:4px solid var(--flag);
+  padding:28px 20px;
+  text-align:center;
+}
+.back-to-books{display:inline-block;font-size:12.5px;color:#C9DCF0;text-decoration:none;margin-bottom:14px;opacity:0.85;}
+.back-to-books:hover{opacity:1;text-decoration:underline;}
+header h1{margin:0 0 6px 0; color:#F2EFE6; font-size:24px;}
+header p{margin:0; color:#C9D6E3; font-size:14px;}
+.wrap{max-width:900px; margin:0 auto; padding:24px 20px 60px;}
+.chapter{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:8px;
+  margin-bottom:18px;
+  overflow:hidden;
+}
+.chapter-head{
+  background:var(--navy);
+  color:#fff;
+  padding:12px 18px;
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+}
+.chapter-head .num{
+  font-family:'JetBrains Mono',monospace;
+  font-weight:700;
+  color:var(--flag);
+  font-size:15px;
+}
+.chapter-head h2{margin:0; font-size:16px;}
+.items{padding:8px 12px;}
+a.item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 10px;
+  text-decoration:none;
+  color:var(--text);
+  border-bottom:1px solid var(--border);
+}
+.items a.item:last-child{border-bottom:none;}
+a.item:hover{background:var(--flag-soft);}
+a.item .tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:#fff;
+  background:var(--text-soft);
+  padding:3px 7px;
+  border-radius:4px;
+  flex-shrink:0;
+}
+a.item .tag.summary{background:#2B6CB0;}
+a.item .tag.quiz{background:var(--flag);}
+a.item .tag.exam{background:#B3341F;}
+a.item .label{font-size:14.5px;}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="back-to-books" href="../index.html">&larr; ทุกเล่ม / All Books</a>
+  <h1>สถิติ 300-1211 — สารบัญแบบฝึกหัดทั้งหมด</h1>
+  <p>เรียงตามลำดับบทเรียน · คลิกหัวข้อเพื่อเปิดเอกสาร</p>
+</header>
+
+<div class="wrap">
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="num">บทที่ 4</span><h2>Binomial Distribution</h2></div>
+    <div class="items">
+      <a class="item" href="01_บทที่4_Binomial_Distribution/Practice_1_IC_4-1_Binomial_Distribution.html"><span class="tag quiz">Quiz</span><span class="label">IC 4-1: Binomial Distribution</span></a>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="num">บทที่ 5</span><h2>Normal &amp; Sampling Distribution</h2></div>
+    <div class="items">
+      <a class="item" href="02_บทที่5_Normal_and_Sampling_Distribution/Practice_IC_5-2_Normal_Distribution.html"><span class="tag quiz">Quiz</span><span class="label">IC 5-2: Normal Distribution</span></a>
+      <a class="item" href="02_บทที่5_Normal_and_Sampling_Distribution/Practice_2_IC_5-3_Sampling_Distribution.html"><span class="tag quiz">Quiz</span><span class="label">IC 5-3: Sampling Distribution</span></a>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="num">บทที่ 6</span><h2>Confidence Intervals</h2></div>
+    <div class="items">
+      <a class="item" href="03_บทที่6_Confidence_Intervals/สรุปบทเรียน_Confidence_Intervals_4กรณี.html"><span class="tag summary">สรุป</span><span class="label">สรุปบทเรียน — Confidence Intervals ครบ 4 กรณี</span></a>
+      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-1_CI_Mean_sigma_Known.html"><span class="tag quiz">Quiz</span><span class="label">6-1: CI for the Mean (σ Known)</span></a>
+      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-2_CI_Mean_sigma_Unknown.html"><span class="tag quiz">Quiz</span><span class="label">6-2: CI for the Mean (σ Unknown)</span></a>
+      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-3_CI_Proportion.html"><span class="tag quiz">Quiz</span><span class="label">6-3: CI for Population Proportions</span></a>
+      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-4_CI_Variance_SD.html"><span class="tag quiz">Quiz</span><span class="label">6-4: CI for Variance and Standard Deviation</span></a>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="num">บทที่ 7</span><h2>Hypothesis Testing</h2></div>
+    <div class="items">
+      <a class="item" href="04_บทที่7_Hypothesis_Testing/สรุปบทเรียน_Hypothesis_Testing_4กรณี.html"><span class="tag summary">สรุป</span><span class="label">สรุปบทเรียน — Hypothesis Testing ครบ 4 กรณี</span></a>
+      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-1_HT_Mean_sigma_Known.html"><span class="tag quiz">Quiz</span><span class="label">7-1: HT for the Mean (σ Known)</span></a>
+      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-2_HT_Mean_sigma_Unknown.html"><span class="tag quiz">Quiz</span><span class="label">7-2: HT for the Mean (σ Unknown)</span></a>
+      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-3_HT_Proportion.html"><span class="tag quiz">Quiz</span><span class="label">7-3: HT for the Proportion</span></a>
+      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-4_HT_Variance.html"><span class="tag quiz">Quiz</span><span class="label">7-4: HT for the Variance</span></a>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="num">ทบทวน</span><h2>Pretest &amp; Midterm Review</h2></div>
+    <div class="items">
+      <a class="item" href="05_Pretest_and_Midterm_Review/สรุปบทเรียนสถิติ_Pretest_I.html"><span class="tag summary">สรุป</span><span class="label">สรุปบทเรียนสถิติ — Pretest I</span></a>
+      <a class="item" href="05_Pretest_and_Midterm_Review/Pretest_I1_Statistics.html"><span class="tag exam">Exam</span><span class="label">Pretest I1 — สถิติ (12 ข้อ)</span></a>
+      <a class="item" href="05_Pretest_and_Midterm_Review/Midterm_Exam_Statistics.html"><span class="tag exam">Exam</span><span class="label">Midterm Exam — สถิติ (12 ข้อ)</span></a>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="num">บทที่ 8</span><h2>Difference of Means &amp; Proportions</h2></div>
+    <div class="items">
+      <a class="item" href="06_บทที่8_Difference_of_Means_and_Proportions/(STATICS)Practice_by_CLaude_IC_Quiz_8.1-8.4.html"><span class="tag quiz">Quiz</span><span class="label">Quiz 8: Testing the Difference Between Means &amp; Proportions (รวม 4 ชุด)</span></a>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="num">บทที่ 9</span><h2>สหสัมพันธ์และการถดถอย (Correlation &amp; Regression)</h2></div>
+    <div class="items">
+      <a class="item" href="07_บทที่9_Correlation_and_Regression/(STATICS)บทที่_9_สหสัมพันธ์และการถดถอย_สรุป.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 9 — สรุปสหสัมพันธ์และการถดถอย</span></a>
+      <a class="item" href="07_บทที่9_Correlation_and_Regression/(STATICS)Practice_by_CLaude_IC_Quiz_9.1-9.2.html"><span class="tag quiz">Quiz</span><span class="label">Quiz 9-1, 9-2 — สหสัมพันธ์และการถดถอย</span></a>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="num">บทที่ 10</span><h2>Chi-Square Tests</h2></div>
+    <div class="items">
+      <a class="item" href="08_บทที่10_Chi_Square_Tests/(STATICS)Chi-Square_Tests_Quiz_บทที่_10.html"><span class="tag quiz">Quiz</span><span class="label">แบบฝึกหัด Chi-Square Tests (บทที่ 10)</span></a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
