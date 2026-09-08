@@ -31,7 +31,7 @@
   --cream:#F4F2E8;
 }
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --paper:#12161d; --panel:#1b212b; --border:#333c48;
     --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0; --navy-deep:#0b1420;
     --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
@@ -39,6 +39,14 @@
     --incorrect:#f0958a; --incorrect-soft:#33201d;
     --flag:#e3bd74; --flag-soft:#332a17; --unanswered:#8b93a0; --cream:#232922;
   }
+}
+:root[data-theme="dark"]{
+  --paper:#12161d; --panel:#1b212b; --border:#333c48;
+  --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0; --navy-deep:#0b1420;
+  --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
+  --correct:#7fd0a0; --correct-soft:#173323;
+  --incorrect:#f0958a; --incorrect-soft:#33201d;
+  --flag:#e3bd74; --flag-soft:#332a17; --unanswered:#8b93a0; --cream:#232922;
 }
 *{box-sizing:border-box;}
 body{margin:0;font-family:'Sarabun',"Segoe UI",sans-serif;background:var(--paper);color:var(--text);}
@@ -52,6 +60,12 @@ header h1{font-size:18px;margin:0;color:#F2EFE6;font-weight:700;}
 header .subtitle{font-size:12px;color:#C9C2AE;margin-top:2px;}
 .back-to-books{display:inline-block;font-size:12px;color:#C9DCF0;text-decoration:none;margin-bottom:6px;opacity:0.85;}
 .back-to-books:hover{opacity:1;text-decoration:underline;}
+.theme-toggle-btn{
+  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
+  width:34px;height:34px;border-radius:6px;font-size:15px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:flex;align-items:center;justify-content:center;
+}
+.theme-toggle-btn:hover{background:#fff;}
 .mode-toggle{display:flex;border:1px solid rgba(242,239,230,0.4);border-radius:6px;overflow:hidden;background:rgba(242,239,230,0.08);}
 .mode-toggle button{border:none;background:transparent;color:#F2EFE6;padding:8px 16px;cursor:pointer;font-size:14px;font-family:'Sarabun',sans-serif;}
 .mode-toggle button.active{background:var(--flag);color:#1B1300;font-weight:700;}
@@ -186,6 +200,7 @@ main{flex:1;min-width:0;}
     <div class="subtitle">ลำดับขีดจาก KanjiVG (CC BY-SA) — สลับ Hiragana/Katakana ได้ที่ปุ่มขวา</div>
   </div>
   <div class="toolbar">
+    <button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button>
     <div class="mode-toggle script-toggle" id="scriptToggle">
       <button id="btnKatakana" class="active">カタカナ</button>
       <button id="btnHiragana">ひらがな</button>
@@ -810,6 +825,37 @@ displayIndexes = computeDisplayIndexes();
 render();
 updateTimerDisplay();
 
+</script>
+<script>
+(function(){
+  function systemPrefersDark(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function resolvedTheme(t){
+    return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+    else { document.documentElement.removeAttribute('data-theme'); }
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      var r = resolvedTheme(t);
+      btn.textContent = r === 'dark' ? '☀️' : '🌙';
+      btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+    }
+  }
+  var bookTheme = 'system';
+  try{ bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+  applyTheme(bookTheme);
+  var btn = document.getElementById('themeToggle');
+  if(btn){
+    btn.addEventListener('click', function(){
+      bookTheme = resolvedTheme(bookTheme) === 'dark' ? 'light' : 'dark';
+      try{ localStorage.setItem('book_theme', bookTheme); }catch(e){}
+      applyTheme(bookTheme);
+    });
+  }
+})();
 </script>
 </body>
 </html>

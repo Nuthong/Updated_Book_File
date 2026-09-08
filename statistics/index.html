@@ -21,10 +21,14 @@
   --flag-soft:#FBF1DA;
 }
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --paper:#12161d; --panel:#1b212b; --border:#333c48;
     --text:#e4e7ec; --text-soft:#9aa5b3; --flag:#e3bd74; --flag-soft:#332a17;
   }
+}
+:root[data-theme="dark"]{
+  --paper:#12161d; --panel:#1b212b; --border:#333c48;
+  --text:#e4e7ec; --text-soft:#9aa5b3; --flag:#e3bd74; --flag-soft:#332a17;
 }
 *{box-sizing:border-box;}
 body{
@@ -34,11 +38,19 @@ body{
   color:var(--text);
 }
 header{
+  position:relative;
   background:var(--navy-deep);
   border-bottom:4px solid var(--flag);
   padding:28px 20px;
   text-align:center;
 }
+.theme-toggle-btn{
+  position:absolute;top:14px;right:16px;
+  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
+  width:32px;height:32px;border-radius:4px;font-size:15px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:flex;align-items:center;justify-content:center;
+}
+.theme-toggle-btn:hover{background:#fff;}
 .back-to-books{display:inline-block;font-size:12.5px;color:#C9DCF0;text-decoration:none;margin-bottom:14px;opacity:0.85;}
 .back-to-books:hover{opacity:1;text-decoration:underline;}
 header h1{margin:0 0 6px 0; color:#F2EFE6; font-size:24px;}
@@ -96,6 +108,7 @@ a.item .label{font-size:14.5px;}
 <body>
 
 <header>
+  <button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button>
   <a class="back-to-books" href="../index.html">&larr; ทุกเล่ม / All Books</a>
   <h1>สถิติ 300-1211 — สารบัญแบบฝึกหัดทั้งหมด</h1>
   <p>เรียงตามลำดับบทเรียน · คลิกหัวข้อเพื่อเปิดเอกสาร</p>
@@ -187,5 +200,36 @@ a.item .label{font-size:14.5px;}
 
 </div>
 
+<script>
+(function(){
+  function systemPrefersDark(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function resolvedTheme(t){
+    return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+    else { document.documentElement.removeAttribute('data-theme'); }
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      var r = resolvedTheme(t);
+      btn.textContent = r === 'dark' ? '☀️' : '🌙';
+      btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+    }
+  }
+  var bookTheme = 'system';
+  try{ bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+  applyTheme(bookTheme);
+  var btn = document.getElementById('themeToggle');
+  if(btn){
+    btn.addEventListener('click', function(){
+      bookTheme = resolvedTheme(bookTheme) === 'dark' ? 'light' : 'dark';
+      try{ localStorage.setItem('book_theme', bookTheme); }catch(e){}
+      applyTheme(bookTheme);
+    });
+  }
+})();
+</script>
 </body>
 </html>
