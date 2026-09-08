@@ -353,7 +353,7 @@ table tr:nth-child(even) td{background:#F4F2E8;}
   --fontScale:1;
 }
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
     --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0;
     --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
@@ -367,8 +367,30 @@ table tr:nth-child(even) td{background:#F4F2E8;}
     --gold:#e3bd74;
     --cream:#232922; --diagram-bg:#181e27;
   }
-  .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
+  :root:not([data-theme="light"]) .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
 }
+:root[data-theme="dark"]{
+  --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
+  --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0;
+  --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
+  --correct:#7fd0a0; --correct-soft:#173323;
+  --incorrect:#f0958a; --incorrect-soft:#33201d;
+  --flag:#e3bd74; --flag-soft:#332a17; --unanswered:#8b93a0;
+  --line:#333c48; --ink:#e4e7ec; --muted:#9aa5b3;
+  --blue:#8ec1f2; --blue-soft:#1c2b3d;
+  --good:#7fd0a0; --good-bg:#173323;
+  --bad:#f0958a; --bad-bg:#33201d;
+  --gold:#e3bd74;
+  --cream:#232922; --diagram-bg:#181e27;
+}
+:root[data-theme="dark"] .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
+.theme-toggle-btn{
+  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
+  width:32px;height:32px;border-radius:4px;font-size:15px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:flex;align-items:center;justify-content:center;
+}
+.theme-toggle-btn:hover{background:#fff;}
+@media print{.theme-toggle-btn{display:none;}}
 .back-to-index{
   display:inline-block;font-size:12px;color:#C9DCF0;text-decoration:none;
   margin-bottom:6px;opacity:0.85;
@@ -458,6 +480,7 @@ table{font-size:calc(13.5px * var(--fontScale)) !important;}
       <button id="fontMinus" title="ลดขนาดตัวอักษร / Decrease font size">A&minus;</button>
       <button id="fontPlus" title="เพิ่มขนาดตัวอักษร / Increase font size">A+</button>
     </div>
+    <button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button>
     <button class="calc-toggle-btn" id="calcHeaderBtn" style="margin-top:0;">🧮 เครื่องคิดเลข</button>
   </div>
 </header>
@@ -821,6 +844,34 @@ const fontMinusBtn = document.getElementById('fontMinus');
 if(fontMinusBtn){ fontMinusBtn.addEventListener('click', function(){ setFontScale(fontScale-0.1); }); }
 const fontPlusBtn = document.getElementById('fontPlus');
 if(fontPlusBtn){ fontPlusBtn.addEventListener('click', function(){ setFontScale(fontScale+0.1); }); }
+
+function systemPrefersDark(){
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+function resolvedTheme(t){
+  return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+}
+function applyTheme(t){
+  if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+  else { document.documentElement.removeAttribute('data-theme'); }
+  const btn = document.getElementById('themeToggle');
+  if(btn){
+    const r = resolvedTheme(t);
+    btn.textContent = r === 'dark' ? '☀️' : '🌙';
+    btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+  }
+}
+let bookTheme = 'system';
+try{ bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+applyTheme(bookTheme);
+const themeToggleBtn = document.getElementById('themeToggle');
+if(themeToggleBtn){
+  themeToggleBtn.addEventListener('click', function(){
+    bookTheme = resolvedTheme(bookTheme) === 'dark' ? 'light' : 'dark';
+    try{ localStorage.setItem('book_theme', bookTheme); }catch(e){}
+    applyTheme(bookTheme);
+  });
+}
 
 if(!INCLUDE_CALC){
   document.getElementById("calcHeaderBtn").style.display = "none";

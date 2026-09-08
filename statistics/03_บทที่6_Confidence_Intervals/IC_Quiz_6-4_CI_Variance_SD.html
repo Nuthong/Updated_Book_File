@@ -588,7 +588,7 @@ main{flex:1;min-width:0;}
 <style>
 :root{ color-scheme: light dark; }
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
     --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0;
     --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
@@ -602,13 +602,69 @@ main{flex:1;min-width:0;}
     --gold:#e3bd74;
   }
 }
+:root[data-theme="dark"]{
+  --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
+  --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0;
+  --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
+  --correct:#7fd0a0; --correct-soft:#173323;
+  --incorrect:#f0958a; --incorrect-soft:#33201d;
+  --flag:#e3bd74; --flag-soft:#332a17; --unanswered:#8b93a0;
+  --line:#333c48; --ink:#e4e7ec; --muted:#9aa5b3;
+  --blue:#8ec1f2; --blue-soft:#1c2b3d;
+  --good:#7fd0a0; --good-bg:#173323;
+  --bad:#f0958a; --bad-bg:#33201d;
+  --gold:#e3bd74;
+}
 .back-to-index{
   display:inline-block;font-size:12px;color:#C9DCF0;text-decoration:none;
   margin-bottom:6px;opacity:0.85;
 }
 .back-to-index:hover{opacity:1;text-decoration:underline;}
 @media print{.back-to-index{display:none;}}
+.theme-toggle-btn{
+  border:1.5px solid var(--border);background:var(--panel);color:var(--navy);
+  width:34px;height:34px;border-radius:6px;font-size:15px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:inline-flex;align-items:center;justify-content:center;
+  vertical-align:middle;
+}
+.theme-toggle-btn:hover{background:var(--accent-soft);}
+@media print{.theme-toggle-btn{display:none;}}
 </style>
+
+<script>
+(function(){
+  function systemPrefersDark(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function resolvedTheme(t){
+    return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+    else { document.documentElement.removeAttribute('data-theme'); }
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      var r = resolvedTheme(t);
+      btn.textContent = r === 'dark' ? '☀️' : '🌙';
+      btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+    }
+  }
+  var bookTheme = 'system';
+  try{ bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+  applyTheme(bookTheme);
+  document.addEventListener('DOMContentLoaded', function(){
+    applyTheme(bookTheme);
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      btn.addEventListener('click', function(){
+        bookTheme = resolvedTheme(bookTheme) === 'dark' ? 'light' : 'dark';
+        try{ localStorage.setItem('book_theme', bookTheme); }catch(e){}
+        applyTheme(bookTheme);
+      });
+    }
+  });
+})();
+</script>
 </head>
 <body>
 
@@ -616,6 +672,7 @@ main{flex:1;min-width:0;}
   <a class="back-to-index" href="../index.html">&larr; สารบัญทั้งหมด / All Chapters</a>
   <h1>IC Quiz 6-4: Confidence Intervals for Variance and Standard Deviation</h1>
   <div class="toolbar">
+    <button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button>
     <div class="mode-toggle">
       <button id="btnExerciseMode" class="active">แบบฝึกหัด</button>
       <button id="btnAnswerMode">เฉลย</button>
