@@ -431,7 +431,7 @@ main{flex:1;min-width:0;}
 #calcModal .field label{font-size:12.5px;color:var(--muted);font-weight:600}
 #calcModal .field select, #calcModal .field input{
   font-family:'JetBrains Mono',monospace;font-size:14px;
-  padding:8px 10px;border:1.5px solid var(--line);border-radius:4px;background:#fff;
+  padding:8px 10px;border:1.5px solid var(--line);border-radius:4px;background:var(--panel);color:var(--text);
 }
 #calcModal .field select{font-family:'Sarabun',sans-serif}
 #calcModal .field input:focus, #calcModal .field select:focus{outline:none;border-color:var(--blue)}
@@ -510,7 +510,7 @@ main{flex:1;min-width:0;}
   cursor:pointer;color:var(--ink);
 }
 #calcModal .calc-grid button:hover{background:var(--blue-soft)}
-#calcModal .calc-grid button.op{background:#F0EEE6;color:var(--navy)}
+#calcModal .calc-grid button.op{background:var(--panel);color:var(--navy)}
 #calcModal .calc-grid button.eq{background:var(--navy);color:#fff;grid-column:span 1}
 #calcModal .linecalc-history{
   max-height:280px;overflow-y:auto;background:var(--navy-deep);border-radius:6px;
@@ -1411,6 +1411,10 @@ function sanitizePromptHtml(str){
     return "\u0000IMG"+(placeholders.length-1)+"\u0000";
   });
   out = out.replace(/<div class="img-caption">[\s\S]*?<\/div>/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = out.replace(/<\/?(br|table|thead|tbody|tr|td|th)\b[^>]*>/gi, (m)=>{
     placeholders.push(m);
     return "\u0000IMG"+(placeholders.length-1)+"\u0000";
   });
