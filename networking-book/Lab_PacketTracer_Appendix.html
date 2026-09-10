@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>สรุปเนื้อหา Lab Packet Tracer ทั้ง 9 ชิ้น</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+
+:root{
+  color-scheme: light dark;
+  --paper:#F6F4EE;
+  --bg:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --accent:#1B3A5C;
+  --accent2:#2B6CB0;
+  --accent-soft:#EAF1FA;
+  --correct:#256D46;
+  --correct-soft:#E7F3EB;
+  --incorrect:#B3341F;
+  --incorrect-soft:#FBEAE6;
+  --flag:#B7862C;
+  --flag-soft:#FBF1DA;
+  --unanswered:#9A9486;
+  --cream:#F4F2E8;
+  --diagram-bg:#FBFAF6;
+  --fontScale:1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12161d;
+    --panel:#1b212b;
+    --border:#333c48;
+    --text:#e4e7ec;
+    --text-soft:#9aa5b3;
+    --navy:#7fb0e0;
+    --accent:#7fb0e0;
+    --accent2:#8ec1f2;
+    --accent-soft:#1c2b3d;
+    --correct:#7fd0a0;
+    --correct-soft:#173323;
+    --incorrect:#f0958a;
+    --incorrect-soft:#33201d;
+    --flag:#e3bd74;
+    --flag-soft:#332a17;
+    --unanswered:#8b93a0;
+    --cream:#232922;
+    --diagram-bg:#181e27;
+  }
+  :root:not([data-theme="light"]) .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
+}
+:root[data-theme="dark"]{
+  --paper:#12161d;
+  --panel:#1b212b;
+  --border:#333c48;
+  --text:#e4e7ec;
+  --text-soft:#9aa5b3;
+  --navy:#7fb0e0;
+  --accent:#7fb0e0;
+  --accent2:#8ec1f2;
+  --accent-soft:#1c2b3d;
+  --correct:#7fd0a0;
+  --correct-soft:#173323;
+  --incorrect:#f0958a;
+  --incorrect-soft:#33201d;
+  --flag:#e3bd74;
+  --flag-soft:#332a17;
+  --unanswered:#8b93a0;
+  --cream:#232922;
+  --diagram-bg:#181e27;
+}
+:root[data-theme="dark"] .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Sarabun',"Segoe UI",sans-serif;
+  background:var(--paper);
+  color:var(--text);
+}
+header{
+  background:var(--navy-deep);
+  border-bottom:4px solid var(--flag);
+  box-shadow:0 2px 10px rgba(15,39,64,0.25);
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+header h1{
+  font-size:18px;
+  margin:0;
+  color:#F2EFE6;
+  font-weight:700;
+}
+header .subtitle{
+  font-size:12.5px;
+  color:#C9C2AE;
+  margin-top:2px;
+}
+.back-to-index{
+  display:inline-block;
+  font-size:12px;
+  color:#C9DCF0;
+  text-decoration:none;
+  margin-bottom:6px;
+  opacity:0.85;
+}
+.back-to-index:hover{opacity:1;text-decoration:underline;}
+@media print{.back-to-index{display:none;}}
+.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.layout{
+  display:flex;
+  max-width:1200px;
+  margin:0 auto;
+  gap:20px;
+  padding:20px;
+}
+.sidebar{width:250px;flex-shrink:0;}
+.sidebar-panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:16px;
+  position:sticky;
+  top:80px;
+  box-shadow:0 2px 8px rgba(15,39,64,0.06);
+  max-height:calc(100vh - 100px);
+  overflow-y:auto;
+}
+.sidebar-panel summary{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-soft);
+  margin:0 0 10px 0;
+  font-weight:600;
+  cursor:pointer;
+  user-select:none;
+}
+.toc-list{list-style:none;margin:0;padding:0;}
+.toc-list li{margin-bottom:2px;}
+.toc-list a{
+  display:block;
+  padding:7px 10px;
+  border-radius:4px;
+  color:var(--text);
+  text-decoration:none;
+  font-size:13px;
+  border-left:3px solid transparent;
+}
+.toc-list a:hover{background:var(--accent-soft);color:var(--accent2);}
+.toc-list a.active{background:var(--accent-soft);color:var(--navy);border-left:3px solid var(--navy);font-weight:600;}
+main{flex:1;min-width:0;}
+.section-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:0 2px 10px rgba(15,39,64,0.06);
+  scroll-margin-top:80px;
+}
+.section-card h2{
+  margin:0 0 14px 0;
+  font-size:18px;
+  color:var(--navy-deep);
+  padding-bottom:10px;
+  border-bottom:2px solid var(--border);
+}
+.section-card h3{
+  font-size:15px;
+  color:var(--navy);
+  margin:20px 0 10px 0;
+}
+.section-card .body-text{
+  font-size:14.5px;
+  line-height:1.9;
+  white-space:pre-wrap;
+}
+.callout{
+  margin:16px 0;
+  padding:14px 16px;
+  border-radius:6px;
+  border-left:4px solid;
+  font-size:14px;
+  line-height:1.8;
+  white-space:pre-wrap;
+}
+.callout-note{background:var(--accent-soft);border-color:var(--accent2);}
+.callout-example{background:var(--cream);border-color:var(--flag);}
+.callout-warning{background:var(--incorrect-soft);border-color:var(--incorrect);}
+.callout-formula{
+  background:var(--navy-deep);
+  color:#EAF1FA;
+  border-color:var(--flag);
+  font-family:'JetBrains Mono',monospace;
+  overflow-x:auto;
+}
+.callout-title{
+  font-weight:700;
+  font-size:12.5px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:8px;
+  display:block;
+  white-space:normal;
+}
+.callout code, .body-text code{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.92em;
+  background:rgba(127,127,127,0.16);
+  padding:1px 5px;
+  border-radius:3px;
+}
+.callout-note .callout-title{color:var(--accent2);}
+.callout-example .callout-title{color:var(--flag);}
+.callout-warning .callout-title{color:var(--incorrect);}
+.callout-formula .callout-title{color:#C9DCF0;}
+.image-block{
+  margin:18px 0;
+  text-align:center;
+}
+.image-block img{
+  max-width:100%;
+  height:auto;
+  border-radius:6px;
+  border:1px solid var(--border);
+  box-shadow:0 2px 10px rgba(15,39,64,0.08);
+}
+.image-block .image-caption{
+  font-size:12.5px;
+  color:var(--text-soft);
+  margin-top:8px;
+  font-style:italic;
+}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13.5px;}
+table th{background:var(--navy-deep);color:#F2EFE6;padding:9px 12px;text-align:left;}
+table td{padding:8px 12px;border-bottom:1px solid var(--border);}
+table tr:nth-child(even) td{background:var(--cream);}
+@media (max-width:800px){
+  .layout{flex-direction:column;}
+  .sidebar{width:100%;}
+  .sidebar-panel{position:static;max-height:none;}
+}
+@media print{
+  header .header-actions, .sidebar, #readProgress, #backToTop, .diagram-play-btn{display:none !important;}
+  .layout{display:block;padding:0;max-width:100%;}
+  main{width:100%;}
+  header{position:static;box-shadow:none;}
+  .section-card{opacity:1 !important;transform:none !important;box-shadow:none;border:1px solid #ccc;break-inside:avoid;}
+  body{background:#fff;}
+}
+
+</style>
+<style>
+
+/* ===== Readability & diagram enhancements ===== */
+#readProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--flag),var(--accent2));width:0%;z-index:999;transition:width .12s ease;}
+
+#backToTop{
+  position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;
+  background:var(--navy-deep);color:#F2EFE6;border:none;cursor:pointer;font-size:18px;
+  box-shadow:0 4px 14px rgba(15,39,64,0.3);display:none;align-items:center;justify-content:center;
+  z-index:998;opacity:0;transition:opacity .2s ease, transform .2s ease;
+}
+#backToTop:hover{transform:translateY(-2px);}
+#backToTop.show{display:flex;opacity:1;}
+
+#fontCtrl{display:flex;gap:6px;align-items:center;}
+#fontCtrl button{
+  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
+  width:32px;height:32px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:700;
+  font-family:'Sarabun',sans-serif;
+}
+#fontCtrl button:hover{background:#fff;}
+
+.theme-toggle-btn{
+  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
+  width:32px;height:32px;border-radius:4px;font-size:15px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:flex;align-items:center;justify-content:center;
+}
+.theme-toggle-btn:hover{background:#fff;}
+@media print{.theme-toggle-btn{display:none;}}
+
+.read-time-badge{
+  font-size:11.5px;color:#C9C2AE;background:rgba(255,255,255,0.08);padding:5px 10px;border-radius:20px;
+  border:1px solid rgba(242,239,230,0.25);white-space:nowrap;
+}
+
+.section-card{opacity:0;transform:translateY(14px);transition:opacity .55s ease, transform .55s ease;}
+.section-card.revealed{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion: reduce){
+  .section-card{opacity:1;transform:none;transition:none;}
+}
+
+.section-card .body-text{font-size:calc(14.5px * var(--fontScale)) !important;}
+.section-card h2{font-size:calc(18px * var(--fontScale)) !important;}
+.section-card h3{font-size:calc(15px * var(--fontScale)) !important;}
+.callout{font-size:calc(14px * var(--fontScale)) !important;}
+table{font-size:calc(13.5px * var(--fontScale)) !important;}
+
+.callout-note .callout-title::before{content:"📝 ";}
+.callout-example .callout-title::before{content:"💡 ";}
+.callout-warning .callout-title::before{content:"⚠️ ";}
+.callout-formula .callout-title::before{content:"∑ ";}
+
+/* ==== Animated sequence / flow diagrams ==== */
+.diagram-block{
+  margin:20px 0;padding:16px 18px 14px;background:var(--diagram-bg);border:1px solid var(--border);
+  border-radius:8px;
+}
+.diagram-block h4{
+  margin:0 0 12px 0;font-size:calc(14.5px * var(--fontScale));color:var(--navy-deep);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.diagram-play-btn{
+  border:1.5px solid var(--accent2);background:#fff;color:var(--accent2);padding:5px 12px;
+  border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;
+  flex-shrink:0;
+}
+.diagram-play-btn:hover{background:var(--accent-soft);}
+.diagram-svg-wrap{overflow-x:auto;}
+.diagram-svg{display:block;margin:0 auto;min-width:420px;}
+.diagram-actor-label{font-family:'Sarabun',sans-serif;font-size:11.5px;font-weight:600;fill:var(--navy-deep);}
+.diagram-lifeline{stroke:var(--border);stroke-width:1.5;stroke-dasharray:3,3;}
+.diagram-node-box{fill:var(--panel);stroke:var(--navy);stroke-width:1.3;}
+.diagram-arrow-path{fill:none;stroke:var(--accent2);stroke-width:2;marker-end:url(#arrowhead);}
+.diagram-arrow-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;fill:var(--navy-deep);}
+.diagram-glow-dot{fill:var(--flag);filter:url(#glowFilter);opacity:0;}
+.diagram-steps-list{list-style:none;margin:12px 0 0;padding:0;font-size:calc(13px * var(--fontScale));line-height:1.7;}
+.diagram-steps-list li{padding:6px 10px;border-left:3px solid transparent;border-radius:4px;transition:background .3s ease, border-color .3s ease;}
+.diagram-steps-list li.step-active{background:var(--accent-soft);border-left-color:var(--flag);}
+.diagram-steps-list .step-num{
+  display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;
+  text-align:center;line-height:20px;font-size:11px;margin-right:8px;font-family:'JetBrains Mono',monospace;
+}
+
+</style>
+</head>
+<body>
+<div id="readProgress"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#2B6CB0"></path></marker>
+<filter id="glowFilter" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+</defs>
+</svg>
+
+<header>
+  <div>
+    <a class="back-to-index" href="index.html">&larr; สารบัญทั้งหมด / All Chapters</a>
+    <h1>Lab Packet Tracer: สรุป 9 ชิ้น พร้อมขั้นตอนตั้งค่า</h1>
+    <div class="subtitle">Computer Networking — CDTI — สรุปจาก running-config/topology จริงในไฟล์ .pkt</div>
+  </div>
+  <div class="header-actions">
+    <span class="read-time-badge" id="readTimeBadge"></span>
+    <div id="fontCtrl">
+      <button id="fontMinus" title="ลดขนาดตัวอักษร / Decrease font size">A&minus;</button>
+      <button id="fontPlus" title="เพิ่มขนาดตัวอักษร / Increase font size">A+</button>
+    </div>
+    <button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="sidebar">
+    <details class="sidebar-panel" id="tocPanel" open>
+      <summary>สารบัญ / Contents</summary>
+      <ul class="toc-list" id="tocList"></ul>
+    </details>
+  </div>
+  <main id="mainArea"></main>
+</div>
+
+<button id="backToTop" title="กลับขึ้นด้านบน / Back to top">&uarr;</button>
+
+<script>
+const SECTIONS = [{"title": "ภาพรวมทั้ง 9 Lab", "body": "เอกสารนี้สรุปเนื้อหาที่ครอบคลุมใน Lab ของ Cisco Packet Tracer (ซอฟต์แวร์จำลองเครือข่ายของ Cisco) ทั้ง 9 ชิ้น (Lab1–Lab9) ที่เคยทำไว้ โดยถอดรหัสไฟล์ .pkt ต้นฉบับด้วยเครื่องมือโอเพนซอร์ส pka2xml เพื่อดึงโทโพโลยีและ running-config ของอุปกรณ์แต่ละตัวออกมาโดยตรง (อ้างอิง: pka2xml (mircodz), GitHub, https://github.com/mircodz/pka2xml, เข้าถึง 10 ก.ย. 2569)\n\nภาพรวมของชุด lab ทั้งหมด เริ่มจากพื้นฐานการเชื่อมต่อ PC 2 เครื่องตรง ๆ (Lab1) ไปจนถึงการจัดเส้นทาง แบบไดนามิกด้วย OSPF ระหว่างเราเตอร์ 3 ตัว (Lab9) โดยมีหัวข้อ VLAN/trunk, router-on-a-stick, DHCP, และ static routing คั่นอยู่ระหว่างทาง", "blocks": [{"type": "diagram", "layout": "lifeline", "title": "ภาพรวม: จาก Lab พื้นฐานสู่การจัดเส้นทางแบบไดนามิก", "actors": ["Lab 1-2\nIP พื้นฐาน + Switch Security", "Lab 3-4\nVLAN/Trunk", "Lab 5-7\nRouter-on-a-stick + DHCP", "Lab 8\nStatic Routing", "Lab 9\nOSPF (Dynamic)"], "steps": [{"from": 0, "to": 1, "label": "จากเชื่อมต่อตรง สู่การแบ่งเครือข่ายเสมือนด้วย VLAN", "note": ""}, {"from": 1, "to": 2, "label": "เพิ่ม router ให้ข้าม VLAN ได้ + แจก IP อัตโนมัติ", "note": ""}, {"from": 2, "to": 3, "label": "ขยายเป็นหลาย router ที่ไม่เห็นกันโดยตรง ต้องกำหนดเส้นทางเอง", "note": ""}, {"from": 3, "to": 4, "label": "เปลี่ยนจากกำหนดเส้นทางเอง เป็นให้ router คำนวณเองด้วย link-state", "note": ""}]}, {"type": "table", "content": "\n<table>\n<thead><tr><th>Lab</th><th>อุปกรณ์</th><th>การตั้งค่าเด่น</th><th>เทียบเนื้อหาบทเรียน</th></tr></thead>\n<tbody>\n<tr><td>1</td><td>PC 2 เครื่อง (ต่อตรง)</td><td>IP static, ทดสอบ ping</td><td>บทที่ 1 — network edge, IP addressing เบื้องต้น</td></tr>\n<tr><td>2</td><td>Switch 1 + PC 1</td><td>hostname, username/secret, SSH, IP บน VLAN1, จำกัด VTY เฉพาะ SSH</td><td>บทที่ 6 (switch) + บทที่ 8 (authentication)</td></tr>\n<tr><td>3</td><td>Switch 2 + PC 3</td><td>VLAN10(+20), trunk, subnet เดียวกันทั้งหมด (/24)</td><td>บทที่ 6 — VLAN, trunk</td></tr>\n<tr><td>4</td><td>Switch 2 + PC 3</td><td>VLAN10/20 + trunk เหมือน Lab3 แต่แยก subnet ต่อ VLAN แบบ VLSM (/30)</td><td>บทที่ 6 (VLAN) + บทที่ 4 (VLSM)</td></tr>\n<tr><td>5</td><td>Switch 2 + Router 1 + PC 2</td><td>router-on-a-stick 2 VLAN คนละ physical port, subnet /29</td><td>บทที่ 6 (VLAN) + บทที่ 4 (subnetting)</td></tr>\n<tr><td>6</td><td>Switch 2 + Router 1 + PC 2</td><td>เหมือน Lab5 ทุกประการ + เพิ่ม router เป็น DHCP server 2 VLAN</td><td>บทที่ 4/6 (VLAN routing) + บทที่ 2 (DHCP)</td></tr>\n<tr><td>7</td><td>Switch 4 + Router 1 + PC 6</td><td>router-on-a-stick 3 VLAN บน trunk เดียว + DHCP แยก pool</td><td>บทที่ 4/6 (VLAN routing) + บทที่ 2 (DHCP)</td></tr>\n<tr><td>8</td><td>Router 3 + Switch 3 + PC 3</td><td>R3 เป็นตัวกลางเชื่อม R1/R2, VLAN+router-on-a-stick ที่ปลายทาง, static routing ทุก router</td><td>บทที่ 5 — static routing</td></tr>\n<tr><td>9</td><td>Router 3 + Switch 3 + PC 3</td><td>โทโพโลยี/IP เดียวกับ Lab8 ทุกประการ แต่เปลี่ยนเป็น OSPF area 0</td><td>บทที่ 5 — OSPF, link-state routing</td></tr>\n</tbody>\n</table>\n"}, {"type": "note", "content": "ตรวจสอบ running-config ของทุกอุปกรณ์ในทั้ง 9 lab แล้ว ไม่พบคำสั่งตั้งค่า logging (syslog) เช่น logging host, logging buffered, logging trap ในอุปกรณ์ใดเลย มีเพียงบรรทัด \"no service timestamps log datetime msec\" ซึ่งเป็นค่า default ที่ Cisco IOS ใส่ให้ทุกอุปกรณ์อยู่แล้ว"}]}, {"title": "Lab 1: เชื่อมต่อ PC โดยตรงและพื้นฐานการกำหนด IP", "body": "PC 2 เครื่อง (PC1, PC2) เชื่อมต่อกันโดยตรงด้วยสายไขว้ (crossover cable — สายที่ใช้เชื่อมอุปกรณ์ ประเภทเดียวกัน เช่น PC ต่อ PC โดยไม่ผ่าน switch) กำหนด IP แบบ static ให้ทั้งสองเครื่องอยู่ในเครือข่าย เดียวกัน แล้วทดสอบการเชื่อมต่อด้วย ping (คำสั่งทดสอบด้วย ICMP echo)\n\nเป็น lab พื้นฐานที่สุดในชุดนี้ เน้นแนวคิดเรื่อง physical media และการกำหนดที่อยู่ IP เบื้องต้น ก่อนเข้าสู่เรื่องอุปกรณ์ตัวกลาง (switch/router) ใน lab ถัดไป", "blocks": [{"type": "diagram", "layout": "lifeline", "title": "Lab 1: เชื่อมต่อ PC ตรง + ทดสอบ ping", "actors": ["PC1\n192.168.1.10/24", "Crossover Cable", "PC2\n192.168.1.20/24"], "steps": [{"from": 0, "to": 1, "label": "กำหนด static IP ให้ทั้งสองเครื่องก่อนเชื่อมสาย", "note": ""}, {"from": 1, "to": 2, "label": "สายไขว้ใช้เชื่อมอุปกรณ์ประเภทเดียวกันโดยตรง (PC-PC) โดยไม่ผ่าน switch", "note": ""}, {"from": 2, "to": 0, "label": "ping 192.168.1.20 → ได้ ICMP echo reply กลับมา = เชื่อมต่อสำเร็จ", "note": ""}]}, {"type": "table", "content": "<table><thead><tr><th>อุปกรณ์</th><th>IP</th><th>Subnet Mask</th></tr></thead><tbody><tr><td>PC1</td><td>192.168.1.10</td><td>255.255.255.0 (/24)</td></tr><tr><td>PC2</td><td>192.168.1.20</td><td>255.255.255.0 (/24)</td></tr></tbody></table>"}, {"type": "note", "content": "เชื่อมโยงเนื้อหา: [บทที่ 1 — Introduction](Chapter_1_Summary.html) (network edge, physical media) และ [OSI Model — IP addressing เบื้องต้น](OSI_Model_Summary.html)"}, {"type": "formula", "label": "ขั้นตอนตั้งค่า (Packet Tracer Desktop)", "content": "PC1 > Desktop > IP Configuration\n  IP Address: 192.168.1.10\n  Subnet Mask: 255.255.255.0\n\nPC2 > Desktop > IP Configuration\n  IP Address: 192.168.1.20\n  Subnet Mask: 255.255.255.0\n\nทดสอบจาก PC1:\nPC> ping 192.168.1.20"}]}, {"title": "Lab 2: การตั้งค่าความปลอดภัยพื้นฐานบน Switch (SSH)", "body": "Switch รุ่น 2960-24TT 1 ตัว ต่อกับ PC 1 เครื่อง ตั้งค่าชื่ออุปกรณ์ (hostname — ชื่ออุปกรณ์ที่แสดงใน prompt ของ CLI) เป็น SW2960-ISE-Lab, สร้าง username/secret สำหรับล็อกอินแบบเข้ารหัส, เปิดใช้ SSH (Secure Shell — โพรโทคอลเข้าถึงอุปกรณ์ระยะไกลแบบเข้ารหัส ไม่มีคำแปลไทยมาตรฐาน) เวอร์ชัน 1 พร้อม กำหนด domain-name ที่จำเป็นสำหรับสร้างกุญแจเข้ารหัส, กำหนด IP บริหารจัดการ (192.168.1.2/24) บน VLAN1 (Virtual LAN, LAN เสมือน) พร้อม default gateway (เกตเวย์เริ่มต้น) และจำกัดให้ line VTY (ช่องทางเข้าถึงอุปกรณ์ระยะไกล) ยอมรับเฉพาะการเชื่อมต่อผ่าน SSH เท่านั้น (ปิดทาง Telnet ที่ไม่เข้ารหัส)", "blocks": [{"type": "diagram", "layout": "lifeline", "title": "Lab 2: ลำดับการตั้งค่า SSH บน Switch", "actors": ["1. hostname", "2. username/secret\n+ domain-name", "3. crypto key\ngenerate rsa", "4. ip ssh version", "5. VTY: login local\n+ transport input ssh"], "steps": [{"from": 0, "to": 1, "label": "ตั้งชื่ออุปกรณ์และบัญชีผู้ใช้ก่อนเริ่มเข้ารหัส", "note": ""}, {"from": 1, "to": 2, "label": "ต้องมี domain-name ก่อน ไม่งั้นสร้างกุญแจ RSA ไม่ได้", "note": ""}, {"from": 2, "to": 3, "label": "กุญแจถูกสร้างแล้วจึงเปิดใช้ SSH ได้", "note": ""}, {"from": 3, "to": 4, "label": "ปิด Telnet ทิ้ง ให้ VTY รับเฉพาะ SSH เท่านั้น", "note": ""}]}, {"type": "note", "content": "เชื่อมโยงเนื้อหา: [บทที่ 6 — The Link Layer and LANs](Chapter_6_Summary.html) (switch) และ [บทที่ 8 — Security](Chapter_8_Summary.html) (authentication, การเข้าถึงระยะไกลอย่างปลอดภัย)"}, {"type": "formula", "label": "ขั้นตอนตั้งค่า (Cisco IOS บน Switch)", "content": "Switch> enable\nSwitch# configure terminal\nSwitch(config)# hostname SW2960-ISE-Lab\nSW2960-ISE-Lab(config)# ip domain-name lab.local\nSW2960-ISE-Lab(config)# username admin secret Cisco123!\nSW2960-ISE-Lab(config)# crypto key generate rsa\n% ระบบจะถาม How many bits in the modulus [512]: ใส่ 1024\nSW2960-ISE-Lab(config)# ip ssh version 1\nSW2960-ISE-Lab(config)# interface vlan 1\nSW2960-ISE-Lab(config-if)# ip address 192.168.1.2 255.255.255.0\nSW2960-ISE-Lab(config-if)# no shutdown\nSW2960-ISE-Lab(config-if)# exit\nSW2960-ISE-Lab(config)# ip default-gateway 192.168.1.1\nSW2960-ISE-Lab(config)# line vty 0 15\nSW2960-ISE-Lab(config-line)# login local\nSW2960-ISE-Lab(config-line)# transport input ssh"}, {"type": "warning", "content": "Lab นี้ใช้ **SSH version 1** ตามที่ตั้งค่าไว้จริง แต่ในทางปฏิบัติ SSHv1 มีช่องโหว่ที่รู้จักแล้วและไม่ควรใช้งานจริง — งานจริงควรใช้ `ip ssh version 2` และกุญแจ RSA อย่างน้อย 1024 บิตขึ้นไปเสมอ"}]}, {"title": "Lab 3: VLAN และ Trunk พื้นฐาน (subnet เดียว)", "body": "Switch 2960-24TT 2 ตัวเชื่อมกันด้วยลิงก์ trunk (ทรังก์ — ลิงก์ที่ขนส่งได้หลาย VLAN ผ่านการติดแท็ก ตามมาตรฐาน 802.1Q ไม่มีคำแปลไทยมาตรฐาน), แบ่งเป็น VLAN 10 (และ VLAN 20 บาง port บน switch ตัวที่สอง) PC ทั้ง 3 เครื่องกำหนด IP อยู่ในเครือข่ายเดียวกันคือ 192.168.10.0/24 ทั้งหมด", "blocks": [{"type": "diagram", "layout": "lifeline", "title": "Lab 3: สร้าง VLAN และตั้งค่า Trunk", "actors": ["1. สร้าง VLAN\n(vlan 10)", "2. กำหนด Access Port\nเข้า VLAN", "3. ตั้ง Trunk Port\nระหว่าง Switch", "4. อนุญาต VLAN\nผ่าน Trunk"], "steps": [{"from": 0, "to": 1, "label": "ต้องสร้าง VLAN ในฐานข้อมูลก่อนนำไปผูกกับ port", "note": ""}, {"from": 1, "to": 2, "label": "port ที่ต่อ PC ตั้งเป็น access, port ที่ต่อ switch อีกตัวตั้งเป็น trunk", "note": ""}, {"from": 2, "to": 3, "label": "trunk ต้องระบุชัดว่าอนุญาต VLAN ใดผ่านได้บ้าง", "note": ""}]}, {"type": "table", "content": "<table><thead><tr><th>อุปกรณ์</th><th>IP</th><th>Subnet Mask</th></tr></thead><tbody><tr><td>PC0</td><td>192.168.10.3</td><td>255.255.255.0 (/24)</td></tr><tr><td>PC1</td><td>192.168.10.4</td><td>255.255.255.0 (/24)</td></tr><tr><td>PC2</td><td>192.168.10.5</td><td>255.255.255.0 (/24)</td></tr></tbody></table>"}, {"type": "note", "content": "เชื่อมโยงเนื้อหา: [บทที่ 6 — The Link Layer and LANs](Chapter_6_Summary.html) (VLAN, trunk, การทำงานของ switch)"}, {"type": "formula", "label": "ขั้นตอนตั้งค่า (Cisco IOS บน Switch)", "content": "Switch1(config)# vlan 10\nSwitch1(config-vlan)# name Data\nSwitch1(config-vlan)# exit\nSwitch1(config)# interface range fastEthernet 0/1 - 2\nSwitch1(config-if-range)# switchport mode access\nSwitch1(config-if-range)# switchport access vlan 10\nSwitch1(config-if-range)# exit\nSwitch1(config)# interface fastEthernet 0/24\nSwitch1(config-if)# switchport mode trunk\nSwitch1(config-if)# switchport trunk allowed vlan 10,20\n\n! Switch2 ทำเช่นเดียวกัน เพิ่ม VLAN 20 บาง port ตามที่โจทย์กำหนด\nSwitch2(config)# vlan 20\nSwitch2(config-vlan)# name Voice\nSwitch2(config-vlan)# exit\nSwitch2(config)# interface fastEthernet 0/2\nSwitch2(config-if)# switchport mode access\nSwitch2(config-if)# switchport access vlan 20"}]}, {"title": "Lab 4: VLAN และ Trunk พร้อมแบ่ง Subnet ต่อ VLAN (VLSM)", "body": "โครงสร้างการตั้งค่า switch (VLAN 10/20 + trunk) เหมือน Lab 3 ทุกประการ แต่เปลี่ยนรูปแบบการกำหนด IP ให้แต่ละ VLAN ใช้ subnet ของตัวเองขนาดเล็กสุด (/30 = ใช้งานได้จริง 2 IP ต่อ subnet) แทนที่จะใช้ subnet เดียวกันทั้งหมดแบบ Lab 3 — เป็นตัวอย่างการทำ VLSM (Variable Length Subnet Masking — ไม่มีคำแปลไทยมาตรฐาน, การแบ่งซับเน็ตให้ขนาดต่างกันตามจำนวน host ที่ต้องใช้จริงในแต่ละ VLAN)", "blocks": [{"type": "table", "content": "<table><thead><tr><th>อุปกรณ์</th><th>IP</th><th>Subnet Mask</th><th>VLAN</th></tr></thead><tbody><tr><td>PC0</td><td>172.16.10.1</td><td>255.255.255.252 (/30)</td><td>10</td></tr><tr><td>PC1</td><td>172.16.10.2</td><td>255.255.255.252 (/30)</td><td>10</td></tr><tr><td>PC2</td><td>172.16.10.5</td><td>255.255.255.252 (/30)</td><td>20 (คนละ subnet กับ PC0/PC1)</td></tr></tbody></table>"}, {"type": "note", "content": "เชื่อมโยงเนื้อหา: [บทที่ 6 — The Link Layer and LANs](Chapter_6_Summary.html) (VLAN, trunk) ผสม [OSI Model — การแบ่ง subnet / VLSM](OSI_Model_Summary.html)"}, {"type": "formula", "label": "ขั้นตอนตั้งค่า IP แบบ VLSM", "content": "! โครงสร้าง VLAN/trunk เหมือน Lab 3 ทุกประการ (ดูคำสั่งใน Lab 3)\n! ต่างกันแค่ตอนกำหนด IP ให้ PC — แบ่งเป็น subnet /30 แยกต่อ VLAN แทนที่จะใช้ /24 ร่วมกัน\n\nPC0 (VLAN 10) > IP Configuration\n  IP Address: 172.16.10.1\n  Subnet Mask: 255.255.255.252   (/30)\n\nPC1 (VLAN 10) > IP Configuration\n  IP Address: 172.16.10.2\n  Subnet Mask: 255.255.255.252   (/30)\n\nPC2 (VLAN 20) > IP Configuration\n  IP Address: 172.16.10.5\n  Subnet Mask: 255.255.255.252   (/30)  ! คนละ subnet กับ VLAN 10"}]}, {"title": "Lab 5: Inter-VLAN Routing ด้วย Router-on-a-stick (แยก Physical Port)", "body": "Switch 2 ตัว + Router 2901 1 ตัว + PC 2 เครื่อง ทำ inter-VLAN routing (การจัดเส้นทางข้าม VLAN) แบบ router-on-a-stick (ไม่มีคำแปลไทยมาตรฐาน — เทคนิคใช้ router ตัวเดียวสร้าง subinterface, ซับอินเทอร์เฟซ/อินเทอร์เฟซย่อยเชิงตรรกะ, แยกตาม VLAN เพื่อจัดเส้นทางข้าม VLAN) โดยแยก VLAN 10 กับ VLAN 20 ไว้คนละ physical interface (GigabitEthernet0/0.10 และ GigabitEthernet0/1.20) แทนที่จะรวมอยู่ บน trunk เดียว ใช้ subnet ขนาด /29 (ใช้งานได้จริง 6 IP ต่อ subnet)", "blocks": [{"type": "diagram", "layout": "lifeline", "title": "Lab 5: Router-on-a-stick (แยก Physical Port ต่อ VLAN)", "actors": ["VLAN 10\nPC0: 10.10.10.2", "Switch (Trunk)", "Router: Gi0/0.10\n10.10.10.1", "Router: Gi0/1.20\n10.10.10.9", "VLAN 20\nPC1: 10.10.10.10"], "steps": [{"from": 0, "to": 1, "label": "เฟรมจาก PC0 ถูกแท็ก VLAN 10 ผ่าน access port", "note": ""}, {"from": 1, "to": 2, "label": "switch ส่งเข้า subinterface ที่ตรงกับ VLAN 10 บน physical port แรก", "note": ""}, {"from": 2, "to": 3, "label": "router จัดเส้นทางข้าม VLAN ภายในตัวเอง ระหว่างสอง subinterface", "note": ""}, {"from": 3, "to": 4, "label": "ออกทาง physical port ที่สองไปหา VLAN 20", "note": ""}]}, {"type": "table", "content": "<table><thead><tr><th>VLAN</th><th>Subnet</th><th>Router</th><th>PC</th></tr></thead><tbody><tr><td>10</td><td>10.10.10.0/29</td><td>10.10.10.1 (Gi0/0.10)</td><td>PC0: 10.10.10.2</td></tr><tr><td>20</td><td>10.10.10.8/29</td><td>10.10.10.9 (Gi0/1.20)</td><td>PC1: 10.10.10.10</td></tr></tbody></table>"}, {"type": "note", "content": "เชื่อมโยงเนื้อหา: [บทที่ 6 — The Link Layer and LANs](Chapter_6_Summary.html) (VLAN) ผสม [บทที่ 4 — Network Layer: Data Plane](Chapter_4_Summary.html) (IP addressing/subnetting)"}, {"type": "formula", "label": "ขั้นตอนตั้งค่า (Cisco IOS)", "content": "! ฝั่ง Switch: ตั้ง trunk ไปหา router เหมือน Lab 3\nSwitch(config)# interface fastEthernet 0/24\nSwitch(config-if)# switchport mode trunk\n\n! ฝั่ง Router: แยก subinterface คนละ physical port ต่อ VLAN\nRouter(config)# interface gigabitEthernet 0/0.10\nRouter(config-subif)# encapsulation dot1Q 10\nRouter(config-subif)# ip address 10.10.10.1 255.255.255.248\nRouter(config-subif)# no shutdown\nRouter(config-subif)# exit\nRouter(config)# interface gigabitEthernet 0/1.20\nRouter(config-subif)# encapsulation dot1Q 20\nRouter(config-subif)# ip address 10.10.10.9 255.255.255.248\nRouter(config-subif)# no shutdown"}]}, {"title": "Lab 6: Router-on-a-stick พร้อม DHCP (2 VLAN)", "body": "โครงสร้างเดียวกับ Lab 5 ทุกประการ (router-on-a-stick แยก physical interface ต่อ VLAN, subnet /29 เดิม ทั้ง IP router และช่วง subnet) แต่เพิ่มให้ router ทำหน้าที่ DHCP server (Dynamic Host Configuration Protocol — ไม่มีคำแปลไทยมาตรฐาน, โพรโทคอลแจกจ่าย IP ให้อัตโนมัติ) ให้ทั้งสอง VLAN แยก pool ต่อ VLAN พร้อมกำหนด DNS server (1.1.1.1) — PC ทั้งสองเครื่องตั้งค่าให้รับ IP อัตโนมัติผ่าน DHCP แทนการกำหนด static", "blocks": [{"type": "diagram", "layout": "lifeline", "title": "Lab 6: ขั้นตอน DHCP (DORA) เมื่อ PC ขอ IP จาก Router", "actors": ["PC\n(ยังไม่มี IP)", "Router DHCP Server\n(VLAN pool)"], "steps": [{"from": 0, "to": 1, "label": "Discover: PC broadcast หา DHCP server", "note": ""}, {"from": 1, "to": 0, "label": "Offer: router เสนอ IP ว่างจาก pool ที่ตรง VLAN", "note": ""}, {"from": 0, "to": 1, "label": "Request: PC ขอรับ IP ที่เสนอมาอย่างเป็นทางการ", "note": ""}, {"from": 1, "to": 0, "label": "Ack: router ยืนยัน พร้อมแนบ default-router และ dns-server (1.1.1.1)", "note": ""}]}, {"type": "note", "content": "เชื่อมโยงเนื้อหา: [บทที่ 4 — Network Layer: Data Plane](Chapter_4_Summary.html) / [บทที่ 6 — Link Layer](Chapter_6_Summary.html) (VLAN routing) ผสม [บทที่ 2 — Application Layer](Chapter_2_Summary.html) (DHCP)"}, {"type": "formula", "label": "ขั้นตอนตั้งค่า DHCP Server บน Router", "content": "! ต่อยอดจาก Lab 5 — เพิ่มการตั้งค่า DHCP บน router ตัวเดิม\nRouter(config)# ip dhcp excluded-address 10.10.10.1 10.10.10.1\nRouter(config)# ip dhcp excluded-address 10.10.10.9 10.10.10.9\nRouter(config)# ip dhcp pool VLAN10_POOL\nRouter(dhcp-config)# network 10.10.10.0 255.255.255.248\nRouter(dhcp-config)# default-router 10.10.10.1\nRouter(dhcp-config)# dns-server 1.1.1.1\nRouter(dhcp-config)# exit\nRouter(config)# ip dhcp pool VLAN20_POOL\nRouter(dhcp-config)# network 10.10.10.8 255.255.255.248\nRouter(dhcp-config)# default-router 10.10.10.9\nRouter(dhcp-config)# dns-server 1.1.1.1\n\n! ฝั่ง PC: เปลี่ยนจาก Static เป็น DHCP\nPC0 > Desktop > IP Configuration > เลือก DHCP"}]}, {"title": "Lab 7: Router-on-a-stick 3 VLAN บน Trunk เดียว พร้อม DHCP", "body": "ขยับความซับซ้อนจาก Lab 6: Switch 4 ตัว + Router 2901 1 ตัว + PC 6 เครื่อง ทำ router-on-a-stick 3 VLAN (10/20/30) ผ่าน subinterface บน physical interface เดียว (GigabitEthernet0/0) แทนที่จะแยกคนละ port แบบ Lab 5/6 — router ยังทำหน้าที่ DHCP server แยก pool ต่อ VLAN เช่นเดียวกับ Lab 6 ใช้ subnet ขนาด /29 เหมือนเดิม", "blocks": [{"type": "table", "content": "<table><thead><tr><th>VLAN</th><th>Subnet</th><th>Router Gateway</th></tr></thead><tbody><tr><td>10</td><td>10.10.15.0/29</td><td>10.10.15.1 (Gi0/0.10)</td></tr><tr><td>20</td><td>10.10.15.8/29</td><td>10.10.15.9 (Gi0/0.20)</td></tr><tr><td>30</td><td>10.10.15.16/29</td><td>10.10.15.17 (Gi0/0.30)</td></tr></tbody></table>"}, {"type": "note", "content": "เชื่อมโยงเนื้อหา: [บทที่ 4 — Network Layer: Data Plane](Chapter_4_Summary.html) / [บทที่ 6 — Link Layer](Chapter_6_Summary.html) (VLAN routing บน trunk เดียว) ผสม [บทที่ 2 — Application Layer](Chapter_2_Summary.html) (DHCP)"}, {"type": "formula", "label": "ขั้นตอนตั้งค่า (Cisco IOS)", "content": "! ต่างจาก Lab 5/6 ตรงที่ subinterface ทั้ง 3 VLAN อยู่บน physical port เดียว (Gi0/0)\nRouter(config)# interface gigabitEthernet 0/0.10\nRouter(config-subif)# encapsulation dot1Q 10\nRouter(config-subif)# ip address 10.10.15.1 255.255.255.248\nRouter(config-subif)# exit\nRouter(config)# interface gigabitEthernet 0/0.20\nRouter(config-subif)# encapsulation dot1Q 20\nRouter(config-subif)# ip address 10.10.15.9 255.255.255.248\nRouter(config-subif)# exit\nRouter(config)# interface gigabitEthernet 0/0.30\nRouter(config-subif)# encapsulation dot1Q 30\nRouter(config-subif)# ip address 10.10.15.17 255.255.255.248\nRouter(config-subif)# exit\nRouter(config)# interface gigabitEthernet 0/0\nRouter(config-if)# no shutdown\n\n! DHCP แยก pool ต่อ VLAN เหมือน Lab 6 (ทำซ้ำอีก 1 pool สำหรับ VLAN 30)\nRouter(config)# ip dhcp pool VLAN30_POOL\nRouter(dhcp-config)# network 10.10.15.16 255.255.255.248\nRouter(dhcp-config)# default-router 10.10.15.17\nRouter(dhcp-config)# dns-server 1.1.1.1"}]}, {"title": "Lab 8: จัดเส้นทางหลาย Router ด้วย Static Routing", "body": "Router 2901 3 ตัว โดย R3 ทำหน้าที่เป็นตัวกลาง (hub) เชื่อมไปหา R1 และ R2 ฝั่งละเส้นด้วยลิงก์แบบจุดต่อจุด (point-to-point link) ขนาด /30 (ไม่ได้เชื่อมต่อกันครบเป็นรูปสามเหลี่ยม R1 กับ R2 ไม่ได้เชื่อมตรงถึงกัน) — R1 และ R2 มี VLAN + router-on-a-stick เชื่อมกับ switch/PC ของตัวเอง (subnet /28 คนละ VLAN) ส่วน R3 เองก็มี VLAN local ของตัวเองผ่าน port switch ในตัว (built-in switch module บนรุ่น 2901) เพราะ R1 และ R2 มองไม่เห็นกันโดยตรง จึงต้องตั้งเส้นทางแบบสถิต (static routing — การจัดเส้นทางที่ผู้ดูแล กำหนด path ตายตัวด้วยคำสั่ง ip route เอง ไม่ใช่ให้ router คำนวณเอง) ด้วยตนเองในทุก router ให้ครบทุก subnet ปลายทางที่ไม่ได้เชื่อมตรง", "blocks": [{"type": "diagram", "layout": "lifeline", "title": "Lab 8: Static Routing ผ่าน R3 (R1 และ R2 ไม่เห็นกันตรง)", "actors": ["R1\nVLAN10: 172.16.10.0/28", "R3 (ตัวกลาง)\nVLAN20: 172.16.10.16/28", "R2\nVLAN30: 172.16.10.32/28"], "steps": [{"from": 0, "to": 1, "label": "R1 ต้องมี ip route ไปหา subnet ของ R2 และ R3 โดยชี้ next-hop เป็น R3", "note": ""}, {"from": 1, "to": 2, "label": "R3 เห็นทั้งสองฝั่งตรง ๆ จึงมี route ไปหาทุก subnet ผ่าน interface ที่ถูกต้อง", "note": ""}, {"from": 2, "to": 1, "label": "R2 ต้องมี ip route ไปหา subnet ของ R1 และ R3 โดยชี้ next-hop เป็น R3 เช่นกัน", "note": ""}]}, {"type": "table", "content": "<table><thead><tr><th>Router</th><th>VLAN/Subnet ท้องถิ่น</th><th>ลิงก์ไปหา R3</th></tr></thead><tbody><tr><td>R1</td><td>VLAN10: 172.16.10.0/28</td><td>202.44.38.0/30 (R1: .1)</td></tr><tr><td>R2</td><td>VLAN30: 172.16.10.32/28</td><td>202.44.38.4/30 (R2: .6)</td></tr><tr><td>R3</td><td>VLAN20: 172.16.10.16/28 (local, ผ่าน switch module ในตัว)</td><td>เชื่อมทั้งสองฝั่ง (.2 ไปหา R1, .5 ไปหา R2)</td></tr></tbody></table>"}, {"type": "note", "content": "เชื่อมโยงเนื้อหา: [บทที่ 5 — Network Layer: Control Plane](Chapter_5_Summary.html) (static routing)"}, {"type": "formula", "label": "ขั้นตอนตั้งค่า Static Route (ip route ปลายทาง subnet-mask next-hop)", "content": "! R1: ต้องบอกทางไปหา subnet ของ R3(local) และ R2 โดยชี้ next-hop เป็น R3\nR1(config)# ip route 172.16.10.16 255.255.255.240 202.44.38.2\nR1(config)# ip route 172.16.10.32 255.255.255.240 202.44.38.2\n\n! R3: เห็นทุกฝั่งตรง ๆ ผ่าน interface ของตัวเอง ไม่ต้องเพิ่ม route ไปยัง local subnet\nR3(config)# ip route 172.16.10.0 255.255.255.240 202.44.38.1\nR3(config)# ip route 172.16.10.32 255.255.255.240 202.44.38.6\n\n! R2: บอกทางไปหา subnet ของ R1 และ R3(local) โดยชี้ next-hop เป็น R3\nR2(config)# ip route 172.16.10.0 255.255.255.240 202.44.38.5\nR2(config)# ip route 172.16.10.16 255.255.255.240 202.44.38.5\n\n! ตรวจสอบผลด้วย\nR1# show ip route static"}]}, {"title": "Lab 9: จัดเส้นทางหลาย Router ด้วย OSPF (แทนที่ Static Routing)", "body": "โทโพโลยีและการกำหนด IP เหมือน Lab 8 ทุกประการ (router 3 ตัว, R3 เป็นตัวกลางเชื่อม R1/R2 ด้วยลิงก์ /30, VLAN+router-on-a-stick ที่ปลายทางเดิมทุกจุด) แต่เปลี่ยนจากคำสั่ง ip route แบบ Lab 8 มาใช้ OSPF (Open Shortest Path First — โพรโทคอลจัดเส้นทางแบบ link-state ที่ router คำนวณเส้นทางที่ดีที่สุดเอง ด้วยอัลกอริทึม Dijkstra) area เดียว (area 0) ในทุก router แทน\n\nเป็น lab คู่กับ Lab 8 ที่ให้เห็นความต่างระหว่างการจัดเส้นทางแบบ static กับแบบ dynamic (link-state) บนโทโพโลยีเดียวกันเป๊ะ — ตรงกับที่เคยทบทวนเรื่องตาราง confirmed/tentative ของ Dijkstra ตามรูปแบบที่ อาจารย์ใช้", "blocks": [{"type": "diagram", "layout": "lifeline", "title": "Lab 9: OSPF แทนที่ Static Routing (link-state)", "actors": ["1. router ospf 1\nทุก router", "2. network ...\narea 0", "3. แลกเปลี่ยน Hello\nหา neighbor", "4. flood LSA\nสร้างแผนที่เครือข่าย", "5. Dijkstra คำนวณ\nเส้นทางที่ดีที่สุด"], "steps": [{"from": 0, "to": 1, "label": "ประกาศทุก subnet ที่ router เชื่อมอยู่เข้า area 0", "note": ""}, {"from": 1, "to": 2, "label": "router ที่ตั้ง OSPF area เดียวกันจะหากันเจอผ่าน Hello packet", "note": ""}, {"from": 2, "to": 3, "label": "แต่ละ router แชร์สถานะลิงก์ของตัวเอง (LSA) ให้ทุกตัวในบริเวณเดียวกัน", "note": ""}, {"from": 3, "to": 4, "label": "ทุก router มีแผนที่เหมือนกัน แล้วคำนวณเส้นทางสั้นสุดด้วยอัลกอริทึม Dijkstra เอง — ไม่ต้องพิมพ์ ip route มือเหมือน Lab 8", "note": ""}]}, {"type": "note", "content": "เชื่อมโยงเนื้อหา: [บทที่ 5 — Network Layer: Control Plane](Chapter_5_Summary.html) (OSPF, link-state routing, Dijkstra)"}, {"type": "formula", "label": "ขั้นตอนตั้งค่า OSPF (wildcard mask = ตรงข้าม subnet mask)", "content": "! ลบ static route เดิมออกก่อน (no ip route ...) แล้วตั้ง OSPF แทนในทุก router\n\nR1(config)# router ospf 1\nR1(config-router)# network 172.16.10.0 0.0.0.15 area 0\nR1(config-router)# network 202.44.38.0 0.0.0.3 area 0\n\nR3(config)# router ospf 1\nR3(config-router)# network 172.16.10.16 0.0.0.15 area 0\nR3(config-router)# network 202.44.38.0 0.0.0.3 area 0\nR3(config-router)# network 202.44.38.4 0.0.0.3 area 0\n\nR2(config)# router ospf 1\nR2(config-router)# network 172.16.10.32 0.0.0.15 area 0\nR2(config-router)# network 202.44.38.4 0.0.0.3 area 0\n\n! ตรวจสอบว่าเจอเพื่อนบ้านและได้เส้นทางมาจริง\nR1# show ip ospf neighbor\nR1# show ip route ospf"}, {"type": "note", "content": "สังเกตว่า OSPF ใช้ **wildcard mask** (ตรงข้ามบิตกับ subnet mask ปกติ) เช่น subnet /28 → subnet mask 255.255.255.240 → wildcard mask 0.0.0.15 — เป็นจุดที่สับสนบ่อยที่สุดตอนเริ่มเรียน OSPF"}]}];
+
+function renderTOC(){
+  const toc = document.getElementById("tocList");
+  toc.innerHTML = "";
+  SECTIONS.forEach((sec, idx)=>{
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#section_"+idx;
+    const hasDiagram = (sec.blocks||[]).some(function(b){ return b.type === "diagram"; });
+    a.textContent = (hasDiagram ? "🔀 " : "") + sec.title;
+    a.dataset.idx = idx;
+    li.appendChild(a);
+    toc.appendChild(li);
+  });
+}
+
+function setupTocPanel(){
+  const panel = document.getElementById("tocPanel");
+  if(panel && window.matchMedia("(max-width:800px)").matches){
+    panel.removeAttribute("open");
+  }
+}
+
+function escapeXml(s){
+  return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function mdFormat(s){
+  let t = escapeXml(s);
+  t = t.replace(/`([^`\n]+?)`/g, "<code>$1</code>");
+  t = t.replace(/\*\*([^*\n]+?)\*\*/g, "<strong>$1</strong>");
+  t = t.replace(/\[([^\]\n]+?)\]\(([^)\s]+?)\)/g, "<a href=\"$2\">$1</a>");
+  return t;
+}
+function computeReadingTime(){
+  const main = document.getElementById("mainArea");
+  const chars = (main.textContent || "").replace(/\s+/g, "").length;
+  return Math.max(1, Math.round(chars / 900));
+}
+function fmtTspans(text, x){
+  return String(text==null?"":text).split("\n").map(function(line,i){
+    return '<tspan x="'+x+'" dy="'+(i===0?0:15)+'">'+escapeXml(line)+'</tspan>';
+  }).join("");
+}
+
+function renderDiagramBlock(block, secIdx, blockIdx){
+  const uid = "dg_"+secIdx+"_"+blockIdx;
+  const layout = block.layout || "lifeline";
+  const actors = block.actors || [];
+  const steps = block.steps || [];
+  const n = actors.length;
+  const W = 680;
+  const margin = 76;
+  const nodesX = [];
+  for(let i=0;i<n;i++){ nodesX.push(n===1 ? W/2 : margin + i*((W-2*margin)/Math.max(1,n-1))); }
+  let inner = "";
+  let H = 0;
+
+  if(layout === "flow"){
+    const boxY = 50, boxH = 46;
+    const boxW = Math.min(128, Math.max(70,(W-2*margin)/Math.max(1,n-1)-14));
+    H = 168;
+    actors.forEach(function(a,i){
+      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+boxY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
+      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(boxY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
+    });
+    steps.forEach(function(st,i){
+      const x1 = nodesX[st.from]+boxW/2+3, x2 = nodesX[st.to]-boxW/2-3;
+      const y = boxY+boxH/2;
+      const pid = uid+"_p"+i, mid = uid+"_m"+i;
+      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
+      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(boxY-12)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
+      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
+             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
+             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
+             + '</circle>';
+    });
+  } else {
+    const rowH = 64, topY = 12, boxH = 38;
+    H = topY + boxH + steps.length*rowH + 26;
+    const boxW = Math.min(160, Math.max(80,(W-2*margin)/Math.max(1,n-1)-10));
+    actors.forEach(function(a,i){
+      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+topY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
+      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(topY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
+      inner += '<line class="diagram-lifeline" x1="'+nodesX[i]+'" y1="'+(topY+boxH)+'" x2="'+nodesX[i]+'" y2="'+(H-8)+'"></line>';
+    });
+    steps.forEach(function(st,i){
+      const y = topY+boxH+22 + i*rowH;
+      const x1 = nodesX[st.from], x2 = nodesX[st.to];
+      const pid = uid+"_p"+i, mid = uid+"_m"+i;
+      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
+      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(y-9)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
+      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
+             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
+             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
+             + '</circle>';
+    });
+  }
+
+  const svg = '<svg class="diagram-svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" preserveAspectRatio="xMidYMid meet">'+inner+'</svg>';
+
+  let stepsHtml = '<ol class="diagram-steps-list">';
+  steps.forEach(function(st,i){
+    stepsHtml += '<li><span class="step-num">'+(i+1)+'</span><strong>'+escapeXml(st.label||"")+'</strong>'+(st.note?(' — '+escapeXml(st.note)):'')+'</li>';
+  });
+  stepsHtml += '</ol>';
+
+  return '<div class="diagram-block" id="'+uid+'">'
+       + '<h4><span>🔀 '+escapeXml(block.title||"")+'</span><button class="diagram-play-btn" data-diagram-id="'+uid+'">&#9654; เล่นแอนิเมชัน / Play animation</button></h4>'
+       + '<div class="diagram-svg-wrap">'+svg+'</div>'
+       + stepsHtml
+       + '</div>';
+}
+
+function diagramPlay(containerId){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  const svg = wrap.querySelector('svg');
+  const paths = svg.querySelectorAll('.diagram-arrow-path');
+  const dots = svg.querySelectorAll('.diagram-glow-dot');
+  const items = wrap.querySelectorAll('.diagram-steps-list li');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  items.forEach(function(li){ li.classList.remove('step-active'); });
+  if(reduced){ return; }
+  const stepDur = 850;
+  paths.forEach(function(p){
+    const len = p.getTotalLength();
+    p.style.transition = 'none';
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+  void svg.getBoundingClientRect();
+  paths.forEach(function(p,i){
+    setTimeout(function(){
+      p.style.transition = 'stroke-dashoffset '+(stepDur-100)+'ms ease';
+      p.style.strokeDashoffset = 0;
+      const anim = dots[i] ? dots[i].querySelector('animateMotion') : null;
+      if(anim){ try{ anim.beginElement(); }catch(e){} }
+      if(items[i]) items[i].classList.add('step-active');
+    }, i*stepDur);
+  });
+}
+
+function wireDiagramButtons(){
+  document.querySelectorAll('.diagram-play-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ diagramPlay(btn.dataset.diagramId); });
+  });
+}
+
+function renderContent(){
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  SECTIONS.forEach((sec, idx)=>{
+    const card = document.createElement("div");
+    card.className = "section-card";
+    card.id = "section_"+idx;
+    let html = "<h2>"+sec.title+"</h2>";
+    if(sec.body){
+      html += '<div class="body-text">'+mdFormat(sec.body)+'</div>';
+    }
+    (sec.blocks || []).forEach((block, bi)=>{
+      if(block.type === "note"){
+        html += '<div class="callout callout-note"><span class="callout-title">หมายเหตุ / Note</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "example"){
+        html += '<div class="callout callout-example"><span class="callout-title">ตัวอย่าง / Example</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "warning"){
+        html += '<div class="callout callout-warning"><span class="callout-title">ข้อควรระวัง / Warning</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "formula"){
+        html += '<div class="callout callout-formula"><span class="callout-title">'+(block.label || "สูตร / Formula")+'</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "subheading"){
+        html += '<h3>'+mdFormat(block.content)+'</h3>';
+      } else if(block.type === "table"){
+        html += block.content;
+      } else if(block.type === "image"){
+        html += '<div class="image-block"><img src="'+block.src+'" alt="'+(block.alt || "")+'" loading="lazy">';
+        if(block.caption){
+          html += '<div class="image-caption">'+block.caption+'</div>';
+        }
+        html += '</div>';
+      } else if(block.type === "diagram"){
+        html += renderDiagramBlock(block, idx, bi);
+      }
+    });
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+
+  if(window.renderMathInElement){
+    renderMathInElement(main, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
+    });
+  }
+}
+
+function setupScrollSpy(){
+  const links = document.querySelectorAll(".toc-list a");
+  const sections = document.querySelectorAll(".section-card");
+  window.addEventListener("scroll", ()=>{
+    let currentIdx = 0;
+    sections.forEach((sec, idx)=>{
+      const rect = sec.getBoundingClientRect();
+      if(rect.top <= 100) currentIdx = idx;
+    });
+    links.forEach(l=>l.classList.remove("active"));
+    if(links[currentIdx]) links[currentIdx].classList.add("active");
+  });
+}
+
+function setupReveal(){
+  const cards = document.querySelectorAll('.section-card');
+  if(!('IntersectionObserver' in window)){
+    cards.forEach(function(c){ c.classList.add('revealed'); });
+    return;
+  }
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.08, rootMargin:'0px 0px -60px 0px'});
+  cards.forEach(function(c){ io.observe(c); });
+}
+
+let fontScale = parseFloat(localStorage.getItem('netbook_fontScale')||'1');
+function setFontScale(v){
+  fontScale = Math.min(1.3, Math.max(0.85, Math.round(v*10)/10));
+  try{ localStorage.setItem('netbook_fontScale', fontScale); }catch(e){}
+  document.documentElement.style.setProperty('--fontScale', fontScale);
+}
+
+function updateProgress(){
+  const el = document.documentElement;
+  const max = el.scrollHeight - el.clientHeight;
+  const pct = max>0 ? (el.scrollTop/max*100) : 0;
+  const bar = document.getElementById('readProgress');
+  if(bar) bar.style.width = pct+'%';
+  const btt = document.getElementById('backToTop');
+  if(btt){ if(el.scrollTop>420){ btt.classList.add('show'); } else { btt.classList.remove('show'); } }
+}
+
+renderTOC();
+renderContent();
+setupScrollSpy();
+setupReveal();
+setupTocPanel();
+wireDiagramButtons();
+setFontScale(fontScale);
+const readTimeBadge = document.getElementById('readTimeBadge');
+if(readTimeBadge){ readTimeBadge.textContent = '⏱ ~' + computeReadingTime() + ' นาทีในการอ่าน / min read'; }
+
+window.addEventListener('scroll', updateProgress);
+const backToTopBtn = document.getElementById('backToTop');
+if(backToTopBtn){ backToTopBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); }); }
+const fontMinusBtn = document.getElementById('fontMinus');
+if(fontMinusBtn){ fontMinusBtn.addEventListener('click', function(){ setFontScale(fontScale-0.1); }); }
+const fontPlusBtn = document.getElementById('fontPlus');
+if(fontPlusBtn){ fontPlusBtn.addEventListener('click', function(){ setFontScale(fontScale+0.1); }); }
+
+function systemPrefersDark(){
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+function resolvedTheme(t){
+  return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+}
+function applyTheme(t){
+  if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+  else { document.documentElement.removeAttribute('data-theme'); }
+  const btn = document.getElementById('themeToggle');
+  if(btn){
+    const r = resolvedTheme(t);
+    btn.textContent = r === 'dark' ? '☀️' : '🌙';
+    btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+  }
+}
+let bookTheme = 'system';
+try{ bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+applyTheme(bookTheme);
+const themeToggleBtn = document.getElementById('themeToggle');
+if(themeToggleBtn){
+  themeToggleBtn.addEventListener('click', function(){
+    bookTheme = resolvedTheme(bookTheme) === 'dark' ? 'light' : 'dark';
+    try{ localStorage.setItem('book_theme', bookTheme); }catch(e){}
+    applyTheme(bookTheme);
+  });
+}
+
+</script>
+</body>
+</html>
