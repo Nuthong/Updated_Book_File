@@ -1,0 +1,3192 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<title>Topic 9–10: จาก LC-3 สู่ RISC-V RV32I — แบบฝึกหัด + เฉลย</title>
+<style>
+:root{
+  --paper:#F6F4EE;
+  --bg:#F6F4EE;
+  --panel:#FFFFFF;
+  --border:#DCD6C7;
+  --text:#2A2A26;
+  --text-soft:#6B6558;
+  --navy:#1B3A5C;
+  --navy-deep:#0F2740;
+  --accent:#1B3A5C;
+  --accent2:#2B6CB0;
+  --accent-soft:#EAF1FA;
+  --correct:#256D46;
+  --correct-soft:#E7F3EB;
+  --incorrect:#B3341F;
+  --incorrect-soft:#FBEAE6;
+  --flag:#B7862C;
+  --flag-soft:#FBF1DA;
+  --unanswered:#9A9486;
+  --line:#DCD6C7;
+  --ink:#2A2A26;
+  --muted:#6B6558;
+  --blue:#2B6CB0;
+  --blue-soft:#EAF1FA;
+  --good:#256D46;
+  --good-bg:#E7F3EB;
+  --bad:#B3341F;
+  --bad-bg:#FBEAE6;
+  --gold:#B7862C;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Sarabun',"Segoe UI",sans-serif;
+  background:var(--paper);
+  color:var(--text);
+}
+header{
+  background:var(--navy-deep);
+  border-bottom:4px solid var(--flag);
+  box-shadow:0 2px 10px rgba(15,39,64,0.25);
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+header h1{
+  font-size:18px;
+  margin:0;
+  color:#F2EFE6;
+  font-weight:700;
+}
+.mode-toggle{
+  display:flex;
+  border:1px solid rgba(242,239,230,0.4);
+  border-radius:6px;
+  overflow:hidden;
+  background:rgba(242,239,230,0.08);
+}
+.mode-toggle button{
+  border:none;
+  background:transparent;
+  color:#F2EFE6;
+  padding:8px 16px;
+  cursor:pointer;
+  font-size:14px;
+  font-family:'Sarabun',sans-serif;
+}
+.mode-toggle button.active{
+  background:var(--flag);
+  color:#1B1300;
+  font-weight:700;
+}
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.toolbar select, .toolbar button{
+  border:1.5px solid var(--border);
+  background:#FFFFFF;
+  border-radius:4px;
+  padding:6px 10px;
+  font-size:13px;
+  color:var(--text);
+  cursor:pointer;
+  font-family:'Sarabun',sans-serif;
+}
+.timer-box{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  border:1.5px solid rgba(242,239,230,0.4);
+  border-radius:4px;
+  padding:6px 10px;
+  background:rgba(255,255,255,0.95);
+  font-variant-numeric:tabular-nums;
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  color:var(--navy-deep);
+}
+.layout{
+  display:flex;
+  max-width:1200px;
+  margin:0 auto;
+  gap:20px;
+  padding:20px;
+}
+.sidebar{
+  width:220px;
+  flex-shrink:0;
+}
+.sidebar-panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:16px;
+  position:sticky;
+  top:80px;
+  box-shadow:0 2px 8px rgba(15,39,64,0.06);
+}
+.sidebar-panel h3{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-soft);
+  margin:0 0 10px 0;
+  font-weight:600;
+}
+.nav-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+}
+.nav-cell{
+  aspect-ratio:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:4px;
+  border:1.5px solid var(--border);
+  background:#ffffff;
+  color:var(--text-soft);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  cursor:pointer;
+}
+.nav-cell:hover{border-color:var(--navy);}
+.nav-cell.current{outline:2px solid var(--navy);}
+.nav-cell.answered{background:var(--accent-soft);color:var(--accent2);border-color:var(--accent2);}
+.nav-cell.correct{background:var(--correct-soft);color:var(--correct);border-color:var(--correct);}
+.nav-cell.incorrect{background:var(--incorrect-soft);color:var(--incorrect);border-color:var(--incorrect);}
+.legend{
+  margin-top:12px;
+  font-size:11px;
+  color:var(--text-soft);
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
+.score-box{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid var(--border);
+  font-size:13px;
+}
+.score-box .big{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--navy);}
+main{flex:1;min-width:0;}
+.q-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 2px 10px rgba(15,39,64,0.06);
+}
+.q-card .q-index{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-soft);
+  margin-bottom:6px;
+}
+.q-card .q-prompt{
+  font-size:15px;
+  margin-bottom:14px;
+  white-space:pre-wrap;
+  line-height:1.6;
+}
+.q-card .q-prompt img{
+  display:block;
+  max-width:100%;
+  height:auto;
+  border-radius:6px;
+  border:1px solid var(--border);
+  margin:12px 0;
+}
+.q-card .q-prompt .img-caption{
+  font-size:12.5px;
+  color:var(--text-soft);
+  text-align:center;
+  margin-top:-6px;
+  margin-bottom:12px;
+  font-style:italic;
+}
+.sub-item{margin-bottom:14px;}
+.sub-item label{display:block;font-size:13px;color:var(--text-soft);margin-bottom:6px;font-weight:600;}
+.sub-item select, .sub-item input[type=text]{
+  width:100%;
+  max-width:360px;
+  padding:9px 10px;
+  border:1.5px solid var(--border);
+  border-radius:4px;
+  font-size:14px;
+  font-family:'JetBrains Mono',monospace;
+  background:var(--panel);
+  color:var(--text);
+}
+.sub-item select{font-family:'Sarabun',sans-serif;}
+.sub-item select:focus, .sub-item input[type=text]:focus{
+  outline:none;
+  border-color:var(--accent2);
+}
+.sub-item.correct select, .sub-item.correct input{border-color:var(--correct);background:var(--correct-soft);}
+.sub-item.incorrect select, .sub-item.incorrect input{border-color:var(--incorrect);background:var(--incorrect-soft);}
+.sub-item.locked select, .sub-item.locked input{opacity:0.75;cursor:not-allowed;}
+.reveal-box{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:4px;
+  border-left:3px solid var(--incorrect);
+  background:var(--incorrect-soft);
+  font-size:13px;
+  line-height:1.9;
+}
+.reveal-box .reveal-title{
+  font-weight:700;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--incorrect);
+  display:block;
+  margin-bottom:6px;
+}
+.reveal-box .reveal-line{margin-bottom:2px;}
+.reveal-box .reveal-line b{color:var(--navy-deep);}
+.calc-open-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border:1.5px solid var(--border);
+  background:#fff;
+  color:var(--navy);
+  padding:6px 12px;
+  border-radius:4px;
+  font-size:12.5px;
+  cursor:pointer;
+  margin-left:8px;
+  font-family:'Sarabun',sans-serif;
+  font-weight:600;
+}
+.calc-open-btn:hover{background:var(--accent-soft);}
+.hint-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border:1.5px solid var(--flag);
+  background:#fff;
+  color:var(--flag);
+  padding:6px 12px;
+  border-radius:4px;
+  font-size:12.5px;
+  cursor:pointer;
+  margin-left:8px;
+  font-family:'Sarabun',sans-serif;
+  font-weight:600;
+}
+.hint-btn:hover{background:var(--flag-soft);}
+.hint-box{
+  margin-top:10px;
+  padding:12px 14px;
+  border-radius:4px;
+  border-left:3px solid var(--flag);
+  background:var(--flag-soft);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+  white-space:pre-wrap;
+  line-height:1.8;
+  color:var(--navy-deep);
+}
+.calc-slot{width:100%;}
+.answer-block{
+  margin-top:6px;
+  padding:12px 14px;
+  border-radius:4px;
+  border-left:3px solid var(--accent2);
+  background:var(--accent-soft);
+  font-size:13px;
+}
+.answer-block.flagged{background:var(--flag-soft);border-left:3px solid var(--flag);}
+.flag-badge{
+  display:inline-block;
+  font-size:11px;
+  color:var(--flag);
+  border:1px solid var(--flag);
+  border-radius:12px;
+  padding:2px 8px;
+  margin-bottom:6px;
+  font-family:'JetBrains Mono',monospace;
+}
+.explain-block{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
+.explain-block h4{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin:0 0 6px 0;
+  color:var(--text-soft);
+}
+.explain-block .formula{
+  background:var(--navy-deep);
+  color:#EAF1FA;
+  border-radius:4px;
+  padding:12px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+  white-space:pre-wrap;
+  margin-bottom:10px;
+  line-height:1.8;
+}
+.explain-block .steps{font-size:13px;line-height:1.8;white-space:pre-wrap;}
+.step-list{display:block;}
+.step-item{display:flex;gap:12px;margin-bottom:14px;width:100%;box-sizing:border-box;}
+.step-item:last-child{margin-bottom:0;}
+.step-num{
+  flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:700;
+}
+.step-body{flex:1;min-width:0;}
+.step-label{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.step-content{font-size:13.5px;line-height:1.8;white-space:pre-wrap;color:var(--text);}
+.step-item.step-why .step-num{background:var(--flag);}
+.step-item.step-why .step-label{color:var(--flag);}
+.footer-actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:8px;}
+.footer-actions button{
+  border:none;
+  background:var(--navy);
+  color:#fff;
+  padding:10px 20px;
+  border-radius:4px;
+  font-size:14px;
+  cursor:pointer;
+  font-family:'Sarabun',sans-serif;
+  font-weight:600;
+}
+.footer-actions button:hover{background:var(--accent2);}
+.footer-actions button.secondary{background:transparent;color:var(--navy);border:1.5px solid var(--border);}
+@media (max-width:800px){
+  .layout{flex-direction:column;}
+  .sidebar{width:100%;}
+  .sidebar-panel{position:static;}
+  .nav-grid{grid-template-columns:repeat(8,1fr);}
+}
+#calcModal{
+  display:none;
+  background:var(--paper);
+  width:100%;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 2px 10px rgba(15,39,64,0.1);
+  margin-top:14px;
+  border:1px solid var(--line);
+}
+#calcModal.open{display:block;}
+#calcModal .calcmodal-head{
+  background:var(--navy-deep);
+  color:#F2EFE6;
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:4px solid var(--flag);
+}
+#calcModal .calcmodal-head h2{margin:0;font-size:15px;}
+#calcModal .calcmodal-close{
+  background:transparent;
+  border:1px solid rgba(242,239,230,0.5);
+  color:#F2EFE6;
+  border-radius:4px;
+  padding:4px 10px;
+  cursor:pointer;
+  font-size:13px;
+}
+#calcModal .calcmodal-body{padding:18px;max-height:none;overflow-y:visible;}
+#calcModal .tabbar{display:flex;gap:4px;margin:20px 0 0;border-bottom:2px solid var(--line)}
+#calcModal .tabbtn{
+  font-family:'Sarabun',sans-serif;font-weight:600;font-size:14.5px;
+  background:transparent;border:none;padding:12px 20px;cursor:pointer;
+  color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;
+}
+#calcModal .tabbtn.active{color:var(--navy);border-bottom-color:var(--blue)}
+#calcModal .panel{display:none;padding-top:22px}
+#calcModal .panel.active{display:block}
+#calcModal .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:20px;margin-bottom:20px}
+#calcModal .row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+#calcModal .field{display:flex;flex-direction:column;gap:6px;min-width:130px}
+#calcModal .field label{font-size:12.5px;color:var(--muted);font-weight:600}
+#calcModal .field select, #calcModal .field input{
+  font-family:'JetBrains Mono',monospace;font-size:14px;
+  padding:8px 10px;border:1.5px solid var(--line);border-radius:4px;background:var(--panel);color:var(--text);
+}
+#calcModal .field select{font-family:'Sarabun',sans-serif}
+#calcModal .field input:focus, #calcModal .field select:focus{outline:none;border-color:var(--blue)}
+#calcModal .btngroup{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+#calcModal .chipbtn{
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+  background:#fff;border:1.5px solid var(--line);color:var(--navy);
+  padding:7px 14px;border-radius:20px;cursor:pointer;
+}
+#calcModal .chipbtn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+#calcModal .st-table{margin:10px 0;}
+#calcModal .st-table table{border-collapse:collapse;margin-bottom:8px;}
+#calcModal .st-table th{
+  font-size:12px;color:var(--muted);font-weight:600;padding:4px 6px;text-align:center;
+  font-family:'Sarabun',sans-serif;
+}
+#calcModal .st-table td{padding:2px;}
+#calcModal .st-table input{
+  width:78px;padding:6px 8px;border:1.5px solid var(--line);border-radius:4px;
+  font-family:'JetBrains Mono',monospace;font-size:13px;text-align:right;background:#fff;color:var(--ink);
+}
+#calcModal .st-table input:focus{outline:none;border-color:var(--blue);}
+#calcModal .st-table .st-rowlabel{
+  font-size:12px;color:var(--muted);padding-right:8px;text-align:right;
+  font-family:'Sarabun',sans-serif;white-space:nowrap;
+}
+#calcModal .st-tablebtns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+#calcModal .st-tablebtns button{
+  font-size:12px;padding:5px 10px;border:1px solid var(--line);border-radius:4px;
+  background:#fff;cursor:pointer;color:var(--navy);font-family:'Sarabun',sans-serif;
+}
+#calcModal .st-tablebtns button:hover{background:var(--blue-soft);}
+#calcModal .st-hint{font-size:11.5px;color:var(--muted);margin-bottom:6px;}
+#calcModal button.primary{
+  font-family:'Sarabun',sans-serif;font-weight:600;font-size:14px;
+  background:var(--navy);color:#fff;border:none;padding:10px 20px;
+  border-radius:4px;cursor:pointer;
+}
+#calcModal button.primary:hover{background:var(--blue)}
+#calcModal button.ghost{
+  font-family:'Sarabun',sans-serif;font-weight:600;font-size:13px;
+  background:transparent;color:var(--navy);border:1.5px solid var(--line);
+  padding:8px 16px;border-radius:4px;cursor:pointer;
+}
+#calcModal svg.chart{width:100%;height:230px;background:#FBFAF6;border:1px solid var(--line);border-radius:4px}
+#calcModal .axislabel{font-family:'JetBrains Mono',monospace;font-size:11px;fill:var(--muted)}
+#calcModal .resultbox{
+  margin-top:16px;padding:14px 16px;background:var(--blue-soft);
+  border-left:3px solid var(--blue);border-radius:4px;
+  font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--navy-deep);
+}
+#calcModal .resultbox .big{font-size:20px;font-weight:700;margin-bottom:4px}
+#calcModal .resultbox .line{display:flex;justify-content:space-between;padding:3px 0;font-size:13px}
+#calcModal .resultbox .decision{
+  margin-top:8px;padding:6px 10px;border-radius:4px;font-weight:700;display:inline-block;
+}
+#calcModal .resultbox .decision.reject{background:var(--bad-bg);color:var(--bad)}
+#calcModal .resultbox .decision.fail{background:var(--good-bg);color:var(--good)}
+#calcModal .formula-box{
+  margin-top:14px;padding:12px 14px;background:var(--navy-deep);color:#EAF1FA;
+  border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  line-height:1.8;white-space:pre-wrap;display:none;
+}
+#calcModal .formula-box.show{display:block}
+#calcModal .calc{max-width:420px;margin:0 auto}
+#calcModal .calc-screen{
+  background:var(--navy-deep);color:#fff;font-family:'JetBrains Mono',monospace;
+  font-size:24px;text-align:right;padding:20px 16px;border-radius:6px 6px 0 0;
+  min-height:60px;overflow-x:auto;white-space:nowrap;
+}
+#calcModal .calc-sub{font-size:13px;color:#9FB3C8;text-align:right;padding:0 16px;margin-top:-6px;margin-bottom:8px;min-height:16px}
+#calcModal .calc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+#calcModal .calc-grid button{
+  font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;
+  padding:14px 4px;border:1px solid var(--line);border-radius:4px;background:#fff;
+  cursor:pointer;color:var(--ink);
+}
+#calcModal .calc-grid button:hover{background:var(--blue-soft)}
+#calcModal .calc-grid button.op{background:var(--panel);color:var(--navy)}
+#calcModal .calc-grid button.eq{background:var(--navy);color:#fff;grid-column:span 1}
+#calcModal .linecalc-history{
+  max-height:280px;overflow-y:auto;background:var(--navy-deep);border-radius:6px;
+  padding:14px 16px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:14px;
+}
+#calcModal .linecalc-line{color:#EAF1FA;margin-bottom:10px;line-height:1.6;cursor:pointer;padding:4px 6px;border-radius:4px;transition:background .1s ease;}
+#calcModal .linecalc-line:hover{background:rgba(255,255,255,0.08);}
+#calcModal .linecalc-line .lc-input{color:#9FB3C8;}
+#calcModal .linecalc-line .lc-result{color:#fff;font-weight:700;}
+#calcModal .linecalc-line.lc-error .lc-result{color:#F2A6A6;}
+#calcModal .linecalc-empty{color:#6B7F94;font-style:italic;}
+#calcModal .linecalc-toprow{display:flex;justify-content:flex-end;margin-bottom:8px;}
+#calcModal .lc-mode-toggle{font-size:12px;padding:5px 10px;}
+#calcModal .linecalc-inputrow{display:flex;gap:8px;}
+#calcModal .lc-mathfield{
+  flex:1;padding:10px 12px;border:1.5px solid var(--line);border-radius:4px;
+  font-family:'JetBrains Mono',monospace;font-size:15px;background:#fff;color:var(--ink);
+  min-height:44px;display:flex;align-items:center;flex-wrap:wrap;cursor:text;
+  outline:none;line-height:1.3;
+}
+#calcModal .lc-mathfield:focus{outline:none;border-color:var(--blue);}
+#calcModal .lc-placeholder{color:#9A9486;}
+#calcModal .lc-char{white-space:pre;}
+#calcModal .lc-frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;font-size:13px;}
+#calcModal .lc-frac-num, #calcModal .lc-frac-den{
+  display:flex;align-items:center;min-height:1.3em;min-width:0.8em;padding:0 3px;
+}
+#calcModal .lc-frac-num{border-bottom:1.5px solid var(--ink);}
+#calcModal .lc-cursor{
+  display:inline-block;width:1.5px;height:1.1em;background:var(--navy);
+  animation:lc-blink 1s step-start infinite;vertical-align:middle;
+}
+@keyframes lc-blink{50%{opacity:0;}}
+#calcModal .linecalc-hint{font-size:12px;color:var(--muted);margin-top:8px;}
+#calcModal .notes-textarea{
+  width:100%;min-height:280px;padding:14px 16px;border:1.5px solid var(--line);border-radius:6px;
+  font-family:'Sarabun',sans-serif;font-size:14px;color:var(--ink);resize:vertical;line-height:1.7;
+}
+#calcModal .notes-textarea:focus{outline:none;border-color:var(--blue);}
+#calcModal .lc-kbtabbar{display:flex;gap:4px;margin-bottom:8px;border-bottom:1.5px solid var(--line);}
+#calcModal .lc-kbtab{
+  border:none;background:transparent;padding:8px 14px;font-size:12.5px;cursor:pointer;
+  color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1.5px;font-family:'Sarabun',sans-serif;
+}
+#calcModal .lc-kbtab.active{color:var(--navy);border-bottom-color:var(--blue);font-weight:600;}
+#calcModal .lc-kbpanel{display:none;margin-bottom:12px;}
+#calcModal .lc-kbpanel.active{display:block;}
+#calcModal .lc-kb-row{display:flex;gap:8px;}
+#calcModal .lc-kb-block{display:grid;gap:5px;}
+#calcModal .lc-kb-block3{grid-template-columns:repeat(3,1fr);flex:3;}
+#calcModal .lc-kb-block4{grid-template-columns:repeat(4,1fr);flex:4;}
+#calcModal .lc-kb-block2{grid-template-columns:repeat(2,1fr);flex:2;}
+#calcModal .lc-kb-row button{
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+  padding:9px 4px;border:1px solid var(--line);border-radius:4px;background:#fff;
+  cursor:pointer;color:var(--ink);
+}
+#calcModal .lc-kb-row button:hover{background:var(--blue-soft);}
+#calcModal .lc-kb-wide{grid-column:span 2;}
+#calcModal .lc-kb-enter{background:var(--navy);color:#fff;}
+#calcModal .lc-kb-enter:hover{background:var(--blue);}
+#calcModal .lc-kb-abcrow{margin-bottom:5px;}
+#calcModal .lc-kb-abcrow button{flex:1;}
+#calcModal .lc-kb-abcrow-indent{padding-left:14px;}
+#calcModal .calc-grid button.fn{color:var(--blue)}
+#calcModal .calc-grid button.wide{grid-column:span 2}
+#calcModal .deg-toggle{display:flex;justify-content:flex-end;gap:6px;margin-bottom:8px}
+#calcModal .deg-toggle button{
+  font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 10px;
+  border:1.5px solid var(--line);border-radius:4px;background:#fff;cursor:pointer;
+}
+#calcModal .deg-toggle button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+</style>
+
+<style>
+:root{ color-scheme: light dark; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
+    --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0;
+    --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
+    --correct:#7fd0a0; --correct-soft:#173323;
+    --incorrect:#f0958a; --incorrect-soft:#33201d;
+    --flag:#e3bd74; --flag-soft:#332a17; --unanswered:#8b93a0;
+    --line:#333c48; --ink:#e4e7ec; --muted:#9aa5b3;
+    --blue:#8ec1f2; --blue-soft:#1c2b3d;
+    --good:#7fd0a0; --good-bg:#173323;
+    --bad:#f0958a; --bad-bg:#33201d;
+    --gold:#e3bd74;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
+  --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0;
+  --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
+  --correct:#7fd0a0; --correct-soft:#173323;
+  --incorrect:#f0958a; --incorrect-soft:#33201d;
+  --flag:#e3bd74; --flag-soft:#332a17; --unanswered:#8b93a0;
+  --line:#333c48; --ink:#e4e7ec; --muted:#9aa5b3;
+  --blue:#8ec1f2; --blue-soft:#1c2b3d;
+  --good:#7fd0a0; --good-bg:#173323;
+  --bad:#f0958a; --bad-bg:#33201d;
+  --gold:#e3bd74;
+}
+.back-to-index{
+  display:inline-block;font-size:12px;color:#C9DCF0;text-decoration:none;
+  margin-bottom:6px;opacity:0.85;
+}
+.back-to-index:hover{opacity:1;text-decoration:underline;}
+@media print{.back-to-index{display:none;}}
+.theme-toggle-btn{
+  border:1.5px solid var(--border);background:var(--panel);color:var(--navy);
+  width:34px;height:34px;border-radius:6px;font-size:15px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:inline-flex;align-items:center;justify-content:center;
+  vertical-align:middle;
+}
+.theme-toggle-btn:hover{background:var(--accent-soft);}
+@media print{.theme-toggle-btn{display:none;}}
+</style>
+
+<script>
+(function(){
+  function systemPrefersDark(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function resolvedTheme(t){
+    return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+    else { document.documentElement.removeAttribute('data-theme'); }
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      var r = resolvedTheme(t);
+      btn.textContent = r === 'dark' ? '☀️' : '🌙';
+      btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+    }
+  }
+  var bookTheme = 'system';
+  try{ bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+  applyTheme(bookTheme);
+  document.addEventListener('DOMContentLoaded', function(){
+    applyTheme(bookTheme);
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      btn.addEventListener('click', function(){
+        bookTheme = resolvedTheme(bookTheme) === 'dark' ? 'light' : 'dark';
+        try{ localStorage.setItem('book_theme', bookTheme); }catch(e){}
+        applyTheme(bookTheme);
+      });
+    }
+  });
+})();
+</script>
+</head>
+<body>
+
+<header>
+  <a class="back-to-index" href="index.html">&larr; สารบัญทั้งหมด / All Chapters</a>
+  <h1>Topic 9–10: จาก LC-3 สู่ RISC-V RV32I — แบบฝึกหัด + เฉลย</h1>
+  <div class="toolbar">
+    <button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button>
+    <div class="mode-toggle">
+      <button id="btnExerciseMode" class="active">แบบฝึกหัด</button>
+      <button id="btnAnswerMode">เฉลย</button>
+    </div>
+    <button id="resetAllBtn" style="border:1.5px solid var(--flag);color:var(--flag);">↺ ทำใหม่ทั้งชุด</button>
+    <select id="orderSelect">
+      <option value="original">เรียงตามต้นฉบับ</option>
+      <option value="shuffle">สลับข้อ</option>
+    </select>
+    <select id="timerModeSelect">
+      <option value="stopwatch">นับขึ้น</option>
+      <option value="countdown">นับถอยหลัง</option>
+    </select>
+    <input type="number" id="countdownMinutes" placeholder="นาที" min="1" style="width:70px;padding:6px;border:1px solid var(--border);border-radius:6px;">
+    <div class="timer-box">
+      <span id="timerDisplay">00:00</span>
+      <button id="timerStartBtn">เริ่ม</button>
+      <button id="timerPauseBtn">พัก</button>
+      <button id="timerResetBtn">รีเซ็ต</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-panel">
+      <h3>สารบัญข้อ</h3>
+      <div class="nav-grid" id="navGrid"></div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--unanswered)"></span>ยังไม่ตอบ</span>
+        <span><span class="dot" style="background:var(--accent)"></span>ตอบบางส่วน</span>
+        <span><span class="dot" style="background:var(--correct)"></span>ถูกต้อง</span>
+        <span><span class="dot" style="background:var(--incorrect)"></span>ไม่ถูกต้อง</span>
+      </div>
+      <div class="score-box" id="scoreBox" style="display:none;">
+        <div>คะแนน</div>
+        <div class="big" id="scoreText">0/0</div>
+      </div>
+    </div>
+  </div>
+  <main id="mainArea"></main>
+</div>
+
+<div id="calcModal">
+<div class="calcmodal-head"><h2>Statistics Calculator</h2><button class="calcmodal-close" id="calcModalClose">✕ ซ่อน</button></div>
+<div class="calcmodal-body">
+<div class="tabbar">
+    <button class="tabbtn active" data-tab="dist">Distribution</button>
+    <button class="tabbtn" data-tab="stat">Statistics</button>
+    <button class="tabbtn" data-tab="calc">Calculator</button>
+    <button class="tabbtn" data-tab="linecalc">Line Calc</button>
+    <button class="tabbtn" data-tab="notes">Notes</button>
+  </div>
+
+  <div class="panel active" id="panel-dist">
+    <div class="card">
+      <div class="row">
+        <div class="field">
+          <label>Distribution</label>
+          <select id="distSelect">
+            <optgroup label="Continuous">
+              <option value="normal">Normal</option>
+              <option value="student">Student (t)</option>
+              <option value="chisq">Chi-Squared</option>
+              <option value="fdist">F-Distribution</option>
+              <option value="exponential">Exponential</option>
+              <option value="cauchy">Cauchy</option>
+              <option value="weibull">Weibull</option>
+              <option value="gammadist">Gamma</option>
+              <option value="betadist">Beta</option>
+              <option value="lognormal">Log-Normal</option>
+              <option value="logistic">Logistic</option>
+            </optgroup>
+            <optgroup label="Discrete">
+              <option value="binomial">Binomial</option>
+              <option value="pascal">Pascal (Negative Binomial)</option>
+              <option value="poisson">Poisson</option>
+              <option value="hypergeometric">Hypergeometric</option>
+            </optgroup>
+          </select>
+        </div>
+        <div id="distParams" class="row" style="margin-bottom:0"></div>
+      </div>
+
+      <svg class="chart" id="distChart" viewBox="0 0 680 230"></svg>
+
+      <div class="btngroup" id="modeGroup"></div>
+      <div class="row" id="boundInputs"></div>
+
+      <div style="display:flex;gap:10px">
+        <button class="primary" id="computeDist">คำนวณ</button>
+      </div>
+
+      <div class="resultbox" id="distResult" style="display:none"></div>
+      <div class="formula-box show" id="distFormula"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-stat">
+    <div class="card">
+      <div class="row">
+        <div class="field" style="min-width:260px">
+          <label>Statistical Test / Estimate</label>
+          <select id="statSelect">
+            <optgroup label="Hypothesis Tests">
+              <option value="ztest">Z Test of a Mean (σ known)</option>
+              <option value="ttest">T Test of a Mean (σ unknown)</option>
+              <option value="z2mean">Z Test, Difference of Means</option>
+              <option value="t2mean">T Test, Difference of Means</option>
+              <option value="zpropt">Z Test of a Proportion</option>
+              <option value="z2prop">Z Test, Difference of Proportions</option>
+              <option value="chitest">Chi-Squared Test (Variance)</option>
+            </optgroup>
+            <optgroup label="Confidence Interval Estimates">
+              <option value="zest">Z Estimate of a Mean (CI)</option>
+              <option value="test">T Estimate of a Mean (CI)</option>
+              <option value="z2meanest">Z Estimate, Difference of Means</option>
+              <option value="t2meanest">T Estimate, Difference of Means</option>
+              <option value="zpropest">Z Estimate of a Proportion (CI)</option>
+              <option value="z2propest">Z Estimate, Difference of Proportions</option>
+              <option value="chiest">Chi-Squared Estimate of σ (CI)</option>
+            </optgroup>
+            <optgroup label="Chi-Squared (Frequency Tables)">
+              <option value="gof">Goodness of Fit Test</option>
+              <option value="chiindep">ChiSquared Test (Independence)</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" id="statParams"></div>
+      <div class="btngroup" id="varGroup"></div>
+      <div id="statTable"></div>
+      <div class="btngroup" id="tailGroup"></div>
+
+      <div style="display:flex;gap:10px">
+        <button class="primary" id="computeStat">คำนวณ</button>
+      </div>
+
+      <div class="resultbox" id="statResult" style="display:none"></div>
+      <div class="formula-box show" id="statFormula"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-calc">
+    <div class="card calc">
+      <div class="deg-toggle">
+        <button id="degBtn" class="active">DEG</button>
+        <button id="radBtn">RAD</button>
+      </div>
+      <div class="calc-screen" id="calcScreen">0</div>
+      <div class="calc-sub" id="calcSub">&nbsp;</div>
+      <div class="calc-grid" id="calcGrid"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-linecalc">
+    <div class="card">
+      <div class="linecalc-toprow">
+        <button id="linecalcModeToggle" class="ghost lc-mode-toggle">แสดงผล: เศษส่วน</button>
+      </div>
+      <div class="linecalc-history" id="linecalcHistory"></div>
+
+      <div class="lc-kbtabbar">
+        <button class="lc-kbtab active" data-kb="main">เมนูหลัก</button>
+        <button class="lc-kbtab" data-kb="abc">abc</button>
+        <button class="lc-kbtab" data-kb="func">ฟังก์ชัน</button>
+      </div>
+
+      <div class="lc-kbpanel active" id="lc-kb-main">
+        <div class="lc-kb-row">
+          <div class="lc-kb-block lc-kb-block3">
+            <button data-ins="^2">a²</button>
+            <button data-ins-cursor="^" data-cursor="1">a^b</button>
+            <button data-func="abs">|a|</button>
+            <button data-func="sqrt">√</button>
+            <button data-nfunc="nthroot">ⁿ√</button>
+            <button data-ins="pi">π</button>
+            <button data-func="sin">sin</button>
+            <button data-func="cos">cos</button>
+            <button data-func="tan">tan</button>
+            <button data-ins="(">(</button>
+            <button data-ins=")">)</button>
+            <button data-ins=",">,</button>
+          </div>
+          <div class="lc-kb-block lc-kb-block4">
+            <button data-ins="7">7</button>
+            <button data-ins="8">8</button>
+            <button data-ins="9">9</button>
+            <button data-ins="÷">÷</button>
+            <button data-ins="4">4</button>
+            <button data-ins="5">5</button>
+            <button data-ins="6">6</button>
+            <button data-ins="×">×</button>
+            <button data-ins="1">1</button>
+            <button data-ins="2">2</button>
+            <button data-ins="3">3</button>
+            <button data-minus>−</button>
+            <button data-ins="0">0</button>
+            <button data-ins=".">.</button>
+            <button data-ins="ans">ans</button>
+            <button data-ins="+">+</button>
+          </div>
+          <div class="lc-kb-block lc-kb-block2">
+            <button data-frac="true" title="สร้างกล่องเศษส่วน">a/b</button>
+            <button data-ins="!">!</button>
+            <button data-cursor-left>←</button>
+            <button data-cursor-right>→</button>
+            <button data-backspace class="lc-kb-wide">⌫</button>
+            <button data-enter class="lc-kb-enter lc-kb-wide">⏎</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lc-kbpanel" id="lc-kb-abc">
+        <div class="lc-kb-row lc-kb-abcrow">
+          <button data-ins="q">q</button><button data-ins="w">w</button><button data-ins="e">e</button><button data-ins="r">r</button><button data-ins="t">t</button><button data-ins="y">y</button><button data-ins="u">u</button><button data-ins="i">i</button><button data-ins="o">o</button><button data-ins="p">p</button>
+        </div>
+        <div class="lc-kb-row lc-kb-abcrow lc-kb-abcrow-indent">
+          <button data-ins="a">a</button><button data-ins="s">s</button><button data-ins="d">d</button><button data-ins="f">f</button><button data-ins="g">g</button><button data-ins="h">h</button><button data-ins="j">j</button><button data-ins="k">k</button><button data-ins="l">l</button>
+        </div>
+        <div class="lc-kb-row lc-kb-abcrow">
+          <button data-ins="=">=</button><button data-ins="z">z</button><button data-ins="x">x</button><button data-ins="c">c</button><button data-ins="v">v</button><button data-ins="b">b</button><button data-ins="n">n</button><button data-ins="m">m</button><button data-backspace>⌫</button>
+        </div>
+        <div class="lc-kb-row lc-kb-abcrow">
+          <button data-ins="(">(</button><button data-ins=")">)</button><button data-ins=",">,</button><button data-ins="!">!</button><button data-ins="pi">π</button><button data-ins="ans">ans</button><button data-enter class="lc-kb-enter">⏎</button>
+        </div>
+      </div>
+
+      <div class="lc-kbpanel" id="lc-kb-func">
+        <div class="lc-kb-row">
+          <div class="lc-kb-block lc-kb-block3">
+            <button data-func="sin">sin</button>
+            <button data-func="cos">cos</button>
+            <button data-func="tan">tan</button>
+            <button data-func="asin">sin⁻¹</button>
+            <button data-func="acos">cos⁻¹</button>
+            <button data-func="atan">tan⁻¹</button>
+            <button data-func="mean">mean</button>
+            <button data-func="stdev">stdev</button>
+            <button data-func="stdevp">stdevp</button>
+            <button data-nfunc="npr">nPr</button>
+            <button data-nfunc="ncr">nCr</button>
+            <button data-ins="!">!</button>
+          </div>
+          <div class="lc-kb-block lc-kb-block3">
+            <button data-ins-cursor="^" data-cursor="1">a^b</button>
+            <button data-func="sqrt">√</button>
+            <button data-nfunc="nthroot">ⁿ√</button>
+            <button data-ins-cursor="e^" data-cursor="2">eˣ</button>
+            <button data-func="abs">abs</button>
+            <button data-func="round">round</button>
+            <button data-func="ln">ln</button>
+            <button data-func="log">log</button>
+            <button data-backspace>⌫</button>
+            <button data-ins="e">e</button>
+            <button data-ins="pi">π</button>
+            <button data-enter class="lc-kb-enter">⏎</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="linecalc-inputrow">
+        <div id="linecalcInput" class="lc-mathfield" tabindex="0"></div>
+        <button id="linecalcClearBtn" class="ghost">ล้าง</button>
+      </div>
+      <div class="linecalc-hint">พิมพ์แล้วกด Enter คำนวณเป็นเศษส่วนไม่ทอน รองรับ + − × / ( ) และทศนิยม · กด a/b เพื่อสร้างกล่องเศษส่วนจริง · คลิกบรรทัดเก่าเพื่อดึงกลับมาแก้ไข</div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-notes">
+    <div class="card">
+      <textarea id="notesArea" class="notes-textarea" placeholder="จดค่าที่คำนวณได้ไว้ตรงนี้..."></textarea>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const QUESTIONS = [{"prompt": "โปรแกรม LC-3 ต่อไปนี้ทำงานกับอาเรย์ที่มีสมาชิก 6 ตัว โดยสะสมผลบวกของค่าที่มันอ่านได้ลงใน R2\n\n.ORIG x3000\nAND R2, R2, #0        ; R2 = ผลรวมสะสม\nLEA R1, ARRAY         ; R1 = ที่อยู่ของสมาชิกตัวที่ 0\nAND R3, R3, #0\nADD R3, R3, #3        ; R3 = ตัวนับรอบ\nLOOP LDR R4, R1, #0   ; อ่านสมาชิกที่ตัวชี้ชี้อยู่\nADD R2, R2, R4        ; บวกสะสม\nADD R1, R1, #2        ; เลื่อนตัวชี้ (LC-3 นับเป็น word)\nADD R3, R3, #-1\nBRp LOOP\nHALT\nARRAY .FILL #12\n      .FILL #-5\n      .FILL #7\n      .FILL #20\n      .FILL #-3\n      .FILL #9\n.END\n\nเมื่อแปลทั้งบล็อกเป็น RV32I บนเครื่องที่อ้างหน่วยความจำทีละไบต์ (1 word = 4 ไบต์) และไม่มีรหัสเงื่อนไข N/Z/P ได้โปรแกรมนี้:\n\n.data\nARRAY: .word 12, -5, 7, 20, -3, 9\n.text\naddi x12, x0, 0       # x12 = ผลรวมสะสม\nla   x11, ARRAY       # x11 = ที่อยู่ของสมาชิกตัวที่ 0\naddi x13, x0, 3       # x13 = ตัวนับรอบ\nLOOP: lw x14, 0(x11)\nadd  x12, x12, x14\naddi x11, x11, 8      # เลื่อนตัวชี้ (RV32I นับเป็นไบต์)\naddi x13, x13, -1\nblt  x0, x13, LOOP\n\nเมื่อคำสั่ง blt ไม่กระโดดและหลุดออกจากลูปแล้ว ค่าใน x12 เป็นเลขฐานสิบเท่าใด", "subs": [{"label": "ค่าสุดท้ายใน x12 (ฐานสิบ)", "type": "number", "correctAnswer": 16, "tolerance": 0, "uncertain": false}], "formula": "ผลรวม = Σ ARRAY[2·i]  สำหรับ i = 0..(จำนวนรอบ-1)\n(บวกเฉพาะดัชนีคู่ เพราะตัวชี้เลื่อนทีละ 2 อิลิเมนต์ต่อรอบ ไม่ใช่ทีละ 1)", "steps": {"given": "ARRAY มี 6 สมาชิก: [12, -5, 7, 20, -3, 9] · ตัวนับรอบ x13 เริ่มที่ 3 · แต่ละรอบ addi x11, x11, 8 เลื่อนตัวชี้ไป 8 ไบต์ = 2 คำ (word) ไม่ใช่ 1 คำ", "why": "บรรทัด ADD R1, R1, #2 ของ LC-3 หมายถึงเลื่อนตัวชี้ไป 2 word เพราะ LC-3 อ้างหน่วยความจำทีละ word ส่วน RV32I อ้างทีละไบต์ ระยะเท่ากันจึงต้องคูณ 4 กลายเป็น addi x11, x11, 8 — ผลคือลูปนี้อ่านสมาชิกแบบเว้นตัว (ดัชนี 0, 2, 4) ไม่ใช่บวกครบทั้ง 6 ตัว และลูปวนแค่ 3 รอบ (x13 เริ่มที่ 3) ไม่ใช่ 6 รอบ", "substitute": "รอบ 1: x11 ชี้ไปที่ ARRAY[0] อ่านได้ 12 → x12 = 0+12 = 12\nรอบ 2: x11 เลื่อนไป 8 ไบต์ ชี้ ARRAY[2] อ่านได้ 7 → x12 = 12+7 = 19\nรอบ 3: x11 เลื่อนไปอีก 8 ไบต์ ชี้ ARRAY[4] อ่านได้ -3 → x12 = 19+(-3) = 16", "calculate": "x13 ลดลงทีละ 1 จาก 3 → 2 → 1 → 0 หลังรอบที่ 3, blt x0, x13, LOOP ตรวจ 0 < x13 ได้เป็นเท็จเมื่อ x13 = 0 จึงหลุดออกจากลูปพอดีหลังบวกครบ 3 รอบ (ดัชนี 0, 2, 4)", "conclude": "x12 = 12 + 7 + (-3) = 16 — สมาชิกที่ดัชนี 1, 3, 5 (-5, 20, 9) ไม่ถูกนำมาบวกด้วยเลย เพราะตัวชี้ข้ามไปทีละ 2 อิลิเมนต์"}}, {"prompt": "ตลอดบทที่ผ่านมาใช้ LC-3 เป็นสนามฝึกเพราะเล็กพอจะมองเห็นทุกบิตในเครื่องได้ทั้งเครื่อง แต่เมื่อจะต่อยอดไปสู่งานจริง หลักสูตรต้องเปลี่ยนไปใช้ RISC-V RV32I ข้อใดคือข้อจำกัดที่ทำให้ LC-3 หยุดอยู่แค่ระดับ \"เครื่องสอน\" (educational machine)", "subs": [{"label": "เลือกคำตอบที่ถูกต้อง", "type": "select", "options": ["ความกว้างของคำสั่ง LC-3 ไม่คงที่ วงจรถอดรหัสจึงซับซ้อนกว่าของ RV32I มาก", "มีเพียงแอสเซมเบลอร์และซิมูเลเตอร์เพื่อการเรียน ไม่มีคอมไพเลอร์และไม่มีชิปจริง", "ชุดคำสั่งและรีจิสเตอร์ของ LC-3 มีมากกว่าของ RV32I จนซับซ้อนเกินกว่าจะสอนต่อ", "LC-3 ไม่มีคำสั่งคูณและคำสั่งเลื่อนบิต จึงเขียนโปรแกรมทั่วไปไม่ได้เลย"], "correctAnswer": "มีเพียงแอสเซมเบลอร์และซิมูเลเตอร์เพื่อการเรียน ไม่มีคอมไพเลอร์และไม่มีชิปจริง", "uncertain": false}], "formula": "แยกสามมิติของข้อจำกัดออกจากกัน: (1) เครื่องมือระดับใช้งานจริง (คอมไพเลอร์/OS/ชิป) (2) การถ่ายโอนทักษะสู่ตลาดจริง (3) สเกลของสถาปัตยกรรม (ความกว้างที่อยู่/จำนวนรีจิสเตอร์)", "steps": {"given": "ตัวเลือกมีทั้งเรื่องความซับซ้อนของวงจรถอดรหัส, เครื่องมือรอบ ISA, จำนวนรีจิสเตอร์/คำสั่ง, และการขาดคำสั่งคูณ/เลื่อนบิต", "why": "จุดที่ทำให้ ISA หนึ่งไปต่อไม่ได้ไม่ใช่ตัวสถาปัตยกรรมเอง แต่คือระบบนิเวศรอบตัวมัน — LC-3 ไม่มีคอมไพเลอร์ภาษา C ไม่มีระบบปฏิบัติการ และไม่มีชิปจริงขายในตลาด ทำให้ทักษะที่ฝึกกับ LC-3 ไม่ต่อยอดไปงานอุตสาหกรรมได้โดยตรง ส่วนตัวเลือกอื่นเป็นข้อเท็จจริงที่ผิดหรือไม่ใช่สาเหตุหลัก: LC-3 มีรีจิสเตอร์และคำสั่งน้อยกว่า RV32I ไม่ใช่มากกว่า และ RV32I เองก็ไม่มีคำสั่งคูณใน base ISA เช่นกัน (คูณอยู่ในส่วนขยาย M) จึงไม่ใช่ตัวชี้ขาด", "substitute": "เทียบ LC-3 กับ RV32I ที่มิติ 'เครื่องมือรอบ ISA': LC-3 = แอสเซมเบลอร์ + ซิมูเลเตอร์เพื่อการเรียนเท่านั้น ไม่มี compiler/OS/ชิปจริง · RV32I = มีคอมไพเลอร์ C, ระบบปฏิบัติการ, และชิปที่ผลิตขายจริงในตลาด", "calculate": "ตัดตัวเลือกที่ผิดข้อเท็จจริงออก: ตัวเลือก c ผิดเพราะ LC-3 มีรีจิสเตอร์/คำสั่งน้อยกว่า RV32I ไม่ใช่มากกว่า ตัวเลือก d ผิดเพราะ RV32I base ก็ไม่มีคำสั่งคูณเหมือนกัน เหลือ a (เรื่องความกว้างคำสั่งไม่คงที่ ไม่ใช่ปัญหาจริงของ LC-3 เพราะ LC-3 มีความกว้างคำสั่งคงที่ 16 บิตอยู่แล้ว) และ b", "conclude": "คำตอบคือ b: LC-3 มีเพียงแอสเซมเบลอร์และซิมูเลเตอร์เพื่อการเรียน ไม่มีคอมไพเลอร์และไม่มีชิปจริง — นี่คือข้อจำกัดเชิงระบบนิเวศที่ทำให้มันอยู่ระดับเครื่องสอนเท่านั้น"}}, {"prompt": "โปรแกรม RV32I ต่อไปนี้จองพื้นที่ 1 word แล้วเก็บค่า 0xDEADBEEF ลงไป\n\n.data\nW: .word 0\n.text\nla x10, W        # x10 = 0x10010000\nli x11, 0xDEADBEEF\nsw x11, 0(x10)\n\nหลังคำสั่ง sw ทำงานเสร็จ เปิดหน้าต่างหน่วยความจำของ debugger ดูทีละไบต์ จะเห็นสี่ช่องดังนี้:\n0x10010000 = ?\n0x10010001 = ?\n0x10010002 = ?\n0x10010003 = ?\n\nช่องที่ address 0x10010002 เก็บค่าอะไร (ตอบเป็นเลขฐานสิบหกสองหลัก เช่น 0x5C)", "subs": [{"label": "ค่าไบต์ที่ address base+2 (เลขฐานสิบหก)", "type": "text", "correctAnswer": "0xAD", "uncertain": false}], "formula": "little-endian: ไบต์ต่ำสุดของค่าลงที่ address ต่ำสุด\n0xDEADBEEF → ไบต์ [0xEF, 0xBE, 0xAD, 0xDE] เรียงจาก address ต่ำไปสูง", "steps": {"given": "ค่า 32 บิต 0xDEADBEEF ถูกเก็บด้วย sw ลงที่ address ฐาน x10 = 0x10010000 บนเครื่อง RV32I ซึ่งเป็น little-endian", "why": "การหั่นค่าเป็น 4 ไบต์ทำตรงไปตรงมา (0xDE เป็นไบต์สูงสุด, 0xEF เป็นไบต์ต่ำสุด) แต่ลำดับที่ไบต์เหล่านี้ถูกวางลงหน่วยความจำขึ้นกับ endianness ของเครื่อง RV32I ใช้ little-endian จึงวางไบต์ต่ำสุดไว้ที่ address ต่ำสุด สวนทางกับลำดับที่เขียนบนกระดาษ", "substitute": "0x10010000 → 0xEF (ไบต์ต่ำสุด)\n0x10010001 → 0xBE\n0x10010002 → 0xAD ← ช่องที่โจทย์ถาม\n0x10010003 → 0xDE (ไบต์สูงสุด)", "calculate": "อ่านกลับด้วย lbu x12, 2(x10) จะได้ 0xAD (ฐานสิบ 173) ตรงกับช่องที่ address 0x10010002 พอดี", "conclude": "address 0x10010002 เก็บค่า 0xAD — ถ้าเขียนและอ่านเป็น word เต็มทั้งคู่ ผลลัพธ์จะเหมือนกันทุกเครื่องไม่ว่า endianness แบบใด แต่พอเข้าถึงเป็นไบต์ ลำดับจึงเปิดเผยออกมา"}}, {"prompt": "คำสั่ง JSR SUB ของ LC-3 แปลเป็น jal x1, SUB ของ RV32I ซึ่งเก็บที่อยู่กลับไว้ที่ x1 (ra) แล้วกระโดดเข้าซับรูทีน\n\nที่อยู่        คำสั่ง\n0x00400010  jal x1, SUB\n0x00400014  (คำสั่งถัดไป — จุดที่จะกลับมาทำต่อ)\n...\n0x00400020  SUB: ...\n\nจงหารหัสเครื่อง 32 บิตของคำสั่ง jal x1, SUB บรรทัดนี้ ตอบเป็นเลขฐานสิบหกแปดหลัก (เช่น 0x00A00293)", "subs": [{"label": "รหัสเครื่อง 32 บิตของ jal x1, SUB", "type": "text", "correctAnswer": "0x010000EF", "uncertain": false}], "formula": "offset (jal) = ที่อยู่เป้าหมาย - ที่อยู่ของตัวคำสั่ง jal เอง (นับเป็นไบต์)\nที่อยู่กลับที่ถูกเก็บใน rd = ที่อยู่ของ jal + 4", "steps": {"given": "jal อยู่ที่ 0x00400010 · เป้าหมาย SUB อยู่ที่ 0x00400020 · ปลายทางเก็บที่อยู่กลับคือ x1", "why": "ต้องแยกสองค่าที่มักสับสน: offset ที่ฝังในตัวคำสั่ง (ระยะจาก jal ไปเป้าหมาย) กับที่อยู่กลับที่ถูกเก็บลง rd (ที่อยู่ของ jal บวก 4 เสมอ ไม่ขึ้นกับตำแหน่งเป้าหมายเลย) หลักการเดียวกับ JSR ของ LC-3 ที่เก็บ PC ที่เพิ่มค่าแล้วลง R7 ต่างกันแค่ตัวเลขบวก (RV32I บวก 4 เพราะหนึ่งคำสั่งยาว 4 ไบต์ ส่วน LC-3 บวก 1 เพราะนับที่อยู่เป็น word)", "substitute": "offset = 0x00400020 - 0x00400010 = 16 (ไบต์)\nฟิลด์ J-type ที่ต้องประกอบ: imm = 16, rd = x1 (00001), opcode = 0x6F (1101111)", "calculate": "ประกอบฟิลด์ J-type ตามลำดับบิตของ imm[20|10:1|11|19:12] + rd[4:0] + opcode[6:0] ด้วย imm=16 และ rd=1 ได้รหัสเครื่อง 0x010000EF", "conclude": "ตรวจย้อนกลับด้วยการถอดรหัส: 0x010000EF ถอดกลับมาได้ jal x1, 16 ตรงกับ offset ที่คำนวณไว้ จึงยืนยันว่า 0x010000EF ถูกต้อง"}}, {"prompt": "LC-3 มีรีจิสเตอร์ 8 ตัว (R0–R7 เลือกด้วย 3 บิต) ส่วน RV32I มี 32 ตัว (x0–x31 เลือกด้วย 5 บิต) ในฮาร์ดแวร์ RV32I รีจิสเตอร์ x1 ถึง x31 เหมือนกันหมด (มีเพียง x0 ที่พิเศษ) หน้าที่ของแต่ละตัวมาจาก ABI ซึ่งเป็นข้อตกลงระดับซอฟต์แวร์ ที่ทำให้โค้ดจากคนละไฟล์และคนละคอมไพเลอร์เรียกกันได้\n\nจงจับคู่รีจิสเตอร์แต่ละกลุ่มกับหน้าที่ตามข้อตกลง ABI", "subs": [{"label": "x1 — ชื่อ ABI ว่า ra", "type": "select", "options": ["ที่อยู่กลับที่ jal เขียนให้ · caller-saved", "ที่เก็บค่าที่ต้องรอดข้ามการเรียกฟังก์ชัน · callee-saved", "ช่องส่งอาร์กิวเมนต์และรับค่าคืน · caller-saved", "ที่พักค่าอายุสั้น · caller-saved ผู้ถูกเรียกทับได้ทันที", "อ่านได้ค่า 0 เสมอ และเขียนทับไม่ติด", "ตัวชี้ยอดสแตก · callee-saved ต้องคืนค่าเท่าเดิมก่อน ret"], "correctAnswer": "ที่อยู่กลับที่ jal เขียนให้ · caller-saved"}, {"label": "x8–x9 และ x18–x27 — ชื่อ ABI ว่า s0–s11", "type": "select", "options": ["ที่อยู่กลับที่ jal เขียนให้ · caller-saved", "ที่เก็บค่าที่ต้องรอดข้ามการเรียกฟังก์ชัน · callee-saved", "ช่องส่งอาร์กิวเมนต์และรับค่าคืน · caller-saved", "ที่พักค่าอายุสั้น · caller-saved ผู้ถูกเรียกทับได้ทันที", "อ่านได้ค่า 0 เสมอ และเขียนทับไม่ติด", "ตัวชี้ยอดสแตก · callee-saved ต้องคืนค่าเท่าเดิมก่อน ret"], "correctAnswer": "ที่เก็บค่าที่ต้องรอดข้ามการเรียกฟังก์ชัน · callee-saved"}, {"label": "x10–x17 — ชื่อ ABI ว่า a0–a7", "type": "select", "options": ["ที่อยู่กลับที่ jal เขียนให้ · caller-saved", "ที่เก็บค่าที่ต้องรอดข้ามการเรียกฟังก์ชัน · callee-saved", "ช่องส่งอาร์กิวเมนต์และรับค่าคืน · caller-saved", "ที่พักค่าอายุสั้น · caller-saved ผู้ถูกเรียกทับได้ทันที", "อ่านได้ค่า 0 เสมอ และเขียนทับไม่ติด", "ตัวชี้ยอดสแตก · callee-saved ต้องคืนค่าเท่าเดิมก่อน ret"], "correctAnswer": "ช่องส่งอาร์กิวเมนต์และรับค่าคืน · caller-saved"}, {"label": "x5–x7 และ x28–x31 — ชื่อ ABI ว่า t0–t6", "type": "select", "options": ["ที่อยู่กลับที่ jal เขียนให้ · caller-saved", "ที่เก็บค่าที่ต้องรอดข้ามการเรียกฟังก์ชัน · callee-saved", "ช่องส่งอาร์กิวเมนต์และรับค่าคืน · caller-saved", "ที่พักค่าอายุสั้น · caller-saved ผู้ถูกเรียกทับได้ทันที", "อ่านได้ค่า 0 เสมอ และเขียนทับไม่ติด", "ตัวชี้ยอดสแตก · callee-saved ต้องคืนค่าเท่าเดิมก่อน ret"], "correctAnswer": "ที่พักค่าอายุสั้น · caller-saved ผู้ถูกเรียกทับได้ทันที"}, {"label": "x0 — ชื่อ ABI ว่า zero", "type": "select", "options": ["ที่อยู่กลับที่ jal เขียนให้ · caller-saved", "ที่เก็บค่าที่ต้องรอดข้ามการเรียกฟังก์ชัน · callee-saved", "ช่องส่งอาร์กิวเมนต์และรับค่าคืน · caller-saved", "ที่พักค่าอายุสั้น · caller-saved ผู้ถูกเรียกทับได้ทันที", "อ่านได้ค่า 0 เสมอ และเขียนทับไม่ติด", "ตัวชี้ยอดสแตก · callee-saved ต้องคืนค่าเท่าเดิมก่อน ret"], "correctAnswer": "อ่านได้ค่า 0 เสมอ และเขียนทับไม่ติด"}, {"label": "x2 — ชื่อ ABI ว่า sp", "type": "select", "options": ["ที่อยู่กลับที่ jal เขียนให้ · caller-saved", "ที่เก็บค่าที่ต้องรอดข้ามการเรียกฟังก์ชัน · callee-saved", "ช่องส่งอาร์กิวเมนต์และรับค่าคืน · caller-saved", "ที่พักค่าอายุสั้น · caller-saved ผู้ถูกเรียกทับได้ทันที", "อ่านได้ค่า 0 เสมอ และเขียนทับไม่ติด", "ตัวชี้ยอดสแตก · callee-saved ต้องคืนค่าเท่าเดิมก่อน ret"], "correctAnswer": "ตัวชี้ยอดสแตก · callee-saved ต้องคืนค่าเท่าเดิมก่อน ret"}], "formula": "เส้นแบ่งสำคัญ: caller-saved (t, a) = ผู้เรียกต้องเซฟเองถ้ายังจะใช้ค่าต่อหลังเรียกฟังก์ชัน\ncallee-saved (s, sp) = ผู้ถูกเรียกต้องคืนค่าเท่าเดิมก่อน return", "steps": {"given": "RV32I มีรีจิสเตอร์ x0–x31 โดย x0 พิเศษ (อ่านได้ 0 เสมอ) ส่วน x1–x31 เหมือนกันทางฮาร์ดแวร์ทุกตัว หน้าที่ต่างกันมาจากข้อตกลง ABI เท่านั้น", "why": "คำถามเดียวที่ใช้แยกกลุ่มได้ทุกกรณีคือ 'ค่านี้ต้องรอดข้ามการเรียกฟังก์ชันไหม' — ถ้าไม่ต้องรอดใช้กลุ่ม t (ไม่มีภาระเซฟ) ถ้าต้องรอดใช้กลุ่ม s (ผู้ถูกเรียกต้องเซฟ/คืนเอง) ส่วน a สงวนไว้ส่งอาร์กิวเมนต์/รับค่าคืนเท่านั้น และ ra/sp มีบทบาทเฉพาะตัวคือเก็บที่อยู่กลับกับชี้ยอดสแตกตามลำดับ x0 พิเศษเพราะฮาร์ดแวร์ล็อกไว้ให้เป็นศูนย์เสมอ ไม่ใช่แค่ข้อตกลง ABI", "substitute": "x1=ra→ที่อยู่กลับที่ jal เขียนให้ (caller-saved) · x8-9,18-27=s0-11→ค่าที่ต้องรอดข้าม call (callee-saved) · x10-17=a0-7→อาร์กิวเมนต์/ค่าคืน (caller-saved) · x5-7,28-31=t0-6→พักชั่วคราว (caller-saved) · x0=zero→ค่าคงที่ศูนย์ฮาร์ดแวร์ · x2=sp→ตัวชี้สแตก (callee-saved)", "calculate": "ตรวจแต่ละคู่กับนิยาม caller/callee-saved: กลุ่ม a และ t ผู้เรียกต้องเซฟเองถ้าจะใช้ต่อ (caller-saved) กลุ่ม s และ sp ผู้ถูกเรียกต้องคืนค่าเดิมก่อน ret (callee-saved) ra ก็ caller-saved เพราะการเรียกซ้อนกันจะทับ ra ทันทีถ้าไม่เซฟ", "conclude": "จับคู่ครบทั้ง 6 กลุ่มตามตาราง ABI มาตรฐานของ RISC-V — นี่คือกลไกที่ทำให้ฟังก์ชันซ้อนกันและเรียกซ้ำได้โดยค่าไม่ทับกันโดยไม่ได้ตั้งใจ"}}, {"prompt": "โปรแกรม RV32I ต่อไปนี้เก็บค่า 0xCAFEB0BA ลงหน่วยความจำ แล้วอ่านไบต์ตำแหน่งเดียวกันกลับมาสองครั้งด้วยคำสั่งคนละตัว\n\n.data\nD: .word 0\n.text\nla x10, D\nli x11, 0xCAFEB0BA\nsw x11, 0(x10)\nlb  x5, 1(x10)\nlbu x6, 1(x10)\n\nค่าในรีจิสเตอร์ x5 และ x6 เมื่ออ่านเป็นจำนวนเต็มฐานสิบเป็นเท่าใด", "subs": [{"label": "เลือกคำตอบที่ถูกต้อง", "type": "select", "options": ["x5 = -80 และ x6 = 176 — ผลต่างกันที่บิตบน", "x5 = 176 และ x6 = 176 — ค่าเดียวกันทั้งคู่", "x5 = -2 และ x6 = 254", "x5 = 176 และ x6 = -80 — ค่าบวกไปอยู่ x5 แทน"], "correctAnswer": "x5 = -80 และ x6 = 176 — ผลต่างกันที่บิตบน"}], "formula": "lb  → sign-extend ไบต์ที่อ่านเป็น 32 บิต (เติมบิตเครื่องหมายซ้ำ)\nlbu → zero-extend ไบต์ที่อ่านเป็น 32 บิต (เติม 0 ล้วน)", "steps": {"given": "0xCAFEB0BA ถูกเก็บแบบ little-endian: address+0→0xBA, +1→0xB0, +2→0xFE, +3→0xCA · offset 1 จึงอ่านไบต์ 0xB0 = 1011 0000 (ฐานสอง)", "why": "ไบต์ในหน่วยความจำเป็นก้อนบิตล้วน ๆ ไม่มีเครื่องหมายติดมาด้วย คำสั่งโหลดต่างหากที่ตัดสินว่าจะเติมบิตบนอีก 24 บิตด้วยอะไร — lb ใช้กับข้อมูลตัวเลขมีเครื่องหมาย ส่วน lbu ใช้กับข้อมูลดิบ/ตัวอักษรที่ไม่ใช่จำนวนมีเครื่องหมาย เลือกผิดโปรแกรมไม่พังทันทีแต่ค่าที่มากกว่า 127 จะกลายเป็นค่าติดลบเงียบ ๆ", "substitute": "ไบต์ที่อ่านได้ = 0xB0 = 1011 0000 · บิตที่ 7 (บิตซ้ายสุด) ของไบต์นี้เป็น 1", "calculate": "lb x5: เติม 1 ลงบิต 8-31 ทั้งหมด → 0xFFFFFFB0 → ตีความเป็นเลขมีเครื่องหมาย = 176 - 256 = -80\nlbu x6: เติม 0 ลงบิต 8-31 → 0x000000B0 → ตีความเป็นเลขไม่มีเครื่องหมาย = 176", "conclude": "x5 = -80 และ x6 = 176 — ไบต์เดียวกันทุกประการ แต่ตีความต่างกันคนละขั้วเพียงเพราะคำสั่งโหลดคนละตัว"}}, {"prompt": "ข้อความต่อไปนี้ถูกหรือผิด — \"ชิปที่รองรับ mul คือซีพียูคนละรุ่นที่ใช้ชุดคำสั่งคนละชุดกับ RV32I ดังนั้นโปรแกรมที่แปลด้วยคำสั่ง RV32I ล้วน ๆ จึงนำไปรันบนชิป RV32IM ไม่ได้\"", "subs": [{"label": "ถูก หรือ ผิด", "type": "select", "options": ["ถูก (True)", "ผิด (False)"], "correctAnswer": "ผิด (False)"}], "formula": "ทิศทางความเข้ากันได้เป็นแบบ subset อยู่ใน superset:\nโปรแกรม base (RV32I) → รันบนชิป RV32IM ได้เสมอ (เล็กอยู่ในใหญ่)\nโปรแกรมที่ใช้ M (เช่น mul) → รันบนชิป RV32I เปล่าไม่ได้ (พังทันทีที่ illegal instruction)", "steps": {"given": "ข้อความอ้างว่า M (ส่วนขยายคูณ/หาร) คือ 'ซีพียูคนละรุ่น' ที่มีชุดคำสั่งแยกขาดจาก RV32I", "why": "M ไม่ใช่ชุดคำสั่งคนละชุด แต่เป็นส่วนขยาย (extension) ที่เพิ่มเข้าไปในชิปตัวเดียวกัน — ดูรหัสเครื่องของ add x7,x8,x9 (funct7=0000000) เทียบกับ mul x7,x8,x9 (funct7=0000001) จะเห็นว่า opcode และตำแหน่งฟิลด์ rd/rs1/rs2 เหมือนกันทุกอย่าง ต่างกันแค่ funct7 เท่านั้น RV32I จึงเป็นฐานที่ทุกชิป RISC-V ต้องมี ส่วน M เป็นวงจรเสริมที่ผู้ออกแบบชิปเลือกใส่หรือไม่ก็ได้", "substitute": "เปรียบเทียบรหัสเครื่อง: add x7,x8,x9 = 0x009403B3 เทียบ mul x7,x8,x9 = 0x029403B3 — ต่างกันแค่ 1 บิตในฟิลด์ funct7", "calculate": "โปรแกรมที่ใช้แต่คำสั่ง base (ไม่มี mul/div เลย) ประกอบด้วยคำสั่งที่ทุกชิป RISC-V (ไม่ว่าจะมี M หรือไม่) ต้องถอดรหัสได้ จึงรันบนชิป RV32IM ได้เสมอ ทิศทางที่จะพังจริงคือกลับกัน: ถ้าคอมไพล์โดยอนุญาตให้ใช้ mul แล้วเอาไปลงชิปที่ไม่มี M ต่างหากที่จะเจอ illegal instruction", "conclude": "ข้อความนี้ผิด — M ไม่ใช่ชุดคำสั่งคนละชุดที่ทำให้เข้ากันไม่ได้ แต่เป็นส่วนขยายที่ RV32I ยังคงเป็นฐานอยู่ข้างใน โปรแกรม RV32I ล้วนจึงรันบนชิป RV32IM ได้เสมอ"}}, {"prompt": "อาเรย์ A เก็บจำนวนเต็ม 32 บิตจำนวน 10 ตัวเรียงติดกันในหน่วยความจำของเครื่อง RV32I โดยที่อยู่ของสมาชิกตัวแรก A[0] อยู่ในรีจิสเตอร์ x10\n\nlw x5, ____(x10)   # ต้องการให้ x5 มีค่าเท่ากับ A[9]\n\nช่อง offset ของคำสั่งข้างบนต้องเป็นเท่าใด (ตอบเป็นจำนวนไบต์ในฐานสิบ)", "subs": [{"label": "ค่า offset (ไบต์)", "type": "number", "correctAnswer": 36, "tolerance": 0}], "formula": "addr(A[i]) = base + (ขนาดสมาชิกเป็นไบต์) × i   (RV32I นับที่อยู่ทีละไบต์)", "steps": {"given": "สมาชิกแต่ละตัวเป็นจำนวนเต็ม 32 บิต = 4 ไบต์ · ต้องการดัชนี i = 9 (A[9] คือสมาชิกตัวที่ 10)", "why": "LC-3 เป็น word-addressable (หนึ่งที่อยู่คือหนึ่ง word เต็ม) การเลื่อนไปสมาชิกถัดไปจึงบวกที่อยู่ทีละ 1 แต่ RV32I เป็น byte-addressable (หนึ่งที่อยู่คือหนึ่งไบต์) และหนึ่ง word กินพื้นที่ 4 ไบต์ ดัชนีจึงต้องคูณ 4 ก่อนเสมอ มิฉะนั้นที่อยู่จะตกกลางไบต์ของสมาชิกอื่นซึ่งไม่ตรงขอบ word", "substitute": "offset = 4 × i = 4 × 9", "calculate": "4 × 9 = 36 ไบต์ — ตรวจช่วง immediate ของ lw (มีเครื่องหมาย 12 บิต รับได้ -2048 ถึง +2047) 36 อยู่ในช่วงจึงเขียนลงคำสั่งเดียวได้เลย: lw x5, 36(x10)", "conclude": "offset = 36 ไบต์ — ถ้ายกเลข 9 มาใส่ตรง ๆ (โดยไม่คูณ 4) จะได้ที่อยู่ที่ตกกลางไบต์ของ A[2] ซึ่งไม่ตรงขอบ word และตัวจำลองมาตรฐานจะฟ้อง misaligned access ทันที"}}, {"prompt": "จงจับคู่คำสั่ง LC-3 ทางซ้ายกับคำสั่ง RV32I ที่ทำงานอย่างเดียวกัน กำหนดให้ R1→x1, R2→x2, R3→x3 ตรงตัว และรีจิสเตอร์ที่ตั้งรหัสเงื่อนไขล่าสุดก่อน BRz คือ R3 (ตัวเลือกทางขวามีตัวลวงปนอยู่ด้วย)", "subs": [{"label": "LDR R1, R2, #2 — โหลดค่าที่ห่างจากฐานไปสอง element", "type": "select", "options": ["lw x1, 8(x2)", "ใส่ 10 ลง a7 แล้วสั่ง ecall", "auipc x1, ส่วนบน แล้ว addi x1, x1, ส่วนล่าง", "xori x1, x2, -1", "jal x1, SUB", "beq x3, x0, LABEL", "lw x1, 2(x2) — (ตัวลวง: ลอก offset ของ LC-3 มาโดยไม่คูณ 4)", "bne x3, x0, LABEL — (ตัวลวง: กระโดดตอน 'ไม่' เป็นศูนย์ กลับด้านกับ BRz)", "jalr x0, 0(x1) — (ตัวลวง: นี่คือ RET ไม่ใช่ JSR)"], "correctAnswer": "lw x1, 8(x2)"}, {"label": "TRAP x25 — ขอให้ระบบจบโปรแกรมให้", "type": "select", "options": ["lw x1, 8(x2)", "ใส่ 10 ลง a7 แล้วสั่ง ecall", "auipc x1, ส่วนบน แล้ว addi x1, x1, ส่วนล่าง", "xori x1, x2, -1", "jal x1, SUB", "beq x3, x0, LABEL", "lw x1, 2(x2) — (ตัวลวง: ลอก offset ของ LC-3 มาโดยไม่คูณ 4)", "bne x3, x0, LABEL — (ตัวลวง: กระโดดตอน 'ไม่' เป็นศูนย์ กลับด้านกับ BRz)", "jalr x0, 0(x1) — (ตัวลวง: นี่คือ RET ไม่ใช่ JSR)"], "correctAnswer": "ใส่ 10 ลง a7 แล้วสั่ง ecall"}, {"label": "LEA R1, DATA — เอาที่อยู่ของ DATA แบบ PC-relative เข้ารีจิสเตอร์", "type": "select", "options": ["lw x1, 8(x2)", "ใส่ 10 ลง a7 แล้วสั่ง ecall", "auipc x1, ส่วนบน แล้ว addi x1, x1, ส่วนล่าง", "xori x1, x2, -1", "jal x1, SUB", "beq x3, x0, LABEL", "lw x1, 2(x2) — (ตัวลวง: ลอก offset ของ LC-3 มาโดยไม่คูณ 4)", "bne x3, x0, LABEL — (ตัวลวง: กระโดดตอน 'ไม่' เป็นศูนย์ กลับด้านกับ BRz)", "jalr x0, 0(x1) — (ตัวลวง: นี่คือ RET ไม่ใช่ JSR)"], "correctAnswer": "auipc x1, ส่วนบน แล้ว addi x1, x1, ส่วนล่าง"}, {"label": "NOT R1, R2 — กลับบิตทุกบิตของ R2", "type": "select", "options": ["lw x1, 8(x2)", "ใส่ 10 ลง a7 แล้วสั่ง ecall", "auipc x1, ส่วนบน แล้ว addi x1, x1, ส่วนล่าง", "xori x1, x2, -1", "jal x1, SUB", "beq x3, x0, LABEL", "lw x1, 2(x2) — (ตัวลวง: ลอก offset ของ LC-3 มาโดยไม่คูณ 4)", "bne x3, x0, LABEL — (ตัวลวง: กระโดดตอน 'ไม่' เป็นศูนย์ กลับด้านกับ BRz)", "jalr x0, 0(x1) — (ตัวลวง: นี่คือ RET ไม่ใช่ JSR)"], "correctAnswer": "xori x1, x2, -1"}, {"label": "JSR SUB — เรียกซับรูทีนพร้อมเก็บที่อยู่กลับ", "type": "select", "options": ["lw x1, 8(x2)", "ใส่ 10 ลง a7 แล้วสั่ง ecall", "auipc x1, ส่วนบน แล้ว addi x1, x1, ส่วนล่าง", "xori x1, x2, -1", "jal x1, SUB", "beq x3, x0, LABEL", "lw x1, 2(x2) — (ตัวลวง: ลอก offset ของ LC-3 มาโดยไม่คูณ 4)", "bne x3, x0, LABEL — (ตัวลวง: กระโดดตอน 'ไม่' เป็นศูนย์ กลับด้านกับ BRz)", "jalr x0, 0(x1) — (ตัวลวง: นี่คือ RET ไม่ใช่ JSR)"], "correctAnswer": "jal x1, SUB"}, {"label": "BRz LABEL — กระโดดถ้าผลล่าสุดเป็นศูนย์", "type": "select", "options": ["lw x1, 8(x2)", "ใส่ 10 ลง a7 แล้วสั่ง ecall", "auipc x1, ส่วนบน แล้ว addi x1, x1, ส่วนล่าง", "xori x1, x2, -1", "jal x1, SUB", "beq x3, x0, LABEL", "lw x1, 2(x2) — (ตัวลวง: ลอก offset ของ LC-3 มาโดยไม่คูณ 4)", "bne x3, x0, LABEL — (ตัวลวง: กระโดดตอน 'ไม่' เป็นศูนย์ กลับด้านกับ BRz)", "jalr x0, 0(x1) — (ตัวลวง: นี่คือ RET ไม่ใช่ JSR)"], "correctAnswer": "beq x3, x0, LABEL"}], "formula": "แปลง LC-3 → RV32I ทีละคำสั่งตามหน้าที่ ไม่ใช่ตามรูปคำสั่งที่หน้าตาคล้ายกัน", "steps": {"given": "LDR R1,R2,#2 (โหลดชดเชย 2 element), TRAP x25 (HALT), LEA (โหลดที่อยู่แบบ PC-relative), NOT (กลับบิต), JSR (เรียกพร้อมเก็บที่อยู่กลับ), BRz (กระโดดถ้าศูนย์) — R3 เก็บรหัสเงื่อนไขล่าสุด", "why": "แต่ละคำสั่งต้องแปลตามความหมาย ไม่ใช่แค่รูปแบบ: LDR ของ LC-3 นับ offset เป็น word (ต้องคูณ 4 เป็นไบต์สำหรับ RV32I → 8(x2)) TRAP หมายเลขบริการของ LC-3 ฝังในตัวคำสั่งเอง แต่ RV32I ต้องย้ายหมายเลขไปไว้ที่ a7 ก่อนเรียก ecall LEA แบบ PC-relative ตรงกับ auipc+addi ไม่ใช่ lui (ซึ่งวางค่าคงที่แบบสัมบูรณ์) NOT คือ XOR กับ -1 ทุกบิต JSR เก็บที่อยู่กลับด้วย jal (ตรงข้ามกับ jalr x0 ที่ทิ้งที่อยู่กลับ ซึ่งคือ RET) และ BRz ต้องเทียบกับ 0 ด้วย beq ไม่ใช่ bne ที่ความหมายกลับด้าน", "substitute": "R1,R2,#2 → offset 2 word × 4 ไบต์/word = 8 ไบต์ → lw x1, 8(x2)\nTRAP x25 → li a7,10; ecall (สมมติ x25 คือรหัสจบโปรแกรม)\nLEA R1,DATA → auipc x1,hi; addi x1,x1,lo (คือ la x1, DATA)\nNOT R1,R2 → xori x1, x2, -1\nJSR SUB → jal x1, SUB\nBRz LABEL → beq x3, x0, LABEL", "calculate": "คัดตัวลวงออกทีละตัว: lw x1,2(x2) ผิดเพราะลืมคูณ 4 · bne x3,x0,LABEL ผิดเพราะเงื่อนไขกลับด้านกับ BRz · jalr x0,0(x1) ผิดเพราะเป็น RET (ทิ้งที่อยู่กลับ) ไม่ใช่ JSR (เก็บที่อยู่กลับ)", "conclude": "จับคู่ได้ครบ 6 คู่ตามหน้าที่จริงของแต่ละคำสั่ง โดยไม่หลงตัวลวงที่ดูคล้ายแต่ผิดจุดสำคัญ (ตัวคูณ offset, ทิศทางเงื่อนไข, หรือว่าที่อยู่กลับถูกเก็บหรือถูกทิ้ง)"}}, {"prompt": "ข้อความต่อไปนี้ถูกหรือผิด — \"เมื่อเปลี่ยนจาก LC-3 ไปใช้ RISC-V RV32I สิ่งที่เรียนมาจาก LC-3 ใช้ต่อไม่ได้แล้ว ต้องเริ่มเรียนวิธีคิดแบบสถาปัตยกรรมใหม่ทั้งหมด\"", "subs": [{"label": "ถูก หรือ ผิด", "type": "select", "options": ["ถูก (True)", "ผิด (False)"], "correctAnswer": "ผิด (False)"}], "formula": "สิ่งที่เปลี่ยนคือ 'เครื่องมือ' ที่ ISA มีให้ในแต่ละขั้น ไม่ใช่วิธีคิดข้างล่าง (แบบจำลองฟอน นอยมันน์, วงจร fetch–decode–execute, ทูส์คอมพลีเมนต์, การเข้าถึงหน่วยความจำแบบฐาน+offset, การใช้สแตกกับโปรแกรมย่อย)", "steps": {"given": "โปรแกรมบวกเลข 1 ถึง 5 ฉบับเต็มของทั้งสองเครื่อง มีโครงสร้างขั้นตอนตรงกันทุกขั้น: ตั้งค่าเริ่มต้น → บวกสะสม → เพิ่มตัวนับ → ตรวจเงื่อนไขวนต่อหรือไม่ → เก็บผล", "why": "ข้อแตกต่างจริงมีแค่สามจุดเชิงเครื่องมือ ไม่ใช่เชิงแนวคิด: (1) RV32I มีรีจิสเตอร์ศูนย์ (x0) จึงตั้งค่าคงที่จบในคำสั่งเดียว ขณะที่ LC-3 ต้องล้างด้วย AND ก่อน (2) คำสั่ง branch ของ RV32I เทียบสองรีจิสเตอร์ในตัวมันเอง ไม่ต้องอาศัยรหัสเงื่อนไข N/Z/P ค้างไว้ก่อนเหมือน LC-3 (3) การเข้าถึงหน่วยความจำต้องเอาที่อยู่ขึ้นรีจิสเตอร์ฐานก่อนแล้วบวก offset — ทั้งสามจุดเป็นรายละเอียดเชิงเทคนิคของแต่ละ ISA ไม่ใช่การรื้อวิธีคิดใหม่ทั้งหมด", "substitute": "เทียบขั้นตอนคู่กัน: AND R1,R1,#0 ↔ addi t0,zero,0 (ตั้งค่าศูนย์) · ADD R1,R2,R2 (บวกสะสม) ↔ add t0,t0,t1 · BRn LOOP (ใช้รหัสเงื่อนไขค้าง) ↔ bge t2,t1,loop (เทียบสดในตัว)", "calculate": "ทั้งสองฉบับให้ผลตรงกันคือ 15 (1+2+3+4+5) โครงสร้างเดียวกันทุกขั้น ย้ายมาได้ทั้งดุ้นโดยเปลี่ยนแค่ไวยากรณ์คำสั่งบางจุด", "conclude": "ข้อความนี้ผิด — LC-3 เป็นบันไดขั้นแรกของแนวคิดสถาปัตยกรรมคอมพิวเตอร์ ไม่ใช่ทางแยกที่ต้องทิ้งความรู้เดิม สิ่งที่ย้ายมาได้ทั้งหมดคือของหนักที่สุด (แบบจำลองฟอน นอยมันน์ วงจร fetch-decode-execute ทูส์คอมพลีเมนต์ คำสั่งแบบ register-register การเข้าถึงหน่วยความจำแบบฐาน+offset และการใช้สแตกกับโปรแกรมย่อย)"}}, {"prompt": "รีจิสเตอร์ x6 เก็บค่า -40 ซึ่งเขียนเป็นทูส์คอมพลีเมนต์ 32 บิตได้ 0xFFFFFFD8 จากนั้นชิป RV32I เปล่า ๆ (ไม่มีส่วนขยายใดเลย) ทำสองคำสั่งนี้ตามลำดับ\n\nsrai x5, x6, 3   # เลื่อนขวา 3 ตำแหน่งแบบเลขคณิต (arithmetic)\nsrli x7, x6, 3   # เลื่อนขวา 3 ตำแหน่งแบบตรรกะ (logical)\n\nค่าใน x5 และ x7 หลังทำสองคำสั่งนี้เป็นเท่าใด (ตอบเป็นเลขฐานสิบหก 32 บิต)", "subs": [{"label": "เลือกคำตอบที่ถูกต้อง", "type": "select", "options": ["x5 = 0xFFFFFFFB และ x7 = 0x1FFFFFFB — ผลต่างกันที่บิตบน", "x5 = 0x1FFFFFFB และ x7 = 0xFFFFFFFB — ค่าบวกไปอยู่ที่ x5 แทน", "x5 = 0xFFFFFFFB และ x7 = 0x00000005 — x7 เหลือแค่ขนาด", "x5 = 0xFFFFFFFB และ x7 = 0xFFFFFFFB — ได้ค่าเท่ากันทั้งคู่"], "correctAnswer": "x5 = 0xFFFFFFFB และ x7 = 0x1FFFFFFB — ผลต่างกันที่บิตบน"}], "formula": "srai: เลื่อนขวาแล้วเติมบิตเครื่องหมายเดิมเข้าทางซ้าย (คงเครื่องหมาย = หารด้วยสองยกกำลัง)\nsrli: เลื่อนขวาแล้วเติม 0 เข้าทางซ้ายเสมอ (มองเป็นรูปแบบบิตล้วน ไม่สนเครื่องหมาย)", "steps": {"given": "x6 = -40 = 0xFFFFFFD8 = 1111 1111 1111 1111 1111 1111 1101 1000 (ฐานสอง)", "why": "คำสั่งเลื่อนบิตทั้งชุด (sll, srl, sra พร้อมรุ่นค่าคงที่ slli, srli, srai) อยู่ใน base RV32I ตั้งแต่แรก ไม่ต้องพึ่งส่วนขยายใด ๆ — เหตุที่ต้องมีสองแบบเพราะข้อมูลต่างชนิดต้องการพฤติกรรมต่างกันจริง: เลขมีเครื่องหมายต้องเลื่อนขวาด้วย srai (เติมเครื่องหมายเดิม รักษาความหมาย 'หารด้วยสองยกกำลัง') ส่วนรูปแบบบิตล้วนหรือเลขไม่มีเครื่องหมายต้องเลื่อนด้วย srli (เติม 0 เสมอ)", "substitute": "srai x5,x6,3: เลื่อน 1111...1101 1000 ขวา 3 ตำแหน่ง แล้วเติม 1 (บิตเครื่องหมายเดิม) เข้าซ้าย 3 ตำแหน่ง\nsrli x7,x6,3: เลื่อนขวา 3 ตำแหน่งเท่ากัน แต่เติม 0 เข้าซ้าย 3 ตำแหน่ง", "calculate": "srai: 1111 1111 1111 1111 1111 1111 1111 1011 = 0xFFFFFFFB → ตีความมีเครื่องหมาย = -5 (ตรวจ: -40 ÷ 8 = -5 ✓)\nsrli: 0001 1111 1111 1111 1111 1111 1111 1011 = 0x1FFFFFFB → ตีความไม่มีเครื่องหมาย = 536,870,907", "conclude": "x5 = 0xFFFFFFFB (คือ -5) และ x7 = 0x1FFFFFFB (คือ 536870907) — สองคำสั่งต่างกันแค่ 3 บิตซ้ายสุดที่เติมเข้ามา (111 กับ 000) แต่ตีความค่าออกมาคนละขั้ว การใช้ srli กับเลขติดลบผิดจะทำให้เกิดบั๊กเงียบที่ค่าบวกให้ผลถูกบังเอิญ แต่ค่าลบพังทันที"}}, {"prompt": "โปรแกรม LC-3 ด้านล่างโหลดตัวนับจากหน่วยความจำ แล้วบวกสะสมลง R5 ไปพร้อมกับนับ R4 ลงทีละหนึ่งจนกว่าตัวนับจะหมด โดยค่าที่เก็บไว้ที่ COUNT คือ 5\n\n; LC-3\nLD  R4, COUNT      ; R4 <- MEM[COUNT]\nAND R5, R5, #0     ; ล้าง R5 ให้เป็นศูนย์\nLOOP ADD R5, R5, R4 ; สะสมผลรวม\nADD R4, R4, #-1    ; นับลง (ตั้งรหัสเงื่อนไขให้อัตโนมัติ)\nBRp LOOP           ; วนต่อถ้าผลล่าสุดยังมากกว่าศูนย์\nHALT\nCOUNT .FILL #5\n\nจงตอบคำถามต่อไปนี้เพื่อแปลลูปนับนี้เป็นรูป compare-and-branch ของ RV32I:", "subs": [{"label": "บรรทัด LD R4, COUNT ต้องแปลเป็น", "type": "select", "options": ["la x1, COUNT แล้ว lw x4, 0(x1)", "lw x4, COUNT(x0) โดยตรง — (ตัวลวง: RV32I ไม่มีโหลดแบบ PC-relative ตรง ๆ)", "auipc x4, COUNT — (ตัวลวง: auipc อย่างเดียวยังไม่ได้ค่า ต้องมี lw ตามด้วย)"], "correctAnswer": "la x1, COUNT แล้ว lw x4, 0(x1)"}, {"label": "รีจิสเตอร์ที่ตั้งรหัสเงื่อนไขให้ BRp คือ", "type": "select", "options": ["x4 เพราะเป็นตัวที่ถูกเขียนค่าล่าสุดก่อนถึง BRp", "x5 เพราะเป็นตัวที่ถูกใช้บวกสะสมผลรวม — (ตัวลวง: ไม่ใช่ตัวที่เพิ่งถูกเขียนก่อน BRp)", "R4 (ชื่อเดิมจาก LC-3) — (ตัวลวง: RV32I ไม่ใช้ชื่อ R)"], "correctAnswer": "x4 เพราะเป็นตัวที่ถูกเขียนค่าล่าสุดก่อนถึง BRp"}, {"label": "เงื่อนไขของ BRp เขียนเป็นการเทียบกับศูนย์ได้ว่า", "type": "select", "options": ["x4 มากกว่า 0", "x4 มากกว่าหรือเท่ากับ 0 — (ตัวลวง: BRp ไม่รวมศูนย์)", "x4 ไม่เท่ากับ 0 — (ตัวลวง: ค่าติดลบก็ไม่เท่ากับ 0 แต่ BRp ไม่วนต่อ)"], "correctAnswer": "x4 มากกว่า 0"}, {"label": "คำสั่ง branch ของ RV32I ที่ตรงกันคือ", "type": "select", "options": ["blt x0, x4, LOOP", "blt x4, x0, LOOP — (ตัวลวง: สลับลำดับกลายเป็น 'x4 ติดลบ' ผิดความหมาย)", "bge x4, x0, LOOP — (ตัวลวง: กลายเป็น BRzp วนเกินจริง 1 รอบ)"], "correctAnswer": "blt x0, x4, LOOP"}, {"label": "จำนวนคำสั่งที่ต้องเพิ่มก่อน branch เพื่อ \"ตั้ง flag\" ให้ RV32I", "type": "number", "correctAnswer": 0, "tolerance": 0}, {"label": "เมื่อรันคำแปลจนจบ ค่าที่อยู่ใน x5 คือ", "type": "number", "correctAnswer": 15, "tolerance": 0}], "formula": "สูตรสามขั้นแปลง condition-code branch (LC-3) เป็น compare-and-branch (RV32I):\n(1) มองย้อนจาก BR ขึ้นไปหาคำสั่งล่าสุดที่เขียนค่าลงรีจิสเตอร์ — รีจิสเตอร์ตัวนั้นคือตัวที่ต้องเทียบ\n(2) แปลงตัวอักษร n/z/p เป็นการเทียบกับศูนย์\n(3) เปิดตารางเลือกคำสั่ง โดยวาง x0 ไว้ตรงตำแหน่งของศูนย์", "steps": {"given": "COUNT = 5 · LC-3 ใช้ LD ดึงค่าจาก label แบบ PC-relative แล้ววนบวกสะสมจนตัวนับ (R4) ลดถึง 0", "why": "RV32I ไม่มีการโหลดค่าคงที่แบบ PC-relative ในคำสั่งเดียว ต้องประกอบที่อยู่ก่อนด้วย la (auipc+addi) แล้วจึง lw อ่านค่าจริง ส่วนการแปลเงื่อนไข BRp (มากกว่าศูนย์) ต้องระวังว่า RV32I มีแต่ blt ('น้อยกว่า') กับ bge ('มากกว่าหรือเท่ากับ') ไม่มี bgt โดยตรง จึงต้องพลิกเงื่อนไข 'x4 มากกว่า 0' เป็น '0 น้อยกว่า x4' แล้ววาง x0 ไว้ฝั่งซ้ายของ blt เสมอ — สลับลำดับผิดจะเปลี่ยนความหมายทันที", "substitute": "la x1, COUNT; lw x4, 0(x1)   → x4 = 5\nandi x5, x5, 0               → x5 = 0\nLOOP: add x5, x5, x4         → สะสม\naddi x4, x4, -1               → นับลง\nblt x0, x4, LOOP              → วนถ้า 0 < x4", "calculate": "รอบ1: x4=5→4, x5=0+5=5(ก่อนลด)... ไล่ตามตาราง: (x4 ก่อน,x5 หลังบวก,x4 หลังลด,วนต่อ?) = (5,5,4,จริง)→(4,9,3,จริง)→(3,12,2,จริง)→(2,14,1,จริง)→(1,15,0,เท็จ→ออก)", "conclude": "จบด้วย x5 = 15 และ x4 = 0 · ไม่ต้องเพิ่มคำสั่งใดก่อน branch เพื่อ 'ตั้ง flag' เลย (คำตอบ = 0 คำสั่ง) เพราะ addi ของ RV32I ทำแค่ลบหนึ่ง ส่วนงานเปรียบเทียบทั้งหมดย้ายไปอยู่ในตัว blt เอง ต่างจาก LC-3 ที่ ADD ตั้งรหัสเงื่อนไขให้อัตโนมัติทุกครั้งที่เขียนรีจิสเตอร์"}}, {"prompt": "ท่อนโปรแกรม LC-3 ด้านล่างบวก R1 กับ R2 แล้วกระโดดไป DONE ถ้าผลรวมเป็นศูนย์ โดยอาศัยรหัสเงื่อนไข (condition code) ที่คำสั่ง ADD ตั้งค้างไว้ให้\n\n; LC-3\nADD R3, R1, R2   ; R3 = R1 + R2 (ตั้ง N/Z/P ให้อัตโนมัติ)\nBRz DONE         ; กระโดดถ้าผลล่าสุดเป็นศูนย์\n\nบรรทัดแรกแปลเป็น add x3, x1, x2 แล้ว จงเลือกคำแปลของบรรทัด BRz DONE ที่ถูกต้องที่สุดในภาษา RV32I", "subs": [{"label": "เลือกคำตอบที่ถูกต้อง", "type": "select", "options": ["beq x3, x0, DONE โดยไม่เพิ่มคำสั่งใดอีก", "slt x4, x3, x0 เพื่อเก็บผลเทียบไว้ แล้วจึง bne x4, x0, DONE", "ต้องมี addi x3, x3, 0 ตั้ง flag ก่อน จึงจะ beq x3, x0, DONE ได้", "beq x3, x1, DONE เพราะต้องเทียบกับตัวตั้งเดิม"], "correctAnswer": "beq x3, x0, DONE โดยไม่เพิ่มคำสั่งใดอีก"}], "formula": "LC-3 (condition code ค้างไว้): ADD ตั้ง N/Z/P → BR อ่าน flag ที่ค้างอยู่\nRV32I (compare-and-branch สด): beq/blt/bge เทียบสองรีจิสเตอร์ในตัวมันเองทันที ไม่มีสถานะค้าง", "steps": {"given": "add x3, x1, x2 คำนวณผลรวมไว้แล้วใน x3 ไม่มี flag ใดถูกตั้งโดยอัตโนมัติในสถาปัตยกรรม RV32I", "why": "ความต่างเชิงแนวคิดที่ใหญ่ที่สุดระหว่างสอง ISA นี้คือ LC-3 เก็บผลเปรียบเทียบไว้ในรหัสเงื่อนไข N/Z/P ที่ถูกตั้งใหม่ทุกครั้งที่มีการเขียนค่าลงรีจิสเตอร์ คำสั่ง BR จึงต้องอาศัยคำสั่งก่อนหน้า ส่วน RV32I ให้คำสั่ง branch เปรียบเทียบรีจิสเตอร์สองตัวด้วยตัวเอง ณ ขณะนั้นเลย ไม่มีสถานะค้างไว้ให้ต้องระวัง ดังนั้น beq x3, x0, DONE จึงสมบูรณ์ในตัวเองโดยไม่ต้องมีคำสั่งเสริมใด ๆ มา 'ตั้ง flag' ก่อน (ตัวเลือกที่อ้างว่าต้องมี addi ตั้ง flag ก่อนจึงผิดหลักการนี้)", "substitute": "BRz DONE หมายถึง 'กระโดดถ้าผลล่าสุด (x3) เป็นศูนย์' → เขียนเป็น beq x3, x0, DONE (เทียบ x3 กับค่าคงที่ศูนย์ผ่าน x0)", "calculate": "ทดลองด้วยค่า: ถ้า R1=5,R2=-5 → x3=0 → beq จริง → กระโดดข้าม (ตรงกับพฤติกรรม LC-3 เดิม) ถ้า R1=5,R2=3 → x3=8 → beq เท็จ → ไหลลงต่อ (ตรงกันอีกเช่นกัน)", "conclude": "คำตอบคือ beq x3, x0, DONE โดยไม่ต้องเพิ่มคำสั่งใดอีก — การแทรก addi x3,x3,0 ก่อนไม่ทำอะไรเสีย (ใส่ได้แต่ไม่จำเป็น) ส่วนตัวเลือกที่เทียบกับ x1 หรือใช้ slt คั่นเป็นการเข้าใจผิดโครงสร้างของ RV32I branch"}}, {"prompt": "โปรแกรม RV32I ด้านล่างสะสมผลรวมของ 1 ถึง 5 ไว้พร้อมกันสองชุด ชุดหนึ่งเก็บใน s1 อีกชุดเก็บใน t0 และเรียกโปรแกรมย่อย show ทุกรอบ\n\nli s1, 0        # ผลรวมชุดที่ 1 เก็บใน s1\nli t0, 0        # ผลรวมชุดที่ 2 เก็บใน t0\nli s0, 1        # i = 1\nli t1, 6        # ขอบบนของลูป\nloop: add s1, s1, s0\nadd t0, t0, s0\nmv a0, s0\njal ra, show\naddi s0, s0, 1\nblt s0, t1, loop\nj done\nshow: li t0, 99   # show ใช้ t0 เป็นที่พักค่าของตัวเอง\nadd t0, t0, a0\nret\ndone: nop\n\nเมื่อโปรแกรมจบ s1 ได้ 15 ซึ่งถูกต้อง แต่ t0 ได้ 104 ข้อใดอธิบายสาเหตุได้ถูกต้อง", "subs": [{"label": "เลือกคำตอบที่ถูกต้อง", "type": "select", "options": ["t0 เป็น caller-saved โปรแกรมย่อยจึงทับค่าได้ทันที", "show ไม่ได้เซฟ ra ค่าที่กลับมาจึงเพี้ยนทั้งชุด", "jal เซฟรีจิสเตอร์ให้ทุกตัว แต่คืนให้เฉพาะกลุ่ม s", "show ผิดกติกาเพราะไม่ได้เซฟ t0 ลงสแตกก่อนใช้"], "correctAnswer": "t0 เป็น caller-saved โปรแกรมย่อยจึงทับค่าได้ทันที"}], "formula": "คำถามเดียวที่ใช้แยกกลุ่มรีจิสเตอร์ได้ทุกกรณี: 'ค่านี้ต้องรอดข้ามการเรียกฟังก์ชันไหม' — ต้องรอดใช้ s (callee-saved), ไม่ต้องรอดใช้ t (caller-saved ไม่มีภาระเซฟ)", "steps": {"given": "s1 อยู่ในกลุ่ม s (callee-saved) ส่วน t0 อยู่ในกลุ่ม t (caller-saved) show ใช้ t0 เป็นที่พักค่าของตัวเองโดยเขียนทับทุกครั้งที่ถูกเรียก", "why": "t0 เป็น caller-saved หมายความว่าฮาร์ดแวร์/ข้อตกลง ABI ไม่รับประกันว่าค่าจะรอดหลังเรียกฟังก์ชัน — ถ้าผู้เรียกยังต้องใช้ค่าต่อ ผู้เรียกต้องเซฟเอง ไม่ใช่หน้าที่ผู้ถูกเรียก ดังนั้น show จึงมีสิทธิ์ทับ t0 ได้ทันทีโดยไม่ผิดกติกาใด ๆ ส่วน s1 เป็น callee-saved ถ้า show จะใช้มันต้องเซฟค่าเดิมลงสแตกแล้วคืนก่อน ret ค่าจึงรอดทุกครั้ง — เหตุผลนี้ไม่เกี่ยวกับ ra เพราะ jal เซฟที่อยู่กลับด้วยกลไกคนละส่วน (ไม่ใช่การเซฟรีจิสเตอร์ข้อมูลทั่วไป) และ jal ก็ไม่ได้ 'เซฟรีจิสเตอร์ทุกตัว' อย่างที่ตัวเลือกหนึ่งกล่าวอ้าง", "substitute": "ไล่ค่า t0 ทีละรอบ: หลัง show คืนกลับมาทุกครั้ง t0 = 99 + a0(=i) เสมอ ไม่ใช่ผลสะสมของโปรแกรมหลัก", "calculate": "รอบ i=1..5: t0 หลังกลับจาก show = 100,101,102,103,104 ตามลำดับ (99+i) ส่วน s1 สะสมจริง = 1+2+3+4+5 = 15 เพราะไม่มีใครแตะ", "conclude": "t0 สุดท้าย = 104 คือเศษที่ show ทิ้งไว้จากรอบสุดท้าย (99+5) ไม่ใช่ผลรวมใด ๆ — สาเหตุคือ t0 เป็น caller-saved โปรแกรมย่อยจึงทับค่าได้ทันทีโดยไม่ผิดกติกา"}}, {"prompt": "LC-3 ติดต่อกับคีย์บอร์ดและจอภาพผ่านรีจิสเตอร์อุปกรณ์ (device register) สี่ตัว ซึ่งถูกกำหนดที่อยู่ไว้ในย่านบนสุดของหน่วยความจำ จงจับคู่รีจิสเตอร์แต่ละตัวกับที่อยู่และหน้าที่ของมัน", "subs": [{"label": "รีจิสเตอร์ข้อมูลของจอภาพ (DDR)", "type": "select", "options": ["xFE06 — รับรหัส ASCII ที่ต้องการให้แสดงบนจอ", "xFE00 — บิต[15] เป็น 1 เมื่อมีตัวอักษรใหม่รออ่านอยู่", "xFE02 — เก็บรหัส ASCII ของปุ่มที่กดล่าสุดไว้ที่บิต [7:0]", "xFE04 — บิต[15] เป็น 1 เมื่อจอพร้อมรับตัวอักษรตัวถัดไป"], "correctAnswer": "xFE06 — รับรหัส ASCII ที่ต้องการให้แสดงบนจอ"}, {"label": "รีจิสเตอร์สถานะของคีย์บอร์ด (KBSR)", "type": "select", "options": ["xFE06 — รับรหัส ASCII ที่ต้องการให้แสดงบนจอ", "xFE00 — บิต[15] เป็น 1 เมื่อมีตัวอักษรใหม่รออ่านอยู่", "xFE02 — เก็บรหัส ASCII ของปุ่มที่กดล่าสุดไว้ที่บิต [7:0]", "xFE04 — บิต[15] เป็น 1 เมื่อจอพร้อมรับตัวอักษรตัวถัดไป"], "correctAnswer": "xFE00 — บิต[15] เป็น 1 เมื่อมีตัวอักษรใหม่รออ่านอยู่"}, {"label": "รีจิสเตอร์ข้อมูลของคีย์บอร์ด (KBDR)", "type": "select", "options": ["xFE06 — รับรหัส ASCII ที่ต้องการให้แสดงบนจอ", "xFE00 — บิต[15] เป็น 1 เมื่อมีตัวอักษรใหม่รออ่านอยู่", "xFE02 — เก็บรหัส ASCII ของปุ่มที่กดล่าสุดไว้ที่บิต [7:0]", "xFE04 — บิต[15] เป็น 1 เมื่อจอพร้อมรับตัวอักษรตัวถัดไป"], "correctAnswer": "xFE02 — เก็บรหัส ASCII ของปุ่มที่กดล่าสุดไว้ที่บิต [7:0]"}, {"label": "รีจิสเตอร์สถานะของจอภาพ (DSR)", "type": "select", "options": ["xFE06 — รับรหัส ASCII ที่ต้องการให้แสดงบนจอ", "xFE00 — บิต[15] เป็น 1 เมื่อมีตัวอักษรใหม่รออ่านอยู่", "xFE02 — เก็บรหัส ASCII ของปุ่มที่กดล่าสุดไว้ที่บิต [7:0]", "xFE04 — บิต[15] เป็น 1 เมื่อจอพร้อมรับตัวอักษรตัวถัดไป"], "correctAnswer": "xFE04 — บิต[15] เป็น 1 เมื่อจอพร้อมรับตัวอักษรตัวถัดไป"}], "formula": "รีจิสเตอร์ข้อมูล (data register) เก็บตัวข้อมูลที่กำลังถ่ายโอน\nรีจิสเตอร์สถานะ (status register) ไม่เก็บข้อมูล แต่บอกว่าอุปกรณ์อยู่ในสภาพใด (พร้อม/ไม่พร้อม)", "steps": {"given": "รีจิสเตอร์อุปกรณ์ทั้งสี่ถูกยกที่อยู่ไว้ในย่าน xFE00–xFFFF ด้วยวิธี memory-mapped I/O ของ LC-3 — คำสั่ง LD/LDI/ST/STI ชุดเดิมจึงใช้รับส่งข้อมูลกับอุปกรณ์ได้โดยไม่ต้องมีคำสั่ง I/O พิเศษ", "why": "รีจิสเตอร์อุปกรณ์คือรีจิสเตอร์ที่อยู่ในตัวอุปกรณ์เอง ไม่ใช่ในซีพียู และเป็นช่องทางเดียวที่โปรแกรมใช้คุยกับอุปกรณ์ได้ ทุกอุปกรณ์แม้ง่ายที่สุดก็ยังต้องมีสองตัว (data + status) เพราะลำพังข้อมูลอย่างเดียวไม่พอ โปรแกรมต้องรู้ด้วยว่าข้อมูลที่เห็นอยู่เป็นของใหม่หรือของเก่า จึงต้องมีบิตสถานะกำกับคู่กันเสมอ", "substitute": "KBDR (xFE02) = ข้อมูล[7:0] รหัส ASCII ที่กด · KBSR (xFE00) = สถานะ[15] พร้อมของคีย์บอร์ด · DDR (xFE06) = ข้อมูล[7:0] รหัส ASCII ที่จะแสดง · DSR (xFE04) = สถานะ[15] พร้อมของจอภาพ", "calculate": "ทั้งสี่ตัวกว้าง 16 บิตเท่ากับหนึ่งคำของ LC-3 แม้ข้อมูลจริงใช้เพียง 8 บิต และสถานะใช้เพียง 1 บิต เพราะที่อยู่หนึ่งที่อยู่ของ LC-3 อ้างถึงหนึ่งคำเสมอ", "conclude": "จับคู่ครบ: DDR=xFE06, KBSR=xFE00, KBDR=xFE02, DSR=xFE04 — คู่ data/status นี้เป็นรูปแบบมาตรฐานที่อุปกรณ์ I/O ทุกตัวใช้"}}, {"prompt": "โปรแกรมต่อไปนี้รับอักขระจากคีย์บอร์ด แล้วแสดงตัวพิมพ์เล็กของอักขระนั้นออกจอภาพ โดยจะทำงานวนไปเรื่อย ๆ จนกว่าจะมีคนกดเลข 7 (รหัส x37)\n\n.ORIG x3000\nSTART LDI R1, KBSRP   ; วนถามฝั่งคีย์บอร์ด\nBRzp START\nLDI R0, KBDRP         ; อ่านอักขระที่พิมพ์เข้ามา\nLD  R2, NEG7\nADD R2, R2, R0        ; เทียบกับรหัสของเลข 7\nBRz EXIT\nLD  R2, ASCII\nADD R0, R0, R2        ; แปลงเป็นตัวพิมพ์เล็ก\nL1 LDI R3, DSRP       ; วนถามฝั่งจอภาพ\nBRzp L1\nSTI R0, DDRP          ; ส่งอักขระออกจอ\nAGAIN BR START\nEXIT HALT\nASCII .FILL x0020\nNEG7  .FILL xFFC9\nKBSRP .FILL xFE00\nKBDRP .FILL xFE02\nDSRP  .FILL xFE04\nDDRP  .FILL xFE06\n.END\n\nก. คำสั่งแรกที่บรรทัด START ทำให้ค่าใน R1 มาจากหน่วยความจำตำแหน่งใด (ตอบเป็นเลขฐานสิบหก)\nข. ลูปที่บรรทัด L1 วนถามค่าจากหน่วยความจำตำแหน่งใด ก่อนที่โปรแกรมจะยอมส่งอักขระออกไป (ตอบเป็นเลขฐานสิบหก)\nค. รีจิสเตอร์ที่ใช้เก็บค่าสถานะของจอภาพระหว่างวนถามในลูปนั้นคือรีจิสเตอร์ใด\nง. ถ้าผู้ใช้กดเครื่องหมาย $ (รหัส x24) สิ่งที่เกิดขึ้นคืออะไร\nจ. คำสั่ง HALT ที่บรรทัด EXIT คือชื่อเรียกแทนของ TRAP x25 ฮาร์ดแวร์จะเปิดอ่านช่องหนึ่งของตารางเวกเตอร์ เพื่อเอาที่อยู่เริ่มต้นของรูทีนบริการออกมา ช่องที่ถูกเปิดอ่านคือหน่วยความจำตำแหน่งใด (ตอบเป็นเลขฐานสิบหก)\n\nรูทีนบริการที่ช่องนั้นชี้ไปคือรูทีนหยุดเครื่อง ซึ่งเขียนไว้ดังนี้:\n\n.ORIG xFD70\nST R7, SaveR7      ; ยืมรีจิสเตอร์ จึงเก็บของเดิมไว้ก่อน\nST R1, SaveR1\nST R0, SaveR0\nLD R0, NewLine\nOUT\nLEA R0, Message    ; แจ้งว่ากำลังจะหยุดเครื่อง\nPUTS\nLD R0, NewLine\nOUT\nLDI R1, MCRP       ; อ่านค่าปัจจุบันของรีจิสเตอร์ควบคุมหลัก\nLD  R0, MASK\nAND R0, R1, R0     ; เคลียร์เฉพาะบิต [15] คงบิตอื่นไว้ครบ\nSTI R0, MCRP       ; เขียนค่าใหม่กลับลงรีจิสเตอร์ควบคุมหลัก\nLD R7, SaveR7      ; กู้รีจิสเตอร์ที่ยืมไว้คืน\nLD R1, SaveR1\nLD R0, SaveR0\nRET\nNewLine .FILL x000A\nSaveR0  .FILL x0000\nSaveR1  .FILL x0000\nSaveR7  .FILL x0000\nMessage .STRINGZ \"Halting the machine.\"\nMCRP .FILL xFFFE\nMASK .FILL x7FFF\n.END\n\nฉ. คำสั่งที่ทำให้เครื่องหยุดเดินจริง ๆ ในรูทีนข้างบนนี้คือคำสั่งใด", "subs": [{"label": "ก. ที่อยู่ที่ค่า R1 มาจาก (ฐานสิบหก)", "type": "text", "correctAnswer": "xFE00"}, {"label": "ข. ที่อยู่ที่ลูป L1 วนถาม (ฐานสิบหก)", "type": "text", "correctAnswer": "xFE04"}, {"label": "ค. รีจิสเตอร์ที่เก็บสถานะจอภาพระหว่างวนถาม", "type": "text", "correctAnswer": "R3"}, {"label": "ง. ถ้าผู้ใช้กด $ (x24) จะเกิดอะไรขึ้น", "type": "select", "options": ["จอแสดงอักษร D แล้วโปรแกรมวนกลับไปรออักขระตัวถัดไป", "โปรแกรมหยุดทำงานทันทีเสมือนกดเลข 7 — (ตัวลวง: $ กับ 7 คนละรหัสกัน ไม่กระโดดไป EXIT)", "จอแสดงเครื่องหมาย $ ตามที่พิมพ์จริง — (ตัวลวง: โค้ดบวก x20 ให้ทุกตัวอักษรที่ผ่านมาถึงจุดนี้เสมอ)"], "correctAnswer": "จอแสดงอักษร D แล้วโปรแกรมวนกลับไปรออักขระตัวถัดไป"}, {"label": "จ. ช่องตารางเวกเตอร์ที่ถูกเปิดอ่าน (ฐานสิบหก)", "type": "text", "correctAnswer": "x0025"}, {"label": "ฉ. คำสั่งที่ทำให้เครื่องหยุดเดินจริง ๆ", "type": "select", "options": ["คำสั่งเก็บค่าที่เขียนค่าใหม่กลับลงรีจิสเตอร์ควบคุมหลัก (STI R0, MCRP)", "คำสั่ง AND R0, R1, R0 ที่เคลียร์บิต [15] — (ตัวลวง: แค่เตรียมค่าไว้ในรีจิสเตอร์ ยังไม่ถึงตัวรีจิสเตอร์ควบคุมจริง)", "คำสั่ง LDI R1, MCRP ที่อ่านค่าปัจจุบันของรีจิสเตอร์ควบคุม — (ตัวลวง: อ่านค่าเข้ามาเฉย ๆ ยังไม่ได้สั่งหยุด)"], "correctAnswer": "คำสั่งเก็บค่าที่เขียนค่าใหม่กลับลงรีจิสเตอร์ควบคุมหลัก (STI R0, MCRP)"}], "formula": "การอ้างที่อยู่ของ LC-3 ผ่านตัวชี้ (LDI/STI) คือการอ้อมสองชั้น: อ่านค่าคงที่ในตัวคำสั่งก่อนเพื่อได้ 'ที่อยู่ของที่อยู่' แล้วจึงอ่าน/เขียนที่ที่อยู่นั้นจริง ๆ อีกที", "steps": {"given": "โปรแกรมวนถามคีย์บอร์ด (KBSRP=xFE00) → อ่านอักขระ (KBDRP=xFE02) → เทียบกับรหัสเลข 7 (x37) → ถ้าไม่ใช่แปลงเป็นตัวพิมพ์เล็ก (+x20) → วนถามจอภาพ (DSRP=xFE04) → ส่งออก (DDRP=xFE06)", "why": "คำสั่ง LDI R1, KBSRP ที่บรรทัด START ต้องอ้อมสองชั้น: ตัวคำสั่งเก็บที่อยู่ของตัวแปร KBSRP ไว้ (สมมติ x300F) อ่านค่าที่นั่นได้ xFE00 (ที่อยู่จริงของ KBSR) แล้วจึงอ่านค่าที่ xFE00 อีกทีเป็นค่าสุดท้ายที่ลง R1 — คำตอบข้อ ก. คือ xFE00 (ที่อยู่ของ KBSR) ไม่ใช่ที่อยู่ของตัวแปร KBSRP เอง เช่นเดียวกันลูป L1 วนถามที่ DSRP ซึ่งชี้ไปที่ xFE04 (สถานะจอภาพ) เก็บผลไว้ที่ R3 (คำสั่ง LDI R3, DSRP) ส่วนกรณีกด $ (x24) ค่า x24+x20 = x44 ซึ่งเป็นรหัสของตัว 'D' พอดี โปรแกรมจึงพิมพ์อักษรที่ไม่มีใครตั้งใจออกมาแล้ววนกลับไปรอตัวถัดไปตามปกติ (ไม่กระโดดไปหยุดเครื่องเพราะ x24 ไม่เท่ากับรหัสเลข 7) ข้อ จ. และ ฉ. ต้องแยกให้ออกว่าเลขเวกเตอร์ x25 ไม่ใช่ที่อยู่ของรูทีนเอง แต่ TRAP x25 ขยายเป็น x0025 แล้วอ่านค่าในช่องนั้นของตารางเวกเตอร์เพื่อได้ที่อยู่เริ่มต้นจริง และภายในรูทีนหยุดเครื่อง คำสั่ง AND เพียงเตรียมค่าไว้ในรีจิสเตอร์ ยังไม่กระทบฮาร์ดแวร์จริง มีแต่ STI R0, MCRP ที่เขียนค่ากลับลงรีจิสเตอร์ควบคุมหลัก (Machine Control Register) เท่านั้นที่ทำให้เครื่องหยุดเดินจริง ๆ", "substitute": "พิมพ์ A (x41): x41+x20=x61='a' ตามที่ตั้งใจ · พิมพ์ $ (x24): x24+x20=x44='D' ผลลัพธ์ที่ไม่มีใครสั่ง · พิมพ์ 7 (x37): เทียบกับ NEG7=xFFC9 ได้ผลรวม x000A≠0... แต่ในทางปฏิบัติค่า 7 คือค่าที่ถูกออกแบบให้ตรวจจับแล้ว BRz กระโดดไป EXIT ก่อนจะมีการส่งอักขระออกจอเลย", "calculate": "ไล่รอบตัวอย่างกดตัว A: LDI R1,KBSRP→R1=xFE00→x8000(บิตพร้อม)... BRzp ไม่วนต่อ→LDI R0,KBDRP→R0=x0041→เทียบ NEG7 ไม่เป็นศูนย์→บวก x20→R0=x0061→วนถาม DSRP ผ่าน R3 จนพร้อม→STI ส่งออกจอเป็น 'a'", "conclude": "ก=xFE00, ข=xFE04, ค=R3, ง=จอแสดง D แล้ววนกลับไปรอตัวถัดไป, จ=x0025 (ช่องตารางเวกเตอร์ ไม่ใช่ที่อยู่รูทีนตรง ๆ), ฉ=คำสั่ง STI R0,MCRP ที่เขียนค่าใหม่กลับลงรีจิสเตอร์ควบคุมหลัก คือคำสั่งเดียวที่หยุดเครื่องจริง"}}, {"prompt": "โปรแกรมหนึ่งอ่านค่าจากรีจิสเตอร์ข้อมูลของคีย์บอร์ด (KBDR ที่ xFE02) โดยไม่ตรวจบิต [15] ของรีจิสเตอร์สถานะ (KBSR ที่ xFE00) ก่อน ข้อใดกล่าวถูกต้อง", "subs": [{"label": "เลือกคำตอบที่ถูกต้อง", "type": "select", "options": ["อาจได้รหัสของปุ่มที่กดครั้งก่อนซ้ำอีก เพราะ KBDR ยังคงค่าเดิมไว้", "โปรเซสเซอร์จะหยุดรอที่คำสั่งนั้นจนกว่าจะมีผู้กดปุ่ม", "ค่าที่ได้จะเป็นศูนย์เสมอ เพราะฮาร์ดแวร์ล้าง KBDR ทุกครั้งที่อ่าน", "บิต [15] จะค้างเป็น 1 จนกว่าโปรแกรมจะเขียนศูนย์กลับไปเอง"], "correctAnswer": "อาจได้รหัสของปุ่มที่กดครั้งก่อนซ้ำอีก เพราะ KBDR ยังคงค่าเดิมไว้"}], "formula": "บิต [15] ของ KBSR คือธงบอกว่า 'ข้อมูลใน KBDR เป็นของใหม่ที่ยังไม่มีใครอ่าน' — ฮาร์ดแวร์ตั้งเป็น 1 เมื่อมีการกดปุ่ม และเคลียร์กลับเป็น 0 เองทันทีที่โปรแกรมอ่าน KBDR", "steps": {"given": "โปรแกรมอ่าน KBDR ตรง ๆ โดยข้ามการตรวจ KBSR bit[15] ไปเลย", "why": "KBDR ไม่ได้ล้างตัวเองหลังถูกอ่าน ค่าที่ค้างอยู่จึงถูกอ่านซ้ำได้เรื่อย ๆ ถ้าไม่มีการกดปุ่มใหม่ บิต [15] ต่างหากที่เป็นข้อตกลงประสานจังหวะ (handshaking) ระหว่างฮาร์ดแวร์คีย์บอร์ดกับโปรแกรม — หน้าที่ตั้ง/เคลียร์บิตนี้เป็นของฮาร์ดแวร์โดยอัตโนมัติ โปรแกรมมีหน้าที่แค่ 'อ่าน' บิตนี้เพื่อตัดสินใจ ไม่ใช่ตั้งหรือล้างมันเอง การข้ามการตรวจจึงทำให้เสียหลักประกันที่ว่า 'ปุ่มหนึ่งครั้ง = อ่านได้หนึ่งครั้ง'", "substitute": "ตัวอย่าง: ตั้งค่าเริ่มต้นให้ xFE02 เก็บรหัสของปุ่ม 'Q' (x0051) แล้วรันคำสั่งอ่าน KBDR สองครั้งติดกันโดยไม่มีการกดปุ่มใหม่คั่นกลาง", "calculate": "ครั้งที่ 1: R0 = x0051 (ตัวอักษรที่ต้องการจริง) ครั้งที่ 2: R1 = x0051 เหมือนเดิมทุกประการ — โปรแกรมเข้าใจผิดว่าผู้ใช้พิมพ์ Q สองครั้ง ทั้งที่พิมพ์แค่ครั้งเดียว", "conclude": "คำตอบคือ อาจได้รหัสของปุ่มที่กดครั้งก่อนซ้ำอีก เพราะ KBDR ยังคงค่าเดิมไว้ — ไม่ใช่เรื่องโปรเซสเซอร์หยุดรอ (นั่นคือพฤติกรรมของการตรวจ KBSR แบบวนถาม ไม่ใช่ของ KBDR เอง) และไม่ใช่ว่าฮาร์ดแวร์ล้างค่าอัตโนมัติ"}}, {"prompt": "คำสั่งโหลดของ LC-3 คำสั่งหนึ่งมีที่อยู่ปลายทางเป็น xFE02 เรารู้ได้อย่างไรว่าคำสั่งนี้อ่านค่าจากรีจิสเตอร์ข้อมูลของคีย์บอร์ด ไม่ใช่จากหน่วยความจำตำแหน่ง xFE02", "subs": [{"label": "เลือกคำตอบที่ถูกต้อง", "type": "select", "options": ["ขึ้นกับโหมดสิทธิ์ขณะนั้น โหมดผู้ใช้จะได้ค่าจากหน่วยความจำ โหมดควบคุมได้ค่าจากอุปกรณ์", "ดูจาก opcode เพราะการอ่านอุปกรณ์ต้องใช้คำสั่ง I/O เฉพาะ ไม่ใช่คำสั่งโหลดธรรมดา", "ต้องใช้ LDI เท่านั้นจึงจะอ่านอุปกรณ์ได้ ส่วน LD จะอ่านหน่วยความจำตามปกติ", "ช่วงที่อยู่ xFE00–xFFFF ถูกจองให้รีจิสเตอร์อุปกรณ์ ไม่มีหน่วยความจำอยู่ตรงนั้น"], "correctAnswer": "ช่วงที่อยู่ xFE00–xFFFF ถูกจองให้รีจิสเตอร์อุปกรณ์ ไม่มีหน่วยความจำอยู่ตรงนั้น"}], "formula": "แผนที่ที่อยู่ของ LC-3: x0000–x00FF = ตารางเวกเตอร์ TRAP, x0100–x01FF = ตารางเวกเตอร์ขัดจังหวะ, x0200–xFDFF = หน่วยความจำจริง, xFE00–xFFFF = รีจิสเตอร์อุปกรณ์", "steps": {"given": "ที่อยู่ xFE02 ถูกใช้เป็นปลายทางของคำสั่งโหลด", "why": "วงจรถอดรหัสที่อยู่ (address decoder) เป็นผู้ตัดสิน ไม่ใช่ตัวคำสั่ง — เมื่อที่อยู่บนบัสเป็น xFE02 วงจรจะส่งสัญญาณไปที่คีย์บอร์ดแทนที่จะไปที่หน่วยความจำเสมอ ไม่ว่าคำสั่งที่พาที่อยู่นั้นมาจะเป็น LD, LDI หรือ LDR ก็ตาม เพราะช่วงที่อยู่ xFE00–xFFFF ถูกจองไว้ให้รีจิสเตอร์อุปกรณ์ตั้งแต่ขั้นออกแบบสถาปัตยกรรม ไม่มีหน่วยความจำจริงติดตั้งอยู่ในช่วงนี้เลย จึงไม่มีทางที่ที่อยู่นี้จะไปอ่านหน่วยความจำได้แม้จะพยายามก็ตาม", "substitute": "ทดลอง: ตั้ง xFE02 ไว้ล่วงหน้าเป็นรหัสของ 'Q' แล้วอ่านด้วย LDI R0,KBDRP (ผ่านตัวชี้) เทียบกับ LD R1,KBDRP ตามด้วย LDR R2,R1,x0 (เอาที่อยู่มาไว้ในรีจิสเตอร์แล้วอ่านด้วยที่อยู่ในรีจิสเตอร์)", "calculate": "ทั้งสองเส้นทางคนละคำสั่งแต่ได้ค่าเดียวกันคือ x0051 — พิสูจน์ว่าที่อยู่ต่างหากที่เป็นตัวตัดสิน ไม่ใช่ชนิดของคำสั่งโหลด", "conclude": "คำตอบคือ ช่วงที่อยู่ xFE00–xFFFF ถูกจองให้รีจิสเตอร์อุปกรณ์ ไม่มีหน่วยความจำอยู่ตรงนั้น — ข้อดีคือไม่ต้องเปลืองรหัสคำสั่งให้ I/O เลย ราคาที่จ่ายคือที่อยู่ 512 ตำแหน่งบนสุดใช้เก็บข้อมูลทั่วไปไม่ได้อีกต่อไป และการอ่านรีจิสเตอร์อุปกรณ์มีผลข้างเคียง (เช่น เคลียร์บิตพร้อมใน KBSR) ต่างจากการอ่านหน่วยความจำธรรมดา"}}, {"prompt": "โปรแกรมกระทำคำสั่ง TRAP x23 โดยหน่วยความจำตำแหน่ง x0023 เก็บค่า x04A0 ไว้\n\nตำแหน่ง x0023 = ค่า x04A0\nตำแหน่ง x04A0 = คำสั่งแรกของรูทีนบริการ (service routine)\n\nฮาร์ดแวร์นำเวกเตอร์ x23 ไปใช้อย่างไร", "subs": [{"label": "เลือกคำตอบที่ถูกต้อง", "type": "select", "options": ["นำ x23 ไปบวกกับ PC ปัจจุบัน แล้วกระโดดไปยังผลบวกที่ได้", "อ่านค่าที่เก็บอยู่ในตำแหน่ง x0023 แล้วนำค่านั้นไปใส่ PC", "นำ x23 คูณด้วย 16 เพื่อให้ได้ที่อยู่เริ่มต้น แล้วกระโดดไปที่นั่น", "กระโดดไปกระทำคำสั่งที่ตำแหน่ง x0023 ทันทีโดยไม่อ่านค่าใด"], "correctAnswer": "อ่านค่าที่เก็บอยู่ในตำแหน่ง x0023 แล้วนำค่านั้นไปใส่ PC"}], "formula": "เวกเตอร์ 8 บิต → ขยายศูนย์เป็นที่อยู่ 16 บิต → อ่านค่าที่ที่อยู่นั้นในตารางเวกเตอร์ → ได้ที่อยู่เริ่มต้นจริง → PC <- ค่านั้น (การอ้อมหนึ่งชั้น / indirection)", "steps": {"given": "TRAP x23 มีเวกเตอร์ x23 · ตำแหน่ง x0023 เก็บค่า x04A0 ซึ่งเป็นที่อยู่จริงของรูทีนบริการ", "why": "เวกเตอร์คือ 'ดัชนี' ของตาราง ไม่ใช่ 'ที่อยู่ของโค้ด' โดยตรง เหตุที่ต้องอ้อมหนึ่งชั้นแบบนี้เพราะช่องในตารางเวกเตอร์กว้างแค่ 1 word ในขณะที่รูทีนบริการจริงยาวได้หลายสิบคำสั่ง การเก็บ 'ที่อยู่' แทน 'โค้ด' ทำให้รูทีนยาวเท่าใดก็ได้ วางไว้ที่ใดก็ได้ และเปลี่ยนรูทีนภายหลังได้เพียงแก้ค่าในตารางช่องเดียว โดยไม่ต้องยุ่งกับตัวคำสั่ง TRAP เลย", "substitute": "ขั้น 1: ขยายเวกเตอร์ 8 บิต x23 เป็นที่อยู่ 16 บิต x0023 (เติมศูนย์ข้างหน้า)\nขั้น 2: อ่านค่าที่ M[x0023] = x04A0", "calculate": "ขั้น 3: PC <- x04A0 แล้วเริ่มกระทำคำสั่งที่ตำแหน่งนั้นเป็นคำสั่งแรกของรูทีนบริการ", "conclude": "คำตอบคือ อ่านค่าที่เก็บอยู่ในตำแหน่ง x0023 แล้วนำค่านั้นไปใส่ PC — ถ้าเปลี่ยนความหมายให้เวกเตอร์บอกที่อยู่เริ่มต้นตรง ๆ (เช่น เวกเตอร์ × 16) จะตัดการอ่านหน่วยความจำออกได้หนึ่งครั้ง แต่แลกกับข้อจำกัดที่รูทีนแต่ละตัวต้องมีขนาดตายตัวและย้ายที่อยู่ไม่ได้อีกต่อไป"}}, {"prompt": "นักศึกษาสองคนเขียนรูทีนบริการอินเทอร์รัปต์ (interrupt service routine) ที่ทำงานเหมือนกันทุกประการ ต่างกันแค่บรรทัดสุดท้าย — คนแรกเผลอปิดท้ายด้วย RET ส่วนคนที่สองปิดท้ายด้วย RTI อย่างถูกต้อง ข้อใดอธิบายสิ่งที่เกิดขึ้นกับรูทีนของคนแรกได้ถูกต้อง", "subs": [{"label": "เลือกคำตอบที่ถูกต้อง", "type": "select", "options": ["โปรแกรมกลับไปทำงานต่อได้ถูกที่ เพียงแต่ยังค้างอยู่ในโหมด supervisor", "PC ถูกโหลดด้วยค่าใน R7 ซึ่งไม่ได้เก็บที่อยู่กลับของโปรแกรมที่ถูกขัดไว้", "ค่า PC และ PSR ที่ถูกผลักไว้ถูกดึงออกจากสแตกเรียบร้อยเช่นเดียวกับ RTI", "รหัสเงื่อนไข N, Z, P ของโปรแกรมที่ถูกขัดยังถูกคืนค่าให้ครบตามเดิม"], "correctAnswer": "PC ถูกโหลดด้วยค่าใน R7 ซึ่งไม่ได้เก็บที่อยู่กลับของโปรแกรมที่ถูกขัดไว้"}], "formula": "เข้า interrupt: ฮาร์ดแวร์ผลัก PSR แล้วผลัก PC ลง supervisor stack (ไม่แตะ R7 เลย)\nRTI: ดึง PC กลับก่อน แล้วดึง PSR กลับทีหลัง — ตรงข้ามกับ RET ซึ่งแค่ PC <- R7", "steps": {"given": "รูทีนที่ผิดปิดท้ายด้วย RET (คือ JMP R7) แทนที่จะเป็น RTI", "why": "RET กับ RTI คู่กับกลไกคนละแบบ: RET คู่กับ JSR (ที่อยู่กลับถูกเก็บไว้ใน R7 โดย JSR) ส่วน RTI คู่กับการขัดจังหวะและ TRAP (ที่อยู่กลับถูกผลักไว้บนสแตกคู่กับ PSR ไม่ใช่ใน R7) เมื่อเข้าสู่การขัดจังหวะ ฮาร์ดแวร์ไม่ได้แตะ R7 เลย ค่าที่อยู่ใน R7 ตอนนั้นจึงเป็นค่าเก่าที่ค้างมาจากการเรียกซับรูทีนครั้งก่อนหน้า ไม่เกี่ยวกับจุดที่ถูกขัดจังหวะแต่อย่างใด การใช้ RET = JMP R7 จึงกระโดดไปผิดที่ทันที และยังทิ้งผลเสียอีกสองอย่างพร้อมกันคือ PSR ไม่ถูกคืน (รหัสเงื่อนไข ระดับความสำคัญ และระดับสิทธิ์ผิดเพี้ยนหมด) และค่าที่ผลักไว้บนสแตกไม่ถูกดึงออก (ค้างเป็นขยะทุกครั้งที่ถูกขัดจังหวะ)", "substitute": "เปรียบเทียบ: RTI ทำ PC <- pop(); PSR <- pop() (2 การกระทำ) ส่วน RET ทำแค่ PC <- R7 (1 การกระทำ ผิดที่มาของค่าตั้งแต่ต้น)", "calculate": "ตัวอย่างผลกระทบจริง: โปรแกรมที่ลบค่าจนได้ศูนย์ (ตั้ง Z) แล้วมีรูทีนบริการแทรกเข้ามาระหว่างกลาง (โหลดค่าติดลบทำให้รหัสเงื่อนไขกลายเป็น N) หากรูทีนไม่คืน PSR ให้ถูกต้อง คำสั่ง BRz ที่ตามมาในโปรแกรมเดิมจะไม่กระโดดตามที่ควรจะเป็น ทั้งที่โค้ดเดิมไม่มีอะไรผิดเลย", "conclude": "คำตอบคือ PC ถูกโหลดด้วยค่าใน R7 ซึ่งไม่ได้เก็บที่อยู่กลับของโปรแกรมที่ถูกขัดไว้ — สลับ RET กับ RTI กันเมื่อไรก็พังทันที เพราะทั้งสองอาศัยแหล่งเก็บที่อยู่กลับคนละที่กันโดยสิ้นเชิง"}}, {"prompt": "โปรแกรมต่อไปนี้ถูกแอสเซมเบิลและสั่งทำงานโดยเริ่มที่ PC = x3000\n\n.ORIG x3000\nLEA R0, Message\nTRAP x01\nTRAP x22\nTRAP x25\nMessage .STRINGZ \"Cat in the hat.\"\n.END\n\nตารางเวกเตอร์ของ TRAP มีข้อมูลเพิ่มจากเดิมดังนี้:\nx0000 = x0100\nx0001 = x0102\nx0002 = x0107\nx0003 = x010A\n\nและมีรูทีนบริการถูกโหลดไว้ในหน่วยความจำล่วงหน้าดังนี้:\n\nx0100 LD R7, SaveR7\nx0101 RET\nx0102 ST R7, SaveR7\nx0103 TRAP x02\nx0104 AND R1, R1, #0\nx0105 STR R1, R0, #3\nx0106 RET\nx0107 AND R1, R1, #0\nx0108 STR R1, R0, #5\nx0109 TRAP x00\nx010A RET\nx010B SaveR7 .BLKW #1\n\nผลของการทำงานคืออะไร", "subs": [{"label": "เลือกคำตอบที่ถูกต้อง", "type": "select", "options": ["พิมพ์ Cat i แล้วหยุดทำงานที่ TRAP x25", "วนไม่รู้จบ ไม่เคยไปถึง TRAP x25", "พิมพ์ Cat แล้วหยุดทำงานที่ TRAP x25", "พิมพ์ Cat in the hat. ครบทั้งสตริงแล้วหยุด"], "correctAnswer": "พิมพ์ Cat i แล้วหยุดทำงานที่ TRAP x25"}], "formula": "TRAP เขียนที่อยู่กลับลง R7 เสมอทุกครั้ง — ถ้ารูทีนหนึ่งไปดึงค่า R7 ที่ถูกรูทีนอื่นทับไปแล้วมาใช้ต่อ RET จะพาการทำงานกระโดดไปผิดจุด", "steps": {"given": "R0 ชี้ไปที่สตริง \"Cat in the hat.\" · เวกเตอร์ x01→x0102, x02→x0107, x00→x0100 · ทุกรูทีนจบด้วย RET (=JMP R7)", "why": "TRAP x01 ที่ x3000 ตั้ง R7=x3002 แล้วกระโดดไป x0102 ซึ่งรูทีนนั้นเก็บ R7 (=x3002) ลง SaveR7 ก่อนเป็นอันดับแรก จากนั้นเรียก TRAP x02 ซ้อนเข้าไปอีกชั้น ทำให้ R7 ถูกเขียนทับเป็น x0104 (ที่อยู่กลับของ TRAP x02) รูทีนที่ x0107 เขียนค่า 0 ทับอักขระตัวที่ 6 ของสตริง (นับจาก 0) แล้วเรียก TRAP x00 ซ้อนอีกชั้น ทำให้ R7 ถูกเขียนทับอีกครั้งเป็น x010A แต่รูทีนที่ x0100 กลับไปหยิบค่าที่เก็บไว้ใน SaveR7 (=x3002 จากขั้นแรกสุด) มาใส่ R7 คืน แล้ว RET ทันที การกระทำนี้ทำให้การทำงานกระโดดตรงกลับไปที่ x3002 โดยข้ามคำสั่งที่เหลือทั้งหมดของทุกรูทีนที่ซ้อนอยู่ (x010A, x0104, x0105) ไปอย่างสิ้นเชิง", "substitute": "ตำแหน่งที่ถูกเขียน 0 ทับ: STR R1,R0,#5 หมายถึง offset 5 จากต้นสตริง \"Cat in the hat.\" → อักษรที่ตำแหน่ง 5 (นับ 0-indexed: C-a-t-(space)-i-n) คือ 'n' ตัวแรกของคำว่า in", "calculate": "สตริงเดิม 'Cat in the hat.' ถูกเขียน 0 ทับที่ตำแหน่ง 5 กลายเป็น 'Cat i' + null-terminator ตรงนั้นพอดี · เมื่อกลับมาที่ x3002 คำสั่งถัดไปคือ TRAP x22 (PUTS) จะพิมพ์สตริงจนกว่าจะเจอ 0 จึงพิมพ์ได้แค่ 'Cat i' แล้วตามด้วย TRAP x25 (HALT) หยุดทำงาน", "conclude": "ผลลัพธ์คือพิมพ์ 'Cat i' แล้วหยุดทำงานที่ TRAP x25 — สาเหตุหลักคือ R7 ถูกทับซ้อนกันหลายชั้นจากการเรียก TRAP ซ้อนกัน และรูทีนที่ x0100 หยิบค่า R7 เก่าคืนมาโดยไม่รู้ว่ามีการเรียกซ้อนหลายชั้นอยู่ระหว่างทาง"}}];
+const INCLUDE_CALC = true;
+
+function decodeCommonEntities(s){
+  return s.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,"&");
+}
+
+function escHtml(str){
+  if(str === undefined || str === null) return "";
+  const s = decodeCommonEntities(String(str));
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function sanitizePromptHtml(str){
+  if(str === undefined || str === null) return "";
+  str = String(str);
+  const placeholders = [];
+  let out = str.replace(/<img\b[^>]*>/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = out.replace(/<div class="img-caption">[\s\S]*?<\/div>/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = out.replace(/<\/?(br|table|thead|tbody|tr|td|th)\b[^>]*>/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = decodeCommonEntities(out);
+  out = out.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  out = out.replace(/\u0000IMG(\d+)\u0000/g, (_, idx)=>placeholders[parseInt(idx)]);
+  return out;
+}
+
+let mode = "exercise";
+let calcCurrentSlotId = null;
+let order = "original";
+let displayIndexes = QUESTIONS.map((q,i)=>i);
+let userAnswers = {};
+let checked = {};
+
+let timerMode = "stopwatch";
+let timerSeconds = 0;
+let timerLimit = 0;
+let timerInterval = null;
+let timerRunning = false;
+
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,"0");
+  const s = Math.floor(sec%60).toString().padStart(2,"0");
+  return m+":"+s;
+}
+
+function updateTimerDisplay(){
+  const displaySec = timerMode==="countdown" ? Math.max(timerLimit - timerSeconds, 0) : timerSeconds;
+  document.getElementById("timerDisplay").textContent = formatTime(displaySec);
+  if(timerMode==="countdown" && timerLimit>0 && timerSeconds>=timerLimit){
+    stopTimer();
+    document.getElementById("timerDisplay").textContent = "หมดเวลา";
+  }
+}
+
+function startTimer(){
+  if(timerRunning) return;
+  if(timerMode==="countdown"){
+    const mins = parseFloat(document.getElementById("countdownMinutes").value);
+    if(mins>0 && timerLimit===0) timerLimit = mins*60;
+  }
+  timerRunning = true;
+  timerInterval = setInterval(()=>{
+    timerSeconds++;
+    updateTimerDisplay();
+  },1000);
+}
+
+function stopTimer(){
+  timerRunning = false;
+  clearInterval(timerInterval);
+}
+
+function resetTimer(){
+  stopTimer();
+  timerSeconds = 0;
+  timerLimit = 0;
+  document.getElementById("countdownMinutes").value = "";
+  updateTimerDisplay();
+}
+
+document.getElementById("timerStartBtn").onclick = startTimer;
+document.getElementById("timerPauseBtn").onclick = stopTimer;
+document.getElementById("timerResetBtn").onclick = resetTimer;
+document.getElementById("timerModeSelect").onchange = (e)=>{
+  timerMode = e.target.value;
+  resetTimer();
+};
+
+function subKey(qIdx, subIdx){
+  return qIdx+"_"+subIdx;
+}
+
+function checkSubAnswer(q, subIdx, value){
+  const sub = q.subs[subIdx];
+  if(sub.type==="number"){
+    const val = parseFloat(value);
+    const tol = sub.tolerance !== undefined ? sub.tolerance : 0.01;
+    return !isNaN(val) && Math.abs(val - sub.correctAnswer) <= tol;
+  }
+  return String(value).trim() === String(sub.correctAnswer).trim();
+}
+
+function questionStatus(qIdx){
+  const q = QUESTIONS[qIdx];
+  const total = q.subs.length;
+  let answeredCount = 0;
+  let correctCount = 0;
+  for(let s=0;s<total;s++){
+    const key = subKey(qIdx,s);
+    if(userAnswers[key] !== undefined && userAnswers[key] !== ""){
+      answeredCount++;
+      if(checked[qIdx] && checkSubAnswer(q,s,userAnswers[key])) correctCount++;
+    }
+  }
+  if(!checked[qIdx]){
+    if(answeredCount===0) return "unanswered";
+    return "partial";
+  }
+  if(correctCount===total) return "correct";
+  return "incorrect";
+}
+
+function renderNavGrid(){
+  const nav = document.getElementById("navGrid");
+  nav.innerHTML = "";
+  displayIndexes.forEach((qIdx, pos)=>{
+    const cell = document.createElement("div");
+    cell.className = "nav-cell";
+    const status = questionStatus(qIdx);
+    if(status==="partial") cell.classList.add("answered");
+    if(status==="correct") cell.classList.add("correct");
+    if(status==="incorrect") cell.classList.add("incorrect");
+    cell.textContent = pos+1;
+    cell.onclick = ()=>{
+      const target = document.getElementById("qcard_"+qIdx);
+      if(target) target.scrollIntoView({behavior:"smooth", block:"start"});
+    };
+    nav.appendChild(cell);
+  });
+}
+
+function calcParkOutsideMain(){
+  const modal = document.getElementById("calcModal");
+  const main = document.getElementById("mainArea");
+  if(modal && main.contains(modal)){
+    modal.classList.remove("open");
+    document.body.appendChild(modal);
+    calcCurrentSlotId = null;
+  }
+}
+
+function isFullyCorrect(qIdx){
+  return questionStatus(qIdx) === "correct";
+}
+
+function updateScore(){
+  const scoreBox = document.getElementById("scoreBox");
+  const scoreText = document.getElementById("scoreText");
+  let correctCount = 0;
+  QUESTIONS.forEach((q, qIdx)=>{
+    if(checked[qIdx] && isFullyCorrect(qIdx)) correctCount++;
+  });
+  scoreText.textContent = correctCount + "/" + QUESTIONS.length;
+  scoreBox.style.display = "block";
+}
+
+function resetAll(){
+  userAnswers = {};
+  checked = {};
+  render();
+}
+
+document.getElementById("resetAllBtn").addEventListener("click", ()=>{
+  resetAll();
+});
+
+function renderExercise(){
+  calcParkOutsideMain();
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  displayIndexes.forEach((qIdx, pos)=>{
+    const q = QUESTIONS[qIdx];
+    const isChecked = !!checked[qIdx];
+    const card = document.createElement("div");
+    card.className = "q-card";
+    card.id = "qcard_"+qIdx;
+    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
+    html += '<div class="q-prompt">'+sanitizePromptHtml(q.prompt)+'</div>';
+    q.subs.forEach((sub, subIdx)=>{
+      const key = subKey(qIdx, subIdx);
+      const lockedClass = isChecked ? " locked" : "";
+      let stateClass = "";
+      if(isChecked && userAnswers[key] !== undefined && userAnswers[key] !== ""){
+        stateClass = checkSubAnswer(q, subIdx, userAnswers[key]) ? " correct" : " incorrect";
+      }
+      html += '<div class="sub-item'+lockedClass+stateClass+'" id="sitem_'+key+'">';
+      html += '<label>'+escHtml(sub.label)+'</label>';
+      const disabledAttr = isChecked ? "disabled" : "";
+      if(sub.type==="select"){
+        html += '<select data-key="'+key+'" '+disabledAttr+'>';
+        html += '<option value="">-- เลือก --</option>';
+        sub.options.forEach(opt=>{
+          const selectedAttr = userAnswers[key]===opt ? "selected" : "";
+          html += '<option value="'+escHtml(opt)+'" '+selectedAttr+'>'+escHtml(opt)+'</option>';
+        });
+        html += '</select>';
+      } else {
+        const val = userAnswers[key] !== undefined ? userAnswers[key] : "";
+        html += '<input type="text" data-key="'+key+'" placeholder="กรอกคำตอบ" value="'+escHtml(val)+'" '+disabledAttr+'>';
+      }
+      html += '</div>';
+    });
+    html += '<div class="footer-actions">';
+    if(!isChecked){
+      html += '<button class="check-btn" data-qidx="'+qIdx+'">ตรวจคำตอบข้อนี้</button>';
+    }
+    if(q.formula){
+      html += '<button class="secondary hint-btn" data-qidx="'+qIdx+'">💡 คำใบ้</button>';
+    }
+    if(INCLUDE_CALC){
+      html += '<button class="secondary calc-open-btn" data-qidx="'+qIdx+'">🧮 เครื่องคิดเลข</button>';
+    }
+    html += '</div>';
+    if(q.formula){
+      html += '<div class="hint-box" id="hintbox_'+qIdx+'" style="display:none">'+escHtml(q.formula)+'</div>';
+    }
+    if(isChecked && !isFullyCorrect(qIdx)){
+      html += '<div class="reveal-box"><span class="reveal-title">เฉลยคำตอบที่ถูกต้อง</span>';
+      q.subs.forEach(sub=>{
+        html += '<div class="reveal-line"><b>'+escHtml(sub.label)+':</b> '+escHtml(sub.correctAnswer)+'</div>';
+      });
+      html += '</div>';
+    }
+    if(INCLUDE_CALC){
+      html += '<div class="calc-slot" id="calcslot_'+qIdx+'"></div>';
+    }
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+
+  main.querySelectorAll("select,input").forEach(el=>{
+    el.addEventListener("input", (e)=>{
+      const key = e.target.getAttribute("data-key");
+      userAnswers[key] = e.target.value;
+      renderNavGrid();
+    });
+  });
+
+  main.querySelectorAll(".check-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = parseInt(e.target.getAttribute("data-qidx"));
+      checked[qIdx] = true;
+      renderExercise();
+    });
+  });
+
+  main.querySelectorAll(".hint-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = e.target.getAttribute("data-qidx");
+      const box = document.getElementById("hintbox_"+qIdx);
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    });
+  });
+
+  main.querySelectorAll(".calc-open-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = parseInt(e.target.getAttribute("data-qidx"));
+      const tabs = QUESTIONS[qIdx].calcTabs || ["calc"];
+      calcOpenInline(tabs, "calcslot_"+qIdx);
+    });
+  });
+
+  renderNavGrid();
+  updateScore();
+}
+
+function renderStepList(steps){
+  const stepDefs = [
+    {key:'given', label:'1. โจทย์ให้อะไรมา', cls:''},
+    {key:'why', label:'2. ทำไมต้องใช้สูตร/วิธีนี้', cls:'step-why'},
+    {key:'substitute', label:'3. แทนค่า', cls:''},
+    {key:'calculate', label:'4. คำนวณ', cls:''},
+    {key:'conclude', label:'5. สรุปผล', cls:''}
+  ];
+  let html = '<div class="step-list">';
+  stepDefs.forEach((def, i)=>{
+    const content = steps[def.key];
+    if(!content) return;
+    html += '<div class="step-item '+def.cls+'"><div class="step-num">'+(i+1)+'</div><div class="step-body">';
+    html += '<div class="step-label">'+def.label+'</div>';
+    html += '<div class="step-content">'+escHtml(content)+'</div>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderAnswers(){
+  calcParkOutsideMain();
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  let correctTotal = 0;
+  let subTotal = 0;
+  displayIndexes.forEach((qIdx, pos)=>{
+    const q = QUESTIONS[qIdx];
+    const card = document.createElement("div");
+    card.className = "q-card";
+    card.id = "qcard_"+qIdx;
+    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
+    html += '<div class="q-prompt">'+sanitizePromptHtml(q.prompt)+'</div>';
+    q.subs.forEach(sub=>{
+      subTotal++;
+      const blockClass = sub.uncertain ? "answer-block flagged" : "answer-block";
+      html += '<div class="sub-item"><label>'+escHtml(sub.label)+'</label>';
+      html += '<div class="'+blockClass+'">';
+      if(sub.uncertain){
+        html += '<div class="flag-badge">⚠ ไม่มั่นใจ 100%</div><br>';
+      }
+      html += '<strong>คำตอบ:</strong> '+escHtml(sub.correctAnswer);
+      html += '</div></div>';
+    });
+    if(q.formula || q.steps){
+      html += '<div class="explain-block">';
+      html += '<h4>วิธีทำ</h4>';
+      if(q.formula) html += '<div class="formula">'+escHtml(q.formula)+'</div>';
+      if(q.steps && typeof q.steps === "object"){
+        html += renderStepList(q.steps);
+      } else if(q.steps){
+        html += '<div class="steps">'+escHtml(q.steps)+'</div>';
+      }
+      html += '</div>';
+    }
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+  document.getElementById("scoreBox").style.display = "none";
+  renderNavGrid();
+}
+
+function render(){
+  if(mode==="exercise") renderExercise();
+  else renderAnswers();
+}
+
+document.getElementById("btnExerciseMode").onclick = ()=>{
+  mode = "exercise";
+  document.getElementById("btnExerciseMode").classList.add("active");
+  document.getElementById("btnAnswerMode").classList.remove("active");
+  render();
+};
+document.getElementById("btnAnswerMode").onclick = ()=>{
+  mode = "answer";
+  document.getElementById("btnAnswerMode").classList.add("active");
+  document.getElementById("btnExerciseMode").classList.remove("active");
+  render();
+};
+document.getElementById("orderSelect").onchange = (e)=>{
+  order = e.target.value;
+  displayIndexes = order==="shuffle" ? shuffleArray(QUESTIONS.map((q,i)=>i)) : QUESTIONS.map((q,i)=>i);
+  render();
+};
+
+displayIndexes = QUESTIONS.map((q,i)=>i);
+render();
+updateTimerDisplay();
+
+function erf(x){
+  const sign = x<0?-1:1; x=Math.abs(x);
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const t=1/(1+p*x);
+  const y=1-((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+  return sign*y;
+}
+function normalCDF(x,mu=0,sigma=1){return 0.5*(1+erf((x-mu)/(sigma*Math.SQRT2)));}
+function normalPDF(x,mu=0,sigma=1){return (1/(sigma*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*Math.pow((x-mu)/sigma,2));}
+function normalInv(p){
+  if(p<=0) return -Infinity;
+  if(p>=1) return Infinity;
+  const a=[-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00];
+  const b=[-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01];
+  const c=[-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00];
+  const d=[7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];
+  const p_low=0.02425, p_high=1-p_low;
+  let q,r;
+  if(p<p_low){
+    q=Math.sqrt(-2*Math.log(p));
+    return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  } else if(p<=p_high){
+    q=p-0.5; r=q*q;
+    return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q / (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+  } else {
+    q=Math.sqrt(-2*Math.log(1-p));
+    return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+}
+function gammaln(x){
+  const g=7;
+  const p=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(x<0.5) return Math.log(Math.PI/Math.sin(Math.PI*x)) - gammaln(1-x);
+  x-=1;
+  let a=p[0];
+  const t=x+g+0.5;
+  for(let i=1;i<g+2;i++) a+=p[i]/(x+i);
+  return 0.5*Math.log(2*Math.PI)+(x+0.5)*Math.log(t)-t+Math.log(a);
+}
+function gammaP(a,x){
+  if(x<0||a<=0) return 0;
+  if(x===0) return 0;
+  if(x<a+1){
+    let sum=1/a, term=sum, ap=a;
+    for(let n=1;n<300;n++){
+      ap+=1; term*=x/ap; sum+=term;
+      if(Math.abs(term)<Math.abs(sum)*1e-15) break;
+    }
+    return sum*Math.exp(-x+a*Math.log(x)-gammaln(a));
+  } else {
+    let b=x+1-a, c=1e300, d=1/b, h=d;
+    for(let i=1;i<300;i++){
+      const an=-i*(i-a);
+      b+=2;
+      d=an*d+b; if(Math.abs(d)<1e-300) d=1e-300;
+      c=b+an/c; if(Math.abs(c)<1e-300) c=1e-300;
+      d=1/d;
+      const del=d*c;
+      h*=del;
+      if(Math.abs(del-1)<1e-15) break;
+    }
+    const Q=Math.exp(-x+a*Math.log(x)-gammaln(a))*h;
+    return 1-Q;
+  }
+}
+function chiSquaredCDF(x,df){return gammaP(df/2,x/2);}
+function chiSquaredPDF(x,df){
+  if(x<=0) return 0;
+  return Math.exp((df/2-1)*Math.log(x)-x/2-(df/2)*Math.log(2)-gammaln(df/2));
+}
+function betacf(x,a,b){
+  const MAXIT=300, EPS=1e-15, FPMIN=1e-300;
+  let qab=a+b, qap=a+1, qam=a-1;
+  let c=1, d=1-qab*x/qap;
+  if(Math.abs(d)<FPMIN) d=FPMIN;
+  d=1/d;
+  let h=d;
+  for(let m=1;m<=MAXIT;m++){
+    const m2=2*m;
+    let aa=m*(b-m)*x/((qam+m2)*(a+m2));
+    d=1+aa*d; if(Math.abs(d)<FPMIN) d=FPMIN;
+    c=1+aa/c; if(Math.abs(c)<FPMIN) c=FPMIN;
+    d=1/d; h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));
+    d=1+aa*d; if(Math.abs(d)<FPMIN) d=FPMIN;
+    c=1+aa/c; if(Math.abs(c)<FPMIN) c=FPMIN;
+    d=1/d;
+    const del=d*c; h*=del;
+    if(Math.abs(del-1)<EPS) break;
+  }
+  return h;
+}
+function betai(x,a,b){
+  if(x<=0) return 0;
+  if(x>=1) return 1;
+  const bt=Math.exp(gammaln(a+b)-gammaln(a)-gammaln(b)+a*Math.log(x)+b*Math.log(1-x));
+  if(x<(a+1)/(a+b+2)) return bt*betacf(x,a,b)/a;
+  else return 1-bt*betacf(1-x,b,a)/b;
+}
+function tCDF(t,df){
+  const x=df/(df+t*t);
+  const ib=betai(x,df/2,0.5);
+  return t>0 ? 1-0.5*ib : 0.5*ib;
+}
+function tPDF(t,df){
+  return Math.exp(gammaln((df+1)/2)-gammaln(df/2)-0.5*Math.log(df*Math.PI)-((df+1)/2)*Math.log(1+t*t/df));
+}
+function invCDF(cdfFn,p,lo,hi){
+  for(let i=0;i<100;i++){
+    const mid=(lo+hi)/2;
+    if(cdfFn(mid)<p) lo=mid; else hi=mid;
+  }
+  return (lo+hi)/2;
+}
+function tInv(p,df){return invCDF(x=>tCDF(x,df),p,-200,200);}
+function chiInv(p,df){return invCDF(x=>chiSquaredCDF(x,df),p,0,Math.max(200,df*10));}
+function binomPMF(k,n,p){
+  return Math.exp(gammaln(n+1)-gammaln(k+1)-gammaln(n-k+1)+k*Math.log(p)+(n-k)*Math.log(1-p));
+}
+function binomCDF(k,n,p){let s=0;for(let i=0;i<=k;i++) s+=binomPMF(i,n,p);return s;}
+function poissonPMF(k,lambda){return Math.exp(-lambda+k*Math.log(lambda)-gammaln(k+1));}
+function poissonCDF(k,lambda){let s=0;for(let i=0;i<=k;i++) s+=poissonPMF(i,lambda);return s;}
+
+function logChoose(n,k){
+  if(k<0||k>n) return -Infinity;
+  return gammaln(n+1)-gammaln(k+1)-gammaln(n-k+1);
+}
+
+function fPDF(x,d1,d2){
+  if(x<=0) return 0;
+  const lg=gammaln((d1+d2)/2)-gammaln(d1/2)-gammaln(d2/2)
+    +(d1/2)*Math.log(d1/d2)+(d1/2-1)*Math.log(x)
+    -((d1+d2)/2)*Math.log(1+d1*x/d2);
+  return Math.exp(lg);
+}
+function fCDF(x,d1,d2){
+  if(x<=0) return 0;
+  return betai(d1*x/(d1*x+d2), d1/2, d2/2);
+}
+
+function expPDF(x,lambda){return x<0?0:lambda*Math.exp(-lambda*x);}
+function expCDF(x,lambda){return x<0?0:1-Math.exp(-lambda*x);}
+
+function cauchyPDF(x,x0,g){return 1/(Math.PI*g*(1+Math.pow((x-x0)/g,2)));}
+function cauchyCDF(x,x0,g){return 0.5+Math.atan((x-x0)/g)/Math.PI;}
+
+function weibullPDF(x,k,lam){
+  if(x<0) return 0;
+  if(x===0) return k===1?1/lam:0;
+  return (k/lam)*Math.pow(x/lam,k-1)*Math.exp(-Math.pow(x/lam,k));
+}
+function weibullCDF(x,k,lam){return x<0?0:1-Math.exp(-Math.pow(x/lam,k));}
+
+function gammaPDF(x,k,theta){
+  if(x<0) return 0;
+  if(x===0) return k<1?Infinity:(k===1?1/theta:0);
+  return Math.exp((k-1)*Math.log(x)-x/theta-gammaln(k)-k*Math.log(theta));
+}
+function gammaCDF(x,k,theta){return x<=0?0:gammaP(k,x/theta);}
+
+function betaPDF(x,a,b){
+  if(x<=0||x>=1) return 0;
+  return Math.exp((a-1)*Math.log(x)+(b-1)*Math.log(1-x)
+    -(gammaln(a)+gammaln(b)-gammaln(a+b)));
+}
+function betaCDF(x,a,b){return betai(x,a,b);}
+
+function lognormPDF(x,mu,sigma){
+  if(x<=0) return 0;
+  return Math.exp(-Math.pow(Math.log(x)-mu,2)/(2*sigma*sigma))/(x*sigma*Math.sqrt(2*Math.PI));
+}
+function lognormCDF(x,mu,sigma){return x<=0?0:normalCDF(Math.log(x),mu,sigma);}
+
+function logisticPDF(x,mu,s){
+  const z=Math.exp(-(x-mu)/s);
+  return z/(s*Math.pow(1+z,2));
+}
+function logisticCDF(x,mu,s){return 1/(1+Math.exp(-(x-mu)/s));}
+
+function pascalPMF(k,r,p){
+  if(k<r) return 0;
+  return Math.exp(logChoose(k-1,r-1)+r*Math.log(p)+(k-r)*Math.log(1-p));
+}
+function pascalCDF(k,r,p){let s=0;for(let i=0;i<=k;i++) s+=pascalPMF(i,r,p);return s;}
+
+function hyperPMF(k,N,K,n){
+  if(k<Math.max(0,n-(N-K))||k>Math.min(n,K)) return 0;
+  return Math.exp(logChoose(K,k)+logChoose(N-K,n-k)-logChoose(N,n));
+}
+function hyperCDF(k,N,K,n){let s=0;for(let i=0;i<=k;i++) s+=hyperPMF(i,N,K,n);return s;}
+
+const distSelect=document.getElementById('distSelect');
+const distParamsEl=document.getElementById('distParams');
+const modeGroupEl=document.getElementById('modeGroup');
+const boundInputsEl=document.getElementById('boundInputs');
+const distChart=document.getElementById('distChart');
+const distResult=document.getElementById('distResult');
+const distFormula=document.getElementById('distFormula');
+
+let distMode='between';
+
+const DIST_DEFS={
+  normal:{
+    label:'Normal',
+    params:[{id:'mu',label:'μ',def:0},{id:'sigma',label:'σ',def:1}],
+    continuous:true,
+    pdf:p=>x=>normalPDF(x,p.mu,p.sigma),
+    cdf:p=>x=>normalCDF(x,p.mu,p.sigma),
+    range:p=>[p.mu-4*p.sigma,p.mu+4*p.sigma],
+    formula:'z = (x − μ) / σ\nPDF: f(x) = 1/(σ√2π) · e^(−(x−μ)²/2σ²)'
+  },
+  student:{
+    label:'Student (t)',
+    params:[{id:'df',label:'df',def:10}],
+    continuous:true,
+    pdf:p=>x=>tPDF(x,p.df),
+    cdf:p=>x=>tCDF(x,p.df),
+    range:p=>[-4-20/p.df,4+20/p.df],
+    formula:'t = (x̄ − μ) / (s/√n) , df = n − 1'
+  },
+  chisq:{
+    label:'Chi-Squared',
+    params:[{id:'df',label:'df',def:10}],
+    continuous:true,
+    pdf:p=>x=>chiSquaredPDF(x,p.df),
+    cdf:p=>x=>chiSquaredCDF(x,p.df),
+    range:p=>[0,p.df+4*Math.sqrt(2*p.df)+5],
+    formula:'χ² = (n−1)s² / σ² , df = n − 1'
+  },
+  binomial:{
+    label:'Binomial',
+    params:[{id:'n',label:'n',def:10},{id:'p',label:'p',def:0.5}],
+    continuous:false,
+    pmf:p=>k=>binomPMF(k,p.n,p.p),
+    cdf:p=>k=>binomCDF(k,p.n,p.p),
+    range:p=>[0,p.n],
+    formula:'P(x) = n!/[(n−x)!x!] · pˣqⁿ⁻ˣ , μ=np , σ²=npq'
+  },
+  poisson:{
+    label:'Poisson',
+    params:[{id:'lambda',label:'λ',def:4}],
+    continuous:false,
+    pmf:p=>k=>poissonPMF(k,p.lambda),
+    cdf:p=>k=>poissonCDF(k,p.lambda),
+    range:p=>[0,Math.max(10,Math.ceil(p.lambda+4*Math.sqrt(p.lambda)+3))],
+    formula:'P(x) = e^(−λ)λˣ / x!'
+  },
+  fdist:{
+    label:'F-Distribution',
+    params:[{id:'d1',label:'d₁ (num df)',def:5},{id:'d2',label:'d₂ (den df)',def:10}],
+    continuous:true,
+    pdf:p=>x=>fPDF(x,p.d1,p.d2),
+    cdf:p=>x=>fCDF(x,p.d1,p.d2),
+    range:p=>[0,Math.max(4,invCDF(x=>fCDF(x,p.d1,p.d2),0.995,0,10000))],
+    formula:'F = s₁²/s₂²  (df₁ = n₁−1, df₂ = n₂−1)\nCDF: I[d₁x/(d₁x+d₂)](d₁/2, d₂/2)'
+  },
+  exponential:{
+    label:'Exponential',
+    params:[{id:'lambda',label:'λ (rate)',def:1}],
+    continuous:true,
+    pdf:p=>x=>expPDF(x,p.lambda),
+    cdf:p=>x=>expCDF(x,p.lambda),
+    range:p=>[0,-Math.log(0.005)/p.lambda],
+    formula:'PDF: f(x) = λe^(−λx) , x ≥ 0\nCDF: F(x) = 1 − e^(−λx) , μ = 1/λ , σ = 1/λ'
+  },
+  cauchy:{
+    label:'Cauchy',
+    params:[{id:'x0',label:'x₀ (location)',def:0},{id:'g',label:'γ (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>cauchyPDF(x,p.x0,p.g),
+    cdf:p=>x=>cauchyCDF(x,p.x0,p.g),
+    range:p=>[p.x0-10*p.g,p.x0+10*p.g],
+    formula:'PDF: f(x) = 1/{πγ[1+((x−x₀)/γ)²]}\nCDF: F(x) = ½ + arctan((x−x₀)/γ)/π  (ไม่มีค่าเฉลี่ย/ความแปรปรวน)'
+  },
+  weibull:{
+    label:'Weibull',
+    params:[{id:'k',label:'k (shape)',def:2},{id:'lam',label:'λ (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>weibullPDF(x,p.k,p.lam),
+    cdf:p=>x=>weibullCDF(x,p.k,p.lam),
+    range:p=>[0,p.lam*Math.pow(-Math.log(0.005),1/p.k)],
+    formula:'PDF: f(x) = (k/λ)(x/λ)^(k−1)·e^(−(x/λ)^k) , x ≥ 0\nCDF: F(x) = 1 − e^(−(x/λ)^k)'
+  },
+  gammadist:{
+    label:'Gamma',
+    params:[{id:'k',label:'k (shape)',def:2},{id:'theta',label:'θ (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>gammaPDF(x,p.k,p.theta),
+    cdf:p=>x=>gammaCDF(x,p.k,p.theta),
+    range:p=>[0,p.theta*(p.k+5*Math.sqrt(p.k)+5)],
+    formula:'PDF: f(x) = x^(k−1)·e^(−x/θ) / [Γ(k)·θ^k] , x ≥ 0\nμ = kθ , σ² = kθ²'
+  },
+  betadist:{
+    label:'Beta',
+    params:[{id:'a',label:'α',def:2},{id:'b',label:'β',def:5}],
+    continuous:true,
+    pdf:p=>x=>betaPDF(x,p.a,p.b),
+    cdf:p=>x=>betaCDF(x,p.a,p.b),
+    range:p=>[0,1],
+    formula:'PDF: f(x) = x^(α−1)(1−x)^(β−1) / B(α,β) , 0 < x < 1\nμ = α/(α+β)'
+  },
+  lognormal:{
+    label:'Log-Normal',
+    params:[{id:'mu',label:'μ (of ln x)',def:0},{id:'sigma',label:'σ (of ln x)',def:1}],
+    continuous:true,
+    pdf:p=>x=>lognormPDF(x,p.mu,p.sigma),
+    cdf:p=>x=>lognormCDF(x,p.mu,p.sigma),
+    range:p=>[0,Math.exp(p.mu+3*p.sigma)],
+    formula:'ถ้า ln X ~ Normal(μ, σ²)\nPDF: f(x) = e^(−(ln x − μ)²/2σ²) / (xσ√2π) , x > 0'
+  },
+  logistic:{
+    label:'Logistic',
+    params:[{id:'mu',label:'μ',def:0},{id:'s',label:'s (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>logisticPDF(x,p.mu,p.s),
+    cdf:p=>x=>logisticCDF(x,p.mu,p.s),
+    range:p=>[p.mu-8*p.s,p.mu+8*p.s],
+    formula:'CDF: F(x) = 1/(1 + e^(−(x−μ)/s))\nPDF: f(x) = e^(−z)/[s(1+e^(−z))²] , z = (x−μ)/s'
+  },
+  pascal:{
+    label:'Pascal (Negative Binomial)',
+    params:[{id:'r',label:'r (successes)',def:3},{id:'p',label:'p',def:0.5}],
+    continuous:false,
+    pmf:p=>k=>pascalPMF(k,p.r,p.p),
+    cdf:p=>k=>pascalCDF(k,p.r,p.p),
+    range:p=>[0,Math.max(p.r+5,Math.ceil(p.r/p.p+4*Math.sqrt(p.r*(1-p.p))/p.p+3))],
+    formula:'X = จำนวนครั้งที่ทดลองจนได้สำเร็จครบ r ครั้ง (x ≥ r)\nP(x) = C(x−1, r−1)·p^r·(1−p)^(x−r) , μ = r/p'
+  },
+  hypergeometric:{
+    label:'Hypergeometric',
+    params:[{id:'N',label:'N (population)',def:50},{id:'K',label:'K (successes)',def:20},{id:'n',label:'n (draws)',def:10}],
+    continuous:false,
+    pmf:p=>k=>hyperPMF(k,p.N,p.K,p.n),
+    cdf:p=>k=>hyperCDF(k,p.N,p.K,p.n),
+    range:p=>[0,Math.min(p.n,p.K)],
+    formula:'P(x) = C(K,x)·C(N−K, n−x) / C(N,n)\nμ = nK/N  (สุ่มแบบไม่ใส่คืน)'
+  }
+};
+
+function getDistParams(){
+  const def=DIST_DEFS[distSelect.value];
+  const p={};
+  def.params.forEach(pr=>{
+    const el=document.getElementById('dp-'+pr.id);
+    p[pr.id]=parseFloat(el.value);
+  });
+  return p;
+}
+
+function renderDistParams(){
+  const def=DIST_DEFS[distSelect.value];
+  distParamsEl.innerHTML=def.params.map(pr=>`
+    <div class="field">
+      <label>${pr.label}</label>
+      <input type="number" id="dp-${pr.id}" value="${pr.def}" step="any">
+    </div>
+  `).join('');
+  distParamsEl.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',renderDistChart));
+
+  const def2=DIST_DEFS[distSelect.value];
+  if(def2.continuous){
+    modeGroupEl.innerHTML=`
+      <button class="chipbtn active" data-mode="between">a ≤ X ≤ b</button>
+      <button class="chipbtn" data-mode="less">X ≤ b</button>
+      <button class="chipbtn" data-mode="greater">X ≥ a</button>
+    `;
+  } else {
+    modeGroupEl.innerHTML=`
+      <button class="chipbtn active" data-mode="exact">X = k</button>
+      <button class="chipbtn" data-mode="atmost">X ≤ k</button>
+      <button class="chipbtn" data-mode="atleast">X ≥ k</button>
+      <button class="chipbtn" data-mode="between">k1 ≤ X ≤ k2</button>
+    `;
+  }
+  distMode=def2.continuous?'between':'exact';
+  modeGroupEl.querySelectorAll('.chipbtn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      modeGroupEl.querySelectorAll('.chipbtn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      distMode=b.dataset.mode;
+      renderBoundInputs();
+      renderDistChart();
+    });
+  });
+  renderBoundInputs();
+  renderDistChart();
+}
+
+function renderBoundInputs(){
+  const def=DIST_DEFS[distSelect.value];
+  const rng=def.range(getDistParams());
+  if(def.continuous){
+    if(distMode==='between'){
+      boundInputsEl.innerHTML=`
+        <div class="field"><label>a</label><input type="number" id="bnd-a" value="${(rng[0]/2).toFixed(2)}" step="any"></div>
+        <div class="field"><label>b</label><input type="number" id="bnd-b" value="${(rng[1]/2).toFixed(2)}" step="any"></div>
+      `;
+    } else if(distMode==='less'){
+      boundInputsEl.innerHTML=`<div class="field"><label>b</label><input type="number" id="bnd-b" value="0" step="any"></div>`;
+    } else {
+      boundInputsEl.innerHTML=`<div class="field"><label>a</label><input type="number" id="bnd-a" value="0" step="any"></div>`;
+    }
+  } else {
+    if(distMode==='exact'||distMode==='atmost'||distMode==='atleast'){
+      boundInputsEl.innerHTML=`<div class="field"><label>k</label><input type="number" id="bnd-k" value="0" step="1" min="0"></div>`;
+    } else {
+      boundInputsEl.innerHTML=`
+        <div class="field"><label>k1</label><input type="number" id="bnd-k1" value="0" step="1" min="0"></div>
+        <div class="field"><label>k2</label><input type="number" id="bnd-k2" value="2" step="1" min="0"></div>
+      `;
+    }
+  }
+  boundInputsEl.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',renderDistChart));
+}
+
+function renderDistChart(){
+  const def=DIST_DEFS[distSelect.value];
+  const p=getDistParams();
+  const rng=def.range(p);
+  const W=680,H=230,pad=34;
+
+  let shadeLo=null, shadeHi=null;
+  if(def.continuous){
+    if(distMode==='between'){
+      shadeLo=parseFloat(document.getElementById('bnd-a')?.value ?? rng[0]);
+      shadeHi=parseFloat(document.getElementById('bnd-b')?.value ?? rng[1]);
+    } else if(distMode==='less'){
+      shadeLo=rng[0]; shadeHi=parseFloat(document.getElementById('bnd-b')?.value ?? 0);
+    } else {
+      shadeLo=parseFloat(document.getElementById('bnd-a')?.value ?? 0); shadeHi=rng[1];
+    }
+  }
+
+  if(def.continuous){
+    const pdf=def.pdf(p);
+    const N=220;
+    let pts=[],ymax=0;
+    for(let i=0;i<=N;i++){
+      const x=rng[0]+(rng[1]-rng[0])*i/N;
+      const y=pdf(x);
+      pts.push([x,y]);
+      if(y>ymax && isFinite(y)) ymax=y;
+    }
+    const sx=x=>pad+(x-rng[0])/(rng[1]-rng[0])*(W-2*pad);
+    const sy=y=>H-pad-(y/ymax)*(H-2*pad-10);
+    const path='M'+pts.map(pt=>sx(pt[0])+','+sy(pt[1])).join(' L');
+    const shadePts=pts.filter(pt=>pt[0]>=shadeLo && pt[0]<=shadeHi);
+    let shadePath='';
+    if(shadePts.length>1){
+      shadePath='M'+sx(shadePts[0][0])+','+sy(0)+' L'+shadePts.map(pt=>sx(pt[0])+','+sy(pt[1])).join(' L')+' L'+sx(shadePts[shadePts.length-1][0])+','+sy(0)+' Z';
+    }
+    const labels=[rng[0],(rng[0]+rng[1])/2,rng[1]].map(v=>v.toFixed(1));
+    distChart.innerHTML=`
+      <path d="${shadePath}" fill="#2B6CB0" fill-opacity="0.35" stroke="none"></path>
+      <path d="${path}" fill="none" stroke="#1B3A5C" stroke-width="2"></path>
+      <line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#999"></line>
+      <text class="axislabel" x="${pad}" y="${H-10}">${labels[0]}</text>
+      <text class="axislabel" x="${W/2-10}" y="${H-10}">${labels[1]}</text>
+      <text class="axislabel" x="${W-pad-25}" y="${H-10}">${labels[2]}</text>
+    `;
+  } else {
+    const pmf=def.pmf(p);
+    const kmax=rng[1];
+    let bars=[],ymax=0;
+    for(let k=0;k<=kmax;k++){
+      const y=pmf(k);
+      bars.push([k,y]);
+      if(y>ymax) ymax=y;
+    }
+    const bw=(W-2*pad)/(kmax+1);
+    const sy=y=>H-pad-(y/ymax)*(H-2*pad-10);
+    let selected=new Set();
+    if(distMode==='exact'){const k=parseInt(document.getElementById('bnd-k')?.value ?? 0);selected.add(k);}
+    else if(distMode==='atmost'){const k=parseInt(document.getElementById('bnd-k')?.value ?? 0);for(let i=0;i<=k;i++) selected.add(i);}
+    else if(distMode==='atleast'){const k=parseInt(document.getElementById('bnd-k')?.value ?? 0);for(let i=k;i<=kmax;i++) selected.add(i);}
+    else {const k1=parseInt(document.getElementById('bnd-k1')?.value ?? 0);const k2=parseInt(document.getElementById('bnd-k2')?.value ?? 0);for(let i=k1;i<=k2;i++) selected.add(i);}
+    let rects=bars.map(b=>{
+      const x=pad+b[0]*bw;
+      const y=sy(b[1]);
+      const h=(H-pad)-y;
+      const fill=selected.has(b[0])?'#2B6CB0':'#B9C9DB';
+      return `<rect x="${x+2}" y="${y}" width="${bw-4}" height="${h}" fill="${fill}"></rect>`;
+    }).join('');
+    distChart.innerHTML=`
+      ${rects}
+      <line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#999"></line>
+      <text class="axislabel" x="${pad}" y="${H-10}">0</text>
+      <text class="axislabel" x="${W-pad-20}" y="${H-10}">${kmax}</text>
+    `;
+  }
+  distFormula.textContent=def.formula;
+}
+
+document.getElementById('computeDist').addEventListener('click',()=>{
+  const def=DIST_DEFS[distSelect.value];
+  const p=getDistParams();
+  let result, label;
+  if(def.continuous){
+    const cdf=def.cdf(p);
+    if(distMode==='between'){
+      const a=parseFloat(document.getElementById('bnd-a').value);
+      const b=parseFloat(document.getElementById('bnd-b').value);
+      result=cdf(b)-cdf(a);
+      label=`P(${a} ≤ X ≤ ${b})`;
+    } else if(distMode==='less'){
+      const b=parseFloat(document.getElementById('bnd-b').value);
+      result=cdf(b);
+      label=`P(X ≤ ${b})`;
+    } else {
+      const a=parseFloat(document.getElementById('bnd-a').value);
+      result=1-cdf(a);
+      label=`P(X ≥ ${a})`;
+    }
+  } else {
+    const pmf=def.pmf(p), cdf=def.cdf(p);
+    if(distMode==='exact'){
+      const k=parseInt(document.getElementById('bnd-k').value);
+      result=pmf(k); label=`P(X = ${k})`;
+    } else if(distMode==='atmost'){
+      const k=parseInt(document.getElementById('bnd-k').value);
+      result=cdf(k); label=`P(X ≤ ${k})`;
+    } else if(distMode==='atleast'){
+      const k=parseInt(document.getElementById('bnd-k').value);
+      result=1-cdf(k-1); label=`P(X ≥ ${k})`;
+    } else {
+      const k1=parseInt(document.getElementById('bnd-k1').value);
+      const k2=parseInt(document.getElementById('bnd-k2').value);
+      result=cdf(k2)-cdf(k1-1); label=`P(${k1} ≤ X ≤ ${k2})`;
+    }
+  }
+  distResult.style.display='block';
+  distResult.innerHTML=`<div class="line"><span>${label}</span><span class="big">${result.toFixed(6)}</span></div>`;
+});
+
+distSelect.addEventListener('change',renderDistParams);
+renderDistParams();
+
+const statSelect=document.getElementById('statSelect');
+const statParamsEl=document.getElementById('statParams');
+const tailGroupEl=document.getElementById('tailGroup');
+const statResult=document.getElementById('statResult');
+const statFormula=document.getElementById('statFormula');
+let tailMode='right';
+
+const STAT_DEFS={
+  ztest:{
+    label:'Z Test of a Mean',
+    fields:[{id:'xbar',label:'x̄',def:0},{id:'mu0',label:'μ₀',def:0},{id:'sigma',label:'σ',def:1},{id:'n',label:'n',def:30},{id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true,
+    formula:'z = (x̄ − μ₀) / (σ/√n)'
+  },
+  ttest:{
+    label:'T Test of a Mean',
+    fields:[{id:'xbar',label:'x̄',def:0},{id:'mu0',label:'μ₀',def:0},{id:'s',label:'s',def:1},{id:'n',label:'n',def:30},{id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true,
+    formula:'t = (x̄ − μ₀) / (s/√n) , df = n − 1'
+  },
+  zpropt:{
+    label:'Z Test of a Proportion',
+    fields:[{id:'phat',label:'p̂',def:0.5},{id:'p0',label:'p₀',def:0.5},{id:'n',label:'n',def:30},{id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true,
+    formula:'z = (p̂ − p₀) / √(p₀q₀/n)'
+  },
+  chitest:{
+    label:'Chi-Squared Test (Variance)',
+    fields:[{id:'s',label:'s',def:1},{id:'sigma0',label:'σ₀',def:1},{id:'n',label:'n',def:20},{id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true,
+    formula:'χ² = (n−1)s² / σ₀² , df = n − 1'
+  },
+  zest:{
+    label:'Z Estimate of a Mean',
+    fields:[{id:'xbar',label:'x̄',def:0},{id:'sigma',label:'σ',def:1},{id:'n',label:'n',def:30},{id:'conf',label:'confidence',def:0.95}],
+    hasTail:false, isTest:false,
+    formula:'E = z·σ/√n , CI: x̄ − E < μ < x̄ + E'
+  },
+  test:{
+    label:'T Estimate of a Mean',
+    fields:[{id:'xbar',label:'x̄',def:0},{id:'s',label:'s',def:1},{id:'n',label:'n',def:30},{id:'conf',label:'confidence',def:0.95}],
+    hasTail:false, isTest:false,
+    formula:'E = t·s/√n , df=n−1 , CI: x̄ − E < μ < x̄ + E'
+  },
+  zpropest:{
+    label:'Z Estimate of a Proportion',
+    fields:[{id:'phat',label:'p̂',def:0.5},{id:'n',label:'n',def:30},{id:'conf',label:'confidence',def:0.95}],
+    hasTail:false, isTest:false,
+    formula:'E = z·√(p̂q̂/n) , CI: p̂ − E < p < p̂ + E'
+  },
+  chiest:{
+    label:'Chi-Squared Estimate of σ',
+    fields:[{id:'s',label:'s',def:1},{id:'n',label:'n',def:20},{id:'conf',label:'confidence',def:0.90}],
+    hasTail:false, isTest:false,
+    formula:'√[(n−1)s²/χ²ᴿ] < σ < √[(n−1)s²/χ²ᴸ] , df = n − 1'
+  },
+  z2mean:{
+    label:'Z Test, Difference of Means',
+    fields:[{id:'xbar1',label:'x̄₁',def:0},{id:'sigma1',label:'σ₁',def:1},{id:'n1',label:'n₁',def:30},
+            {id:'xbar2',label:'x̄₂',def:0},{id:'sigma2',label:'σ₂',def:1},{id:'n2',label:'n₂',def:30},
+            {id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true,
+    formula:'z = (x̄₁ − x̄₂) / √(σ₁²/n₁ + σ₂²/n₂)'
+  },
+  t2mean:{
+    label:'T Test, Difference of Means',
+    fields:[{id:'xbar1',label:'x̄₁',def:0},{id:'s1',label:'s₁',def:1},{id:'n1',label:'n₁',def:30},
+            {id:'xbar2',label:'x̄₂',def:0},{id:'s2',label:'s₂',def:1},{id:'n2',label:'n₂',def:30},
+            {id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true, hasVarMode:true,
+    formula:'Pooled: sp² = [(n₁−1)s₁² + (n₂−1)s₂²]/(n₁+n₂−2) , t = (x̄₁−x̄₂)/(sp√(1/n₁+1/n₂)) , df = n₁+n₂−2\nWelch: t = (x̄₁−x̄₂)/√(s₁²/n₁ + s₂²/n₂) , df = Welch–Satterthwaite'
+  },
+  z2prop:{
+    label:'Z Test, Difference of Proportions',
+    fields:[{id:'x1',label:'x₁',def:0},{id:'n1',label:'n₁',def:30},
+            {id:'x2',label:'x₂',def:0},{id:'n2',label:'n₂',def:30},
+            {id:'alpha',label:'α',def:0.05}],
+    hasTail:true, isTest:true,
+    formula:'p̂₁ = x₁/n₁ , p̂₂ = x₂/n₂ , p̄ = (x₁+x₂)/(n₁+n₂)\nz = (p̂₁ − p̂₂) / √[p̄(1−p̄)(1/n₁ + 1/n₂)]'
+  },
+  z2meanest:{
+    label:'Z Estimate, Difference of Means',
+    fields:[{id:'xbar1',label:'x̄₁',def:0},{id:'sigma1',label:'σ₁',def:1},{id:'n1',label:'n₁',def:30},
+            {id:'xbar2',label:'x̄₂',def:0},{id:'sigma2',label:'σ₂',def:1},{id:'n2',label:'n₂',def:30},
+            {id:'conf',label:'confidence',def:0.95}],
+    hasTail:false, isTest:false,
+    formula:'E = z·√(σ₁²/n₁ + σ₂²/n₂) , CI: (x̄₁−x̄₂) − E < μ₁−μ₂ < (x̄₁−x̄₂) + E'
+  },
+  t2meanest:{
+    label:'T Estimate, Difference of Means',
+    fields:[{id:'xbar1',label:'x̄₁',def:0},{id:'s1',label:'s₁',def:1},{id:'n1',label:'n₁',def:30},
+            {id:'xbar2',label:'x̄₂',def:0},{id:'s2',label:'s₂',def:1},{id:'n2',label:'n₂',def:30},
+            {id:'conf',label:'confidence',def:0.95}],
+    hasTail:false, isTest:false, hasVarMode:true,
+    formula:'Pooled: E = t·sp·√(1/n₁+1/n₂) , df = n₁+n₂−2\nWelch: E = t·√(s₁²/n₁ + s₂²/n₂) , df = Welch–Satterthwaite\nCI: (x̄₁−x̄₂) − E < μ₁−μ₂ < (x̄₁−x̄₂) + E'
+  },
+  z2propest:{
+    label:'Z Estimate, Difference of Proportions',
+    fields:[{id:'x1',label:'x₁',def:0},{id:'n1',label:'n₁',def:30},
+            {id:'x2',label:'x₂',def:0},{id:'n2',label:'n₂',def:30},
+            {id:'conf',label:'confidence',def:0.95}],
+    hasTail:false, isTest:false,
+    formula:'E = z·√(p̂₁q̂₁/n₁ + p̂₂q̂₂/n₂) , CI: (p̂₁−p̂₂) − E < p₁−p₂ < (p̂₁−p̂₂) + E'
+  },
+  gof:{
+    label:'Goodness of Fit Test',
+    fields:[{id:'alpha',label:'α',def:0.05}],
+    hasTail:false, isTest:true, tableMode:'gof',
+    formula:'χ² = Σ (O − E)² / E , df = k − 1 (k = จำนวนหมวด)  — right-tailed เสมอ'
+  },
+  chiindep:{
+    label:'ChiSquared Test (Independence)',
+    fields:[{id:'alpha',label:'α',def:0.05}],
+    hasTail:false, isTest:true, tableMode:'contingency',
+    formula:'E(i,j) = (row total × column total) / grand total\nχ² = Σ (O − E)² / E , df = (r−1)(c−1)  — right-tailed เสมอ'
+  }
+};
+
+let varMode='pooled';
+let gofRows=3;
+let ctRows=2, ctCols=2;
+
+function renderStatTable(){
+  const def=STAT_DEFS[statSelect.value];
+  const el=document.getElementById('statTable');
+  if(!def.tableMode){ el.innerHTML=''; return; }
+
+  if(def.tableMode==='gof'){
+    let rows='';
+    for(let i=0;i<gofRows;i++){
+      rows+=`<tr><td class="st-rowlabel">หมวด ${i+1}</td>`+
+            `<td><input type="number" id="gof-o-${i}" step="any" placeholder="O"></td>`+
+            `<td><input type="number" id="gof-e-${i}" step="any" placeholder="E"></td></tr>`;
+    }
+    el.innerHTML=`<div class="st-table">
+      <div class="st-hint">กรอกความถี่สังเกต (O) และความถี่คาดหวัง (E) ของแต่ละหมวด</div>
+      <div class="st-tablebtns">
+        <button type="button" id="gofAdd">+ เพิ่มหมวด</button>
+        <button type="button" id="gofDel">− ลบหมวด</button>
+      </div>
+      <table><tr><th></th><th>Observed</th><th>Expected</th></tr>${rows}</table>
+    </div>`;
+    document.getElementById('gofAdd').addEventListener('click',()=>{gofRows++;renderStatTable();});
+    document.getElementById('gofDel').addEventListener('click',()=>{if(gofRows>2){gofRows--;renderStatTable();}});
+  } else {
+    let head='<tr><th></th>';
+    for(let j=0;j<ctCols;j++) head+=`<th>คอลัมน์ ${j+1}</th>`;
+    head+='</tr>';
+    let rows='';
+    for(let i=0;i<ctRows;i++){
+      rows+=`<tr><td class="st-rowlabel">แถว ${i+1}</td>`;
+      for(let j=0;j<ctCols;j++){
+        rows+=`<td><input type="number" id="ct-${i}-${j}" step="any" placeholder="O"></td>`;
+      }
+      rows+='</tr>';
+    }
+    el.innerHTML=`<div class="st-table">
+      <div class="st-hint">กรอกความถี่สังเกตในตาราง (ค่าคาดหวังคำนวณให้อัตโนมัติจากผลรวมแถว/คอลัมน์)</div>
+      <div class="st-tablebtns">
+        <button type="button" id="ctAddR">+ แถว</button>
+        <button type="button" id="ctDelR">− แถว</button>
+        <button type="button" id="ctAddC">+ คอลัมน์</button>
+        <button type="button" id="ctDelC">− คอลัมน์</button>
+      </div>
+      <table>${head}${rows}</table>
+    </div>`;
+    document.getElementById('ctAddR').addEventListener('click',()=>{ctRows++;renderStatTable();});
+    document.getElementById('ctDelR').addEventListener('click',()=>{if(ctRows>2){ctRows--;renderStatTable();}});
+    document.getElementById('ctAddC').addEventListener('click',()=>{ctCols++;renderStatTable();});
+    document.getElementById('ctDelC').addEventListener('click',()=>{if(ctCols>2){ctCols--;renderStatTable();}});
+  }
+}
+
+function renderStatParams(){
+  const def=STAT_DEFS[statSelect.value];
+  statParamsEl.innerHTML=def.fields.map(f=>`
+    <div class="field"><label>${f.label}</label><input type="number" id="sp-${f.id}" value="${f.def}" step="any"></div>
+  `).join('');
+
+  const varGroupEl=document.getElementById('varGroup');
+  if(def.hasVarMode){
+    varGroupEl.style.display='flex';
+    varGroupEl.innerHTML=`
+      <button class="chipbtn active" data-var="pooled">Pooled (σ₁=σ₂)</button>
+      <button class="chipbtn" data-var="welch">Welch (σ₁≠σ₂)</button>
+    `;
+    varMode='pooled';
+    varGroupEl.querySelectorAll('.chipbtn').forEach(b=>{
+      b.addEventListener('click',()=>{
+        varGroupEl.querySelectorAll('.chipbtn').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        varMode=b.dataset.var;
+      });
+    });
+  } else {
+    varGroupEl.style.display='none';
+    varGroupEl.innerHTML='';
+  }
+
+  renderStatTable();
+
+  if(def.hasTail){
+    tailGroupEl.style.display='flex';
+    tailGroupEl.innerHTML=`
+      <button class="chipbtn" data-tail="left">Left-tailed</button>
+      <button class="chipbtn active" data-tail="right">Right-tailed</button>
+      <button class="chipbtn" data-tail="two">Two-tailed</button>
+    `;
+    tailMode='right';
+    tailGroupEl.querySelectorAll('.chipbtn').forEach(b=>{
+      b.addEventListener('click',()=>{
+        tailGroupEl.querySelectorAll('.chipbtn').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        tailMode=b.dataset.tail;
+      });
+    });
+  } else {
+    tailGroupEl.style.display='none';
+    tailGroupEl.innerHTML='';
+  }
+  statFormula.textContent=def.formula;
+  statResult.style.display='none';
+}
+
+function getVal(id){return parseFloat(document.getElementById('sp-'+id).value);}
+
+document.getElementById('computeStat').addEventListener('click',()=>{
+  const key=statSelect.value;
+  const def=STAT_DEFS[key];
+  let html='';
+
+  if(key==='ztest'){
+    const xbar=getVal('xbar'),mu0=getVal('mu0'),sigma=getVal('sigma'),n=getVal('n'),alpha=getVal('alpha');
+    const se=sigma/Math.sqrt(n);
+    const z=(xbar-mu0)/se;
+    let crit,pval,reject;
+    if(tailMode==='left'){crit=normalInv(alpha);pval=normalCDF(z);reject=z<crit;}
+    else if(tailMode==='right'){crit=normalInv(1-alpha);pval=1-normalCDF(z);reject=z>crit;}
+    else {crit=normalInv(1-alpha/2);pval=2*(1-normalCDF(Math.abs(z)));reject=Math.abs(z)>crit;}
+    html=statLine('Test statistic z',z)+statLine('Critical value',crit)+statLine('p-value',pval)+decisionTag(reject);
+  }
+  else if(key==='ttest'){
+    const xbar=getVal('xbar'),mu0=getVal('mu0'),s=getVal('s'),n=getVal('n'),alpha=getVal('alpha');
+    const df=n-1;
+    const se=s/Math.sqrt(n);
+    const t=(xbar-mu0)/se;
+    let crit,pval,reject;
+    if(tailMode==='left'){crit=tInv(alpha,df);pval=tCDF(t,df);reject=t<crit;}
+    else if(tailMode==='right'){crit=tInv(1-alpha,df);pval=1-tCDF(t,df);reject=t>crit;}
+    else {crit=tInv(1-alpha/2,df);pval=2*(1-tCDF(Math.abs(t),df));reject=Math.abs(t)>crit;}
+    html=statLine('df',df)+statLine('Test statistic t',t)+statLine('Critical value',crit)+statLine('p-value',pval)+decisionTag(reject);
+  }
+  else if(key==='zpropt'){
+    const phat=getVal('phat'),p0=getVal('p0'),n=getVal('n'),alpha=getVal('alpha');
+    const se=Math.sqrt(p0*(1-p0)/n);
+    const z=(phat-p0)/se;
+    let crit,pval,reject;
+    if(tailMode==='left'){crit=normalInv(alpha);pval=normalCDF(z);reject=z<crit;}
+    else if(tailMode==='right'){crit=normalInv(1-alpha);pval=1-normalCDF(z);reject=z>crit;}
+    else {crit=normalInv(1-alpha/2);pval=2*(1-normalCDF(Math.abs(z)));reject=Math.abs(z)>crit;}
+    html=statLine('Test statistic z',z)+statLine('Critical value',crit)+statLine('p-value',pval)+decisionTag(reject);
+  }
+  else if(key==='chitest'){
+    const s=getVal('s'),sigma0=getVal('sigma0'),n=getVal('n'),alpha=getVal('alpha');
+    const df=n-1;
+    const chi=(df*s*s)/(sigma0*sigma0);
+    let reject,critText;
+    if(tailMode==='left'){const c=chiInv(alpha,df);reject=chi<c;critText=statLine('Critical value',c);}
+    else if(tailMode==='right'){const c=chiInv(1-alpha,df);reject=chi>c;critText=statLine('Critical value',c);}
+    else {const cl=chiInv(alpha/2,df),cr=chiInv(1-alpha/2,df);reject=(chi<cl)||(chi>cr);critText=statLine('Critical value (L)',cl)+statLine('Critical value (R)',cr);}
+    html=statLine('df',df)+statLine('Test statistic χ²',chi)+critText+decisionTag(reject);
+  }
+  else if(key==='zest'){
+    const xbar=getVal('xbar'),sigma=getVal('sigma'),n=getVal('n'),conf=getVal('conf');
+    const alpha=1-conf;
+    const z=normalInv(1-alpha/2);
+    const E=z*sigma/Math.sqrt(n);
+    html=statLine('Critical value z',z)+statLine('Margin of error',E)+statLine('Lower bound',xbar-E)+statLine('Upper bound',xbar+E);
+  }
+  else if(key==='test'){
+    const xbar=getVal('xbar'),s=getVal('s'),n=getVal('n'),conf=getVal('conf');
+    const df=n-1,alpha=1-conf;
+    const t=tInv(1-alpha/2,df);
+    const E=t*s/Math.sqrt(n);
+    html=statLine('df',df)+statLine('Critical value t',t)+statLine('Margin of error',E)+statLine('Lower bound',xbar-E)+statLine('Upper bound',xbar+E);
+  }
+  else if(key==='zpropest'){
+    const phat=getVal('phat'),n=getVal('n'),conf=getVal('conf');
+    const alpha=1-conf;
+    const z=normalInv(1-alpha/2);
+    const E=z*Math.sqrt(phat*(1-phat)/n);
+    html=statLine('Critical value z',z)+statLine('Margin of error',E)+statLine('Lower bound',phat-E)+statLine('Upper bound',phat+E);
+  }
+  else if(key==='chiest'){
+    const s=getVal('s'),n=getVal('n'),conf=getVal('conf');
+    const df=n-1,alpha=1-conf;
+    const cl=chiInv(alpha/2,df),cr=chiInv(1-alpha/2,df);
+    const lo=Math.sqrt((df*s*s)/cr);
+    const hi=Math.sqrt((df*s*s)/cl);
+    html=statLine('df',df)+statLine('χ²ᴸ',cl)+statLine('χ²ᴿ',cr)+statLine('Lower bound (σ)',lo)+statLine('Upper bound (σ)',hi);
+  }
+  else if(key==='z2mean'){
+    const xbar1=getVal('xbar1'),sigma1=getVal('sigma1'),n1=getVal('n1');
+    const xbar2=getVal('xbar2'),sigma2=getVal('sigma2'),n2=getVal('n2'),alpha=getVal('alpha');
+    const se=Math.sqrt(sigma1*sigma1/n1 + sigma2*sigma2/n2);
+    const z=(xbar1-xbar2)/se;
+    let crit,pval,reject;
+    if(tailMode==='left'){crit=normalInv(alpha);pval=normalCDF(z);reject=z<crit;}
+    else if(tailMode==='right'){crit=normalInv(1-alpha);pval=1-normalCDF(z);reject=z>crit;}
+    else {crit=normalInv(1-alpha/2);pval=2*(1-normalCDF(Math.abs(z)));reject=Math.abs(z)>crit;}
+    html=statLine('Standard error',se)+statLine('Test statistic z',z)+statLine('Critical value',crit)+statLine('p-value',pval)+decisionTag(reject);
+  }
+  else if(key==='t2mean'){
+    const xbar1=getVal('xbar1'),s1=getVal('s1'),n1=getVal('n1');
+    const xbar2=getVal('xbar2'),s2=getVal('s2'),n2=getVal('n2'),alpha=getVal('alpha');
+    let se,df,extra;
+    if(varMode==='pooled'){
+      const sp2=((n1-1)*s1*s1+(n2-1)*s2*s2)/(n1+n2-2);
+      se=Math.sqrt(sp2*(1/n1+1/n2));
+      df=n1+n2-2;
+      extra=statLine('Pooled variance sp²',sp2)+statLine('sp',Math.sqrt(sp2));
+    } else {
+      const a=s1*s1/n1, b=s2*s2/n2;
+      se=Math.sqrt(a+b);
+      df=Math.pow(a+b,2)/(a*a/(n1-1)+b*b/(n2-1));
+      extra='';
+    }
+    const t=(xbar1-xbar2)/se;
+    let crit,pval,reject;
+    if(tailMode==='left'){crit=tInv(alpha,df);pval=tCDF(t,df);reject=t<crit;}
+    else if(tailMode==='right'){crit=tInv(1-alpha,df);pval=1-tCDF(t,df);reject=t>crit;}
+    else {crit=tInv(1-alpha/2,df);pval=2*(1-tCDF(Math.abs(t),df));reject=Math.abs(t)>crit;}
+    html=statText('Method',varMode==='pooled'?'Pooled':'Welch')+extra+statLine('df',df)+statLine('Standard error',se)+statLine('Test statistic t',t)+statLine('Critical value',crit)+statLine('p-value',pval)+decisionTag(reject);
+  }
+  else if(key==='z2prop'){
+    const x1=getVal('x1'),n1=getVal('n1'),x2=getVal('x2'),n2=getVal('n2'),alpha=getVal('alpha');
+    const p1=x1/n1, p2=x2/n2;
+    const pbar=(x1+x2)/(n1+n2);
+    const se=Math.sqrt(pbar*(1-pbar)*(1/n1+1/n2));
+    const z=(p1-p2)/se;
+    let crit,pval,reject;
+    if(tailMode==='left'){crit=normalInv(alpha);pval=normalCDF(z);reject=z<crit;}
+    else if(tailMode==='right'){crit=normalInv(1-alpha);pval=1-normalCDF(z);reject=z>crit;}
+    else {crit=normalInv(1-alpha/2);pval=2*(1-normalCDF(Math.abs(z)));reject=Math.abs(z)>crit;}
+    html=statLine('p̂₁',p1)+statLine('p̂₂',p2)+statLine('Pooled p̄',pbar)+statLine('Standard error',se)+statLine('Test statistic z',z)+statLine('Critical value',crit)+statLine('p-value',pval)+decisionTag(reject);
+  }
+  else if(key==='z2meanest'){
+    const xbar1=getVal('xbar1'),sigma1=getVal('sigma1'),n1=getVal('n1');
+    const xbar2=getVal('xbar2'),sigma2=getVal('sigma2'),n2=getVal('n2'),conf=getVal('conf');
+    const alpha=1-conf;
+    const z=normalInv(1-alpha/2);
+    const se=Math.sqrt(sigma1*sigma1/n1 + sigma2*sigma2/n2);
+    const E=z*se;
+    const d=xbar1-xbar2;
+    html=statLine('Point estimate (x̄₁−x̄₂)',d)+statLine('Critical value z',z)+statLine('Standard error',se)+statLine('Margin of error',E)+statLine('Lower bound',d-E)+statLine('Upper bound',d+E);
+  }
+  else if(key==='t2meanest'){
+    const xbar1=getVal('xbar1'),s1=getVal('s1'),n1=getVal('n1');
+    const xbar2=getVal('xbar2'),s2=getVal('s2'),n2=getVal('n2'),conf=getVal('conf');
+    const alpha=1-conf;
+    let se,df,extra;
+    if(varMode==='pooled'){
+      const sp2=((n1-1)*s1*s1+(n2-1)*s2*s2)/(n1+n2-2);
+      se=Math.sqrt(sp2*(1/n1+1/n2));
+      df=n1+n2-2;
+      extra=statLine('Pooled variance sp²',sp2)+statLine('sp',Math.sqrt(sp2));
+    } else {
+      const a=s1*s1/n1, b=s2*s2/n2;
+      se=Math.sqrt(a+b);
+      df=Math.pow(a+b,2)/(a*a/(n1-1)+b*b/(n2-1));
+      extra='';
+    }
+    const t=tInv(1-alpha/2,df);
+    const E=t*se;
+    const d=xbar1-xbar2;
+    html=statText('Method',varMode==='pooled'?'Pooled':'Welch')+extra+statLine('df',df)+statLine('Point estimate (x̄₁−x̄₂)',d)+statLine('Critical value t',t)+statLine('Standard error',se)+statLine('Margin of error',E)+statLine('Lower bound',d-E)+statLine('Upper bound',d+E);
+  }
+  else if(key==='z2propest'){
+    const x1=getVal('x1'),n1=getVal('n1'),x2=getVal('x2'),n2=getVal('n2'),conf=getVal('conf');
+    const p1=x1/n1, p2=x2/n2;
+    const alpha=1-conf;
+    const z=normalInv(1-alpha/2);
+    const se=Math.sqrt(p1*(1-p1)/n1 + p2*(1-p2)/n2);
+    const E=z*se;
+    const d=p1-p2;
+    html=statLine('p̂₁',p1)+statLine('p̂₂',p2)+statLine('Point estimate (p̂₁−p̂₂)',d)+statLine('Critical value z',z)+statLine('Standard error',se)+statLine('Margin of error',E)+statLine('Lower bound',d-E)+statLine('Upper bound',d+E);
+  }
+  else if(key==='gof'){
+    const alpha=getVal('alpha');
+    let chi=0, k=0, bad=false, badMsg='';
+    for(let i=0;i<gofRows;i++){
+      const o=parseFloat(document.getElementById('gof-o-'+i).value);
+      const e=parseFloat(document.getElementById('gof-e-'+i).value);
+      if(isNaN(o)||isNaN(e)){ bad=true; badMsg='กรุณากรอกค่า O และ E ให้ครบทุกหมวด'; break; }
+      if(e<=0){ bad=true; badMsg='ค่าคาดหวัง (E) ต้องมากกว่า 0 ทุกหมวด'; break; }
+      chi += Math.pow(o-e,2)/e;
+      k++;
+    }
+    if(bad){
+      html='<div class="line"><span>ข้อผิดพลาด</span><span class="big">'+escHtml(badMsg)+'</span></div>';
+    } else {
+      const df=k-1;
+      const crit=chiInv(1-alpha,df);
+      const pval=1-chiSquaredCDF(chi,df);
+      const reject=chi>crit;
+      html=statLine('จำนวนหมวด k',k)+statLine('df',df)+statLine('Test statistic χ²',chi)+statLine('Critical value (right)',crit)+statLine('p-value',pval)+decisionTag(reject);
+    }
+  }
+  else if(key==='chiindep'){
+    const alpha=getVal('alpha');
+    let obs=[], bad=false;
+    for(let i=0;i<ctRows;i++){
+      let row=[];
+      for(let j=0;j<ctCols;j++){
+        const v=parseFloat(document.getElementById('ct-'+i+'-'+j).value);
+        if(isNaN(v)){ bad=true; break; }
+        row.push(v);
+      }
+      if(bad) break;
+      obs.push(row);
+    }
+    if(bad){
+      html='<div class="line"><span>ข้อผิดพลาด</span><span class="big">กรุณากรอกความถี่ให้ครบทุกช่อง</span></div>';
+    } else {
+      const rowT=obs.map(r=>r.reduce((a,b)=>a+b,0));
+      const colT=[];
+      for(let j=0;j<ctCols;j++){ let s=0; for(let i=0;i<ctRows;i++) s+=obs[i][j]; colT.push(s); }
+      const grand=rowT.reduce((a,b)=>a+b,0);
+      if(grand<=0){
+        html='<div class="line"><span>ข้อผิดพลาด</span><span class="big">ผลรวมทั้งหมดต้องมากกว่า 0</span></div>';
+      } else {
+        let chi=0, minE=Infinity;
+        for(let i=0;i<ctRows;i++){
+          for(let j=0;j<ctCols;j++){
+            const e=rowT[i]*colT[j]/grand;
+            if(e<minE) minE=e;
+            if(e>0) chi += Math.pow(obs[i][j]-e,2)/e;
+          }
+        }
+        const df=(ctRows-1)*(ctCols-1);
+        const crit=chiInv(1-alpha,df);
+        const pval=1-chiSquaredCDF(chi,df);
+        const reject=chi>crit;
+        html=statText('ขนาดตาราง',ctRows+' × '+ctCols)+statLine('Grand total',grand)+statLine('df',df)+statLine('Test statistic χ²',chi)+statLine('Critical value (right)',crit)+statLine('p-value',pval)+decisionTag(reject);
+        if(minE<5){
+          html+='<div class="line"><span>⚠ ข้อควรระวัง</span><span>ค่าคาดหวังต่ำสุด = '+minE.toFixed(3)+' (&lt; 5) ผลอาจไม่น่าเชื่อถือ</span></div>';
+        }
+      }
+    }
+  }
+
+  statResult.style.display='block';
+  statResult.innerHTML=html;
+});
+
+function statLine(label,val){
+  return `<div class="line"><span>${label}</span><span>${(+val).toFixed(6)}</span></div>`;
+}
+function statText(label,val){
+  return `<div class="line"><span>${label}</span><span>${escHtml(val)}</span></div>`;
+}
+function decisionTag(reject){
+  return `<div class="decision ${reject?'reject':'fail'}">${reject?'Reject H₀':'Fail to Reject H₀'}</div>`;
+}
+
+statSelect.addEventListener('change',renderStatParams);
+renderStatParams();
+
+let isDeg=true;
+let calcExpr='';
+let calcAns=0;
+const calcScreen=document.getElementById('calcScreen');
+const calcSub=document.getElementById('calcSub');
+document.getElementById('degBtn').addEventListener('click',()=>{isDeg=true;document.getElementById('degBtn').classList.add('active');document.getElementById('radBtn').classList.remove('active');});
+document.getElementById('radBtn').addEventListener('click',()=>{isDeg=false;document.getElementById('radBtn').classList.add('active');document.getElementById('degBtn').classList.remove('active');});
+
+const CALC_BUTTONS=[
+  {t:'C',cls:'op',act:'clear'},{t:'(',act:'ins',v:'('},{t:')',act:'ins',v:')'},{t:'⌫',cls:'op',act:'back'},{t:'÷',cls:'op',act:'ins',v:'/'},
+  {t:'sin',cls:'fn',act:'ins',v:'sin('},{t:'cos',cls:'fn',act:'ins',v:'cos('},{t:'tan',cls:'fn',act:'ins',v:'tan('},{t:'√',cls:'fn',act:'ins',v:'sqrt('},{t:'×',cls:'op',act:'ins',v:'*'},
+  {t:'7',act:'ins',v:'7'},{t:'8',act:'ins',v:'8'},{t:'9',act:'ins',v:'9'},{t:'xʸ',cls:'fn',act:'ins',v:'^'},{t:'−',cls:'op',act:'ins',v:'-'},
+  {t:'4',act:'ins',v:'4'},{t:'5',act:'ins',v:'5'},{t:'6',act:'ins',v:'6'},{t:'x²',cls:'fn',act:'ins',v:'^2'},{t:'+',cls:'op',act:'ins',v:'+'},
+  {t:'1',act:'ins',v:'1'},{t:'2',act:'ins',v:'2'},{t:'3',act:'ins',v:'3'},{t:'π',cls:'fn',act:'ins',v:'pi'},{t:'Ans',cls:'fn',act:'ins',v:'Ans'},
+  {t:'0',act:'ins',v:'0',cls:'wide'},{t:'.',act:'ins',v:'.'},{t:'%',act:'ins',v:'/100'},{t:'=',cls:'eq',act:'eval'},
+];
+const calcGrid=document.getElementById('calcGrid');
+CALC_BUTTONS.forEach(b=>{
+  const btn=document.createElement('button');
+  btn.textContent=b.t;
+  if(b.cls) btn.className=b.cls;
+  btn.addEventListener('click',()=>{
+    if(b.act==='clear'){calcExpr='';calcSub.textContent='\u00A0';}
+    else if(b.act==='back'){calcExpr=calcExpr.slice(0,-1);}
+    else if(b.act==='ins'){calcExpr+=b.v;}
+    else if(b.act==='eval'){
+      try{
+        let open=(calcExpr.match(/\(/g)||[]).length;
+        let close=(calcExpr.match(/\)/g)||[]).length;
+        let fixed=calcExpr+')'.repeat(Math.max(0,open-close));
+        const val=evalExpr(fixed);
+        calcSub.textContent=calcExpr+' =';
+        calcAns=val;
+        calcExpr=String(Math.round(val*1e10)/1e10);
+      }catch(e){
+        calcSub.textContent='รูปแบบไม่ถูกต้อง';
+      }
+    }
+    calcScreen.textContent=calcExpr===''?'0':calcExpr;
+  });
+  calcGrid.appendChild(btn);
+});
+
+function evalExpr(expr){
+  const tokens=expr.match(/(\d+\.?\d*|\.\d+|sin|cos|tan|sqrt|pi|Ans|[+\-*/^()])/g)||[];
+  let pos=0;
+  function peek(){return tokens[pos];}
+  function next(){return tokens[pos++];}
+  function parseExpr(){
+    let node=parseTerm();
+    while(peek()==='+'||peek()==='-'){
+      const op=next();const rhs=parseTerm();
+      node=op==='+'?node+rhs:node-rhs;
+    }
+    return node;
+  }
+  function parseTerm(){
+    let node=parseUnary();
+    while(peek()==='*'||peek()==='/'){
+      const op=next();const rhs=parseUnary();
+      node=op==='*'?node*rhs:node/rhs;
+    }
+    return node;
+  }
+  function parseUnary(){
+    if(peek()==='-'){next();return -parseUnary();}
+    return parsePow();
+  }
+  function parsePow(){
+    let base=parseAtom();
+    if(peek()==='^'){
+      next();
+      const exp=parseUnary();
+      return Math.pow(base,exp);
+    }
+    return base;
+  }
+  function parseAtom(){
+    const t=next();
+    if(t==='('){
+      const v=parseExpr();
+      if(peek()===')') next();
+      return v;
+    }
+    if(t==='sin'||t==='cos'||t==='tan'){
+      next();
+      const v=parseExpr();
+      if(peek()===')') next();
+      const rad=isDeg?v*Math.PI/180:v;
+      return t==='sin'?Math.sin(rad):t==='cos'?Math.cos(rad):Math.tan(rad);
+    }
+    if(t==='sqrt'){
+      next();
+      const v=parseExpr();
+      if(peek()===')') next();
+      return Math.sqrt(v);
+    }
+    if(t==='pi') return Math.PI;
+    if(t==='Ans') return calcAns;
+    return parseFloat(t);
+  }
+  return parseExpr();
+}
+
+function calcSetAllowedTabs(tabs){
+  const allowed = (tabs && tabs.length) ? tabs : ["dist","stat","calc"];
+  const alwaysOn = ["linecalc","notes"];
+  document.querySelectorAll('#calcModal .tabbtn').forEach(btn=>{
+    const t = btn.getAttribute('data-tab');
+    btn.style.display = (allowed.includes(t) || alwaysOn.includes(t)) ? "" : "none";
+  });
+  const activeBtn = document.querySelector('#calcModal .tabbtn.active');
+  const activeHidden = !activeBtn || activeBtn.style.display === "none";
+  if(activeHidden){
+    const firstAllowedBtn = document.querySelector('#calcModal .tabbtn[data-tab="'+allowed[0]+'"]');
+    if(firstAllowedBtn) firstAllowedBtn.click();
+  }
+}
+
+function calcOpenInline(tabs, slotId){
+  const modal = document.getElementById("calcModal");
+  const slot = document.getElementById(slotId);
+  if(calcCurrentSlotId === slotId && modal.classList.contains("open")){
+    modal.classList.remove("open");
+    calcCurrentSlotId = null;
+    return;
+  }
+  calcSetAllowedTabs(tabs);
+  slot.appendChild(modal);
+  modal.classList.add("open");
+  calcCurrentSlotId = slotId;
+  if(typeof modal.scrollIntoView === "function"){
+    modal.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+}
+
+document.querySelectorAll('#calcModal .tabbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#calcModal .tabbtn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('#calcModal .panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+document.getElementById("calcModalClose").addEventListener("click", ()=>{
+  document.getElementById("calcModal").classList.remove("open");
+  calcCurrentSlotId = null;
+});
+
+function fracGCD(a,b){
+  a = a<0n ? -a : a;
+  b = b<0n ? -b : b;
+  while(b){ const t = a % b; a = b; b = t; }
+  return a === 0n ? 1n : a;
+}
+
+class Frac{
+  constructor(n, d=1n){
+    if(d === 0n) throw new Error("หารด้วยศูนย์");
+    if(d < 0n){ n = -n; d = -d; }
+    const g = fracGCD(n,d);
+    this.n = n / g;
+    this.d = d / g;
+  }
+  toNumber(){ return Number(this.n) / Number(this.d); }
+  isInt(){ return this.d === 1n; }
+}
+
+function isqrtBig(n){
+  if(n < 0n) throw new Error("negative");
+  if(n < 2n) return n;
+  let x = n, y = (x + 1n) / 2n;
+  while(y < x){ x = y; y = (x + n / x) / 2n; }
+  return x;
+}
+
+// Value: {kind:'frac', frac:Frac} or {kind:'float', v:number}
+function VF(frac){ return {kind:'frac', frac}; }
+function VN(v){ return {kind:'float', v}; }
+function toNum(val){ return val.kind === 'frac' ? val.frac.toNumber() : val.v; }
+
+function fracFromDecimalToken(tok){
+  if(tok.indexOf(".") === -1){
+    return new Frac(BigInt(tok), 1n);
+  }
+  const [intPart, fracPart] = tok.split(".");
+  const denom = 10n ** BigInt(fracPart.length);
+  const numer = BigInt((intPart === "" ? "0" : intPart) + fracPart);
+  return new Frac(numer, denom);
+}
+
+function vAdd(a,b){
+  if(a.kind==='frac' && b.kind==='frac') return VF(new Frac(a.frac.n*b.frac.d + b.frac.n*a.frac.d, a.frac.d*b.frac.d));
+  return VN(toNum(a)+toNum(b));
+}
+function vSub(a,b){
+  if(a.kind==='frac' && b.kind==='frac') return VF(new Frac(a.frac.n*b.frac.d - b.frac.n*a.frac.d, a.frac.d*b.frac.d));
+  return VN(toNum(a)-toNum(b));
+}
+function vMul(a,b){
+  if(a.kind==='frac' && b.kind==='frac') return VF(new Frac(a.frac.n*b.frac.n, a.frac.d*b.frac.d));
+  return VN(toNum(a)*toNum(b));
+}
+function vDiv(a,b){
+  if(a.kind==='frac' && b.kind==='frac'){
+    if(b.frac.n === 0n) throw new Error("หารด้วยศูนย์");
+    return VF(new Frac(a.frac.n*b.frac.d, a.frac.d*b.frac.n));
+  }
+  const bn = toNum(b);
+  if(bn === 0) throw new Error("หารด้วยศูนย์");
+  return VN(toNum(a)/bn);
+}
+function vNeg(a){
+  if(a.kind==='frac') return VF(new Frac(-a.frac.n, a.frac.d));
+  return VN(-a.v);
+}
+
+function vSqrt(a){
+  if(a.kind==='frac' && a.frac.n >= 0n){
+    const sn = isqrtBig(a.frac.n);
+    const sd = isqrtBig(a.frac.d);
+    if(sn*sn === a.frac.n && sd*sd === a.frac.d){
+      return VF(new Frac(sn, sd));
+    }
+  }
+  const num = toNum(a);
+  if(num < 0) throw new Error("ไม่สามารถถอดรากที่สองของจำนวนติดลบได้");
+  return VN(Math.sqrt(num));
+}
+
+function vNthRoot(n, a){
+  const nNum = toNum(n);
+  if(!Number.isInteger(nNum) || nNum <= 0) throw new Error("ลำดับรากต้องเป็นจำนวนเต็มบวก");
+  if(a.kind==='frac' && a.frac.n >= 0n){
+    // try exact integer nth root of numerator and denominator
+    const tryRoot = (val)=>{
+      if(val === 0n) return 0n;
+      let lo=0n, hi=val;
+      while(lo<=hi){
+        const mid=(lo+hi)/2n;
+        let p=1n;
+        for(let i=0;i<nNum;i++) p*=mid;
+        if(p===val) return mid;
+        if(p<val) lo=mid+1n; else hi=mid-1n;
+      }
+      return null;
+    };
+    const rn = tryRoot(a.frac.n);
+    const rd = tryRoot(a.frac.d);
+    if(rn !== null && rd !== null){
+      return VF(new Frac(rn, rd));
+    }
+  }
+  const num = toNum(a);
+  return VN(Math.sign(num) * Math.pow(Math.abs(num), 1/nNum));
+}
+
+function vPow(base, exp){
+  if(base.kind==='frac' && exp.kind==='frac' && exp.frac.isInt()){
+    let e = exp.frac.n;
+    const neg = e < 0n;
+    if(neg) e = -e;
+    let resultN = 1n, resultD = 1n;
+    let bn = base.frac.n, bd = base.frac.d;
+    for(let i=0n;i<e;i++){ resultN *= bn; resultD *= bd; }
+    if(neg){
+      if(resultN === 0n) throw new Error("หารด้วยศูนย์");
+      return VF(new Frac(resultD, resultN));
+    }
+    return VF(new Frac(resultN, resultD));
+  }
+  if(exp.kind==='frac' && exp.frac.d === 2n && exp.frac.n === 1n){
+    return vSqrt(base);
+  }
+  const b = toNum(base), e = toNum(exp);
+  return VN(Math.pow(b,e));
+}
+
+function vFactorial(a){
+  if(a.kind!=='frac' || !a.frac.isInt() || a.frac.n < 0n) throw new Error("ต้องเป็นจำนวนเต็มไม่ติดลบ");
+  let n = a.frac.n, result = 1n;
+  for(let i=2n;i<=n;i++) result *= i;
+  return VF(new Frac(result,1n));
+}
+
+function bigFactorial(n){
+  let result = 1n;
+  for(let i=2n;i<=n;i++) result *= i;
+  return result;
+}
+
+function vNPr(n,r){
+  if(n.kind!=='frac'||!n.frac.isInt()||r.kind!=='frac'||!r.frac.isInt()) throw new Error("ต้องเป็นจำนวนเต็ม");
+  const N=n.frac.n, R=r.frac.n;
+  if(R<0n||R>N||N<0n) throw new Error("ค่าพารามิเตอร์ไม่ถูกต้อง");
+  return VF(new Frac(bigFactorial(N)/bigFactorial(N-R),1n));
+}
+function vNCr(n,r){
+  if(n.kind!=='frac'||!n.frac.isInt()||r.kind!=='frac'||!r.frac.isInt()) throw new Error("ต้องเป็นจำนวนเต็ม");
+  const N=n.frac.n, R=r.frac.n;
+  if(R<0n||R>N||N<0n) throw new Error("ค่าพารามิเตอร์ไม่ถูกต้อง");
+  return VF(new Frac(bigFactorial(N)/(bigFactorial(R)*bigFactorial(N-R)),1n));
+}
+
+function vAbs(a){
+  if(a.kind==='frac') return VF(new Frac(a.frac.n<0n?-a.frac.n:a.frac.n, a.frac.d));
+  return VN(Math.abs(a.v));
+}
+function vRound(a){
+  const num = toNum(a);
+  return VF(new Frac(BigInt(Math.round(num)),1n));
+}
+
+function vMean(list){
+  if(list.length===0) throw new Error("ต้องมีอย่างน้อย 1 ค่า");
+  let sum = list[0];
+  for(let i=1;i<list.length;i++) sum = vAdd(sum, list[i]);
+  return vDiv(sum, VF(new Frac(BigInt(list.length),1n)));
+}
+function vVariance(list, sample){
+  const m = vMean(list);
+  let sumSq = VF(new Frac(0n,1n));
+  list.forEach(x=>{
+    const d = vSub(x,m);
+    sumSq = vAdd(sumSq, vMul(d,d));
+  });
+  const denom = sample ? list.length-1 : list.length;
+  if(denom<=0) throw new Error("ข้อมูลไม่พอสำหรับคำนวณ sample stdev");
+  return vDiv(sumSq, VF(new Frac(BigInt(denom),1n)));
+}
+function vStdev(list){ return vSqrt(vVariance(list, true)); }
+function vStdevp(list){ return vSqrt(vVariance(list, false)); }
+
+function formatFloat(x){
+  if(!isFinite(x)) return x > 0 ? "Infinity" : (x < 0 ? "-Infinity" : "NaN");
+  if(Number.isInteger(x) && Math.abs(x) < 1e15) return x.toString();
+  let s = x.toPrecision(10);
+  if(s.indexOf('e') === -1 && s.indexOf('.') !== -1){
+    s = s.replace(/0+$/,'').replace(/\.$/,'');
+  }
+  return s;
+}
+
+function valueToDisplayString(val){
+  if(val.kind==='frac') return val.frac.isInt() ? val.frac.n.toString() : val.frac.n.toString()+"/"+val.frac.d.toString();
+  return formatFloat(val.v);
+}
+
+let lcDisplayMode = 'frac';
+
+function valueToModeString(val, mode){
+  if(mode === 'decimal'){
+    const num = val.kind==='frac' ? val.frac.toNumber() : val.v;
+    return formatFloat(num);
+  }
+  return valueToDisplayString(val);
+}
+
+let lcHistoryEntries = [];
+
+const RESERVED_FUNCS = new Set(["sin","cos","tan","asin","acos","atan","sqrt","nthroot","abs","round","ln","log","mean","stdev","stdevp","npr","ncr"]);
+const RESERVED_CONSTS = new Set(["pi","e","ans"]);
+
+let lineCalcVars = {};
+let lineCalcAns = null;
+
+
+function lcTokenize(str){
+  const tokens = [];
+  let i = 0;
+  while(i < str.length){
+    const c = str[i];
+    if(c === " " || c === "\t"){ i++; continue; }
+    if("+-*/^!(),=".indexOf(c) !== -1){
+      tokens.push(c);
+      i++;
+      continue;
+    }
+    if("×÷".indexOf(c) !== -1){
+      tokens.push(c === "×" ? "*" : "/");
+      i++;
+      continue;
+    }
+    if(/[0-9.]/.test(c)){
+      let j = i;
+      while(j < str.length && /[0-9.]/.test(str[j])) j++;
+      tokens.push({type:"num", val:str.slice(i,j)});
+      i = j;
+      continue;
+    }
+    if(/[a-zA-Z_]/.test(c)){
+      let j = i;
+      while(j < str.length && /[a-zA-Z0-9_]/.test(str[j])) j++;
+      tokens.push({type:"id", val:str.slice(i,j)});
+      i = j;
+      continue;
+    }
+    throw new Error("อักขระไม่ถูกต้อง: " + c);
+  }
+  return tokens;
+}
+
+function lcParse(tokens){
+  let pos = 0;
+  function peek(){ return tokens[pos]; }
+  function isOp(t, s){ return t === s; }
+  function next(){ return tokens[pos++]; }
+
+  function parseExpr(){
+    let left = parseTerm();
+    while(isOp(peek(),"+") || isOp(peek(),"-")){
+      const op = next();
+      const right = parseTerm();
+      left = op === "+" ? vAdd(left,right) : vSub(left,right);
+    }
+    return left;
+  }
+  function parseTerm(){
+    let left = parseSigned();
+    while(isOp(peek(),"*") || isOp(peek(),"/")){
+      const op = next();
+      const right = parseSigned();
+      left = op === "*" ? vMul(left,right) : vDiv(left,right);
+    }
+    return left;
+  }
+  function parseSigned(){
+    if(isOp(peek(),"-")){ next(); return vNeg(parseSigned()); }
+    if(isOp(peek(),"+")){ next(); return parseSigned(); }
+    return parsePower();
+  }
+  function parsePower(){
+    let base = parsePostfix();
+    if(isOp(peek(),"^")){
+      next();
+      const exp = parseSigned();
+      base = vPow(base, exp);
+    }
+    return base;
+  }
+  function parsePostfix(){
+    let val = parsePrimary();
+    while(isOp(peek(),"!")){
+      next();
+      val = vFactorial(val);
+    }
+    return val;
+  }
+  function parseArgs(){
+    const args = [parseExpr()];
+    while(isOp(peek(),",")){
+      next();
+      args.push(parseExpr());
+    }
+    return args;
+  }
+  function parsePrimary(){
+    const tok = peek();
+    if(tok === undefined) throw new Error("รูปแบบสมการไม่ถูกต้อง");
+    if(isOp(tok,"(")){
+      next();
+      const val = parseExpr();
+      if(!isOp(peek(),")")) throw new Error("วงเล็บไม่ครบ");
+      next();
+      return val;
+    }
+    if(typeof tok === "object" && tok.type === "num"){
+      next();
+      return VF(fracFromDecimalToken(tok.val));
+    }
+    if(typeof tok === "object" && tok.type === "id"){
+      next();
+      const name = tok.val.toLowerCase();
+      if(RESERVED_FUNCS.has(name)){
+        if(!isOp(peek(),"(")) throw new Error("ต้องมีวงเล็บหลังฟังก์ชัน "+name);
+        next();
+        const args = parseArgs();
+        if(!isOp(peek(),")")) throw new Error("วงเล็บไม่ครบ");
+        next();
+        return applyFunc(name, args);
+      }
+      if(name === "pi") return VN(Math.PI);
+      if(name === "e") return VN(Math.E);
+      if(name === "ans"){
+        if(lineCalcAns === null) throw new Error("ยังไม่มีผลลัพธ์ก่อนหน้า");
+        return lineCalcAns;
+      }
+      if(Object.prototype.hasOwnProperty.call(lineCalcVars, name)){
+        return lineCalcVars[name];
+      }
+      throw new Error("ไม่พบตัวแปร "+tok.val);
+    }
+    throw new Error("รูปแบบสมการไม่ถูกต้อง");
+  }
+
+  const result = parseExpr();
+  if(pos !== tokens.length) throw new Error("รูปแบบสมการไม่ถูกต้อง");
+  return result;
+}
+
+function toRad(val){
+  const n = toNum(val);
+  return isDeg ? n*Math.PI/180 : n;
+}
+function fromRad(rad){
+  return isDeg ? rad*180/Math.PI : rad;
+}
+
+function applyFunc(name, args){
+  switch(name){
+    case "sin": return VN(Math.sin(toRad(args[0])));
+    case "cos": return VN(Math.cos(toRad(args[0])));
+    case "tan": return VN(Math.tan(toRad(args[0])));
+    case "asin": return VN(fromRad(Math.asin(toNum(args[0]))));
+    case "acos": return VN(fromRad(Math.acos(toNum(args[0]))));
+    case "atan": return VN(fromRad(Math.atan(toNum(args[0]))));
+    case "sqrt": return vSqrt(args[0]);
+    case "nthroot": return vNthRoot(args[0], args[1]);
+    case "abs": return vAbs(args[0]);
+    case "round": return vRound(args[0]);
+    case "ln": {
+      const v = toNum(args[0]);
+      if(v<=0) throw new Error("ln ต้องรับค่าบวก");
+      return VN(Math.log(v));
+    }
+    case "log": {
+      const v = toNum(args[0]);
+      if(v<=0) throw new Error("log ต้องรับค่าบวก");
+      return VN(Math.log10(v));
+    }
+    case "mean": return vMean(args);
+    case "stdev": return vStdev(args);
+    case "stdevp": return vStdevp(args);
+    case "npr": return vNPr(args[0],args[1]);
+    case "ncr": return vNCr(args[0],args[1]);
+    default: throw new Error("ไม่รู้จักฟังก์ชัน "+name);
+  }
+}
+
+function lineCalcEvaluate(str){
+  str = str.trim();
+  const assignMatch = str.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.+)$/);
+  if(assignMatch && !RESERVED_FUNCS.has(assignMatch[1].toLowerCase()) && !RESERVED_CONSTS.has(assignMatch[1].toLowerCase())){
+    const varName = assignMatch[1].toLowerCase();
+    const tokens = lcTokenize(assignMatch[2]);
+    if(tokens.length===0) throw new Error("กรุณาพิมพ์สมการ");
+    const val = lcParse(tokens);
+    lineCalcVars[varName] = val;
+    lineCalcAns = val;
+    return {display: varName+" = "+valueToDisplayString(val), val, prefix: varName+" = "};
+  }
+  const tokens = lcTokenize(str);
+  if(tokens.length===0) throw new Error("กรุณาพิมพ์สมการ");
+  const val = lcParse(tokens);
+  lineCalcAns = val;
+  return {display: valueToDisplayString(val), val, prefix: ""};
+}
+
+function lineCalcRenderEmpty(){
+  const hist = document.getElementById("linecalcHistory");
+  if(hist.children.length === 0){
+    hist.innerHTML = '<div class="linecalc-empty">ยังไม่มีการคำนวณ พิมพ์สมการแล้วกด Enter</div>';
+  }
+}
+
+let lcRoot = [];
+let lcCursor = {container: lcRoot, index: 0};
+
+function lcCharTok(ch){ return {type:'char', ch}; }
+function lcFracTok(){ return {type:'frac', num:[], den:[]}; }
+
+function lcFindParent(root, target){
+  for(let i=0;i<root.length;i++){
+    const tok = root[i];
+    if(tok.type==='frac'){
+      if(tok.num === target) return {parentContainer:root, parentIndex:i, slot:'num', fracToken:tok};
+      if(tok.den === target) return {parentContainer:root, parentIndex:i, slot:'den', fracToken:tok};
+      const r1 = lcFindParent(tok.num, target);
+      if(r1) return r1;
+      const r2 = lcFindParent(tok.den, target);
+      if(r2) return r2;
+    }
+  }
+  return null;
+}
+
+function lcSerializeContainer(container){
+  let s = "";
+  container.forEach(tok=>{
+    if(tok.type==='char') s += tok.ch;
+    else if(tok.type==='frac'){
+      const numStr = lcSerializeContainer(tok.num) || "0";
+      const denStr = lcSerializeContainer(tok.den) || "1";
+      s += "(" + numStr + ")/(" + denStr + ")";
+    }
+  });
+  return s;
+}
+
+function lcEscapeHtml(ch){
+  if(ch === "<") return "&lt;";
+  if(ch === ">") return "&gt;";
+  if(ch === "&") return "&amp;";
+  return ch;
+}
+
+function lcRenderContainer(container){
+  let html = "";
+  for(let i=0;i<=container.length;i++){
+    if(container === lcCursor.container && i === lcCursor.index){
+      html += '<span class="lc-cursor"></span>';
+    }
+    if(i < container.length){
+      const tok = container[i];
+      if(tok.type==='char'){
+        html += '<span class="lc-char">'+lcEscapeHtml(tok.ch)+'</span>';
+      } else if(tok.type==='frac'){
+        html += '<span class="lc-frac"><span class="lc-frac-num">'+lcRenderContainer(tok.num)+'</span><span class="lc-frac-den">'+lcRenderContainer(tok.den)+'</span></span>';
+      }
+    }
+  }
+  return html;
+}
+
+function lcRender(){
+  const field = document.getElementById("linecalcInput");
+  if(lcRoot.length === 0){
+    field.innerHTML = '<span class="lc-placeholder">เช่น 1/3 + 1/6</span><span class="lc-cursor"></span>';
+  } else {
+    field.innerHTML = lcRenderContainer(lcRoot);
+  }
+}
+
+function lcInsertText(text, cursorOffset){
+  const {container, index} = lcCursor;
+  const toks = [...text].map(lcCharTok);
+  container.splice(index, 0, ...toks);
+  const off = cursorOffset !== undefined ? cursorOffset : text.length;
+  lcCursor = {container, index: index+off};
+  lcRender();
+}
+
+function lcInsertFunc(name){
+  lcInsertText(name+"()", name.length+1);
+}
+function lcInsertNFunc(name){
+  lcInsertText(name+"(,)", name.length+1);
+}
+function lcInsertFrac(){
+  const frac = lcFracTok();
+  const {container, index} = lcCursor;
+  container.splice(index, 0, frac);
+  lcCursor = {container: frac.num, index: 0};
+  lcRender();
+}
+function lcBackspace(){
+  const {container, index} = lcCursor;
+  if(index > 0){
+    container.splice(index-1, 1);
+    lcCursor = {container, index: index-1};
+    lcRender();
+    return;
+  }
+  const info = lcFindParent(lcRoot, container);
+  if(info){
+    if(info.fracToken.num.length===0 && info.fracToken.den.length===0){
+      info.parentContainer.splice(info.parentIndex,1);
+      lcCursor = {container: info.parentContainer, index: info.parentIndex};
+    } else {
+      lcCursor = {container: info.parentContainer, index: info.parentIndex};
+    }
+    lcRender();
+  }
+}
+function lcMoveCursor(dir){
+  dir = dir < 0 ? -1 : 1;
+  const {container, index} = lcCursor;
+  if(dir === -1){
+    if(index > 0){
+      const prevTok = container[index-1];
+      if(prevTok.type==='frac'){
+        lcCursor = {container: prevTok.den, index: prevTok.den.length};
+      } else {
+        lcCursor = {container, index: index-1};
+      }
+    } else {
+      const info = lcFindParent(lcRoot, container);
+      if(info){
+        if(info.slot === 'den'){
+          lcCursor = {container: info.fracToken.num, index: info.fracToken.num.length};
+        } else {
+          lcCursor = {container: info.parentContainer, index: info.parentIndex};
+        }
+      }
+    }
+  } else {
+    if(index < container.length){
+      const curTok = container[index];
+      if(curTok.type==='frac'){
+        lcCursor = {container: curTok.num, index:0};
+      } else {
+        lcCursor = {container, index: index+1};
+      }
+    } else {
+      const info = lcFindParent(lcRoot, container);
+      if(info){
+        if(info.slot === 'num'){
+          lcCursor = {container: info.fracToken.den, index:0};
+        } else {
+          lcCursor = {container: info.parentContainer, index: info.parentIndex+1};
+        }
+      }
+    }
+  }
+  lcRender();
+}
+function lcLoadFlatString(str){
+  lcRoot.length = 0;
+  [...str].forEach(ch=>lcRoot.push(lcCharTok(ch)));
+  lcCursor = {container: lcRoot, index: lcRoot.length};
+  lcRender();
+}
+function lcClear(){
+  lcRoot.length = 0;
+  lcCursor = {container: lcRoot, index: 0};
+  lcRender();
+}
+
+function lineCalcSubmit(){
+  const str = lcSerializeContainer(lcRoot).trim();
+  if(str === "") return;
+  const hist = document.getElementById("linecalcHistory");
+  const emptyMsg = hist.querySelector(".linecalc-empty");
+  if(emptyMsg) emptyMsg.remove();
+  const line = document.createElement("div");
+  line.setAttribute("data-raw", str);
+  line.title = "คลิกเพื่อแก้ไขบรรทัดนี้";
+  let entry = {rawStr: str, val: null, prefix: "", lineEl: line};
+  try{
+    const result = lineCalcEvaluate(str);
+    line.className = "linecalc-line";
+    line.innerHTML = '<span class="lc-input">'+escHtml(str)+'</span> <span class="lc-result">'+escHtml(result.prefix+valueToModeString(result.val, lcDisplayMode))+'</span>';
+    entry.val = result.val;
+    entry.prefix = result.prefix;
+  } catch(e){
+    line.className = "linecalc-line lc-error";
+    line.innerHTML = '<span class="lc-input">'+escHtml(str)+'</span> <span class="lc-result">ผิดพลาด: '+escHtml(e.message)+'</span>';
+  }
+  line.addEventListener("click", ()=>{
+    lcLoadFlatString(line.getAttribute("data-raw"));
+    document.getElementById("linecalcInput").focus();
+  });
+  hist.appendChild(line);
+  lcHistoryEntries.push(entry);
+  hist.scrollTop = hist.scrollHeight;
+  lcClear();
+}
+
+function lcRefreshHistoryDisplay(){
+  lcHistoryEntries.forEach(entry=>{
+    if(entry.val === null) return;
+    const resultEl = entry.lineEl.querySelector(".lc-result");
+    if(resultEl) resultEl.textContent = entry.prefix + valueToModeString(entry.val, lcDisplayMode);
+  });
+}
+
+const LC_ALLOWED_CHARS = "0123456789+-*/^!(),.=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+
+document.getElementById("linecalcInput").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter"){
+    e.preventDefault();
+    lineCalcSubmit();
+  } else if(e.key === "Backspace"){
+    e.preventDefault();
+    lcBackspace();
+  } else if(e.key === "ArrowLeft"){
+    e.preventDefault();
+    lcMoveCursor(-1);
+  } else if(e.key === "ArrowRight"){
+    e.preventDefault();
+    lcMoveCursor(1);
+  } else if(e.key.length === 1 && LC_ALLOWED_CHARS.indexOf(e.key) !== -1){
+    e.preventDefault();
+    lcInsertText(e.key);
+  } else if(e.key === "×" || e.key === "÷"){
+    e.preventDefault();
+    lcInsertText(e.key);
+  }
+});
+
+document.getElementById("linecalcClearBtn").addEventListener("click", ()=>{
+  document.getElementById("linecalcHistory").innerHTML = "";
+  lineCalcVars = {};
+  lineCalcAns = null;
+  lcHistoryEntries = [];
+  lcClear();
+  lineCalcRenderEmpty();
+});
+
+document.getElementById("linecalcModeToggle").addEventListener("click", ()=>{
+  lcDisplayMode = lcDisplayMode === 'frac' ? 'decimal' : 'frac';
+  const btn = document.getElementById("linecalcModeToggle");
+  btn.textContent = lcDisplayMode === 'frac' ? "แสดงผล: เศษส่วน" : "แสดงผล: ทศนิยม";
+  lcRefreshHistoryDisplay();
+});
+
+document.querySelectorAll(".lc-kbtab").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".lc-kbtab").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".lc-kbpanel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("lc-kb-"+btn.getAttribute("data-kb")).classList.add("active");
+  });
+});
+
+document.querySelectorAll(".lc-kbpanel button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    if(btn.hasAttribute("data-ins")){
+      lcInsertText(btn.getAttribute("data-ins"));
+    } else if(btn.hasAttribute("data-ins-cursor")){
+      const text = btn.getAttribute("data-ins-cursor");
+      const cur = parseInt(btn.getAttribute("data-cursor"));
+      lcInsertText(text, cur);
+    } else if(btn.hasAttribute("data-func")){
+      lcInsertFunc(btn.getAttribute("data-func"));
+    } else if(btn.hasAttribute("data-nfunc")){
+      lcInsertNFunc(btn.getAttribute("data-nfunc"));
+    } else if(btn.hasAttribute("data-frac")){
+      lcInsertFrac();
+    } else if(btn.hasAttribute("data-minus")){
+      lcInsertText("-");
+    } else if(btn.hasAttribute("data-backspace")){
+      lcBackspace();
+    } else if(btn.hasAttribute("data-cursor-left")){
+      lcMoveCursor(-1);
+    } else if(btn.hasAttribute("data-cursor-right")){
+      lcMoveCursor(1);
+    } else if(btn.hasAttribute("data-enter")){
+      lineCalcSubmit();
+    }
+    document.getElementById("linecalcInput").focus();
+  });
+});
+
+lcRender();
+lineCalcRenderEmpty();
+</script>
+
+
+</body>
+</html>
