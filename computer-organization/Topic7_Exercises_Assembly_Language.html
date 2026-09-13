@@ -974,7 +974,11 @@ function sanitizePromptHtml(str){
     placeholders.push(m);
     return "\u0000IMG"+(placeholders.length-1)+"\u0000";
   });
-  out = out.replace(/<\/?(br|table|thead|tbody|tr|td|th)\b[^>]*>/gi, (m)=>{
+  out = out.replace(/<\/?(br|table|thead|tbody|tr|td|th|code)\b[^>]*>/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = out.replace(/&nbsp;/gi, (m)=>{
     placeholders.push(m);
     return "\u0000IMG"+(placeholders.length-1)+"\u0000";
   });
