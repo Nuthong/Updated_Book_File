@@ -3,12 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STATICS บทที่ 12: นอนพาราเมตริก</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<title>IC Quiz 11: Nonparametric Test — Sign Test</title>
 <style>
 :root{
   --paper:#F6F4EE;
@@ -67,22 +64,55 @@ header h1{
   color:#F2EFE6;
   font-weight:700;
 }
-header .subtitle{
-  font-size:12.5px;
-  color:#C9C2AE;
-  margin-top:2px;
+.mode-toggle{
+  display:flex;
+  border:1px solid rgba(242,239,230,0.4);
+  border-radius:6px;
+  overflow:hidden;
+  background:rgba(242,239,230,0.08);
 }
-.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-.header-actions button{
-  border:1.5px solid rgba(242,239,230,0.5);
-  background:rgba(255,255,255,0.9);
-  color:var(--navy);
-  padding:8px 14px;
+.mode-toggle button{
+  border:none;
+  background:transparent;
+  color:#F2EFE6;
+  padding:8px 16px;
+  cursor:pointer;
+  font-size:14px;
+  font-family:'Sarabun',sans-serif;
+}
+.mode-toggle button.active{
+  background:var(--flag);
+  color:#1B1300;
+  font-weight:700;
+}
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.toolbar select, .toolbar button{
+  border:1.5px solid var(--border);
+  background:#FFFFFF;
   border-radius:4px;
+  padding:6px 10px;
   font-size:13px;
+  color:var(--text);
   cursor:pointer;
   font-family:'Sarabun',sans-serif;
-  font-weight:600;
+}
+.timer-box{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  border:1.5px solid rgba(242,239,230,0.4);
+  border-radius:4px;
+  padding:6px 10px;
+  background:rgba(255,255,255,0.95);
+  font-variant-numeric:tabular-nums;
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
+  color:var(--navy-deep);
 }
 .layout{
   display:flex;
@@ -91,7 +121,10 @@ header .subtitle{
   gap:20px;
   padding:20px;
 }
-.sidebar{width:250px;flex-shrink:0;}
+.sidebar{
+  width:220px;
+  flex-shrink:0;
+}
 .sidebar-panel{
   background:var(--panel);
   border:1px solid var(--border);
@@ -100,8 +133,6 @@ header .subtitle{
   position:sticky;
   top:80px;
   box-shadow:0 2px 8px rgba(15,39,64,0.06);
-  max-height:calc(100vh - 100px);
-  overflow-y:auto;
 }
 .sidebar-panel h3{
   font-family:'JetBrains Mono',monospace;
@@ -112,22 +143,48 @@ header .subtitle{
   margin:0 0 10px 0;
   font-weight:600;
 }
-.toc-list{list-style:none;margin:0;padding:0;}
-.toc-list li{margin-bottom:2px;}
-.toc-list a{
-  display:block;
-  padding:7px 10px;
-  border-radius:4px;
-  color:var(--text);
-  text-decoration:none;
-  font-size:13px;
-  border-left:3px solid transparent;
+.nav-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
 }
-.toc-list a:hover{background:var(--accent-soft);color:var(--accent2);}
-.toc-list a.active{background:var(--accent-soft);color:var(--navy);border-left:3px solid var(--navy);font-weight:600;}
-.toc-list .toc-sub a{padding-left:22px;font-size:12.5px;color:var(--text-soft);}
+.nav-cell{
+  aspect-ratio:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:4px;
+  border:1.5px solid var(--border);
+  background:#ffffff;
+  color:var(--text-soft);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  cursor:pointer;
+}
+.nav-cell:hover{border-color:var(--navy);}
+.nav-cell.current{outline:2px solid var(--navy);}
+.nav-cell.answered{background:var(--accent-soft);color:var(--accent2);border-color:var(--accent2);}
+.nav-cell.correct{background:var(--correct-soft);color:var(--correct);border-color:var(--correct);}
+.nav-cell.incorrect{background:var(--incorrect-soft);color:var(--incorrect);border-color:var(--incorrect);}
+.legend{
+  margin-top:12px;
+  font-size:11px;
+  color:var(--text-soft);
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
+.score-box{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid var(--border);
+  font-size:13px;
+}
+.score-box .big{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--navy);}
 main{flex:1;min-width:0;}
-.lesson-header{
+.q-card{
   background:var(--panel);
   border:1px solid var(--border);
   border-left:4px solid var(--navy);
@@ -136,87 +193,94 @@ main{flex:1;min-width:0;}
   margin-bottom:18px;
   box-shadow:0 2px 10px rgba(15,39,64,0.06);
 }
-.lesson-header h2{margin:0 0 8px 0;font-size:20px;color:var(--navy-deep);}
-.lesson-header p{margin:0;color:var(--text-soft);font-size:14px;line-height:1.7;}
-.section-card{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-left:4px solid var(--navy);
-  border-radius:6px;
-  padding:24px;
-  margin-bottom:18px;
-  box-shadow:0 2px 10px rgba(15,39,64,0.06);
-  scroll-margin-top:80px;
-}
-.section-card h2{
-  margin:0 0 14px 0;
-  font-size:18px;
-  color:var(--navy-deep);
-  padding-bottom:10px;
-  border-bottom:2px solid var(--border);
-}
-.section-card h3{
-  font-size:15px;
-  color:var(--navy);
-  margin:20px 0 10px 0;
-}
-.section-card .body-text{
-  font-size:14.5px;
-  line-height:1.9;
-  white-space:pre-wrap;
-}
-.callout{
-  margin:16px 0;
-  padding:14px 16px;
-  border-radius:6px;
-  border-left:4px solid;
-  font-size:14px;
-  line-height:1.8;
-}
-.callout-note{background:var(--accent-soft);border-color:var(--accent2);}
-.callout-example{background:#F4F2E8;border-color:var(--flag);}
-.callout-warning{background:var(--incorrect-soft);border-color:var(--incorrect);}
-.callout-formula{
-  background:var(--navy-deep);
-  color:#EAF1FA;
-  border-color:var(--flag);
+.q-card .q-index{
   font-family:'JetBrains Mono',monospace;
-  overflow-x:auto;
-}
-.callout-title{
-  font-weight:700;
-  font-size:12.5px;
+  font-size:12px;
+  letter-spacing:.06em;
   text-transform:uppercase;
-  letter-spacing:.04em;
-  margin-bottom:8px;
+  color:var(--text-soft);
+  margin-bottom:6px;
+}
+.q-card .q-prompt{
+  font-size:15px;
+  margin-bottom:14px;
+  white-space:pre-wrap;
+  line-height:1.6;
+}
+.q-card .q-prompt img{
   display:block;
-}
-.callout-note .callout-title{color:var(--accent2);}
-.callout-example .callout-title{color:var(--flag);}
-.callout-warning .callout-title{color:var(--incorrect);}
-.callout-formula .callout-title{color:#C9DCF0;}
-.image-block{
-  margin:18px 0;
-  text-align:center;
-}
-.image-block img{
   max-width:100%;
   height:auto;
   border-radius:6px;
   border:1px solid var(--border);
-  box-shadow:0 2px 10px rgba(15,39,64,0.08);
+  margin:12px 0;
 }
-.image-block .image-caption{
+.q-card .q-prompt .img-caption{
   font-size:12.5px;
   color:var(--text-soft);
-  margin-top:8px;
+  text-align:center;
+  margin-top:-6px;
+  margin-bottom:12px;
   font-style:italic;
 }
-table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13.5px;}
-table th{background:var(--navy-deep);color:#F2EFE6;padding:9px 12px;text-align:left;}
-table td{padding:8px 12px;border-bottom:1px solid var(--border);}
-table tr:nth-child(even) td{background:#F4F2E8;}
-.calc-toggle-btn{
+.sub-item{margin-bottom:14px;}
+.sub-item label{display:block;font-size:13px;color:var(--text-soft);margin-bottom:6px;font-weight:600;}
+.sub-item select, .sub-item input[type=text]{
+  width:100%;
+  max-width:360px;
+  padding:9px 10px;
+  border:1.5px solid var(--border);
+  border-radius:4px;
+  font-size:14px;
+  font-family:'JetBrains Mono',monospace;
+  background:var(--panel);
+  color:var(--text);
+}
+.sub-item select{font-family:'Sarabun',sans-serif;}
+.sub-item select:focus, .sub-item input[type=text]:focus{
+  outline:none;
+  border-color:var(--accent2);
+}
+.sub-item.correct select, .sub-item.correct input{border-color:var(--correct);background:var(--correct-soft);}
+.sub-item.incorrect select, .sub-item.incorrect input{border-color:var(--incorrect);background:var(--incorrect-soft);}
+.sub-item.locked select, .sub-item.locked input{opacity:0.75;cursor:not-allowed;}
+.reveal-box{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:4px;
+  border-left:3px solid var(--incorrect);
+  background:var(--incorrect-soft);
+  font-size:13px;
+  line-height:1.9;
+}
+.reveal-box .reveal-title{
+  font-weight:700;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--incorrect);
+  display:block;
+  margin-bottom:6px;
+}
+.reveal-box .reveal-line{margin-bottom:2px;}
+.reveal-box .reveal-line b{color:var(--navy-deep);}
+.calc-open-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border:1.5px solid var(--border);
+  background:#fff;
+  color:var(--navy);
+  padding:6px 12px;
+  border-radius:4px;
+  font-size:12.5px;
+  cursor:pointer;
+  margin-left:8px;
+  font-family:'Sarabun',sans-serif;
+  font-weight:600;
+}
+.calc-open-btn:hover{background:var(--accent-soft);}
+.hint-btn{
   display:inline-flex;
   align-items:center;
   gap:6px;
@@ -227,19 +291,97 @@ table tr:nth-child(even) td{background:#F4F2E8;}
   border-radius:4px;
   font-size:12.5px;
   cursor:pointer;
-  margin-top:10px;
+  margin-left:8px;
   font-family:'Sarabun',sans-serif;
   font-weight:600;
 }
-.calc-toggle-btn:hover{background:var(--flag-soft);}
-.calc-slot{width:100%;margin-top:12px;}
+.hint-btn:hover{background:var(--flag-soft);}
+.hint-box{
+  margin-top:10px;
+  padding:12px 14px;
+  border-radius:4px;
+  border-left:3px solid var(--flag);
+  background:var(--flag-soft);
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+  white-space:pre-wrap;
+  line-height:1.8;
+  color:var(--navy-deep);
+}
+.calc-slot{width:100%;}
+.answer-block{
+  margin-top:6px;
+  padding:12px 14px;
+  border-radius:4px;
+  border-left:3px solid var(--accent2);
+  background:var(--accent-soft);
+  font-size:13px;
+}
+.answer-block.flagged{background:var(--flag-soft);border-left:3px solid var(--flag);}
+.flag-badge{
+  display:inline-block;
+  font-size:11px;
+  color:var(--flag);
+  border:1px solid var(--flag);
+  border-radius:12px;
+  padding:2px 8px;
+  margin-bottom:6px;
+  font-family:'JetBrains Mono',monospace;
+}
+.explain-block{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
+.explain-block h4{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin:0 0 6px 0;
+  color:var(--text-soft);
+}
+.explain-block .formula{
+  background:var(--navy-deep);
+  color:#EAF1FA;
+  border-radius:4px;
+  padding:12px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12.5px;
+  white-space:pre-wrap;
+  margin-bottom:10px;
+  line-height:1.8;
+}
+.explain-block .steps{font-size:13px;line-height:1.8;white-space:pre-wrap;}
+.step-list{display:block;}
+.step-item{display:flex;gap:12px;margin-bottom:14px;width:100%;box-sizing:border-box;}
+.step-item:last-child{margin-bottom:0;}
+.step-num{
+  flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:700;
+}
+.step-body{flex:1;min-width:0;}
+.step-label{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.step-content{font-size:13.5px;line-height:1.8;white-space:pre-wrap;color:var(--text);}
+.step-item.step-why .step-num{background:var(--flag);}
+.step-item.step-why .step-label{color:var(--flag);}
+.footer-actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:8px;}
+.footer-actions button{
+  border:none;
+  background:var(--navy);
+  color:#fff;
+  padding:10px 20px;
+  border-radius:4px;
+  font-size:14px;
+  cursor:pointer;
+  font-family:'Sarabun',sans-serif;
+  font-weight:600;
+}
+.footer-actions button:hover{background:var(--accent2);}
+.footer-actions button.secondary{background:transparent;color:var(--navy);border:1.5px solid var(--border);}
 @media (max-width:800px){
   .layout{flex-direction:column;}
   .sidebar{width:100%;}
-  .sidebar-panel{position:static;max-height:none;}
+  .sidebar-panel{position:static;}
+  .nav-grid{grid-template-columns:repeat(8,1fr);}
 }
-</style>
-<style>
 #calcModal{
   display:none;
   background:var(--paper);
@@ -438,16 +580,10 @@ table tr:nth-child(even) td{background:#F4F2E8;}
   border:1.5px solid var(--line);border-radius:4px;background:#fff;cursor:pointer;
 }
 #calcModal .deg-toggle button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-
 </style>
 
 <style>
-:root{
-  color-scheme: light dark;
-  --cream:#F4F2E8;
-  --diagram-bg:#FBFAF6;
-  --fontScale:1;
-}
+:root{ color-scheme: light dark; }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
@@ -461,9 +597,7 @@ table tr:nth-child(even) td{background:#F4F2E8;}
     --good:#7fd0a0; --good-bg:#173323;
     --bad:#f0958a; --bad-bg:#33201d;
     --gold:#e3bd74;
-    --cream:#232922; --diagram-bg:#181e27;
   }
-  :root:not([data-theme="light"]) .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
 }
 :root[data-theme="dark"]{
   --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
@@ -477,122 +611,108 @@ table tr:nth-child(even) td{background:#F4F2E8;}
   --good:#7fd0a0; --good-bg:#173323;
   --bad:#f0958a; --bad-bg:#33201d;
   --gold:#e3bd74;
-  --cream:#232922; --diagram-bg:#181e27;
 }
-:root[data-theme="dark"] .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
-.theme-toggle-btn{
-  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
-  width:32px;height:32px;border-radius:4px;font-size:15px;cursor:pointer;
-  font-family:'Sarabun',sans-serif;display:flex;align-items:center;justify-content:center;
-}
-.theme-toggle-btn:hover{background:#fff;}
-@media print{.theme-toggle-btn{display:none;}}
 .back-to-index{
   display:inline-block;font-size:12px;color:#C9DCF0;text-decoration:none;
   margin-bottom:6px;opacity:0.85;
 }
 .back-to-index:hover{opacity:1;text-decoration:underline;}
 @media print{.back-to-index{display:none;}}
-
-#readProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--flag),var(--accent2));width:0%;z-index:999;transition:width .12s ease;}
-#backToTop{
-  position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;
-  background:var(--navy-deep);color:#F2EFE6;border:none;cursor:pointer;font-size:18px;
-  box-shadow:0 4px 14px rgba(15,39,64,0.3);display:none;align-items:center;justify-content:center;
-  z-index:998;opacity:0;transition:opacity .2s ease, transform .2s ease;
+.theme-toggle-btn{
+  border:1.5px solid var(--border);background:var(--panel);color:var(--navy);
+  width:34px;height:34px;border-radius:6px;font-size:15px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:inline-flex;align-items:center;justify-content:center;
+  vertical-align:middle;
 }
-#backToTop:hover{transform:translateY(-2px);}
-#backToTop.show{display:flex;opacity:1;}
-#fontCtrl{display:flex;gap:6px;align-items:center;}
-#fontCtrl button{
-  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
-  width:32px;height:32px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:700;
-  font-family:'Sarabun',sans-serif;
-}
-#fontCtrl button:hover{background:#fff;}
-.read-time-badge{
-  font-size:11.5px;color:#C9C2AE;background:rgba(255,255,255,0.08);padding:5px 10px;border-radius:20px;
-  border:1px solid rgba(242,239,230,0.25);white-space:nowrap;
-}
-.section-card{opacity:0;transform:translateY(14px);transition:opacity .55s ease, transform .55s ease;}
-.section-card.revealed{opacity:1;transform:translateY(0);}
-@media (prefers-reduced-motion: reduce){.section-card{opacity:1;transform:none;transition:none;}}
-.section-card .body-text{font-size:calc(14.5px * var(--fontScale)) !important;}
-.section-card h2{font-size:calc(18px * var(--fontScale)) !important;}
-.section-card h3{font-size:calc(15px * var(--fontScale)) !important;}
-.callout{font-size:calc(14px * var(--fontScale)) !important;}
-table{font-size:calc(13.5px * var(--fontScale)) !important;}
-.callout-note .callout-title::before{content:"📝 ";}
-.callout-example .callout-title::before{content:"💡 ";}
-.callout-warning .callout-title::before{content:"⚠️ ";}
-.callout-formula .callout-title::before{content:"∑ ";}
-
-.diagram-block{margin:20px 0;padding:16px 18px 14px;background:var(--diagram-bg);border:1px solid var(--border);border-radius:8px;}
-.diagram-block h4{margin:0 0 12px 0;font-size:calc(14.5px * var(--fontScale));color:var(--navy-deep);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
-.diagram-play-btn{border:1.5px solid var(--accent2);background:#fff;color:var(--accent2);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;flex-shrink:0;}
-.diagram-play-btn:hover{background:var(--accent-soft);}
-.diagram-svg-wrap{overflow-x:auto;}
-.diagram-svg{display:block;margin:0 auto;min-width:420px;}
-.diagram-actor-label{font-family:'Sarabun',sans-serif;font-size:11.5px;font-weight:600;fill:var(--navy-deep);}
-.diagram-lifeline{stroke:var(--border);stroke-width:1.5;stroke-dasharray:3,3;}
-.diagram-node-box{fill:var(--panel);stroke:var(--navy);stroke-width:1.3;}
-.diagram-arrow-path{fill:none;stroke:var(--accent2);stroke-width:2;marker-end:url(#arrowhead);}
-.diagram-arrow-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;fill:var(--navy-deep);}
-.diagram-glow-dot{fill:var(--flag);filter:url(#glowFilter);opacity:0;}
-.diagram-steps-list{list-style:none;margin:12px 0 0;padding:0;font-size:calc(13px * var(--fontScale));line-height:1.7;}
-.diagram-steps-list li{padding:6px 10px;border-left:3px solid transparent;border-radius:4px;transition:background .3s ease, border-color .3s ease;}
-.diagram-steps-list li.step-active{background:var(--accent-soft);border-left-color:var(--flag);}
-.diagram-steps-list .step-num{display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;text-align:center;line-height:20px;font-size:11px;margin-right:8px;font-family:'JetBrains Mono',monospace;}
-
-@media print{
-  header .header-actions, .sidebar, #readProgress, #backToTop, .diagram-play-btn, #calcModal{display:none !important;}
-  .layout{display:block;padding:0;max-width:100%;}
-  main{width:100%;}
-  header{position:static;box-shadow:none;}
-  .section-card{opacity:1 !important;transform:none !important;box-shadow:none;border:1px solid #ccc;break-inside:avoid;}
-  body{background:#fff;}
-}
+.theme-toggle-btn:hover{background:var(--accent-soft);}
+@media print{.theme-toggle-btn{display:none;}}
 </style>
+
+<script>
+(function(){
+  function systemPrefersDark(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function resolvedTheme(t){
+    return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+    else { document.documentElement.removeAttribute('data-theme'); }
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      var r = resolvedTheme(t);
+      btn.textContent = r === 'dark' ? '☀️' : '🌙';
+      btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+    }
+  }
+  var bookTheme = 'system';
+  try{ bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+  applyTheme(bookTheme);
+  document.addEventListener('DOMContentLoaded', function(){
+    applyTheme(bookTheme);
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      btn.addEventListener('click', function(){
+        bookTheme = resolvedTheme(bookTheme) === 'dark' ? 'light' : 'dark';
+        try{ localStorage.setItem('book_theme', bookTheme); }catch(e){}
+        applyTheme(bookTheme);
+      });
+    }
+  });
+})();
+</script>
 </head>
 <body>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-<defs>
-<marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#2B6CB0"></path></marker>
-<filter id="glowFilter" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
-</defs>
-</svg>
-<div id="readProgress"></div>
-
 <header>
-  <div>
-    <a class="back-to-index" href="../index.html">&larr; สารบัญทั้งหมด / All Chapters</a>
-    <h1>STATICS บทที่ 12: นอนพาราเมตริก</h1>
-    <div class="subtitle">การทดสอบไม่อิงพารามิเตอร์</div>
-  </div>
-  <div class="header-actions">
-    <span class="read-time-badge" id="readTimeBadge"></span>
-    <div id="fontCtrl">
-      <button id="fontMinus" title="ลดขนาดตัวอักษร / Decrease font size">A&minus;</button>
-      <button id="fontPlus" title="เพิ่มขนาดตัวอักษร / Increase font size">A+</button>
-    </div>
+  <a class="back-to-index" href="../index.html">&larr; สารบัญทั้งหมด / All Chapters</a>
+  <h1>IC Quiz 11: Nonparametric Test — Sign Test</h1>
+  <div class="toolbar">
     <button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button>
-    <button class="calc-toggle-btn" id="calcHeaderBtn" style="margin-top:0;">🧮 เครื่องคิดเลข</button>
+    <div class="mode-toggle">
+      <button id="btnExerciseMode" class="active">แบบฝึกหัด</button>
+      <button id="btnAnswerMode">เฉลย</button>
+    </div>
+    <button id="resetAllBtn" style="border:1.5px solid var(--flag);color:var(--flag);">↺ ทำใหม่ทั้งชุด</button>
+    <select id="orderSelect">
+      <option value="original">เรียงตามต้นฉบับ</option>
+      <option value="shuffle">สลับข้อ</option>
+    </select>
+    <select id="timerModeSelect">
+      <option value="stopwatch">นับขึ้น</option>
+      <option value="countdown">นับถอยหลัง</option>
+    </select>
+    <input type="number" id="countdownMinutes" placeholder="นาที" min="1" style="width:70px;padding:6px;border:1px solid var(--border);border-radius:6px;">
+    <div class="timer-box">
+      <span id="timerDisplay">00:00</span>
+      <button id="timerStartBtn">เริ่ม</button>
+      <button id="timerPauseBtn">พัก</button>
+      <button id="timerResetBtn">รีเซ็ต</button>
+    </div>
   </div>
 </header>
 
 <div class="layout">
   <div class="sidebar">
-    <details class="sidebar-panel" id="tocPanel" open>
-      <summary>สารบัญ / Contents</summary>
-      <ul class="toc-list" id="tocList"></ul>
-      <div class="calc-slot" id="calcslot_sidebar"></div>
-    </details>
+    <div class="sidebar-panel">
+      <div class="reading-pointer" style="font-size:12.5px;margin:0 0 10px;padding:8px 10px;background:var(--accent-soft);border:1px solid var(--border);border-radius:6px;line-height:1.5;">อ่านเนื้อหาก่อนทำ: <a href="สรุปบทเรียน_Nonparametric_บทที่12.html#section_2" style="color:var(--navy);font-weight:600;">12.2 Sign Test และ Wilcoxon Signed-Rank</a> (บทที่ 12 — สถิตินอนพาราเมตริก)</div>
+      <h3>สารบัญข้อ</h3>
+      <div class="nav-grid" id="navGrid"></div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--unanswered)"></span>ยังไม่ตอบ</span>
+        <span><span class="dot" style="background:var(--accent)"></span>ตอบบางส่วน</span>
+        <span><span class="dot" style="background:var(--correct)"></span>ถูกต้อง</span>
+        <span><span class="dot" style="background:var(--incorrect)"></span>ไม่ถูกต้อง</span>
+      </div>
+      <div class="score-box" id="scoreBox" style="display:none;">
+        <div>คะแนน</div>
+        <div class="big" id="scoreText">0/0</div>
+      </div>
+    </div>
   </div>
   <main id="mainArea"></main>
 </div>
-
-<button id="backToTop" title="กลับขึ้นด้านบน / Back to top">&uarr;</button>
 
 <div id="calcModal">
 <div class="calcmodal-head"><h2>Statistics Calculator</h2><button class="calcmodal-close" id="calcModalClose">✕ ซ่อน</button></div>
@@ -611,11 +731,25 @@ table{font-size:calc(13.5px * var(--fontScale)) !important;}
         <div class="field">
           <label>Distribution</label>
           <select id="distSelect">
-            <option value="normal">Normal</option>
-            <option value="student">Student (t)</option>
-            <option value="chisq">Chi-Squared</option>
-            <option value="binomial">Binomial</option>
-            <option value="poisson">Poisson</option>
+            <optgroup label="Continuous">
+              <option value="normal">Normal</option>
+              <option value="student">Student (t)</option>
+              <option value="chisq">Chi-Squared</option>
+              <option value="fdist">F-Distribution</option>
+              <option value="exponential">Exponential</option>
+              <option value="cauchy">Cauchy</option>
+              <option value="weibull">Weibull</option>
+              <option value="gammadist">Gamma</option>
+              <option value="betadist">Beta</option>
+              <option value="lognormal">Log-Normal</option>
+              <option value="logistic">Logistic</option>
+            </optgroup>
+            <optgroup label="Discrete">
+              <option value="binomial">Binomial</option>
+              <option value="pascal">Pascal (Negative Binomial)</option>
+              <option value="poisson">Poisson</option>
+              <option value="hypergeometric">Hypergeometric</option>
+            </optgroup>
           </select>
         </div>
         <div id="distParams" class="row" style="margin-bottom:0"></div>
@@ -816,7 +950,7 @@ table{font-size:calc(13.5px * var(--fontScale)) !important;}
 </div>
 
 <script>
-const SECTIONS = [{"title": "บทที่ 12 คืออะไร: การทดสอบไม่อิงพารามิเตอร์", "body": "แอปสั่งอาหารอิ่มดีให้บริการส่งอาหารใน 2 โซนของเมือง ทีมปฏิบัติการอยากรู้ว่าโซนไหนส่งช้ากว่ากัน เพื่อจัดสรรไรเดอร์ให้เหมาะสม แต่ข้อมูล เวลาส่ง ของทั้งสองโซนมีปัญหาอย่างหนึ่งร่วมกัน คือ เบ้ขวา: ออเดอร์ส่วนใหญ่ถึงมือลูกค้าในเวลาปกติ แต่มีออเดอร์ส่วนน้อยที่ช้ามาก เพราะติดฝน รอร้านนาน หรือที่อยู่หายาก ออเดอร์ช้าไม่กี่รายการนี้ดึง ค่าเฉลี่ย ให้สูงเกินจริง จนภาพ 'ออเดอร์ทั่วไป' ผิดเพี้ยน\n\nในสถานการณ์แบบนี้ มัธยฐาน และ อันดับ สะท้อนความจริงได้ดีกว่าค่าเฉลี่ย บทนี้จะพาผู้เรียนใช้ข้อมูลของอิ่มดีเป็นเส้นเรื่อง ตั้งแต่การเข้าใจว่าทำไมค่าเฉลี่ยหลอกตา ไปจนถึงการเปรียบเทียบเวลาส่งของสองโซนด้วยวิธีที่ไม่อิงพารามิเตอร์\n\nวิธีการทางสถิติส่วนใหญ่ เช่น การทดสอบที สมมติว่าข้อมูลมีการแจกแจงแบบปกติ (normal) แต่เวลาส่งอาหาร เวลาตอบสนองของระบบ และข้อมูลหางยาวอื่น ๆ มักไม่เป็นเช่นนั้น บทนี้จึงเปิดประตูสู่กลุ่มวิธีที่ ไม่ต้อง สมมติรูปร่างการแจกแจง โดยมีแนวคิดเดียวเป็นหัวใจร่วม คือการแทนค่าจริงด้วย อันดับ (ranks)", "blocks": [{"type": "note", "content": "เป้าหมายการเรียนรู้ของบทที่ 12: (1) อธิบายว่าเมื่อใดข้อสมมติของการทดสอบที (t-test) ล้มเหลว และทำไมต้องใช้วิธีไม่อิงพารามิเตอร์ (nonparametric); (2) อธิบายแนวคิด อันดับ (ranks) และแปลงชุดข้อมูลค่าจริงให้กลายเป็นอันดับได้ด้วยมือ; (3) ทำการทดสอบเครื่องหมาย (sign test) และการทดสอบอันดับเครื่องหมายของวิลคอกซัน (Wilcoxon signed-rank) ทีละขั้น; (4) คำนวณค่า U ของแมน-วิตนีย์ (Mann-Whitney U / Wilcoxon rank-sum) จากอันดับและตีความผล; (5) ทำการทดสอบครัสคัล-วอลลิส (Kruskal-Wallis) สำหรับหลายกลุ่ม และคำนวณสหสัมพันธ์อันดับสเปียร์แมน (Spearman); (6) ตีความผลการทดสอบนอนพาราเมตริกในบริบทจริง"}, {"type": "example", "content": "ตัวเลขจากอิ่มดี: เก็บ เวลาส่ง (นาที) ของออเดอร์ในโซนหนึ่ง 300 รายการ ส่วนใหญ่ถึงมือลูกค้าราว 20 นาที แต่มีออเดอร์ส่วนน้อยที่ช้ามาก 50–150 นาที เพราะติดฝน รอร้านนาน หรือที่อยู่หายาก ผลคือค่าเฉลี่ย (เส้นแดง) อยู่ที่ประมาณ 29 นาที ในขณะที่มัธยฐาน (เส้นน้ำเงิน) อยู่เพียง 24 นาที — ค่าเฉลี่ยถูกลากให้สูงกว่ามัธยฐานอย่างชัดเจน"}, {"type": "subheading", "content": "ทำไมการเบ้ทำให้ค่าเฉลี่ยหลอกตา"}, {"type": "note", "content": "ค่าเฉลี่ยถ่วงด้วยขนาดของค่า ค่าสุดโต่งเพียงไม่กี่ค่าจึงดึงมันไปได้ไกล ส่วนมัธยฐานสนใจเพียง ลำดับ ไม่ใช่ขนาด ค่าสุดโต่งจึงขยับมันได้น้อยมาก เมื่อข้อมูลเบ้หรือมีค่าผิดปกติ การสรุปและทดสอบด้วยอันดับจึงน่าเชื่อถือกว่า"}, {"type": "table", "content": "<table><thead><tr><th>แนวที่บทนี้ร้อยทุกหัวข้อ</th><th>รายละเอียด</th></tr></thead><tbody><tr><td>12.1 ทำไมต้องนอนพาราเมตริก</td><td>เมื่อข้อมูลเบ้ มีค่าผิดปกติ เป็นอันดับ หรือ n เล็ก</td></tr><tr><td>12.2 ข้อมูลจับคู่</td><td>sign test (ใช้แค่เครื่องหมาย) และ Wilcoxon signed-rank (ใช้อันดับของขนาดผลต่าง)</td></tr><tr><td>12.3 สองกลุ่มอิสระ</td><td>Mann-Whitney U รวมสองกลุ่มแล้วจัดอันดับร่วม</td></tr><tr><td>12.4 หลายกลุ่มและความสัมพันธ์</td><td>Kruskal-Wallis (หลายกลุ่ม) และ Spearman (สหสัมพันธ์อันดับ)</td></tr></tbody></table>"}]}, {"title": "12.1 เมื่อใดควรใช้นอนพาราเมตริก", "body": "การทดสอบทีและช่วงความเชื่อมั่นที่อาศัยค่าเฉลี่ย ตั้งอยู่บนข้อสมมติบางอย่าง เมื่อข้อสมมติเหล่านี้ล้มเหลว ผลที่ได้อาจคลาดเคลื่อน เราจึงต้องมีเครื่องมือสำรอง", "blocks": [{"type": "warning", "content": "สี่สถานการณ์ที่ t-test เริ่มไม่น่าเชื่อถือ:\n\n• การเบ้ (skew) — ข้อมูลไม่สมมาตร หางข้างหนึ่งยาวกว่า ค่าเฉลี่ยถูกหางลาก\n\n• ข้อมูลเรียงอันดับ (ordinal) — เป็นคะแนนจัดอันดับ เช่น 1–5 ดาว ระยะห่างไม่เท่ากัน การเฉลี่ยจึงตีความยาก\n\n• ตัวอย่างเล็ก (small n) — เมื่อ n น้อย ทฤษฎีบทลิมิตกลาง (CLT) ยังไม่ช่วย ความปกติของข้อมูลจึงสำคัญมาก\n\n• ค่าผิดปกติ (outliers) — ค่าสุดโต่งไม่กี่ค่าครอบงำทั้งค่าเฉลี่ยและส่วนเบี่ยงเบนมาตรฐาน"}, {"type": "note", "content": "วิธีไม่อิงพารามิเตอร์ (nonparametric): วิธีทดสอบที่ไม่สมมติว่าข้อมูลมาจากการแจกแจงรูปร่างใดรูปร่างหนึ่ง (เช่น ปกติ) ส่วนใหญ่ทำงานบน อันดับ ของข้อมูลแทนค่าจริง จึงทนต่อการเบ้และค่าผิดปกติ และใช้กับข้อมูลเรียงอันดับได้ด้วย"}, {"type": "example", "content": "ข้อแลกเปลี่ยน: เมื่อข้อมูลปกติจริง การทดสอบที่มีกำลัง (power) มากกว่าเล็กน้อย แต่เมื่อข้อสมมติพัง วิธีไม่อิงพารามิเตอร์น่าเชื่อถือกว่ามาก หลายครั้งทีมข้อมูลเลือกความทนทานไว้ก่อน"}, {"type": "subheading", "content": "หัวใจของบท — แนวคิดอันดับ (ranks)"}, {"type": "note", "content": "อันดับ (rank): การจัดอันดับคือการเรียงข้อมูลจากน้อยไปมาก แล้วแทนแต่ละค่าด้วย ตำแหน่งที่ ของมัน ค่าน้อยสุดได้อันดับ 1 ค่ามากสุดได้อันดับ $n$ ผลคือเราเปลี่ยนตัวเลขที่ระยะห่างไม่เท่ากัน ให้เป็นเลข 1, 2, 3, ... ที่ระยะห่างเท่ากันเสมอ\n\nทำไมอันดับจึงแก้ปัญหาค่าผิดปกติ: สังเกตว่าค่าที่ห่างจากค่าอื่นมาก ถ้าเฉลี่ยมันจะครอบงำผล แต่เมื่อแทนด้วยอันดับ มันกลายเป็นแค่ 'อันดับสุดท้าย' ห่างจากอันดับรองสุดท้ายเพียงหนึ่งก้าว เท่ากับทุกคู่ที่ติดกัน — ความสุดโต่งของขนาดถูกบีบให้หายไป เหลือเพียงข้อมูลของลำดับ นี่คือเหตุผลที่วิธีอันดับทนต่อค่าผิดปกติและการเบ้"}, {"type": "formula", "label": "สูตรตรวจสอบการจัดอันดับ", "content": "ผลรวมของอันดับทั้งหมดเท่ากับ $\\dfrac{n(n+1)}{2}$ เสมอ ใช้ตรวจว่าจัดอันดับถูกหรือไม่"}, {"type": "example", "content": "ฝึกแปลงค่าเป็นอันดับ — กฎเสมอกัน (tied ranks): ถ้ามีค่าซ้ำกัน เราให้ อันดับเฉลี่ย แก่ค่าที่เสมอกัน เช่น ถ้าค่าสองตัวเท่ากันและจะได้อันดับ 3 กับ 4 เราให้ทั้งคู่เป็นอันดับ $(3+4)/2=3.5$\n\nโจทย์: จงแปลงค่าเหล่านี้เป็นอันดับ: 50, 12, 50, 31, 8\n\nขั้น 1 — เรียงจากน้อยไปมาก: 8, 12, 31, 50, 50 (จำตำแหน่งเดิมไว้ด้วย)\n\nขั้น 2 — ให้อันดับตามตำแหน่งที่เรียง: 8 ได้อันดับ 1, 12 ได้อันดับ 2, 31 ได้อันดับ 3, 50 ได้ตำแหน่ง 4, 50 ได้ตำแหน่ง 5\n\nขั้น 3 — จัดการค่าเสมอ: ค่า 50 สองตัวอยู่ตำแหน่ง 4 และ 5 จึงให้อันดับเฉลี่ย $(4+5)/2=4.5$ ทั้งคู่\n\nขั้น 4 — เขียนกลับตามลำดับเดิม: 50→4.5, 12→2, 50→4.5, 31→3, 8→1\n\nตรวจสอบ: ผลรวมอันดับต้องเท่ากับ $\\dfrac{n(n+1)}{2}=\\dfrac{5\\cdot 6}{2}=15$ และ $4.5+2+4.5+3+1=15$ ✓\n\nตัวอย่างอิ่มดี — อันดับเวลาส่ง: สมมติเวลาส่ง (นาที) ของ 6 ออเดอร์คือ 22, 16, 240, 25, 18, 20 ค่า 240 คือออเดอร์ที่ติดฝนหนักผิดปกติ เมื่อจัดอันดับได้ 4, 1, 6, 5, 2, 3 — ค่า 240 กลายเป็นเพียง 'อันดับ 6' การทดสอบที่ทำงานบนอันดับจึงไม่ถูก outlier นี้ครอบงำ"}, {"type": "diagram", "layout": "lifeline", "title": "แนวคิดอันดับ (Ranks): หัวใจของสถิตินอนพาราเมตริก", "actors": ["ข้อมูลดิบ", "เรียงจากน้อยไปมาก", "ให้อันดับ (rank)\n1, 2, 3, ...", "ใช้อันดับแทนค่าดิบ\nในการคำนวณสถิติ"], "steps": [{"from": 0, "to": 1, "label": "ไม่สนใจค่าจริง สนใจแค่ตำแหน่งเรียงลำดับ", "note": ""}, {"from": 1, "to": 2, "label": "ค่าเท่ากัน (tie) ให้อันดับเฉลี่ยของตำแหน่งที่เสมอกัน", "note": ""}, {"from": 2, "to": 3, "label": "ผลรวมอันดับทั้งหมดต้องเท่ากับ n(n+1)/2 เสมอ — ใช้ตรวจสอบความถูกต้อง", "note": ""}]}]}, {"title": "12.2 Sign Test และ Wilcoxon Signed-Rank", "body": "หัวข้อนี้เริ่มจากกรณีที่เรียบง่ายที่สุด — เรามีข้อมูล จับคู่ (paired) เช่น วัดอะไรบางอย่างก่อนและหลัง ในหน่วยเดียวกัน แล้วอยากรู้ว่า 'หลัง' ต่างจาก 'ก่อน' อย่างมีนัยสำคัญหรือไม่", "blocks": [{"type": "subheading", "content": "การทดสอบเครื่องหมาย (Sign Test)"}, {"type": "note", "content": "การทดสอบเครื่องหมาย (sign test): ทดสอบว่ามัธยฐานของผลต่างเป็นศูนย์หรือไม่ โดยดูเพียง เครื่องหมาย ของผลต่างแต่ละคู่ (บวกหรือลบ) ทิ้งขนาดของผลต่างไปทั้งหมด ภายใต้สมมติฐานหลัก จำนวนเครื่องหมายบวกควรเป็นไปตามการแจกแจงทวินาม (binomial) ที่ $p=0.5$"}, {"type": "example", "content": "โจทย์: คะแนนความพึงพอใจของผู้ใช้ 8 คน ก่อน/หลังอัปเดตหน้าแอป เราอยากรู้ว่าหลังอัปเดตดีขึ้นไหม\n\nขั้น 1 หาผลต่าง (หลัง−ก่อน) และเครื่องหมาย: คน 1–8 ได้ผลต่าง +3, +1, −2, +4, 0, +2, +1, +5 → เครื่องหมาย +, +, −, +, 0, +, +, +\n\nขั้น 2 ทิ้งค่าที่เป็นศูนย์: คนที่ 5 ผลต่าง 0 ตัดทิ้ง เหลือ $n=7$ คู่ (ค่าศูนย์ไม่ให้ข้อมูลทิศทางใด ๆ จึงไม่นำมานับ)\n\nขั้น 3 นับเครื่องหมาย: บวก = 6 ตัว, ลบ = 1 ตัว ให้สถิติทดสอบ $S=$ จำนวนที่น้อยกว่า $=1$\n\nขั้น 4 เทียบกับทวินาม: ภายใต้ $H_0$ จำนวนบวก $\\sim \\text{Binomial}(7, 0.5)$ ค่า p สองด้าน $=2\\cdot P(X\\le 1)$\n\nขั้น 5 คำนวณ: $P(X\\le 1) = \\binom{7}{0}0.5^7+\\binom{7}{1}0.5^7 = \\dfrac{1+7}{128}=0.0625$ ดังนั้น p สองด้าน $=2\\times 0.0625=0.125$\n\nขั้น 6 สรุป: $p=0.125>0.05$ จึง ปฏิเสธ $H_0$ ไม่ได้ ยังสรุปไม่ได้ว่าการอัปเดตทำให้คะแนนต่างอย่างมีนัยสำคัญ (sign test มีกำลังต่ำเพราะทิ้งขนาดของผลต่างไป)"}, {"type": "subheading", "content": "Wilcoxon Signed-Rank — แนวคิดและการคำนวณ"}, {"type": "note", "content": "เกร็ดประวัติ: แฟรงก์ วิลค็อกซัน (1892–1965) นักเคมีและนักสถิติชาวอเมริกัน ผู้เสนอการทดสอบอันดับ (signed-rank และ rank-sum) ในปี 1945 แนวคิดของเขาคือการแทนค่าจริงด้วยอันดับ ทำให้ทดสอบได้โดยไม่ต้องสมมติว่าข้อมูลแจกแจงแบบปกติ เป็นรากฐานของวิธีไม่อิงพารามิเตอร์ที่ใช้กันแพร่หลายมาจนถึงปัจจุบัน"}, {"type": "note", "content": "Wilcoxon signed-rank test: การทดสอบเครื่องหมายทิ้งข้อมูลขนาดไปทั้งหมด ซึ่งน่าเสียดาย — ถ้าผลต่าง +5 ควร 'หนัก' กว่าผลต่าง +1 วิลคอกซันแก้ตรงนี้โดยนำ อันดับของขนาดผลต่าง มาใช้ด้วย: หาผลต่างของแต่ละคู่ แล้วจัดอันดับ ขนาด (ค่าสัมบูรณ์) ของผลต่าง ติดเครื่องหมายเดิมกลับเข้าไปที่อันดับ แล้วรวมอันดับของฝั่งบวกได้ $W^+$ และฝั่งลบได้ $W^-$ สถิติทดสอบคือค่าที่น้อยกว่าระหว่าง $W^+$ และ $W^-$ ถ้าทั้งสองฝั่งสมดุล แปลว่าไม่มีความต่าง"}, {"type": "example", "content": "โจทย์: เวลาส่งของ 7 ออเดอร์ในร้านเดิม (นาที) ก่อน/หลังอิ่มดีเปิดเส้นทางลัดให้ไรเดอร์ ทดสอบว่าเส้นทางลัดช่วยลดเวลาส่งไหม ผลต่าง (หลัง−ก่อน) ของ 7 ออเดอร์คือ −1.2, −0.4, +0.3, −2.1, −0.9, −1.5, −0.7\n\nขั้น 1 หาขนาด $|d|$ แล้วจัดอันดับขนาด: $|d|=$ 1.2, 0.4, 0.3, 2.1, 0.9, 1.5, 0.7 → อันดับ 5, 2, 1, 7, 4, 6, 3\n\nขั้น 2 ติดเครื่องหมายเดิมกลับเข้าที่อันดับ: −5, −2, +1, −7, −4, −6, −3\n\nขั้น 3 รวมอันดับแต่ละฝั่ง: $W^+=1$ (มีแค่ค่าออเดอร์ 3); $W^-=5+2+7+4+6+3=27$\n\nขั้น 4 ตรวจสอบ: $W^++W^-=\\dfrac{n(n+1)}{2}=\\dfrac{7\\cdot 8}{2}=28$ และ $1+27=28$ ✓ สถิติทดสอบ $W=\\min(W^+,W^-)=1$\n\nขั้น 5 เทียบค่าวิกฤต: ตารางวิลคอกซันที่ $n=7,\\ \\alpha=0.05$ สองด้าน ให้ค่าวิกฤต $W_{crit}=2$ กฎ: ปฏิเสธ $H_0$ ถ้า $W\\le W_{crit}$\n\nขั้น 6 สรุป: $W=1\\le 2$ จึง ปฏิเสธ $H_0$ — สรุปได้ว่าเส้นทางลัดลดเวลาส่งอย่างมีนัยสำคัญ (สังเกตว่าวิลคอกซันให้ผลชัดกว่า sign test เพราะใช้ข้อมูลขนาดด้วย)"}, {"type": "table", "content": "<table><thead><tr><th>n</th><th>alpha=0.05 (สองด้าน)</th><th>alpha=0.01 (สองด้าน)</th></tr></thead><tbody><tr><td>6</td><td>0</td><td>—</td></tr><tr><td>7</td><td>2</td><td>—</td></tr><tr><td>8</td><td>3</td><td>0</td></tr><tr><td>9</td><td>5</td><td>1</td></tr><tr><td>10</td><td>8</td><td>3</td></tr><tr><td>12</td><td>13</td><td>7</td></tr><tr><td>15</td><td>25</td><td>15</td></tr></tbody></table>"}, {"type": "note", "content": "ตารางค่าวิกฤตบางส่วนของวิลคอกซัน (ปฏิเสธ $H_0$ เมื่อ $W\\le$ ค่าในตาราง) — สังเกตว่าการทดสอบเครื่องหมายใช้ข้อมูลน้อยที่สุด คือเพียงเครื่องหมาย จึงทนทานมากแต่กำลังต่ำ ถ้าผลต่างมีขนาดที่มีความหมาย วิลคอกซันในหัวข้อถัดไปจะใช้ข้อมูลนั้นและมีกำลังมากกว่า"}, {"type": "diagram", "layout": "lifeline", "title": "Sign Test vs Wilcoxon Signed-Rank (ข้อมูลจับคู่)", "actors": ["หาผลต่างรายคู่\n(d = x₂−x₁)", "Sign Test:\nนับเครื่องหมาย +/−", "Wilcoxon:\nจัดอันดับ |d| แล้วคืนเครื่องหมาย", "เทียบสถิติทดสอบ\nกับค่าวิกฤต"], "steps": [{"from": 0, "to": 1, "label": "Sign test สนใจแค่ทิศทาง ไม่สนขนาดของผลต่าง — ใช้ข้อมูลน้อยที่สุด", "note": ""}, {"from": 0, "to": 2, "label": "Wilcoxon ใช้ทั้งทิศทางและขนาด (ผ่านอันดับ) — มีกำลังการทดสอบสูงกว่า", "note": ""}, {"from": 2, "to": 3, "label": "เลือกใช้ตัวใดตัวหนึ่งตามข้อมูลที่มี ไม่ใช่ใช้ทั้งคู่พร้อมกัน", "note": ""}]}]}, {"title": "12.3 Mann-Whitney U (Wilcoxon Rank-Sum)", "body": "วิลคอกซันใช้กับข้อมูลจับคู่ แต่บ่อยครั้งสองกลุ่มเป็นอิสระจากกัน เช่น ออเดอร์คนละโซน ลูกค้าคนละชุด การทดสอบแมน-วิตนีย์ ยู (Mann-Whitney U) หรือเรียกอีกชื่อว่า Wilcoxon rank-sum ออกแบบมาสำหรับกรณีนี้ และยังคงทำงานบน อันดับ\n\nเกร็ดประวัติ: เฮนรี แมนน์ (Henry Mann) และโดนัลด์ วิตนีย์ (Donald Whitney) ขยายแนวคิด rank-sum ของวิลค็อกซันให้เป็นรูปสถิติ U ในปี 1947 ชื่อการทดสอบจึงรวมทั้งสามคน", "blocks": [{"type": "note", "content": "Mann-Whitney U test: รวมข้อมูลทั้งสองกลุ่มแล้วจัดอันดับทุกค่าพร้อมกัน (pooled ranks) หาผลรวมอันดับของกลุ่มหนึ่ง เรียก $R_1$ คำนวณ $U_1 = R_1 - \\dfrac{n_1(n_1+1)}{2}$ ซึ่งแปลว่า 'จำนวนครั้งที่ค่าในกลุ่ม 1 มากกว่าค่าในกลุ่ม 2' (นับทุกคู่ข้ามกลุ่ม) สถิติทดสอบคือ $U=\\min(U_1,U_2)$ ถ้าสองกลุ่มเหมือนกัน $U_1$ และ $U_2$ ควรใกล้เคียงกัน\n\n$U$ มีความหมายเชิงรูปธรรมที่สวยงาม คือ 'จำนวนคู่ข้ามกลุ่มที่กลุ่มหนึ่งชนะอีกกลุ่ม' ถ้ากลุ่ม A ชนะ B ทุกคู่ $U$ ฝั่งหนึ่งจะเป็น 0 (สุดขั้ว) ถ้าเสมอกัน $U_1\\approx U_2\\approx n_1 n_2/2$"}, {"type": "subheading", "content": "คำนวณ U ด้วยมือทีละขั้น — สองโซนส่งของอิ่มดี"}, {"type": "example", "content": "โจทย์: เก็บเวลาส่ง (นาที) ของโซน A จำนวน 5 ออเดอร์ และโซน B จำนวน 5 ออเดอร์ ทั้งสองชุดเบ้และมีหางยาว (มีออเดอร์ที่ติดฝนช้ามาก) การเฉลี่ยจึงไม่ยุติธรรม จึงใช้แมน-วิตนีย์เพื่อถามว่าโซน A ส่งเร็วกว่าโซน B อย่างมีระบบหรือไม่\n\nข้อมูล (นาที): A = {18, 24, 31, 22, 95}; B = {40, 52, 47, 61, 130} ($n_1=n_2=5$) A มีออเดอร์ช้าผิดปกติ 95, B มีออเดอร์ช้าผิดปกติ 130\n\nขั้น 1 รวมและจัดอันดับร่วม: เรียงทั้ง 10 ค่า: 18,22,24,31,40,47,52,61,95,130 → อันดับ 1–10; A ครองอันดับ 1,2,3,4,9; B ครองอันดับ 5,6,7,8,10\n\nขั้น 2 รวมอันดับของโซน A: $R_1 = 1+2+3+4+9 = 19$\n\nขั้น 3 ตรวจสอบด้วยโซน B: $R_2 = 5+6+7+8+10 = 36$ และ $R_1+R_2=19+36=55=\\dfrac{10\\cdot 11}{2}$ ✓\n\nขั้น 4 คำนวณ $U_1$: $U_1 = R_1 - \\dfrac{n_1(n_1+1)}{2} = 19 - \\dfrac{5\\cdot 6}{2} = 19-15=4$\n\nขั้น 5 คำนวณ $U_2$: $U_2 = R_2 - \\dfrac{n_2(n_2+1)}{2} = 36-15=21$ ตรวจ: $U_1+U_2=n_1n_2=25$ ✓\n\nขั้น 6 สถิติทดสอบ: $U=\\min(U_1,U_2)=\\min(4,21)=4$ ($U_1$ เล็ก แปลว่าโซน A มักได้อันดับต่ำ คือส่งเร็วกว่า)\n\nขั้น 7 เทียบค่าวิกฤต: ตาราง Mann-Whitney ที่ $n_1=n_2=5,\\ \\alpha=0.05$ สองด้าน ให้ $U_{crit}=2$ กฎ: ปฏิเสธ $H_0$ ถ้า $U\\le U_{crit}$\n\nขั้น 8 สรุป: $U=4>2$ จึง ปฏิเสธ $H_0$ ไม่ได้ ที่ระดับ 0.05 แม้โซน A ดูเร็วกว่า แต่ด้วยตัวอย่างเพียง 5 ต่อ 5 และออเดอร์ช้า 95 นาทีของ A หลักฐานยังไม่พอ (ลองเพิ่ม n แล้วสังเกตว่าผลเปลี่ยน)"}, {"type": "warning", "content": "สังเกตพลังของอันดับ: ออเดอร์ช้า 95 นาทีของโซน A และ 130 นาทีของโซน B แทบไม่ครอบงำผล เพราะถูกบีบเป็นเพียงอันดับ 9 และ 10 ถ้าใช้ค่าเฉลี่ย ค่า 130 จะดึงค่าเฉลี่ยของโซน B สูงเกินจริง"}, {"type": "note", "content": "ภาพกล่อง (boxplot) ช่วยให้เห็นความต่างของสองโซนที่เบ้ทั้งคู่ เส้นในกล่องคือมัธยฐาน ขอบกล่องคือควอไทล์ที่ 1 และ 3 จุดนอกหนวดคือค่าผิดปกติ ทั้งหมดเป็นมุมมองเชิงอันดับ ไม่อิงค่าเฉลี่ย — การเปรียบเทียบด้วยมัธยฐานและอันดับจึงยุติธรรมกว่าค่าเฉลี่ยเมื่อข้อมูลเบ้แบบนี้"}, {"type": "diagram", "layout": "lifeline", "title": "Mann-Whitney U (Wilcoxon Rank-Sum): เปรียบเทียบสองกลุ่มอิสระ", "actors": ["รวมข้อมูล\nทั้งสองกลุ่ม", "จัดอันดับร่วม\nทั้งชุด", "แยกผลรวมอันดับ\nกลับตามกลุ่มเดิม", "คำนวณ U\nแต่ละกลุ่ม", "เทียบกับ U วิกฤต"], "steps": [{"from": 0, "to": 1, "label": "จัดอันดับโดยไม่สนว่าค่านั้นมาจากกลุ่มไหน", "note": ""}, {"from": 1, "to": 2, "label": "R₁ = ผลรวมอันดับกลุ่ม 1, R₂ = ผลรวมอันดับกลุ่ม 2", "note": ""}, {"from": 2, "to": 3, "label": "U = n₁n₂ + n₁(n₁+1)/2 − R₁ (หรือสูตรสมมูลของกลุ่ม 2)", "note": ""}, {"from": 3, "to": 4, "label": "ถ้าสองกลุ่มมาจากการแจกแจงเดียวกัน U ควรอยู่ตรงกลางช่วงที่เป็นไปได้", "note": ""}]}]}, {"title": "12.4 Kruskal-Wallis และ Spearman", "body": "แมน-วิตนีย์เทียบได้เพียงสองกลุ่ม เมื่อมีตั้งแต่สามกลุ่มขึ้นไป (เช่น สามโซนส่งของอิ่มดี) เราใช้การทดสอบครัสคัล-วอลลิส (Kruskal-Wallis) ซึ่งเป็นคู่ขนานแบบไม่อิงพารามิเตอร์ของ ANOVA ทางเดียว และยังคงทำงานบนอันดับร่วม", "blocks": [{"type": "formula", "label": "สถิติ H ของ Kruskal-Wallis", "content": "รวมทุกกลุ่มแล้วจัดอันดับร่วมทั้งหมด หาผลรวมอันดับของแต่ละกลุ่ม $R_i$ ถ้าทุกกลุ่มเหมือนกัน ผลรวมอันดับเฉลี่ยของแต่ละกลุ่มควรใกล้เคียงกัน\n\n$$H = \\dfrac{12}{N(N+1)}\\sum_i \\dfrac{R_i^2}{n_i} - 3(N+1)$$\n\nโดย $N$ คือจำนวนทั้งหมด เมื่อ $H$ ใหญ่ แปลว่ากลุ่มต่างกัน $H$ มีการแจกแจงประมาณไคสแควร์ (chi-square) ที่องศาอิสระ $k-1$ เมื่อ $k$ คือจำนวนกลุ่ม\n\nทำไม H ใหญ่จึงแปลว่ากลุ่มต่างกัน: ถ้าทุกกลุ่มมาจากการแจกแจงเดียวกัน อันดับสูง-ต่ำจะกระจายปนกันทุกกลุ่ม ผลรวมอันดับเฉลี่ยของแต่ละกลุ่มจึงใกล้กัน ทำให้ $H$ เล็ก แต่ถ้ากลุ่มหนึ่งมีค่าสูงกว่าอย่างเป็นระบบ มันจะกินอันดับสูงไปเกือบหมด $\\sum R_i^2/n_i$ จะใหญ่ขึ้น และ $H$ จึงใหญ่"}, {"type": "subheading", "content": "Kruskal-Wallis — คำนวณทีละขั้น"}, {"type": "example", "content": "โจทย์: เวลาส่ง (นาที) ของอิ่มดี 3 โซน โซนละ 4 ออเดอร์ ต่างกันหรือไม่ (ไม่อิงพารามิเตอร์)\n\nข้อมูล: G1={20,24,22,30}; G2={35,41,38,33}; G3={52,60,48,70} ($N=12$)\n\nขั้น 1 จัดอันดับร่วมทั้ง 12 ค่า: เรียง 20,22,24,30,33,35,38,41,48,52,60,70 → G1 ครองอันดับ 1,2,3,4; G2 ครองอันดับ 5,6,7,8; G3 ครองอันดับ 9,10,11,12\n\nขั้น 2 ผลรวมอันดับแต่ละกลุ่ม: $R_1=1+2+3+4=10$; $R_2=5+6+7+8=26$; $R_3=9+10+11+12=42$ (ตรวจ: $10+26+42=78=\\dfrac{12\\cdot 13}{2}$ ✓)\n\nขั้น 3 แทนในสูตร H: $H = \\dfrac{12}{12\\cdot 13}\\left(\\dfrac{10^2}{4}+\\dfrac{26^2}{4}+\\dfrac{42^2}{4}\\right) - 3(13)$\n\nขั้น 4 คำนวณวงเล็บ: $\\dfrac{100}{4}+\\dfrac{676}{4}+\\dfrac{1764}{4} = 25+169+441=635$\n\nขั้น 5 รวม: $H = \\dfrac{12}{156}\\times 635 - 39 = 0.07692\\times 635-39 = 48.85-39=9.85$\n\nขั้น 6 เทียบไคสแควร์: องศาอิสระ $df=k-1=2$ ค่าวิกฤต $\\chi^2_{0.05,2}=5.99$ กฎ: ปฏิเสธ $H_0$ ถ้า $H>5.99$\n\nขั้น 7 สรุป: $H=9.85>5.99$ จึง ปฏิเสธ $H_0$ — เวลาส่งของสามโซนต่างกันอย่างมีนัยสำคัญ (จากอันดับ โซน G3 ส่งช้าสุดชัดเจน)"}, {"type": "warning", "content": "Kruskal-Wallis บอกเพียงว่า 'มีอย่างน้อยหนึ่งกลุ่มต่าง' แต่ไม่บอกว่าคู่ไหน ต้องทำการทดสอบรายคู่ (post-hoc) ต่อ เช่น Mann-Whitney แบบปรับค่านัยสำคัญ (Bonferroni) — หลักการเดียวกับที่ ANOVA ต้องมี post-hoc ในบทที่ 11"}, {"type": "subheading", "content": "สหสัมพันธ์อันดับสเปียร์แมน — แนวคิด"}, {"type": "note", "content": "เกร็ดประวัติ: ชาลส์ สเปียร์แมน (1863–1945) นักจิตวิทยาชาวอังกฤษ ผู้คิดค้นสหสัมพันธ์อันดับสเปียร์แมน เขาพัฒนาวิธีนี้จากงานด้านจิตวิทยาเชิงปริมาณ โดยเฉพาะการศึกษาเชาวน์ปัญญา (general intelligence, g-factor) การวัดความสัมพันธ์บนอันดับช่วยให้จับความสัมพันธ์เชิงเอกภาพได้ แม้ข้อมูลจะไม่เป็นเส้นตรงหรือมีค่าผิดปกติ"}, {"type": "formula", "label": "Spearman rank correlation", "content": "จัดอันดับค่าของตัวแปร X แยกกัน และของ Y แยกกัน คำนวณสหสัมพันธ์เพียร์สันระหว่างอันดับทั้งสอง ได้ $r_s\\in[-1,1]$ เมื่อไม่มีค่าเสมอ ใช้สูตรลัด:\n\n$$r_s = 1 - \\dfrac{6\\sum d_i^2}{n(n^2-1)}$$\n\nโดย $d_i$ คือผลต่างของอันดับในแต่ละคู่ $r_s$ วัดความสัมพันธ์ เชิงเอกภาพ (monotonic) คือไปทางเดียวกันหรือไม่ ไม่จำเป็นต้องเป็นเส้นตรง — สเปียร์แมนต่างจากเพียร์สันตรงที่จับความสัมพันธ์เชิงเอกภาพที่ไม่เป็นเส้นตรงได้ เช่น $Y=X^2$ ($X>0$) ให้ $r_s=1$ พอดี (เอกภาพสมบูรณ์) แต่เพียร์สันจะน้อยกว่า 1 เพราะไม่เป็นเส้นตรง"}, {"type": "example", "content": "โจทย์: ระยะทางส่ง (กม.) กับเวลาส่ง (นาที) ของ 6 ออเดอร์อิ่มดี สัมพันธ์กันแบบเอกภาพหรือไม่\n\nข้อมูล: X ระยะทาง = 1.0, 2.5, 3.0, 5.5, 8.0, 12.0; Y เวลา = 12, 20, 18, 31, 40, 65\n\nขั้น 1 จัดอันดับ X และ Y แยกกัน: อันดับ X = 1,2,3,4,5,6; อันดับ Y = 1,3,2,4,5,6\n\nขั้น 2 หาผลต่างอันดับ $d$ และ $d^2$: $d=$ 0, −1, +1, 0, 0, 0; $d^2=$ 0, 1, 1, 0, 0, 0\n\nขั้น 3 รวม $\\sum d^2$: $0+1+1+0+0+0=2$\n\nขั้น 4 แทนในสูตรลัด: $r_s = 1-\\dfrac{6\\sum d^2}{n(n^2-1)} = 1-\\dfrac{6\\cdot 2}{6(36-1)} = 1-\\dfrac{12}{210}$\n\nขั้น 5 คำนวณ: $r_s = 1-0.0571=0.943$\n\nขั้น 6 ตีความ: $r_s=0.94$ ใกล้ 1 มาก แปลว่าระยะทางส่งกับเวลาส่งสัมพันธ์เชิงเอกภาพแบบบวกที่แข็งแรง ยิ่งระยะทางไกล ยิ่งใช้เวลานานเกือบเสมอ"}, {"type": "note", "content": "ขนาดผลและการประมาณค่าด้วยอันดับ: การทดสอบบอกว่า 'ต่างหรือไม่' แต่ผู้ปฏิบัติงานมักอยากรู้ว่า 'ต่างเท่าไร' สำหรับวิธีไม่อิงพารามิเตอร์ เราประมาณ ขนาดผล (effect size) และตำแหน่งกลางได้โดยไม่ต้องอิงค่าเฉลี่ย: มัธยฐานของผลต่าง สำหรับข้อมูลจับคู่ ใช้แทนค่าเฉลี่ยของผลต่าง ทนต่อค่าผิดปกติ และ ความน่าจะเป็นของความเหนือกว่า (probability of superiority) $\\hat p = U_1/(n_1 n_2)$ คือโอกาสที่ค่าสุ่มจากกลุ่ม 1 จะมากกว่าค่าสุ่มจากกลุ่ม 2 เป็นขนาดผลที่ตีความง่ายของ Mann-Whitney ค่า $\\hat p=0.5$ แปลว่าสองกลุ่มไม่ต่าง ยิ่งห่างจาก 0.5 ยิ่งต่างมาก ตัวอย่างเช่น จากตัวอย่างสองโซนในหัวข้อ 12.3 เราได้ $U_1=4$ และ $n_1n_2=25$ ดังนั้น $\\hat p=4/25=0.16$ แปลว่าโอกาสที่ออเดอร์สุ่มของโซน A จะช้ากว่าออเดอร์สุ่มของโซน B มีเพียง 16 เปอร์เซ็นต์ กล่าวอีกนัย โซน A เร็วกว่าโซน B ถึง 84 เปอร์เซ็นต์ของคู่ที่เทียบ ซึ่งเป็นขนาดผลที่ใหญ่ แม้การทดสอบที่ n เล็กจะยังไม่ถึงนัยสำคัญ — นัยสำคัญตอบคำถาม 'มั่นใจว่าต่างไหม' ส่วนขนาดผลตอบว่า 'ต่างมากพอจะสนใจไหม' ควรรายงานทั้งคู่"}, {"type": "diagram", "layout": "lifeline", "title": "Kruskal-Wallis H: ANOVA แบบไม่อิงพารามิเตอร์", "actors": ["รวมทุกกลุ่ม\nจัดอันดับร่วม", "หาผลรวมอันดับ Rᵢ\nของแต่ละกลุ่ม", "คำนวณสถิติ H", "เทียบกับ χ² วิกฤต\nที่ df = k−1"], "steps": [{"from": 0, "to": 1, "label": "เหมือน Mann-Whitney แต่ขยายไปมากกว่า 2 กลุ่ม", "note": ""}, {"from": 1, "to": 2, "label": "H = [12/N(N+1)]·Σ(Rᵢ²/nᵢ) − 3(N+1)", "note": ""}, {"from": 2, "to": 3, "label": "H มากเกินค่าวิกฤต → อย่างน้อยหนึ่งกลุ่มมีการแจกแจงต่างจากกลุ่มอื่น", "note": ""}]}]}, {"title": "สรุปบทที่ 12", "body": "ทุกการทดสอบในบทนี้ใช้แนวคิดเดียวกัน คือ แทนค่าจริงด้วยอันดับ แล้วถามว่าอันดับกระจายอย่างที่ควรเป็นภายใต้สมมติฐานหลักหรือไม่ นี่คือเหตุผลที่วิธีเหล่านี้ทนต่อการเบ้และค่าผิดปกติ และใช้กับข้อมูลเรียงอันดับได้", "blocks": [{"type": "table", "content": "<table><thead><tr><th>สถานการณ์</th><th>วิธีอิงพารามิเตอร์</th><th>วิธีไม่อิงพารามิเตอร์ (บทนี้)</th></tr></thead><tbody><tr><td>สองกลุ่มจับคู่</td><td>paired t-test</td><td>Sign test / Wilcoxon signed-rank</td></tr><tr><td>สองกลุ่มอิสระ</td><td>two-sample t-test</td><td>Mann-Whitney U (rank-sum)</td></tr><tr><td>หลายกลุ่มอิสระ</td><td>one-way ANOVA</td><td>Kruskal-Wallis</td></tr><tr><td>ความสัมพันธ์สองตัวแปร</td><td>Pearson correlation</td><td>Spearman rank correlation</td></tr></tbody></table>"}, {"type": "warning", "content": "กับดักที่พบบ่อยเมื่อใช้วิธีไม่อิงพารามิเตอร์:\n\n• ลืมจัดการค่าเสมอ — ค่าซ้ำต้องได้อันดับเฉลี่ย ไม่ใช่อันดับเรียงตามใจ\n\n• ใช้ Mann-Whitney กับข้อมูลจับคู่ — ข้อมูลก่อน/หลังของหน่วยเดียวกันต้องใช้ Wilcoxon signed-rank ไม่ใช่ Mann-Whitney\n\n• ตีความว่า 'ไม่ต่าง' ทันทีเมื่อ $p>0.05$ ที่ n เล็ก — กำลังการทดสอบต่ำ การไม่ปฏิเสธไม่ได้แปลว่าเหมือนกัน\n\n• หยุดที่ Kruskal-Wallis เมื่อพบความต่าง ต้องทดสอบรายคู่ต่อจึงรู้ว่าคู่ไหน\n\n• สับสน Spearman กับสาเหตุ สหสัมพันธ์สูงไม่ได้แปลว่าเป็นสาเหตุ"}, {"type": "note", "content": "จุดร่วมของกับดักเหล่านี้คือการลืมว่า 'อันดับ' และ 'การจับคู่/อิสระ' คือหัวใจ ถ้ายึดสามคำถามนำจากต้นบทไว้ (ข้อมูลเป็นตัวเลขต่อเนื่องปกติหรือเบ้/มีค่าผิดปกติ/เป็นอันดับ, กำลังเปรียบเทียบกี่กลุ่มและกลุ่มเหล่านั้นจับคู่หรืออิสระ, ต้องการทดสอบความต่างของตำแหน่งกลางหรือความสัมพันธ์) จะเลือกได้เกือบทั้งหมด บทนี้และบทที่ 11 ร้อยเป็นภาพเดียวกัน คือทดสอบภาพรวมก่อนเสมอเมื่อมีหลายกลุ่ม (ANOVA คู่กับ Kruskal-Wallis) แล้วจึงเจาะรายคู่ด้วย post-hoc ที่ควบคุมความผิดพลาด"}, {"type": "note", "content": "ฝึกทำโจทย์ Sign Test แบบมีเฉลยทีละขั้นตอนได้ที่ [IC Quiz 12-1: Nonparametric Test — Sign Test](IC_Quiz_12-1_Sign_Test.html) (อ่านหัวข้อ 12.2 ด้านบนก่อนทำ)"}]}];
+const QUESTIONS = [{"prompt": "A labor organization estimates that the median hourly wage of podiatrists is at least $55.89. In a random sample of 25 podiatrists, 8 are paid less than $55.89 per hour, 7 are paid more than $55.89 per hour, and 10 is paid $55.89 per hour. At α = 0.01, can you reject the labor organization's claim?", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["sign test", "Wilcoxon signed-rank test", "Mann-Whitney U test", "Kruskal-Wallis test"], "correctAnswer": "sign test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["One-Tailed Test", "Two-Tailed Test"], "correctAnswer": "One-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 2, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 7, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "Sign Test — n ≤ 25 (exact binomial table)\nH0/Ha ตั้งจาก claim: ถ้า claim มีเครื่องหมาย = รวมอยู่ (≥, ≤, =) → claim เป็น H0, ตรงข้ามเป็น Ha\nตัดค่า tie (เท่ากับค่ามัธยฐานที่ตั้งสมมติฐานพอดี) ทิ้งก่อนนับ\nx = min(จำนวนเครื่องหมาย +, จำนวนเครื่องหมาย -)\nค่าวิกฤต = ค่า x0 มากที่สุดที่ P(X ≤ x0) ≤ α เมื่อ X ~ Binomial(n, 0.5)\nกฎตัดสินใจ: reject H0 ถ้า x ≤ ค่าวิกฤต", "calcTabs": ["dist", "stat", "calc"], "steps": {"given": "n = 25 ตัวอย่าง แบ่งเป็น: ต่ำกว่า 55.89 = 8 ค่า (เครื่องหมาย -), สูงกว่า 55.89 = 7 ค่า (เครื่องหมาย +), เท่ากับ 55.89 พอดี = 10 ค่า (tie) | α = 0.01 | claim: median ≥ 55.89", "why": "claim 'at least $55.89' คือ median ≥ 55.89 ซึ่งมีเครื่องหมาย = รวมอยู่ ตาม convention การตั้งสมมติฐานจึงให้ claim เป็น H0 เสมอ → H0: median ≥ 55.89, Ha: median < 55.89 (one-tailed ด้านซ้าย) ใช้ sign test เพราะโจทย์บอกแค่ว่าค่าจ้างสูง/ต่ำกว่าค่าที่กำหนดเท่านั้น ไม่มีข้อมูลรูปร่างการแจกแจงประชากร (nonparametric test) ต้องตัดค่า tie (10 ค่าที่เท่ากับ 55.89 พอดี) ทิ้งก่อน เพราะไม่บอกทิศทางว่าอยู่เหนือหรือใต้มัธยฐาน เหลือ n ที่ใช้จริง = 8+7 = 15 ซึ่ง ≤ 25 จึงต้องใช้ตาราง exact จาก binomial distribution โดยตรง ไม่ใช่ normal approximation", "substitute": "x = min(จำนวน +, จำนวน -) = min(7, 8) = 7\nหาค่าวิกฤตจาก X ~ Binomial(n=15, p=0.5): P(X≤2) = C(15,0)+C(15,1)+C(15,2) ทั้งหมด × 0.5^15 = 0.00369, P(X≤3) = 0.01758", "calculate": "P(X≤2) = 0.00369 ≤ 0.01 แต่ P(X≤3) = 0.01758 > 0.01 → ค่าวิกฤต (x0) = 2\nสถิติทดสอบ x = 7", "conclude": "x = 7 มากกว่าค่าวิกฤต = 2 (7 > 2) → ไม่เข้าเงื่อนไข reject (x ≤ ค่าวิกฤต) → Fail to reject H0: ข้อมูลไม่เพียงพอที่จะปฏิเสธ claim ว่า median ค่าจ้างพอดิแอทริสต์อย่างน้อย $55.89"}}, {"prompt": "A research group claims that the median age of Twitter® users is greater than 30 years old. In a random sample of 29 Twitter® users, 8 are less than 30 years old, 6 are more than 30 years old, and 15 are 30 years old. At α = 0.01, can you support the research group's claim?", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["sign test", "Wilcoxon signed-rank test", "Mann-Whitney U test", "Kruskal-Wallis test"], "correctAnswer": "sign test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["One-Tailed Test", "Two-Tailed Test"], "correctAnswer": "One-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": 2, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": 6, "tolerance": 0.01, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "Sign Test — n ≤ 25 (exact binomial table)\nclaim ไม่มีเครื่องหมาย = รวมอยู่ (strict > หรือ <) → claim เป็น Ha เสมอ\nx = min(จำนวนเครื่องหมาย +, จำนวนเครื่องหมาย -)\nค่าวิกฤต = ค่า x0 มากที่สุดที่ P(X ≤ x0) ≤ α เมื่อ X ~ Binomial(n, 0.5)\nกฎตัดสินใจ: reject H0 ถ้า x ≤ ค่าวิกฤต", "calcTabs": ["dist", "stat", "calc"], "steps": {"given": "n = 29 ตัวอย่าง แบ่งเป็น: น้อยกว่า 30 ปี = 8 ค่า (-), มากกว่า 30 ปี = 6 ค่า (+), เท่ากับ 30 ปีพอดี = 15 ค่า (tie) | α = 0.01 | claim: median > 30", "why": "claim 'greater than 30' เป็น strict inequality ไม่มีเครื่องหมาย = จึงตั้ง claim เป็น Ha เสมอ → H0: median ≤ 30, Ha: median > 30 (one-tailed ด้านขวา) ใช้ sign test เพราะข้อมูลระบุแค่อายุมากกว่า/น้อยกว่าค่าที่กำหนด ตัดค่า tie (15 ค่าที่อายุ 30 พอดี) ทิ้ง เหลือ n ที่ใช้จริง = 8+6 = 14 ≤ 25 จึงใช้ตาราง exact binomial", "substitute": "x = min(จำนวน +, จำนวน -) = min(6, 8) = 6\nหาค่าวิกฤตจาก X ~ Binomial(n=14, p=0.5): P(X≤2) = 0.00647, P(X≤3) = 0.02869", "calculate": "P(X≤2) = 0.00647 ≤ 0.01 แต่ P(X≤3) = 0.02869 > 0.01 → ค่าวิกฤต (x0) = 2\nสถิติทดสอบ x = 6", "conclude": "x = 6 มากกว่าค่าวิกฤต = 2 (6 > 2) → ไม่เข้าเงื่อนไข reject → Fail to reject H0: ข้อมูลไม่เพียงพอที่จะสนับสนุน claim ว่า median อายุผู้ใช้ Twitter มากกว่า 30 ปี"}}, {"prompt": "A financial services institution reports that the median amount of credit card debt for families holding such debts is at least $3000. In a random sample of 102 families holding debt, the debts of 42 families were less than $3000 and the debts of 46 families were greater than $3000. At α = 0.01, can you reject the institution's claim?", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["sign test", "Wilcoxon signed-rank test", "Mann-Whitney U test", "Kruskal-Wallis test"], "correctAnswer": "sign test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["One-Tailed Test", "Two-Tailed Test"], "correctAnswer": "One-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": -2.33, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": -0.32, "tolerance": 0.02, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "Sign Test — n > 25 (normal approximation)\nz = [(x ± 0.5) − n/2] / (√n / 2)\nx = min(จำนวน +, จำนวน -) เสมอ (จึงมักน้อยกว่า n/2 → ใช้ +0.5 continuity correction) → z ที่ได้จากสูตรนี้จึงติดลบเสมอไม่ว่า Ha จะเป็นทิศทางไหน\nกฎตัดสินใจ (one-tailed ด้านซ้าย): reject H0 ถ้า z ≤ −z_critical", "calcTabs": ["dist", "stat", "calc"], "steps": {"given": "n รวม = 102, หนี้ < 3000 = 42 ค่า (-), หนี้ > 3000 = 46 ค่า (+), ส่วนต่าง 102−(42+46)=14 ครอบครัวมีหนี้ = 3000 พอดี (tie) | α = 0.01 | claim: median ≥ 3000", "why": "claim 'at least $3000' คือ median ≥ 3000 มีเครื่องหมาย = รวมอยู่ → claim เป็น H0 → H0: median ≥ 3000, Ha: median < 3000 (one-tailed ด้านซ้าย) ตัด tie (14 ค่า) ทิ้ง เหลือ n ที่ใช้จริง = 42+46 = 88 ซึ่ง > 25 แล้ว จึงต้องเปลี่ยนไปใช้ normal approximation (การประมาณด้วยการแจกแจงปกติ) แทนตาราง binomial โดยตรง เพราะตารางค่าวิกฤต exact ปกติมีให้แค่ n ≤ 25", "substitute": "x = min(42, 46) = 42, n = 88, n/2 = 44, √n/2 = √88/2 = 9.3808/2 = 4.6904\nx = 42 < n/2 = 44 → ใช้ continuity correction +0.5: x+0.5 = 42.5\nz = (42.5 − 44) / 4.6904", "calculate": "z = −1.5 / 4.6904 ≈ −0.32\nค่าวิกฤต one-tailed α=0.01 จากตาราง standard normal distribution: z0 = −2.33", "conclude": "z = −0.32 มากกว่าค่าวิกฤต −2.33 (−0.32 > −2.33) → ไม่เข้าเขต reject → Fail to reject H0: ข้อมูลไม่เพียงพอที่จะปฏิเสธ claim ว่า median หนี้บัตรเครดิตอย่างน้อย $3000"}}, {"prompt": "A marriage counselor estimates that the median age of brides at the time of their first marriage is less than or equal to 26 years. In a random sample of 72 brides, 21 are less than 26 years old, 39 are more than 26 years old, and 12 are 26 years old. At α = 0.05, can you reject the counselor's claim?", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["sign test", "Wilcoxon signed-rank test", "Mann-Whitney U test", "Kruskal-Wallis test"], "correctAnswer": "sign test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["One-Tailed Test", "Two-Tailed Test"], "correctAnswer": "One-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": -1.645, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": -2.19, "tolerance": 0.02, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Reject Null Hypothesis", "uncertain": false}], "formula": "Sign Test — n > 25 (normal approximation)\nz = [(x ± 0.5) − n/2] / (√n / 2)\nx = min(จำนวน +, จำนวน -) เสมอ → z ที่ได้จึงติดลบเสมอ แม้ Ha จะเป็นด้าน 'มากกว่า' ก็ตาม บริเวณ reject ยังคงอยู่ที่ z ≤ −z_critical เสมอ\nกฎตัดสินใจ (one-tailed ด้านขวาของ Ha แต่สถิติทดสอบยังเทียบกับ −z_critical): reject H0 ถ้า z ≤ −z_critical", "calcTabs": ["dist", "stat", "calc"], "steps": {"given": "n รวม = 72, อายุ < 26 = 21 ค่า (-), อายุ > 26 = 39 ค่า (+), อายุ = 26 พอดี = 12 ค่า (tie) | α = 0.05 | claim: median ≤ 26", "why": "claim '≤ 26' มีเครื่องหมาย = รวมอยู่ → claim เป็น H0 → H0: median ≤ 26, Ha: median > 26 (one-tailed ด้านขวา) ตัด tie (12 ค่า) ทิ้ง เหลือ n ที่ใช้จริง = 21+39 = 60 > 25 จึงใช้ normal approximation แทนตาราง binomial โดยตรง ข้อสำคัญ: x ในสูตร sign test นิยามเป็นจำนวนเครื่องหมายฝั่งที่น้อยกว่าเสมอ (ในที่นี้คือฝั่ง -) ไม่ใช่ฝั่งที่สอดคล้องกับทิศทางของ Ha ดังนั้น z ที่คำนวณได้จะติดลบเสมอไม่ว่าโจทย์จะทดสอบทิศทางไหน", "substitute": "x = min(21, 39) = 21, n = 60, n/2 = 30, √n/2 = √60/2 = 7.7460/2 = 3.8730\nx = 21 < n/2 = 30 → continuity correction +0.5: x+0.5 = 21.5\nz = (21.5 − 30) / 3.8730", "calculate": "z = −8.5 / 3.8730 ≈ −2.19\nค่าวิกฤต one-tailed α=0.05 จากตาราง standard normal: z0 = −1.645", "conclude": "z = −2.19 น้อยกว่าหรือเท่ากับค่าวิกฤต −1.645 (−2.19 ≤ −1.645) → เข้าเขต reject → Reject H0: มีหลักฐานเพียงพอที่จะปฏิเสธ claim ของนักให้คำปรึกษาที่ว่า median อายุเจ้าสาวแรกแต่งงาน ≤ 26 ปี"}}, {"prompt": "A labor organization estimates that the median hourly wage of computer systems analysts is $37.06. In a random sample of 41 computer systems analysts, 15 are paid less than $37.06 per hour, 18 are paid more than $37.06 per hour, and 8 are paid $37.06 per hour. At α = 0.05, can you reject the labor organization's claim?", "subs": [{"label": "Identify statistical test", "type": "select", "options": ["sign test", "Wilcoxon signed-rank test", "Mann-Whitney U test", "Kruskal-Wallis test"], "correctAnswer": "sign test", "uncertain": false}, {"label": "Identify type of test", "type": "select", "options": ["One-Tailed Test", "Two-Tailed Test"], "correctAnswer": "Two-Tailed Test", "uncertain": false}, {"label": "Find critical value", "type": "number", "correctAnswer": -1.96, "tolerance": 0.01, "uncertain": false}, {"label": "Find standardized test statistics", "type": "number", "correctAnswer": -0.35, "tolerance": 0.02, "uncertain": false}, {"label": "Make a decision", "type": "select", "options": ["Reject Null Hypothesis", "Fail to reject Null Hypothesis"], "correctAnswer": "Fail to reject Null Hypothesis", "uncertain": false}], "formula": "Sign Test — n > 25 (normal approximation), two-tailed\nz = [(x ± 0.5) − n/2] / (√n / 2)\nα แบ่งครึ่งเป็น α/2 ต่อหาง แต่เนื่องจาก x = min(+, -) เสมอ ค่า z ที่ได้จึงติดลบเสมอ → เทียบกับ −z_(α/2) โดยตรง\nกฎตัดสินใจ: reject H0 ถ้า z ≤ −z_(α/2) (เทียบเท่ากับ |z| ≥ z_(α/2))", "calcTabs": ["dist", "stat", "calc"], "steps": {"given": "n รวม = 41, ค่าจ้าง < 37.06 = 15 ค่า (-), ค่าจ้าง > 37.06 = 18 ค่า (+), ค่าจ้าง = 37.06 พอดี = 8 ค่า (tie) | α = 0.05 | claim: median = 37.06", "why": "claim 'is $37.06' เป็นค่าเท่ากับล้วน ๆ (ไม่มีอสมการ) → claim เป็น H0 → H0: median = 37.06, Ha: median ≠ 37.06 (two-tailed) ตัด tie (8 ค่า) ทิ้ง เหลือ n ที่ใช้จริง = 15+18 = 33 > 25 จึงใช้ normal approximation ในการทดสอบสองทาง (two-tailed) ต้องแบ่ง α เป็น α/2 ต่อหางก่อนหาค่าวิกฤต", "substitute": "x = min(15, 18) = 15, n = 33, n/2 = 16.5, √n/2 = √33/2 = 5.7446/2 = 2.8723\nx = 15 < n/2 = 16.5 → continuity correction +0.5: x+0.5 = 15.5\nz = (15.5 − 16.5) / 2.8723", "calculate": "z = −1 / 2.8723 ≈ −0.35\nค่าวิกฤต two-tailed α=0.05 → α/2 = 0.025 ต่อหาง → z_(α/2) = 1.96 → ค่าวิกฤตด้านลบ = −1.96", "conclude": "|z| = 0.35 น้อยกว่า 1.96 (0.35 < 1.96) → ไม่เข้าเขต reject → Fail to reject H0: ข้อมูลไม่เพียงพอที่จะปฏิเสธ claim ว่า median ค่าจ้างนักวิเคราะห์ระบบคอมพิวเตอร์เท่ากับ $37.06 พอดี"}}];
 const INCLUDE_CALC = true;
 
 function decodeCommonEntities(s){
@@ -828,299 +962,381 @@ function escHtml(str){
   const s = decodeCommonEntities(String(str));
   return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
+
+function sanitizePromptHtml(str){
+  if(str === undefined || str === null) return "";
+  str = String(str);
+  const placeholders = [];
+  let out = str.replace(/<img\b[^>]*>/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = out.replace(/<div class="img-caption">[\s\S]*?<\/div>/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = out.replace(/<\/?(br|table|thead|tbody|tr|td|th|code)\b[^>]*>/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = out.replace(/&nbsp;/gi, (m)=>{
+    placeholders.push(m);
+    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
+  });
+  out = decodeCommonEntities(out);
+  out = out.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  out = out.replace(/\u0000IMG(\d+)\u0000/g, (_, idx)=>placeholders[parseInt(idx)]);
+  return out;
+}
+
+let mode = "exercise";
 let calcCurrentSlotId = null;
+let order = "original";
+let displayIndexes = QUESTIONS.map((q,i)=>i);
+let userAnswers = {};
+let checked = {};
 
-function renderTOC(){
-  const toc = document.getElementById("tocList");
-  toc.innerHTML = "";
-  SECTIONS.forEach((sec, idx)=>{
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    a.href = "#section_"+idx;
-    const hasDiagram = (sec.blocks||[]).some(function(b){ return b.type === "diagram"; });
-    a.textContent = (hasDiagram ? "🔀 " : "") + sec.title;
-    a.dataset.idx = idx;
-    li.appendChild(a);
-    toc.appendChild(li);
-  });
+let timerMode = "stopwatch";
+let timerSeconds = 0;
+let timerLimit = 0;
+let timerInterval = null;
+let timerRunning = false;
+
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
 }
 
-function setupTocPanel(){
-  const panel = document.getElementById("tocPanel");
-  if(panel && window.matchMedia("(max-width:800px)").matches){
-    panel.removeAttribute("open");
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,"0");
+  const s = Math.floor(sec%60).toString().padStart(2,"0");
+  return m+":"+s;
+}
+
+function updateTimerDisplay(){
+  const displaySec = timerMode==="countdown" ? Math.max(timerLimit - timerSeconds, 0) : timerSeconds;
+  document.getElementById("timerDisplay").textContent = formatTime(displaySec);
+  if(timerMode==="countdown" && timerLimit>0 && timerSeconds>=timerLimit){
+    stopTimer();
+    document.getElementById("timerDisplay").textContent = "หมดเวลา";
   }
 }
 
-function escapeXml(s){
-  return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+function startTimer(){
+  if(timerRunning) return;
+  if(timerMode==="countdown"){
+    const mins = parseFloat(document.getElementById("countdownMinutes").value);
+    if(mins>0 && timerLimit===0) timerLimit = mins*60;
+  }
+  timerRunning = true;
+  timerInterval = setInterval(()=>{
+    timerSeconds++;
+    updateTimerDisplay();
+  },1000);
 }
-function mdFormat(s){
-  let t = escapeXml(s);
-  t = t.replace(/`([^`\n]+?)`/g, "<code>$1</code>");
-  t = t.replace(/\*\*([^*\n]+?)\*\*/g, "<strong>$1</strong>");
-  t = t.replace(/\[([^\]\n]+?)\]\(([^)\s]+?)\)/g, "<a href=\"$2\">$1</a>");
-  return t;
+
+function stopTimer(){
+  timerRunning = false;
+  clearInterval(timerInterval);
 }
-function computeReadingTime(){
+
+function resetTimer(){
+  stopTimer();
+  timerSeconds = 0;
+  timerLimit = 0;
+  document.getElementById("countdownMinutes").value = "";
+  updateTimerDisplay();
+}
+
+document.getElementById("timerStartBtn").onclick = startTimer;
+document.getElementById("timerPauseBtn").onclick = stopTimer;
+document.getElementById("timerResetBtn").onclick = resetTimer;
+document.getElementById("timerModeSelect").onchange = (e)=>{
+  timerMode = e.target.value;
+  resetTimer();
+};
+
+function subKey(qIdx, subIdx){
+  return qIdx+"_"+subIdx;
+}
+
+function checkSubAnswer(q, subIdx, value){
+  const sub = q.subs[subIdx];
+  if(sub.type==="number"){
+    const val = parseFloat(value);
+    const tol = sub.tolerance !== undefined ? sub.tolerance : 0.01;
+    return !isNaN(val) && Math.abs(val - sub.correctAnswer) <= tol;
+  }
+  return String(value).trim() === String(sub.correctAnswer).trim();
+}
+
+function questionStatus(qIdx){
+  const q = QUESTIONS[qIdx];
+  const total = q.subs.length;
+  let answeredCount = 0;
+  let correctCount = 0;
+  for(let s=0;s<total;s++){
+    const key = subKey(qIdx,s);
+    if(userAnswers[key] !== undefined && userAnswers[key] !== ""){
+      answeredCount++;
+      if(checked[qIdx] && checkSubAnswer(q,s,userAnswers[key])) correctCount++;
+    }
+  }
+  if(!checked[qIdx]){
+    if(answeredCount===0) return "unanswered";
+    return "partial";
+  }
+  if(correctCount===total) return "correct";
+  return "incorrect";
+}
+
+function renderNavGrid(){
+  const nav = document.getElementById("navGrid");
+  nav.innerHTML = "";
+  displayIndexes.forEach((qIdx, pos)=>{
+    const cell = document.createElement("div");
+    cell.className = "nav-cell";
+    const status = questionStatus(qIdx);
+    if(status==="partial") cell.classList.add("answered");
+    if(status==="correct") cell.classList.add("correct");
+    if(status==="incorrect") cell.classList.add("incorrect");
+    cell.textContent = pos+1;
+    cell.onclick = ()=>{
+      const target = document.getElementById("qcard_"+qIdx);
+      if(target) target.scrollIntoView({behavior:"smooth", block:"start"});
+    };
+    nav.appendChild(cell);
+  });
+}
+
+function calcParkOutsideMain(){
+  const modal = document.getElementById("calcModal");
   const main = document.getElementById("mainArea");
-  const chars = (main.textContent || "").replace(/\s+/g, "").length;
-  return Math.max(1, Math.round(chars / 900));
-}
-function fmtTspans(text, x){
-  return String(text==null?"":text).split("\n").map(function(line,i){
-    return '<tspan x="'+x+'" dy="'+(i===0?0:15)+'">'+escapeXml(line)+'</tspan>';
-  }).join("");
-}
-
-function renderDiagramBlock(block, secIdx, blockIdx){
-  const uid = "dg_"+secIdx+"_"+blockIdx;
-  const layout = block.layout || "lifeline";
-  const actors = block.actors || [];
-  const steps = block.steps || [];
-  const n = actors.length;
-  const W = 680;
-  const margin = 76;
-  const nodesX = [];
-  for(let i=0;i<n;i++){ nodesX.push(n===1 ? W/2 : margin + i*((W-2*margin)/Math.max(1,n-1))); }
-  let inner = "";
-  let H = 0;
-
-  if(layout === "flow"){
-    const boxY = 50, boxH = 46;
-    const boxW = Math.min(128, Math.max(70,(W-2*margin)/Math.max(1,n-1)-14));
-    H = 168;
-    actors.forEach(function(a,i){
-      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+boxY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
-      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(boxY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
-    });
-    steps.forEach(function(st,i){
-      const x1 = nodesX[st.from]+boxW/2+3, x2 = nodesX[st.to]-boxW/2-3;
-      const y = boxY+boxH/2;
-      const pid = uid+"_p"+i, mid = uid+"_m"+i;
-      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
-      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(boxY-12)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
-      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
-             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
-             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
-             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
-             + '</circle>';
-    });
-  } else {
-    const rowH = 64, topY = 12, boxH = 38;
-    H = topY + boxH + steps.length*rowH + 26;
-    const boxW = Math.min(160, Math.max(80,(W-2*margin)/Math.max(1,n-1)-10));
-    actors.forEach(function(a,i){
-      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+topY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
-      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(topY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
-      inner += '<line class="diagram-lifeline" x1="'+nodesX[i]+'" y1="'+(topY+boxH)+'" x2="'+nodesX[i]+'" y2="'+(H-8)+'"></line>';
-    });
-    steps.forEach(function(st,i){
-      const y = topY+boxH+22 + i*rowH;
-      const x1 = nodesX[st.from], x2 = nodesX[st.to];
-      const pid = uid+"_p"+i, mid = uid+"_m"+i;
-      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
-      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(y-9)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
-      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
-             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
-             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
-             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
-             + '</circle>';
-    });
+  if(modal && main.contains(modal)){
+    modal.classList.remove("open");
+    document.body.appendChild(modal);
+    calcCurrentSlotId = null;
   }
-
-  const svg = '<svg class="diagram-svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" preserveAspectRatio="xMidYMid meet">'+inner+'</svg>';
-
-  let stepsHtml = '<ol class="diagram-steps-list">';
-  steps.forEach(function(st,i){
-    stepsHtml += '<li><span class="step-num">'+(i+1)+'</span><strong>'+escapeXml(st.label||"")+'</strong>'+(st.note?(' — '+escapeXml(st.note)):'')+'</li>';
-  });
-  stepsHtml += '</ol>';
-
-  return '<div class="diagram-block" id="'+uid+'">'
-       + '<h4><span>🔀 '+escapeXml(block.title||"")+'</span><button class="diagram-play-btn" data-diagram-id="'+uid+'">&#9654; เล่นแอนิเมชัน / Play animation</button></h4>'
-       + '<div class="diagram-svg-wrap">'+svg+'</div>'
-       + stepsHtml
-       + '</div>';
 }
 
-function diagramPlay(containerId){
-  const wrap = document.getElementById(containerId);
-  if(!wrap) return;
-  const svg = wrap.querySelector('svg');
-  const paths = svg.querySelectorAll('.diagram-arrow-path');
-  const dots = svg.querySelectorAll('.diagram-glow-dot');
-  const items = wrap.querySelectorAll('.diagram-steps-list li');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  items.forEach(function(li){ li.classList.remove('step-active'); });
-  if(reduced){ return; }
-  const stepDur = 850;
-  paths.forEach(function(p){
-    const len = p.getTotalLength();
-    p.style.transition = 'none';
-    p.style.strokeDasharray = len;
-    p.style.strokeDashoffset = len;
-  });
-  void svg.getBoundingClientRect();
-  paths.forEach(function(p,i){
-    setTimeout(function(){
-      p.style.transition = 'stroke-dashoffset '+(stepDur-100)+'ms ease';
-      p.style.strokeDashoffset = 0;
-      const anim = dots[i] ? dots[i].querySelector('animateMotion') : null;
-      if(anim){ try{ anim.beginElement(); }catch(e){} }
-      if(items[i]) items[i].classList.add('step-active');
-    }, i*stepDur);
-  });
+function isFullyCorrect(qIdx){
+  return questionStatus(qIdx) === "correct";
 }
 
-function wireDiagramButtons(){
-  document.querySelectorAll('.diagram-play-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){ diagramPlay(btn.dataset.diagramId); });
+function updateScore(){
+  const scoreBox = document.getElementById("scoreBox");
+  const scoreText = document.getElementById("scoreText");
+  let correctCount = 0;
+  QUESTIONS.forEach((q, qIdx)=>{
+    if(checked[qIdx] && isFullyCorrect(qIdx)) correctCount++;
   });
+  scoreText.textContent = correctCount + "/" + QUESTIONS.length;
+  scoreBox.style.display = "block";
 }
 
-function renderContent(){
+function resetAll(){
+  userAnswers = {};
+  checked = {};
+  render();
+}
+
+document.getElementById("resetAllBtn").addEventListener("click", ()=>{
+  resetAll();
+});
+
+function renderExercise(){
+  calcParkOutsideMain();
   const main = document.getElementById("mainArea");
   main.innerHTML = "";
-  SECTIONS.forEach((sec, idx)=>{
+  displayIndexes.forEach((qIdx, pos)=>{
+    const q = QUESTIONS[qIdx];
+    const isChecked = !!checked[qIdx];
     const card = document.createElement("div");
-    card.className = "section-card";
-    card.id = "section_"+idx;
-    let html = "<h2>"+escapeXml(sec.title)+"</h2>";
-    if(sec.body){
-      html += '<div class="body-text">'+mdFormat(sec.body)+'</div>';
-    }
-    (sec.blocks || []).forEach((block, bi)=>{
-      if(block.type === "note"){
-        html += '<div class="callout callout-note"><span class="callout-title">หมายเหตุ</span>'+mdFormat(block.content)+'</div>';
-      } else if(block.type === "example"){
-        html += '<div class="callout callout-example"><span class="callout-title">ตัวอย่าง</span>'+mdFormat(block.content)+'</div>';
-      } else if(block.type === "warning"){
-        html += '<div class="callout callout-warning"><span class="callout-title">ข้อควรระวัง</span>'+mdFormat(block.content)+'</div>';
-      } else if(block.type === "formula"){
-        html += '<div class="callout callout-formula"><span class="callout-title">'+escapeXml(block.label || "สูตร")+'</span>'+mdFormat(block.content)+'</div>';
-      } else if(block.type === "subheading"){
-        html += '<h3>'+mdFormat(block.content)+'</h3>';
-      } else if(block.type === "table"){
-        html += block.content;
-      } else if(block.type === "image"){
-        html += '<div class="image-block"><img src="'+block.src+'" alt="'+escapeXml(block.alt || "")+'">';
-        if(block.caption){
-          html += '<div class="image-caption">'+escapeXml(block.caption)+'</div>';
-        }
-        html += '</div>';
-      } else if(block.type === "diagram"){
-        html += renderDiagramBlock(block, idx, bi);
+    card.className = "q-card";
+    card.id = "qcard_"+qIdx;
+    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
+    html += '<div class="q-prompt">'+sanitizePromptHtml(q.prompt)+'</div>';
+    q.subs.forEach((sub, subIdx)=>{
+      const key = subKey(qIdx, subIdx);
+      const lockedClass = isChecked ? " locked" : "";
+      let stateClass = "";
+      if(isChecked && userAnswers[key] !== undefined && userAnswers[key] !== ""){
+        stateClass = checkSubAnswer(q, subIdx, userAnswers[key]) ? " correct" : " incorrect";
       }
+      html += '<div class="sub-item'+lockedClass+stateClass+'" id="sitem_'+key+'">';
+      html += '<label>'+escHtml(sub.label)+'</label>';
+      const disabledAttr = isChecked ? "disabled" : "";
+      if(sub.type==="select"){
+        html += '<select data-key="'+key+'" '+disabledAttr+'>';
+        html += '<option value="">-- เลือก --</option>';
+        sub.options.forEach(opt=>{
+          const selectedAttr = userAnswers[key]===opt ? "selected" : "";
+          html += '<option value="'+escHtml(opt)+'" '+selectedAttr+'>'+escHtml(opt)+'</option>';
+        });
+        html += '</select>';
+      } else {
+        const val = userAnswers[key] !== undefined ? userAnswers[key] : "";
+        html += '<input type="text" data-key="'+key+'" placeholder="กรอกคำตอบ" value="'+escHtml(val)+'" '+disabledAttr+'>';
+      }
+      html += '</div>';
     });
+    html += '<div class="footer-actions">';
+    if(!isChecked){
+      html += '<button class="check-btn" data-qidx="'+qIdx+'">ตรวจคำตอบข้อนี้</button>';
+    }
+    if(q.formula){
+      html += '<button class="secondary hint-btn" data-qidx="'+qIdx+'">💡 คำใบ้</button>';
+    }
+    if(INCLUDE_CALC){
+      html += '<button class="secondary calc-open-btn" data-qidx="'+qIdx+'">🧮 เครื่องคิดเลข</button>';
+    }
+    html += '</div>';
+    if(q.formula){
+      html += '<div class="hint-box" id="hintbox_'+qIdx+'" style="display:none">'+escHtml(q.formula)+'</div>';
+    }
+    if(isChecked && !isFullyCorrect(qIdx)){
+      html += '<div class="reveal-box"><span class="reveal-title">เฉลยคำตอบที่ถูกต้อง</span>';
+      q.subs.forEach(sub=>{
+        html += '<div class="reveal-line"><b>'+escHtml(sub.label)+':</b> '+escHtml(sub.correctAnswer)+'</div>';
+      });
+      html += '</div>';
+    }
+    if(INCLUDE_CALC){
+      html += '<div class="calc-slot" id="calcslot_'+qIdx+'"></div>';
+    }
     card.innerHTML = html;
     main.appendChild(card);
   });
 
-  if(window.renderMathInElement){
-    renderMathInElement(main, {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},
-        {left: "$", right: "$", display: false}
-      ]
+  main.querySelectorAll("select,input").forEach(el=>{
+    el.addEventListener("input", (e)=>{
+      const key = e.target.getAttribute("data-key");
+      userAnswers[key] = e.target.value;
+      renderNavGrid();
     });
-  }
-}
-
-function setupScrollSpy(){
-  const links = document.querySelectorAll(".toc-list a");
-  const sections = document.querySelectorAll(".section-card");
-  window.addEventListener("scroll", ()=>{
-    let currentIdx = 0;
-    sections.forEach((sec, idx)=>{
-      const rect = sec.getBoundingClientRect();
-      if(rect.top <= 100) currentIdx = idx;
-    });
-    links.forEach(l=>l.classList.remove("active"));
-    if(links[currentIdx]) links[currentIdx].classList.add("active");
   });
-}
 
-function setupReveal(){
-  const cards = document.querySelectorAll('.section-card');
-  if(!('IntersectionObserver' in window)){
-    cards.forEach(function(c){ c.classList.add('revealed'); });
-    return;
-  }
-  const io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target); }
+  main.querySelectorAll(".check-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = parseInt(e.target.getAttribute("data-qidx"));
+      checked[qIdx] = true;
+      renderExercise();
     });
-  }, {threshold:0.08, rootMargin:'0px 0px -60px 0px'});
-  cards.forEach(function(c){ io.observe(c); });
-}
-
-let fontScale = parseFloat(localStorage.getItem('statsbook_fontScale')||'1');
-function setFontScale(v){
-  fontScale = Math.min(1.3, Math.max(0.85, Math.round(v*10)/10));
-  try{ localStorage.setItem('statsbook_fontScale', fontScale); }catch(e){}
-  document.documentElement.style.setProperty('--fontScale', fontScale);
-}
-
-function updateProgress(){
-  const el = document.documentElement;
-  const max = el.scrollHeight - el.clientHeight;
-  const pct = max>0 ? (el.scrollTop/max*100) : 0;
-  const bar = document.getElementById('readProgress');
-  if(bar) bar.style.width = pct+'%';
-  const btt = document.getElementById('backToTop');
-  if(btt){ if(el.scrollTop>420){ btt.classList.add('show'); } else { btt.classList.remove('show'); } }
-}
-
-renderTOC();
-renderContent();
-setupScrollSpy();
-setupReveal();
-setupTocPanel();
-wireDiagramButtons();
-setFontScale(fontScale);
-const readTimeBadge = document.getElementById('readTimeBadge');
-if(readTimeBadge){ readTimeBadge.textContent = '⏱ ~' + computeReadingTime() + ' นาทีในการอ่าน / min read'; }
-
-window.addEventListener('scroll', updateProgress);
-const backToTopBtn = document.getElementById('backToTop');
-if(backToTopBtn){ backToTopBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); }); }
-const fontMinusBtn = document.getElementById('fontMinus');
-if(fontMinusBtn){ fontMinusBtn.addEventListener('click', function(){ setFontScale(fontScale-0.1); }); }
-const fontPlusBtn = document.getElementById('fontPlus');
-if(fontPlusBtn){ fontPlusBtn.addEventListener('click', function(){ setFontScale(fontScale+0.1); }); }
-
-function systemPrefersDark(){
-  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-}
-function resolvedTheme(t){
-  return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
-}
-function applyTheme(t){
-  if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
-  else { document.documentElement.removeAttribute('data-theme'); }
-  const btn = document.getElementById('themeToggle');
-  if(btn){
-    const r = resolvedTheme(t);
-    btn.textContent = r === 'dark' ? '☀️' : '🌙';
-    btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
-  }
-}
-let bookTheme = 'system';
-try{ bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
-applyTheme(bookTheme);
-const themeToggleBtn = document.getElementById('themeToggle');
-if(themeToggleBtn){
-  themeToggleBtn.addEventListener('click', function(){
-    bookTheme = resolvedTheme(bookTheme) === 'dark' ? 'light' : 'dark';
-    try{ localStorage.setItem('book_theme', bookTheme); }catch(e){}
-    applyTheme(bookTheme);
   });
+
+  main.querySelectorAll(".hint-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = e.target.getAttribute("data-qidx");
+      const box = document.getElementById("hintbox_"+qIdx);
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    });
+  });
+
+  main.querySelectorAll(".calc-open-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      const qIdx = parseInt(e.target.getAttribute("data-qidx"));
+      const tabs = QUESTIONS[qIdx].calcTabs || ["calc"];
+      calcOpenInline(tabs, "calcslot_"+qIdx);
+    });
+  });
+
+  renderNavGrid();
+  updateScore();
 }
 
-if(!INCLUDE_CALC){
-  document.getElementById("calcHeaderBtn").style.display = "none";
+function renderStepList(steps){
+  const stepDefs = [
+    {key:'given', label:'1. โจทย์ให้อะไรมา', cls:''},
+    {key:'why', label:'2. ทำไมต้องใช้สูตร/วิธีนี้', cls:'step-why'},
+    {key:'substitute', label:'3. แทนค่า', cls:''},
+    {key:'calculate', label:'4. คำนวณ', cls:''},
+    {key:'conclude', label:'5. สรุปผล', cls:''}
+  ];
+  let html = '<div class="step-list">';
+  stepDefs.forEach((def, i)=>{
+    const content = steps[def.key];
+    if(!content) return;
+    html += '<div class="step-item '+def.cls+'"><div class="step-num">'+(i+1)+'</div><div class="step-body">';
+    html += '<div class="step-label">'+def.label+'</div>';
+    html += '<div class="step-content">'+escHtml(content)+'</div>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+  return html;
 }
+
+function renderAnswers(){
+  calcParkOutsideMain();
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  let correctTotal = 0;
+  let subTotal = 0;
+  displayIndexes.forEach((qIdx, pos)=>{
+    const q = QUESTIONS[qIdx];
+    const card = document.createElement("div");
+    card.className = "q-card";
+    card.id = "qcard_"+qIdx;
+    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
+    html += '<div class="q-prompt">'+sanitizePromptHtml(q.prompt)+'</div>';
+    q.subs.forEach(sub=>{
+      subTotal++;
+      const blockClass = sub.uncertain ? "answer-block flagged" : "answer-block";
+      html += '<div class="sub-item"><label>'+escHtml(sub.label)+'</label>';
+      html += '<div class="'+blockClass+'">';
+      if(sub.uncertain){
+        html += '<div class="flag-badge">⚠ ไม่มั่นใจ 100%</div><br>';
+      }
+      html += '<strong>คำตอบ:</strong> '+escHtml(sub.correctAnswer);
+      html += '</div></div>';
+    });
+    if(q.formula || q.steps){
+      html += '<div class="explain-block">';
+      html += '<h4>วิธีทำ</h4>';
+      if(q.formula) html += '<div class="formula">'+escHtml(q.formula)+'</div>';
+      if(q.steps && typeof q.steps === "object"){
+        html += renderStepList(q.steps);
+      } else if(q.steps){
+        html += '<div class="steps">'+escHtml(q.steps)+'</div>';
+      }
+      html += '</div>';
+    }
+    card.innerHTML = html;
+    main.appendChild(card);
+  });
+  document.getElementById("scoreBox").style.display = "none";
+  renderNavGrid();
+}
+
+function render(){
+  if(mode==="exercise") renderExercise();
+  else renderAnswers();
+}
+
+document.getElementById("btnExerciseMode").onclick = ()=>{
+  mode = "exercise";
+  document.getElementById("btnExerciseMode").classList.add("active");
+  document.getElementById("btnAnswerMode").classList.remove("active");
+  render();
+};
+document.getElementById("btnAnswerMode").onclick = ()=>{
+  mode = "answer";
+  document.getElementById("btnAnswerMode").classList.add("active");
+  document.getElementById("btnExerciseMode").classList.remove("active");
+  render();
+};
+document.getElementById("orderSelect").onchange = (e)=>{
+  order = e.target.value;
+  displayIndexes = order==="shuffle" ? shuffleArray(QUESTIONS.map((q,i)=>i)) : QUESTIONS.map((q,i)=>i);
+  render();
+};
+
+displayIndexes = QUESTIONS.map((q,i)=>i);
+render();
+updateTimerDisplay();
 
 function erf(x){
   const sign = x<0?-1:1; x=Math.abs(x);
@@ -1245,6 +1461,74 @@ function binomCDF(k,n,p){let s=0;for(let i=0;i<=k;i++) s+=binomPMF(i,n,p);return
 function poissonPMF(k,lambda){return Math.exp(-lambda+k*Math.log(lambda)-gammaln(k+1));}
 function poissonCDF(k,lambda){let s=0;for(let i=0;i<=k;i++) s+=poissonPMF(i,lambda);return s;}
 
+function logChoose(n,k){
+  if(k<0||k>n) return -Infinity;
+  return gammaln(n+1)-gammaln(k+1)-gammaln(n-k+1);
+}
+
+function fPDF(x,d1,d2){
+  if(x<=0) return 0;
+  const lg=gammaln((d1+d2)/2)-gammaln(d1/2)-gammaln(d2/2)
+    +(d1/2)*Math.log(d1/d2)+(d1/2-1)*Math.log(x)
+    -((d1+d2)/2)*Math.log(1+d1*x/d2);
+  return Math.exp(lg);
+}
+function fCDF(x,d1,d2){
+  if(x<=0) return 0;
+  return betai(d1*x/(d1*x+d2), d1/2, d2/2);
+}
+
+function expPDF(x,lambda){return x<0?0:lambda*Math.exp(-lambda*x);}
+function expCDF(x,lambda){return x<0?0:1-Math.exp(-lambda*x);}
+
+function cauchyPDF(x,x0,g){return 1/(Math.PI*g*(1+Math.pow((x-x0)/g,2)));}
+function cauchyCDF(x,x0,g){return 0.5+Math.atan((x-x0)/g)/Math.PI;}
+
+function weibullPDF(x,k,lam){
+  if(x<0) return 0;
+  if(x===0) return k===1?1/lam:0;
+  return (k/lam)*Math.pow(x/lam,k-1)*Math.exp(-Math.pow(x/lam,k));
+}
+function weibullCDF(x,k,lam){return x<0?0:1-Math.exp(-Math.pow(x/lam,k));}
+
+function gammaPDF(x,k,theta){
+  if(x<0) return 0;
+  if(x===0) return k<1?Infinity:(k===1?1/theta:0);
+  return Math.exp((k-1)*Math.log(x)-x/theta-gammaln(k)-k*Math.log(theta));
+}
+function gammaCDF(x,k,theta){return x<=0?0:gammaP(k,x/theta);}
+
+function betaPDF(x,a,b){
+  if(x<=0||x>=1) return 0;
+  return Math.exp((a-1)*Math.log(x)+(b-1)*Math.log(1-x)
+    -(gammaln(a)+gammaln(b)-gammaln(a+b)));
+}
+function betaCDF(x,a,b){return betai(x,a,b);}
+
+function lognormPDF(x,mu,sigma){
+  if(x<=0) return 0;
+  return Math.exp(-Math.pow(Math.log(x)-mu,2)/(2*sigma*sigma))/(x*sigma*Math.sqrt(2*Math.PI));
+}
+function lognormCDF(x,mu,sigma){return x<=0?0:normalCDF(Math.log(x),mu,sigma);}
+
+function logisticPDF(x,mu,s){
+  const z=Math.exp(-(x-mu)/s);
+  return z/(s*Math.pow(1+z,2));
+}
+function logisticCDF(x,mu,s){return 1/(1+Math.exp(-(x-mu)/s));}
+
+function pascalPMF(k,r,p){
+  if(k<r) return 0;
+  return Math.exp(logChoose(k-1,r-1)+r*Math.log(p)+(k-r)*Math.log(1-p));
+}
+function pascalCDF(k,r,p){let s=0;for(let i=0;i<=k;i++) s+=pascalPMF(i,r,p);return s;}
+
+function hyperPMF(k,N,K,n){
+  if(k<Math.max(0,n-(N-K))||k>Math.min(n,K)) return 0;
+  return Math.exp(logChoose(K,k)+logChoose(N-K,n-k)-logChoose(N,n));
+}
+function hyperCDF(k,N,K,n){let s=0;for(let i=0;i<=k;i++) s+=hyperPMF(i,N,K,n);return s;}
+
 const distSelect=document.getElementById('distSelect');
 const distParamsEl=document.getElementById('distParams');
 const modeGroupEl=document.getElementById('modeGroup');
@@ -1300,6 +1584,96 @@ const DIST_DEFS={
     cdf:p=>k=>poissonCDF(k,p.lambda),
     range:p=>[0,Math.max(10,Math.ceil(p.lambda+4*Math.sqrt(p.lambda)+3))],
     formula:'P(x) = e^(−λ)λˣ / x!'
+  },
+  fdist:{
+    label:'F-Distribution',
+    params:[{id:'d1',label:'d₁ (num df)',def:5},{id:'d2',label:'d₂ (den df)',def:10}],
+    continuous:true,
+    pdf:p=>x=>fPDF(x,p.d1,p.d2),
+    cdf:p=>x=>fCDF(x,p.d1,p.d2),
+    range:p=>[0,Math.max(4,invCDF(x=>fCDF(x,p.d1,p.d2),0.995,0,10000))],
+    formula:'F = s₁²/s₂²  (df₁ = n₁−1, df₂ = n₂−1)\nCDF: I[d₁x/(d₁x+d₂)](d₁/2, d₂/2)'
+  },
+  exponential:{
+    label:'Exponential',
+    params:[{id:'lambda',label:'λ (rate)',def:1}],
+    continuous:true,
+    pdf:p=>x=>expPDF(x,p.lambda),
+    cdf:p=>x=>expCDF(x,p.lambda),
+    range:p=>[0,-Math.log(0.005)/p.lambda],
+    formula:'PDF: f(x) = λe^(−λx) , x ≥ 0\nCDF: F(x) = 1 − e^(−λx) , μ = 1/λ , σ = 1/λ'
+  },
+  cauchy:{
+    label:'Cauchy',
+    params:[{id:'x0',label:'x₀ (location)',def:0},{id:'g',label:'γ (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>cauchyPDF(x,p.x0,p.g),
+    cdf:p=>x=>cauchyCDF(x,p.x0,p.g),
+    range:p=>[p.x0-10*p.g,p.x0+10*p.g],
+    formula:'PDF: f(x) = 1/{πγ[1+((x−x₀)/γ)²]}\nCDF: F(x) = ½ + arctan((x−x₀)/γ)/π  (ไม่มีค่าเฉลี่ย/ความแปรปรวน)'
+  },
+  weibull:{
+    label:'Weibull',
+    params:[{id:'k',label:'k (shape)',def:2},{id:'lam',label:'λ (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>weibullPDF(x,p.k,p.lam),
+    cdf:p=>x=>weibullCDF(x,p.k,p.lam),
+    range:p=>[0,p.lam*Math.pow(-Math.log(0.005),1/p.k)],
+    formula:'PDF: f(x) = (k/λ)(x/λ)^(k−1)·e^(−(x/λ)^k) , x ≥ 0\nCDF: F(x) = 1 − e^(−(x/λ)^k)'
+  },
+  gammadist:{
+    label:'Gamma',
+    params:[{id:'k',label:'k (shape)',def:2},{id:'theta',label:'θ (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>gammaPDF(x,p.k,p.theta),
+    cdf:p=>x=>gammaCDF(x,p.k,p.theta),
+    range:p=>[0,p.theta*(p.k+5*Math.sqrt(p.k)+5)],
+    formula:'PDF: f(x) = x^(k−1)·e^(−x/θ) / [Γ(k)·θ^k] , x ≥ 0\nμ = kθ , σ² = kθ²'
+  },
+  betadist:{
+    label:'Beta',
+    params:[{id:'a',label:'α',def:2},{id:'b',label:'β',def:5}],
+    continuous:true,
+    pdf:p=>x=>betaPDF(x,p.a,p.b),
+    cdf:p=>x=>betaCDF(x,p.a,p.b),
+    range:p=>[0,1],
+    formula:'PDF: f(x) = x^(α−1)(1−x)^(β−1) / B(α,β) , 0 < x < 1\nμ = α/(α+β)'
+  },
+  lognormal:{
+    label:'Log-Normal',
+    params:[{id:'mu',label:'μ (of ln x)',def:0},{id:'sigma',label:'σ (of ln x)',def:1}],
+    continuous:true,
+    pdf:p=>x=>lognormPDF(x,p.mu,p.sigma),
+    cdf:p=>x=>lognormCDF(x,p.mu,p.sigma),
+    range:p=>[0,Math.exp(p.mu+3*p.sigma)],
+    formula:'ถ้า ln X ~ Normal(μ, σ²)\nPDF: f(x) = e^(−(ln x − μ)²/2σ²) / (xσ√2π) , x > 0'
+  },
+  logistic:{
+    label:'Logistic',
+    params:[{id:'mu',label:'μ',def:0},{id:'s',label:'s (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>logisticPDF(x,p.mu,p.s),
+    cdf:p=>x=>logisticCDF(x,p.mu,p.s),
+    range:p=>[p.mu-8*p.s,p.mu+8*p.s],
+    formula:'CDF: F(x) = 1/(1 + e^(−(x−μ)/s))\nPDF: f(x) = e^(−z)/[s(1+e^(−z))²] , z = (x−μ)/s'
+  },
+  pascal:{
+    label:'Pascal (Negative Binomial)',
+    params:[{id:'r',label:'r (successes)',def:3},{id:'p',label:'p',def:0.5}],
+    continuous:false,
+    pmf:p=>k=>pascalPMF(k,p.r,p.p),
+    cdf:p=>k=>pascalCDF(k,p.r,p.p),
+    range:p=>[0,Math.max(p.r+5,Math.ceil(p.r/p.p+4*Math.sqrt(p.r*(1-p.p))/p.p+3))],
+    formula:'X = จำนวนครั้งที่ทดลองจนได้สำเร็จครบ r ครั้ง (x ≥ r)\nP(x) = C(x−1, r−1)·p^r·(1−p)^(x−r) , μ = r/p'
+  },
+  hypergeometric:{
+    label:'Hypergeometric',
+    params:[{id:'N',label:'N (population)',def:50},{id:'K',label:'K (successes)',def:20},{id:'n',label:'n (draws)',def:10}],
+    continuous:false,
+    pmf:p=>k=>hyperPMF(k,p.N,p.K,p.n),
+    cdf:p=>k=>hyperCDF(k,p.N,p.K,p.n),
+    range:p=>[0,Math.min(p.n,p.K)],
+    formula:'P(x) = C(K,x)·C(N−K, n−x) / C(N,n)\nμ = nK/N  (สุ่มแบบไม่ใส่คืน)'
   }
 };
 
@@ -1958,7 +2332,8 @@ document.getElementById('computeStat').addEventListener('click',()=>{
 
 function statLine(label,val){
   return `<div class="line"><span>${label}</span><span>${(+val).toFixed(6)}</span></div>`;
-}function statText(label,val){
+}
+function statText(label,val){
   return `<div class="line"><span>${label}</span><span>${escHtml(val)}</span></div>`;
 }
 function decisionTag(reject){
@@ -2116,11 +2491,6 @@ document.querySelectorAll('#calcModal .tabbtn').forEach(btn=>{
 document.getElementById("calcModalClose").addEventListener("click", ()=>{
   document.getElementById("calcModal").classList.remove("open");
   calcCurrentSlotId = null;
-});
-
-
-document.getElementById("calcHeaderBtn").addEventListener("click", ()=>{
-  calcOpenInline(["dist","stat","calc"], "calcslot_sidebar");
 });
 
 function fracGCD(a,b){
