@@ -986,6 +986,7 @@ function sanitizePromptHtml(str){
     placeholders.push(m);
     return "\u0000IMG"+(placeholders.length-1)+"\u0000";
   });
+  out = out.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,"&");
   out = out.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   out = out.replace(/\u0000IMG(\d+)\u0000/g, (_, idx)=>placeholders[parseInt(idx)]);
   return out;
