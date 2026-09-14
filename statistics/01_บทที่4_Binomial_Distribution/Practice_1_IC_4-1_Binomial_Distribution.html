@@ -733,11 +733,25 @@ main{flex:1;min-width:0;}
         <div class="field">
           <label>Distribution</label>
           <select id="distSelect">
-            <option value="normal">Normal</option>
-            <option value="student">Student (t)</option>
-            <option value="chisq">Chi-Squared</option>
-            <option value="binomial">Binomial</option>
-            <option value="poisson">Poisson</option>
+            <optgroup label="Continuous">
+              <option value="normal">Normal</option>
+              <option value="student">Student (t)</option>
+              <option value="chisq">Chi-Squared</option>
+              <option value="fdist">F-Distribution</option>
+              <option value="exponential">Exponential</option>
+              <option value="cauchy">Cauchy</option>
+              <option value="weibull">Weibull</option>
+              <option value="gammadist">Gamma</option>
+              <option value="betadist">Beta</option>
+              <option value="lognormal">Log-Normal</option>
+              <option value="logistic">Logistic</option>
+            </optgroup>
+            <optgroup label="Discrete">
+              <option value="binomial">Binomial</option>
+              <option value="pascal">Pascal (Negative Binomial)</option>
+              <option value="poisson">Poisson</option>
+              <option value="hypergeometric">Hypergeometric</option>
+            </optgroup>
           </select>
         </div>
         <div id="distParams" class="row" style="margin-bottom:0"></div>
@@ -1709,6 +1723,74 @@ function binomCDF(k,n,p){let s=0;for(let i=0;i<=k;i++) s+=binomPMF(i,n,p);return
 function poissonPMF(k,lambda){return Math.exp(-lambda+k*Math.log(lambda)-gammaln(k+1));}
 function poissonCDF(k,lambda){let s=0;for(let i=0;i<=k;i++) s+=poissonPMF(i,lambda);return s;}
 
+function logChoose(n,k){
+  if(k<0||k>n) return -Infinity;
+  return gammaln(n+1)-gammaln(k+1)-gammaln(n-k+1);
+}
+
+function fPDF(x,d1,d2){
+  if(x<=0) return 0;
+  const lg=gammaln((d1+d2)/2)-gammaln(d1/2)-gammaln(d2/2)
+    +(d1/2)*Math.log(d1/d2)+(d1/2-1)*Math.log(x)
+    -((d1+d2)/2)*Math.log(1+d1*x/d2);
+  return Math.exp(lg);
+}
+function fCDF(x,d1,d2){
+  if(x<=0) return 0;
+  return betai(d1*x/(d1*x+d2), d1/2, d2/2);
+}
+
+function expPDF(x,lambda){return x<0?0:lambda*Math.exp(-lambda*x);}
+function expCDF(x,lambda){return x<0?0:1-Math.exp(-lambda*x);}
+
+function cauchyPDF(x,x0,g){return 1/(Math.PI*g*(1+Math.pow((x-x0)/g,2)));}
+function cauchyCDF(x,x0,g){return 0.5+Math.atan((x-x0)/g)/Math.PI;}
+
+function weibullPDF(x,k,lam){
+  if(x<0) return 0;
+  if(x===0) return k===1?1/lam:0;
+  return (k/lam)*Math.pow(x/lam,k-1)*Math.exp(-Math.pow(x/lam,k));
+}
+function weibullCDF(x,k,lam){return x<0?0:1-Math.exp(-Math.pow(x/lam,k));}
+
+function gammaPDF(x,k,theta){
+  if(x<0) return 0;
+  if(x===0) return k<1?Infinity:(k===1?1/theta:0);
+  return Math.exp((k-1)*Math.log(x)-x/theta-gammaln(k)-k*Math.log(theta));
+}
+function gammaCDF(x,k,theta){return x<=0?0:gammaP(k,x/theta);}
+
+function betaPDF(x,a,b){
+  if(x<=0||x>=1) return 0;
+  return Math.exp((a-1)*Math.log(x)+(b-1)*Math.log(1-x)
+    -(gammaln(a)+gammaln(b)-gammaln(a+b)));
+}
+function betaCDF(x,a,b){return betai(x,a,b);}
+
+function lognormPDF(x,mu,sigma){
+  if(x<=0) return 0;
+  return Math.exp(-Math.pow(Math.log(x)-mu,2)/(2*sigma*sigma))/(x*sigma*Math.sqrt(2*Math.PI));
+}
+function lognormCDF(x,mu,sigma){return x<=0?0:normalCDF(Math.log(x),mu,sigma);}
+
+function logisticPDF(x,mu,s){
+  const z=Math.exp(-(x-mu)/s);
+  return z/(s*Math.pow(1+z,2));
+}
+function logisticCDF(x,mu,s){return 1/(1+Math.exp(-(x-mu)/s));}
+
+function pascalPMF(k,r,p){
+  if(k<r) return 0;
+  return Math.exp(logChoose(k-1,r-1)+r*Math.log(p)+(k-r)*Math.log(1-p));
+}
+function pascalCDF(k,r,p){let s=0;for(let i=0;i<=k;i++) s+=pascalPMF(i,r,p);return s;}
+
+function hyperPMF(k,N,K,n){
+  if(k<Math.max(0,n-(N-K))||k>Math.min(n,K)) return 0;
+  return Math.exp(logChoose(K,k)+logChoose(N-K,n-k)-logChoose(N,n));
+}
+function hyperCDF(k,N,K,n){let s=0;for(let i=0;i<=k;i++) s+=hyperPMF(i,N,K,n);return s;}
+
 const distSelect=document.getElementById('distSelect');
 const distParamsEl=document.getElementById('distParams');
 const modeGroupEl=document.getElementById('modeGroup');
@@ -1764,6 +1846,96 @@ const DIST_DEFS={
     cdf:p=>k=>poissonCDF(k,p.lambda),
     range:p=>[0,Math.max(10,Math.ceil(p.lambda+4*Math.sqrt(p.lambda)+3))],
     formula:'P(x) = e^(−λ)λˣ / x!'
+  },
+  fdist:{
+    label:'F-Distribution',
+    params:[{id:'d1',label:'d₁ (num df)',def:5},{id:'d2',label:'d₂ (den df)',def:10}],
+    continuous:true,
+    pdf:p=>x=>fPDF(x,p.d1,p.d2),
+    cdf:p=>x=>fCDF(x,p.d1,p.d2),
+    range:p=>[0,Math.max(4,invCDF(x=>fCDF(x,p.d1,p.d2),0.995,0,10000))],
+    formula:'F = s₁²/s₂²  (df₁ = n₁−1, df₂ = n₂−1)\nCDF: I[d₁x/(d₁x+d₂)](d₁/2, d₂/2)'
+  },
+  exponential:{
+    label:'Exponential',
+    params:[{id:'lambda',label:'λ (rate)',def:1}],
+    continuous:true,
+    pdf:p=>x=>expPDF(x,p.lambda),
+    cdf:p=>x=>expCDF(x,p.lambda),
+    range:p=>[0,-Math.log(0.005)/p.lambda],
+    formula:'PDF: f(x) = λe^(−λx) , x ≥ 0\nCDF: F(x) = 1 − e^(−λx) , μ = 1/λ , σ = 1/λ'
+  },
+  cauchy:{
+    label:'Cauchy',
+    params:[{id:'x0',label:'x₀ (location)',def:0},{id:'g',label:'γ (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>cauchyPDF(x,p.x0,p.g),
+    cdf:p=>x=>cauchyCDF(x,p.x0,p.g),
+    range:p=>[p.x0-10*p.g,p.x0+10*p.g],
+    formula:'PDF: f(x) = 1/{πγ[1+((x−x₀)/γ)²]}\nCDF: F(x) = ½ + arctan((x−x₀)/γ)/π  (ไม่มีค่าเฉลี่ย/ความแปรปรวน)'
+  },
+  weibull:{
+    label:'Weibull',
+    params:[{id:'k',label:'k (shape)',def:2},{id:'lam',label:'λ (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>weibullPDF(x,p.k,p.lam),
+    cdf:p=>x=>weibullCDF(x,p.k,p.lam),
+    range:p=>[0,p.lam*Math.pow(-Math.log(0.005),1/p.k)],
+    formula:'PDF: f(x) = (k/λ)(x/λ)^(k−1)·e^(−(x/λ)^k) , x ≥ 0\nCDF: F(x) = 1 − e^(−(x/λ)^k)'
+  },
+  gammadist:{
+    label:'Gamma',
+    params:[{id:'k',label:'k (shape)',def:2},{id:'theta',label:'θ (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>gammaPDF(x,p.k,p.theta),
+    cdf:p=>x=>gammaCDF(x,p.k,p.theta),
+    range:p=>[0,p.theta*(p.k+5*Math.sqrt(p.k)+5)],
+    formula:'PDF: f(x) = x^(k−1)·e^(−x/θ) / [Γ(k)·θ^k] , x ≥ 0\nμ = kθ , σ² = kθ²'
+  },
+  betadist:{
+    label:'Beta',
+    params:[{id:'a',label:'α',def:2},{id:'b',label:'β',def:5}],
+    continuous:true,
+    pdf:p=>x=>betaPDF(x,p.a,p.b),
+    cdf:p=>x=>betaCDF(x,p.a,p.b),
+    range:p=>[0,1],
+    formula:'PDF: f(x) = x^(α−1)(1−x)^(β−1) / B(α,β) , 0 < x < 1\nμ = α/(α+β)'
+  },
+  lognormal:{
+    label:'Log-Normal',
+    params:[{id:'mu',label:'μ (of ln x)',def:0},{id:'sigma',label:'σ (of ln x)',def:1}],
+    continuous:true,
+    pdf:p=>x=>lognormPDF(x,p.mu,p.sigma),
+    cdf:p=>x=>lognormCDF(x,p.mu,p.sigma),
+    range:p=>[0,Math.exp(p.mu+3*p.sigma)],
+    formula:'ถ้า ln X ~ Normal(μ, σ²)\nPDF: f(x) = e^(−(ln x − μ)²/2σ²) / (xσ√2π) , x > 0'
+  },
+  logistic:{
+    label:'Logistic',
+    params:[{id:'mu',label:'μ',def:0},{id:'s',label:'s (scale)',def:1}],
+    continuous:true,
+    pdf:p=>x=>logisticPDF(x,p.mu,p.s),
+    cdf:p=>x=>logisticCDF(x,p.mu,p.s),
+    range:p=>[p.mu-8*p.s,p.mu+8*p.s],
+    formula:'CDF: F(x) = 1/(1 + e^(−(x−μ)/s))\nPDF: f(x) = e^(−z)/[s(1+e^(−z))²] , z = (x−μ)/s'
+  },
+  pascal:{
+    label:'Pascal (Negative Binomial)',
+    params:[{id:'r',label:'r (successes)',def:3},{id:'p',label:'p',def:0.5}],
+    continuous:false,
+    pmf:p=>k=>pascalPMF(k,p.r,p.p),
+    cdf:p=>k=>pascalCDF(k,p.r,p.p),
+    range:p=>[0,Math.max(p.r+5,Math.ceil(p.r/p.p+4*Math.sqrt(p.r*(1-p.p))/p.p+3))],
+    formula:'X = จำนวนครั้งที่ทดลองจนได้สำเร็จครบ r ครั้ง (x ≥ r)\nP(x) = C(x−1, r−1)·p^r·(1−p)^(x−r) , μ = r/p'
+  },
+  hypergeometric:{
+    label:'Hypergeometric',
+    params:[{id:'N',label:'N (population)',def:50},{id:'K',label:'K (successes)',def:20},{id:'n',label:'n (draws)',def:10}],
+    continuous:false,
+    pmf:p=>k=>hyperPMF(k,p.N,p.K,p.n),
+    cdf:p=>k=>hyperCDF(k,p.N,p.K,p.n),
+    range:p=>[0,Math.min(p.n,p.K)],
+    formula:'P(x) = C(K,x)·C(N−K, n−x) / C(N,n)\nμ = nK/N  (สุ่มแบบไม่ใส่คืน)'
   }
 };
 
