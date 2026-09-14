@@ -103,6 +103,24 @@ a.item .tag.summary{background:#2B6CB0;}
 a.item .tag.quiz{background:var(--flag);}
 a.item .tag.exam{background:#B3341F;}
 a.item .label{font-size:14.5px;}
+.eq-table-card{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:var(--flag-soft);
+  border:1.5px solid var(--flag);
+  border-radius:8px;
+  padding:14px 18px;
+  margin-bottom:18px;
+  text-decoration:none;
+  color:var(--text);
+}
+.eq-table-card:hover{background:var(--panel);}
+.eq-table-card .icon{font-size:26px;flex-shrink:0;}
+.eq-table-card .title{font-weight:700;font-size:15px;color:var(--navy-deep);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .eq-table-card .title{color:var(--flag);}}
+:root[data-theme="dark"] .eq-table-card .title{color:var(--flag);}
+.eq-table-card .desc{font-size:12.5px;color:var(--text-soft);margin-top:2px;}
 </style>
 </head>
 <body>
@@ -115,6 +133,14 @@ a.item .label{font-size:14.5px;}
 </header>
 
 <div class="wrap">
+
+  <a class="eq-table-card" href="EQ_TABLE.pdf" target="_blank" rel="noopener">
+    <div class="icon">📋</div>
+    <div>
+      <div class="title">ตารางสูตรและตารางสถิติ (EQ Table) — เปิดในแท็บใหม่</div>
+      <div class="desc">สูตรรวมทุกบท + Table 4 Standard Normal (Z), Table 5 t-Distribution, Table 6 Chi-Square, Table 7 F-Distribution, Table 8 Sign Test, Table 9 Wilcoxon Signed-Rank, Table 10 Spearman, Table 11 Pearson — ใช้อ้างอิงตอนทำโจทย์และสอบ</div>
+    </div>
+  </a>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 4</span><h2>Binomial Distribution</h2></div>
@@ -165,6 +191,7 @@ a.item .label{font-size:14.5px;}
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 8</span><h2>Difference of Means &amp; Proportions</h2></div>
     <div class="items">
+      <a class="item" href="06_บทที่8_Difference_of_Means_and_Proportions/สรุปบทเรียน_Two_Sample_Hypothesis_Testing_บทที่8.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 8 — การทดสอบสมมติฐานสองประชากร (z/t independent, paired t, two-proportion)</span></a>
       <a class="item" href="06_บทที่8_Difference_of_Means_and_Proportions/(STATICS)Practice_by_CLaude_IC_Quiz_8.1-8.4.html"><span class="tag quiz">Quiz</span><span class="label">Quiz 8: Testing the Difference Between Means &amp; Proportions (รวม 4 ชุด)</span></a>
     </div>
   </div>
@@ -180,6 +207,7 @@ a.item .label{font-size:14.5px;}
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 10</span><h2>Chi-Square Tests</h2></div>
     <div class="items">
+      <a class="item" href="08_บทที่10_Chi_Square_Tests/สรุปบทเรียน_Chi_Square_Tests_บทที่10.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 10 — Chi-Square: Goodness-of-fit, Independence, RR/OR, Simpson's Paradox, Fisher's Exact Test</span></a>
       <a class="item" href="08_บทที่10_Chi_Square_Tests/(STATICS)Chi-Square_Tests_Quiz_บทที่_10.html"><span class="tag quiz">Quiz</span><span class="label">แบบฝึกหัด Chi-Square Tests (บทที่ 10)</span></a>
     </div>
   </div>
