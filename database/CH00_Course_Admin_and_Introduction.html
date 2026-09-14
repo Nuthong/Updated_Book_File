@@ -520,12 +520,19 @@ table tr:nth-child(even) td{background:#F4F2E8;}
 .section-card .body-text{font-size:calc(14.5px * var(--fontScale)) !important;}
 .section-card h2{font-size:calc(18px * var(--fontScale)) !important;}
 .section-card h3{font-size:calc(15px * var(--fontScale)) !important;}
-.callout{font-size:calc(14px * var(--fontScale)) !important;}
+.callout{font-size:calc(14px * var(--fontScale)) !important; white-space:pre-wrap;}
 table{font-size:calc(13.5px * var(--fontScale)) !important;}
 .callout-note .callout-title::before{content:"📝 ";}
 .callout-example .callout-title::before{content:"💡 ";}
 .callout-warning .callout-title::before{content:"⚠️ ";}
 .callout-formula .callout-title::before{content:"∑ ";}
+.code-block{
+  display:block;margin:10px 0;padding:12px 14px;background:var(--navy-deep);color:#EAF1FA;
+  border-radius:6px;overflow-x:auto;font-family:'JetBrains Mono',monospace;
+  font-size:calc(12.5px * var(--fontScale));line-height:1.6;white-space:pre;
+}
+.code-block code{font-family:inherit;background:none;padding:0;color:inherit;}
+@media print{.code-block{white-space:pre-wrap;word-break:break-word;}}
 
 .diagram-block{margin:20px 0;padding:16px 18px 14px;background:var(--diagram-bg);border:1px solid var(--border);border-radius:8px;}
 .diagram-block h4{margin:0 0 12px 0;font-size:calc(14.5px * var(--fontScale));color:var(--navy-deep);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
@@ -866,14 +873,25 @@ function setupTocPanel(){
   }
 }
 
+function decodeCommonEntities(s){
+  return s.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,"&");
+}
 function escapeXml(s){
-  return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const decoded = decodeCommonEntities(String(s==null?"":s));
+  return decoded.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 function mdFormat(s){
-  let t = escapeXml(s);
+  const str = String(s==null?"":s);
+  const codeBlocks = [];
+  let t = str.replace(/```[a-zA-Z0-9]*\n([\s\S]*?)```/g, function(_, code){
+    codeBlocks.push('<pre class="code-block"><code>'+escapeXml(code.replace(/\n$/,""))+'</code></pre>');
+    return " CODEBLOCK"+(codeBlocks.length-1)+" ";
+  });
+  t = escapeXml(t);
   t = t.replace(/`([^`\n]+?)`/g, "<code>$1</code>");
   t = t.replace(/\*\*([^*\n]+?)\*\*/g, "<strong>$1</strong>");
   t = t.replace(/\[([^\]\n]+?)\]\(([^)\s]+?)\)/g, "<a href=\"$2\">$1</a>");
+  t = t.replace(/ CODEBLOCK(\d+) /g, function(_, idx){ return codeBlocks[parseInt(idx)]; });
   return t;
 }
 function computeReadingTime(){
