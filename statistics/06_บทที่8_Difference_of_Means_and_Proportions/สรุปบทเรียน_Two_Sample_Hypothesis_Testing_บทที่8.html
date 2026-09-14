@@ -3,9 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>บทที่ 8 · การทดสอบสมมติฐาน: สองประชากร</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<title>IC Quiz 10-2: F-test</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 <style>
 :root{
   --paper:#F6F4EE;
@@ -64,55 +67,22 @@ header h1{
   color:#F2EFE6;
   font-weight:700;
 }
-.mode-toggle{
-  display:flex;
-  border:1px solid rgba(242,239,230,0.4);
-  border-radius:6px;
-  overflow:hidden;
-  background:rgba(242,239,230,0.08);
+header .subtitle{
+  font-size:12.5px;
+  color:#C9C2AE;
+  margin-top:2px;
 }
-.mode-toggle button{
-  border:none;
-  background:transparent;
-  color:#F2EFE6;
-  padding:8px 16px;
-  cursor:pointer;
-  font-size:14px;
-  font-family:'Sarabun',sans-serif;
-}
-.mode-toggle button.active{
-  background:var(--flag);
-  color:#1B1300;
-  font-weight:700;
-}
-.toolbar{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.toolbar select, .toolbar button{
-  border:1.5px solid var(--border);
-  background:#FFFFFF;
+.header-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.header-actions button{
+  border:1.5px solid rgba(242,239,230,0.5);
+  background:rgba(255,255,255,0.9);
+  color:var(--navy);
+  padding:8px 14px;
   border-radius:4px;
-  padding:6px 10px;
   font-size:13px;
-  color:var(--text);
   cursor:pointer;
   font-family:'Sarabun',sans-serif;
-}
-.timer-box{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  border:1.5px solid rgba(242,239,230,0.4);
-  border-radius:4px;
-  padding:6px 10px;
-  background:rgba(255,255,255,0.95);
-  font-variant-numeric:tabular-nums;
-  font-family:'JetBrains Mono',monospace;
-  font-size:14px;
-  color:var(--navy-deep);
+  font-weight:600;
 }
 .layout{
   display:flex;
@@ -121,10 +91,7 @@ header h1{
   gap:20px;
   padding:20px;
 }
-.sidebar{
-  width:220px;
-  flex-shrink:0;
-}
+.sidebar{width:250px;flex-shrink:0;}
 .sidebar-panel{
   background:var(--panel);
   border:1px solid var(--border);
@@ -133,6 +100,8 @@ header h1{
   position:sticky;
   top:80px;
   box-shadow:0 2px 8px rgba(15,39,64,0.06);
+  max-height:calc(100vh - 100px);
+  overflow-y:auto;
 }
 .sidebar-panel h3{
   font-family:'JetBrains Mono',monospace;
@@ -143,48 +112,22 @@ header h1{
   margin:0 0 10px 0;
   font-weight:600;
 }
-.nav-grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:6px;
-}
-.nav-cell{
-  aspect-ratio:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.toc-list{list-style:none;margin:0;padding:0;}
+.toc-list li{margin-bottom:2px;}
+.toc-list a{
+  display:block;
+  padding:7px 10px;
   border-radius:4px;
-  border:1.5px solid var(--border);
-  background:#ffffff;
-  color:var(--text-soft);
-  font-family:'JetBrains Mono',monospace;
-  font-size:12px;
-  cursor:pointer;
-}
-.nav-cell:hover{border-color:var(--navy);}
-.nav-cell.current{outline:2px solid var(--navy);}
-.nav-cell.answered{background:var(--accent-soft);color:var(--accent2);border-color:var(--accent2);}
-.nav-cell.correct{background:var(--correct-soft);color:var(--correct);border-color:var(--correct);}
-.nav-cell.incorrect{background:var(--incorrect-soft);color:var(--incorrect);border-color:var(--incorrect);}
-.legend{
-  margin-top:12px;
-  font-size:11px;
-  color:var(--text-soft);
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-.legend span{display:inline-flex;align-items:center;gap:6px;}
-.dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
-.score-box{
-  margin-top:14px;
-  padding-top:14px;
-  border-top:1px solid var(--border);
+  color:var(--text);
+  text-decoration:none;
   font-size:13px;
+  border-left:3px solid transparent;
 }
-.score-box .big{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--navy);}
+.toc-list a:hover{background:var(--accent-soft);color:var(--accent2);}
+.toc-list a.active{background:var(--accent-soft);color:var(--navy);border-left:3px solid var(--navy);font-weight:600;}
+.toc-list .toc-sub a{padding-left:22px;font-size:12.5px;color:var(--text-soft);}
 main{flex:1;min-width:0;}
-.q-card{
+.lesson-header{
   background:var(--panel);
   border:1px solid var(--border);
   border-left:4px solid var(--navy);
@@ -193,94 +136,87 @@ main{flex:1;min-width:0;}
   margin-bottom:18px;
   box-shadow:0 2px 10px rgba(15,39,64,0.06);
 }
-.q-card .q-index{
-  font-family:'JetBrains Mono',monospace;
-  font-size:12px;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  color:var(--text-soft);
-  margin-bottom:6px;
+.lesson-header h2{margin:0 0 8px 0;font-size:20px;color:var(--navy-deep);}
+.lesson-header p{margin:0;color:var(--text-soft);font-size:14px;line-height:1.7;}
+.section-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-left:4px solid var(--navy);
+  border-radius:6px;
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:0 2px 10px rgba(15,39,64,0.06);
+  scroll-margin-top:80px;
 }
-.q-card .q-prompt{
+.section-card h2{
+  margin:0 0 14px 0;
+  font-size:18px;
+  color:var(--navy-deep);
+  padding-bottom:10px;
+  border-bottom:2px solid var(--border);
+}
+.section-card h3{
   font-size:15px;
-  margin-bottom:14px;
-  white-space:pre-wrap;
-  line-height:1.6;
+  color:var(--navy);
+  margin:20px 0 10px 0;
 }
-.q-card .q-prompt img{
+.section-card .body-text{
+  font-size:14.5px;
+  line-height:1.9;
+  white-space:pre-wrap;
+}
+.callout{
+  margin:16px 0;
+  padding:14px 16px;
+  border-radius:6px;
+  border-left:4px solid;
+  font-size:14px;
+  line-height:1.8;
+}
+.callout-note{background:var(--accent-soft);border-color:var(--accent2);}
+.callout-example{background:#F4F2E8;border-color:var(--flag);}
+.callout-warning{background:var(--incorrect-soft);border-color:var(--incorrect);}
+.callout-formula{
+  background:var(--navy-deep);
+  color:#EAF1FA;
+  border-color:var(--flag);
+  font-family:'JetBrains Mono',monospace;
+  overflow-x:auto;
+}
+.callout-title{
+  font-weight:700;
+  font-size:12.5px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:8px;
   display:block;
+}
+.callout-note .callout-title{color:var(--accent2);}
+.callout-example .callout-title{color:var(--flag);}
+.callout-warning .callout-title{color:var(--incorrect);}
+.callout-formula .callout-title{color:#C9DCF0;}
+.image-block{
+  margin:18px 0;
+  text-align:center;
+}
+.image-block img{
   max-width:100%;
   height:auto;
   border-radius:6px;
   border:1px solid var(--border);
-  margin:12px 0;
+  box-shadow:0 2px 10px rgba(15,39,64,0.08);
 }
-.q-card .q-prompt .img-caption{
+.image-block .image-caption{
   font-size:12.5px;
   color:var(--text-soft);
-  text-align:center;
-  margin-top:-6px;
-  margin-bottom:12px;
+  margin-top:8px;
   font-style:italic;
 }
-.sub-item{margin-bottom:14px;}
-.sub-item label{display:block;font-size:13px;color:var(--text-soft);margin-bottom:6px;font-weight:600;}
-.sub-item select, .sub-item input[type=text]{
-  width:100%;
-  max-width:360px;
-  padding:9px 10px;
-  border:1.5px solid var(--border);
-  border-radius:4px;
-  font-size:14px;
-  font-family:'JetBrains Mono',monospace;
-  background:var(--panel);
-  color:var(--text);
-}
-.sub-item select{font-family:'Sarabun',sans-serif;}
-.sub-item select:focus, .sub-item input[type=text]:focus{
-  outline:none;
-  border-color:var(--accent2);
-}
-.sub-item.correct select, .sub-item.correct input{border-color:var(--correct);background:var(--correct-soft);}
-.sub-item.incorrect select, .sub-item.incorrect input{border-color:var(--incorrect);background:var(--incorrect-soft);}
-.sub-item.locked select, .sub-item.locked input{opacity:0.75;cursor:not-allowed;}
-.reveal-box{
-  margin-top:12px;
-  padding:12px 14px;
-  border-radius:4px;
-  border-left:3px solid var(--incorrect);
-  background:var(--incorrect-soft);
-  font-size:13px;
-  line-height:1.9;
-}
-.reveal-box .reveal-title{
-  font-weight:700;
-  font-size:12px;
-  text-transform:uppercase;
-  letter-spacing:.04em;
-  color:var(--incorrect);
-  display:block;
-  margin-bottom:6px;
-}
-.reveal-box .reveal-line{margin-bottom:2px;}
-.reveal-box .reveal-line b{color:var(--navy-deep);}
-.calc-open-btn{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  border:1.5px solid var(--border);
-  background:#fff;
-  color:var(--navy);
-  padding:6px 12px;
-  border-radius:4px;
-  font-size:12.5px;
-  cursor:pointer;
-  margin-left:8px;
-  font-family:'Sarabun',sans-serif;
-  font-weight:600;
-}
-.calc-open-btn:hover{background:var(--accent-soft);}
-.hint-btn{
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13.5px;}
+table th{background:var(--navy-deep);color:#F2EFE6;padding:9px 12px;text-align:left;}
+table td{padding:8px 12px;border-bottom:1px solid var(--border);}
+table tr:nth-child(even) td{background:#F4F2E8;}
+.calc-toggle-btn{
   display:inline-flex;
   align-items:center;
   gap:6px;
@@ -291,97 +227,19 @@ main{flex:1;min-width:0;}
   border-radius:4px;
   font-size:12.5px;
   cursor:pointer;
-  margin-left:8px;
-  font-family:'Sarabun',sans-serif;
-  font-weight:600;
-}
-.hint-btn:hover{background:var(--flag-soft);}
-.hint-box{
   margin-top:10px;
-  padding:12px 14px;
-  border-radius:4px;
-  border-left:3px solid var(--flag);
-  background:var(--flag-soft);
-  font-family:'JetBrains Mono',monospace;
-  font-size:12.5px;
-  white-space:pre-wrap;
-  line-height:1.8;
-  color:var(--navy-deep);
-}
-.calc-slot{width:100%;}
-.answer-block{
-  margin-top:6px;
-  padding:12px 14px;
-  border-radius:4px;
-  border-left:3px solid var(--accent2);
-  background:var(--accent-soft);
-  font-size:13px;
-}
-.answer-block.flagged{background:var(--flag-soft);border-left:3px solid var(--flag);}
-.flag-badge{
-  display:inline-block;
-  font-size:11px;
-  color:var(--flag);
-  border:1px solid var(--flag);
-  border-radius:12px;
-  padding:2px 8px;
-  margin-bottom:6px;
-  font-family:'JetBrains Mono',monospace;
-}
-.explain-block{margin-top:16px;padding-top:14px;border-top:1px dashed var(--border);}
-.explain-block h4{
-  font-family:'JetBrains Mono',monospace;
-  font-size:12px;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  margin:0 0 6px 0;
-  color:var(--text-soft);
-}
-.explain-block .formula{
-  background:var(--navy-deep);
-  color:#EAF1FA;
-  border-radius:4px;
-  padding:12px;
-  font-family:'JetBrains Mono',monospace;
-  font-size:12.5px;
-  white-space:pre-wrap;
-  margin-bottom:10px;
-  line-height:1.8;
-}
-.explain-block .steps{font-size:13px;line-height:1.8;white-space:pre-wrap;}
-.step-list{display:block;}
-.step-item{display:flex;gap:12px;margin-bottom:14px;width:100%;box-sizing:border-box;}
-.step-item:last-child{margin-bottom:0;}
-.step-num{
-  flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
-  font-size:12px;font-weight:700;
-}
-.step-body{flex:1;min-width:0;}
-.step-label{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;}
-.step-content{font-size:13.5px;line-height:1.8;white-space:pre-wrap;color:var(--text);}
-.step-item.step-why .step-num{background:var(--flag);}
-.step-item.step-why .step-label{color:var(--flag);}
-.footer-actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:8px;}
-.footer-actions button{
-  border:none;
-  background:var(--navy);
-  color:#fff;
-  padding:10px 20px;
-  border-radius:4px;
-  font-size:14px;
-  cursor:pointer;
   font-family:'Sarabun',sans-serif;
   font-weight:600;
 }
-.footer-actions button:hover{background:var(--accent2);}
-.footer-actions button.secondary{background:transparent;color:var(--navy);border:1.5px solid var(--border);}
+.calc-toggle-btn:hover{background:var(--flag-soft);}
+.calc-slot{width:100%;margin-top:12px;}
 @media (max-width:800px){
   .layout{flex-direction:column;}
   .sidebar{width:100%;}
-  .sidebar-panel{position:static;}
-  .nav-grid{grid-template-columns:repeat(8,1fr);}
+  .sidebar-panel{position:static;max-height:none;}
 }
+</style>
+<style>
 #calcModal{
   display:none;
   background:var(--paper);
@@ -580,10 +438,16 @@ main{flex:1;min-width:0;}
   border:1.5px solid var(--line);border-radius:4px;background:#fff;cursor:pointer;
 }
 #calcModal .deg-toggle button.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
 </style>
 
 <style>
-:root{ color-scheme: light dark; }
+:root{
+  color-scheme: light dark;
+  --cream:#F4F2E8;
+  --diagram-bg:#FBFAF6;
+  --fontScale:1;
+}
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
@@ -597,7 +461,9 @@ main{flex:1;min-width:0;}
     --good:#7fd0a0; --good-bg:#173323;
     --bad:#f0958a; --bad-bg:#33201d;
     --gold:#e3bd74;
+    --cream:#232922; --diagram-bg:#181e27;
   }
+  :root:not([data-theme="light"]) .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
 }
 :root[data-theme="dark"]{
   --paper:#12161d; --bg:#12161d; --panel:#1b212b; --border:#333c48;
@@ -611,108 +477,130 @@ main{flex:1;min-width:0;}
   --good:#7fd0a0; --good-bg:#173323;
   --bad:#f0958a; --bad-bg:#33201d;
   --gold:#e3bd74;
+  --cream:#232922; --diagram-bg:#181e27;
 }
+:root[data-theme="dark"] .image-block img{box-shadow:0 2px 10px rgba(0,0,0,0.4);}
+.theme-toggle-btn{
+  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
+  width:32px;height:32px;border-radius:4px;font-size:15px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:flex;align-items:center;justify-content:center;
+}
+.theme-toggle-btn:hover{background:#fff;}
+@media print{.theme-toggle-btn{display:none;}}
 .back-to-index{
   display:inline-block;font-size:12px;color:#C9DCF0;text-decoration:none;
   margin-bottom:6px;opacity:0.85;
 }
 .back-to-index:hover{opacity:1;text-decoration:underline;}
 @media print{.back-to-index{display:none;}}
-.theme-toggle-btn{
-  border:1.5px solid var(--border);background:var(--panel);color:var(--navy);
-  width:34px;height:34px;border-radius:6px;font-size:15px;cursor:pointer;
-  font-family:'Sarabun',sans-serif;display:inline-flex;align-items:center;justify-content:center;
-  vertical-align:middle;
-}
-.theme-toggle-btn:hover{background:var(--accent-soft);}
-@media print{.theme-toggle-btn{display:none;}}
-</style>
 
-<script>
-(function(){
-  function systemPrefersDark(){
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  }
-  function resolvedTheme(t){
-    return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
-  }
-  function applyTheme(t){
-    if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
-    else { document.documentElement.removeAttribute('data-theme'); }
-    var btn = document.getElementById('themeToggle');
-    if(btn){
-      var r = resolvedTheme(t);
-      btn.textContent = r === 'dark' ? '☀️' : '🌙';
-      btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
-    }
-  }
-  var bookTheme = 'system';
-  try{ bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
-  applyTheme(bookTheme);
-  document.addEventListener('DOMContentLoaded', function(){
-    applyTheme(bookTheme);
-    var btn = document.getElementById('themeToggle');
-    if(btn){
-      btn.addEventListener('click', function(){
-        bookTheme = resolvedTheme(bookTheme) === 'dark' ? 'light' : 'dark';
-        try{ localStorage.setItem('book_theme', bookTheme); }catch(e){}
-        applyTheme(bookTheme);
-      });
-    }
-  });
-})();
-</script>
+#readProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--flag),var(--accent2));width:0%;z-index:999;transition:width .12s ease;}
+#backToTop{
+  position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;
+  background:var(--navy-deep);color:#F2EFE6;border:none;cursor:pointer;font-size:18px;
+  box-shadow:0 4px 14px rgba(15,39,64,0.3);display:none;align-items:center;justify-content:center;
+  z-index:998;opacity:0;transition:opacity .2s ease, transform .2s ease;
+}
+#backToTop:hover{transform:translateY(-2px);}
+#backToTop.show{display:flex;opacity:1;}
+#fontCtrl{display:flex;gap:6px;align-items:center;}
+#fontCtrl button{
+  border:1.5px solid rgba(242,239,230,0.5);background:rgba(255,255,255,0.9);color:var(--navy);
+  width:32px;height:32px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:700;
+  font-family:'Sarabun',sans-serif;
+}
+#fontCtrl button:hover{background:#fff;}
+.read-time-badge{
+  font-size:11.5px;color:#C9C2AE;background:rgba(255,255,255,0.08);padding:5px 10px;border-radius:20px;
+  border:1px solid rgba(242,239,230,0.25);white-space:nowrap;
+}
+.section-card{opacity:0;transform:translateY(14px);transition:opacity .55s ease, transform .55s ease;}
+.section-card.revealed{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion: reduce){.section-card{opacity:1;transform:none;transition:none;}}
+.section-card .body-text{font-size:calc(14.5px * var(--fontScale)) !important;}
+.section-card h2{font-size:calc(18px * var(--fontScale)) !important;}
+.section-card h3{font-size:calc(15px * var(--fontScale)) !important;}
+.callout{font-size:calc(14px * var(--fontScale)) !important; white-space:pre-wrap;}
+table{font-size:calc(13.5px * var(--fontScale)) !important;}
+.callout-note .callout-title::before{content:"📝 ";}
+.callout-example .callout-title::before{content:"💡 ";}
+.callout-warning .callout-title::before{content:"⚠️ ";}
+.callout-formula .callout-title::before{content:"∑ ";}
+.code-block{
+  display:block;margin:10px 0;padding:12px 14px;background:var(--navy-deep);color:#EAF1FA;
+  border-radius:6px;overflow-x:auto;font-family:'JetBrains Mono',monospace;
+  font-size:calc(12.5px * var(--fontScale));line-height:1.6;white-space:pre;
+}
+.code-block code{font-family:inherit;background:none;padding:0;color:inherit;}
+@media print{.code-block{white-space:pre-wrap;word-break:break-word;}}
+
+.diagram-block{margin:20px 0;padding:16px 18px 14px;background:var(--diagram-bg);border:1px solid var(--border);border-radius:8px;}
+.diagram-block h4{margin:0 0 12px 0;font-size:calc(14.5px * var(--fontScale));color:var(--navy-deep);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.diagram-play-btn{border:1.5px solid var(--accent2);background:#fff;color:var(--accent2);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;flex-shrink:0;}
+.diagram-play-btn:hover{background:var(--accent-soft);}
+.diagram-svg-wrap{overflow-x:auto;}
+.diagram-svg{display:block;margin:0 auto;min-width:420px;}
+.diagram-actor-label{font-family:'Sarabun',sans-serif;font-size:11.5px;font-weight:600;fill:var(--navy-deep);}
+.diagram-lifeline{stroke:var(--border);stroke-width:1.5;stroke-dasharray:3,3;}
+.diagram-node-box{fill:var(--panel);stroke:var(--navy);stroke-width:1.3;}
+.diagram-arrow-path{fill:none;stroke:var(--accent2);stroke-width:2;marker-end:url(#arrowhead);}
+.diagram-arrow-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;fill:var(--navy-deep);}
+.diagram-glow-dot{fill:var(--flag);filter:url(#glowFilter);opacity:0;}
+.diagram-steps-list{list-style:none;margin:12px 0 0;padding:0;font-size:calc(13px * var(--fontScale));line-height:1.7;}
+.diagram-steps-list li{padding:6px 10px;border-left:3px solid transparent;border-radius:4px;transition:background .3s ease, border-color .3s ease;}
+.diagram-steps-list li.step-active{background:var(--accent-soft);border-left-color:var(--flag);}
+.diagram-steps-list .step-num{display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;text-align:center;line-height:20px;font-size:11px;margin-right:8px;font-family:'JetBrains Mono',monospace;}
+
+@media print{
+  header .header-actions, .sidebar, #readProgress, #backToTop, .diagram-play-btn, #calcModal{display:none !important;}
+  .layout{display:block;padding:0;max-width:100%;}
+  main{width:100%;}
+  header{position:static;box-shadow:none;}
+  .section-card{opacity:1 !important;transform:none !important;box-shadow:none;border:1px solid #ccc;break-inside:avoid;}
+  body{background:#fff;}
+}
+</style>
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#2B6CB0"></path></marker>
+<filter id="glowFilter" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.2" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+</defs>
+</svg>
+<div id="readProgress"></div>
+
 <header>
-  <a class="back-to-index" href="../index.html">&larr; สารบัญทั้งหมด / All Chapters</a>
+  <div>
+    <a class="back-to-index" href="../index.html">&larr; สารบัญทั้งหมด / All Chapters</a>
   <a class="back-to-index" href="../EQ_TABLE.pdf" target="_blank" rel="noopener" title="สูตรและตารางสถิติ (Z, t, Chi-square, F, Sign test, Wilcoxon, Spearman, Pearson) — เปิดในแท็บใหม่">📋 ตารางสูตร/สถิติ (EQ Table)</a>
-  <h1>IC Quiz 10-2: F-test</h1>
-  <div class="toolbar">
+    <h1>บทที่ 8 · การทดสอบสมมติฐาน: สองประชากร</h1>
+    <div class="subtitle">300-1211 สถิติและการวิเคราะห์ข้อมูล · Two-Sample Hypothesis Testing · สรุปบทเรียน (L3)</div>
+  </div>
+  <div class="header-actions">
+    <span class="read-time-badge" id="readTimeBadge"></span>
+    <div id="fontCtrl">
+      <button id="fontMinus" title="ลดขนาดตัวอักษร / Decrease font size">A&minus;</button>
+      <button id="fontPlus" title="เพิ่มขนาดตัวอักษร / Increase font size">A+</button>
+    </div>
     <button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button>
-    <div class="mode-toggle">
-      <button id="btnExerciseMode" class="active">แบบฝึกหัด</button>
-      <button id="btnAnswerMode">เฉลย</button>
-    </div>
-    <button id="resetAllBtn" style="border:1.5px solid var(--flag);color:var(--flag);">↺ ทำใหม่ทั้งชุด</button>
-    <select id="orderSelect">
-      <option value="original">เรียงตามต้นฉบับ</option>
-      <option value="shuffle">สลับข้อ</option>
-    </select>
-    <select id="timerModeSelect">
-      <option value="stopwatch">นับขึ้น</option>
-      <option value="countdown">นับถอยหลัง</option>
-    </select>
-    <input type="number" id="countdownMinutes" placeholder="นาที" min="1" style="width:70px;padding:6px;border:1px solid var(--border);border-radius:6px;">
-    <div class="timer-box">
-      <span id="timerDisplay">00:00</span>
-      <button id="timerStartBtn">เริ่ม</button>
-      <button id="timerPauseBtn">พัก</button>
-      <button id="timerResetBtn">รีเซ็ต</button>
-    </div>
+    <button class="calc-toggle-btn" id="calcHeaderBtn" style="margin-top:0;">🧮 เครื่องคิดเลข</button>
   </div>
 </header>
 
 <div class="layout">
   <div class="sidebar">
-    <div class="sidebar-panel">
-      <h3>สารบัญข้อ</h3>
-      <div class="nav-grid" id="navGrid"></div>
-      <div class="legend">
-        <span><span class="dot" style="background:var(--unanswered)"></span>ยังไม่ตอบ</span>
-        <span><span class="dot" style="background:var(--accent)"></span>ตอบบางส่วน</span>
-        <span><span class="dot" style="background:var(--correct)"></span>ถูกต้อง</span>
-        <span><span class="dot" style="background:var(--incorrect)"></span>ไม่ถูกต้อง</span>
-      </div>
-      <div class="score-box" id="scoreBox" style="display:none;">
-        <div>คะแนน</div>
-        <div class="big" id="scoreText">0/0</div>
-      </div>
-    </div>
+    <details class="sidebar-panel" id="tocPanel" open>
+      <summary>สารบัญ / Contents</summary>
+      <ul class="toc-list" id="tocList"></ul>
+      <div class="calc-slot" id="calcslot_sidebar"></div>
+    </details>
   </div>
   <main id="mainArea"></main>
 </div>
+
+<button id="backToTop" title="กลับขึ้นด้านบน / Back to top">&uarr;</button>
 
 <div id="calcModal">
 <div class="calcmodal-head"><h2>Statistics Calculator</h2><button class="calcmodal-close" id="calcModalClose">✕ ซ่อน</button></div>
@@ -950,333 +838,7 @@ main{flex:1;min-width:0;}
 </div>
 
 <script>
-const QUESTIONS = [
- {
-  "prompt": "For a test of H0 : σ1² ≤ σ2² , Ha : σ1² > σ2²<br>Level of significance α = 0.01<br><br>Sample statistics:<br>s1² = 285, n1 = 11<br>s2² = 97, n2 = 4<br><br>Assume the samples are random and independent, and the populations are normally distributed.",
-  "calcTabs": [
-   "dist",
-   "stat",
-   "calc"
-  ],
-  "subs": [
-   {
-    "label": "Identify statistical test",
-    "type": "select",
-    "options": [
-     "z-test",
-     "t-test",
-     "Chi-squared Test",
-     "F-test"
-    ],
-    "correctAnswer": "F-test",
-    "uncertain": false
-   },
-   {
-    "label": "Identify type of test",
-    "type": "select",
-    "options": [
-     "Left-Tailed Test",
-     "Right-Tailed Test",
-     "Two-Tailed Test"
-    ],
-    "correctAnswer": "Right-Tailed Test",
-    "uncertain": false
-   },
-   {
-    "label": "Find critical value",
-    "type": "number",
-    "correctAnswer": 27.23,
-    "tolerance": 0.01,
-    "uncertain": false
-   },
-   {
-    "label": "Find standardized test statistics",
-    "type": "number",
-    "correctAnswer": 2.9381,
-    "tolerance": 0.001,
-    "uncertain": false
-   },
-   {
-    "label": "Make a decision",
-    "type": "select",
-    "options": [
-     "Reject Null Hypothesis",
-     "Fail to reject Null Hypothesis"
-    ],
-    "correctAnswer": "Fail to reject Null Hypothesis",
-    "uncertain": false
-   }
-  ],
-  "formula": "F = s1² / s2²   (variance ที่ระบุเป็นกลุ่มที่ 1 อยู่ตัวเศษเมื่อ Ha ระบุทิศทาง)\nd.f.N = n1 − 1 , d.f.D = n2 − 1\nOne-tailed: เปิดตาราง F ที่ระดับ α ตรง ๆ (ไม่หาร 2)",
-  "steps": {
-   "given": "s1² = 285 กับ n1 = 11 (กลุ่มที่ 1), s2² = 97 กับ n2 = 4 (กลุ่มที่ 2), α = 0.01, H0: σ1² ≤ σ2², Ha: σ1² > σ2²",
-   "why": "โจทย์เปรียบเทียบ variance (ความแปรปรวน) ของประชากรสองกลุ่ม ไม่ใช่ mean (ค่าเฉลี่ย) → ใช้ F-test (การทดสอบเอฟ) เพราะอัตราส่วนของ sample variance สองตัวจากประชากรปกติมี F distribution (การแจกแจงเอฟ) เป็น sampling distribution (การแจกแจงเชิงสุ่ม) — และ Ha เขียนเป็นเครื่องหมาย > ทิศทางเดียว จึงเป็น Right-Tailed Test (การทดสอบหางขวา) ไม่ต้องหาร α ด้วย 2. หมายเหตุ: ในกรณี one-tailed แบบนี้ กลุ่มที่ Ha อ้างว่าใหญ่กว่า (กลุ่ม 1) ต้องเป็นตัวเศษเสมอ ห้ามสลับ",
-   "substitute": "F = 285 / 97 ; d.f.N = 11 − 1 = 10 ; d.f.D = 4 − 1 = 3 ; เปิดตาราง F ที่ α = 0.01",
-   "calculate": "F = 285 / 97 = 2.9381\nF0.01(10, 3) = 27.23 → rejection region (เขตปฏิเสธ) คือ F > 27.23",
-   "conclude": "2.9381 < 27.23 → ค่าตกนอกเขตปฏิเสธ → Fail to reject H0. ที่ α = 0.01 หลักฐานไม่พอจะสรุปว่า variance ของกลุ่ม 1 มากกว่ากลุ่ม 2. สังเกตว่า d.f.D = 3 ต่ำมาก ทำให้ค่าวิกฤตสูงถึง 27.23 การจะ reject ได้ต้องมี F ใหญ่มากเป็นพิเศษ"
-  }
- },
- {
-  "prompt": "For a test of H0 : σ1² = σ2² , Ha : σ1² ≠ σ2²<br>Level of significance α = 0.01<br><br>Sample statistics:<br>s1² = 100, n1 = 11<br>s2² = 100, n2 = 4<br><br>Assume the samples are random and independent, and the populations are normally distributed.",
-  "calcTabs": [
-   "dist",
-   "stat",
-   "calc"
-  ],
-  "subs": [
-   {
-    "label": "Identify statistical test",
-    "type": "select",
-    "options": [
-     "z-test",
-     "t-test",
-     "Chi-squared Test",
-     "F-test"
-    ],
-    "correctAnswer": "F-test",
-    "uncertain": false
-   },
-   {
-    "label": "Identify type of test",
-    "type": "select",
-    "options": [
-     "Left-Tailed Test",
-     "Right-Tailed Test",
-     "Two-Tailed Test"
-    ],
-    "correctAnswer": "Two-Tailed Test",
-    "uncertain": false
-   },
-   {
-    "label": "Find critical value",
-    "type": "number",
-    "correctAnswer": 43.69,
-    "tolerance": 0.01,
-    "uncertain": false
-   },
-   {
-    "label": "Find standardized test statistics",
-    "type": "number",
-    "correctAnswer": 1.0,
-    "tolerance": 0.001,
-    "uncertain": false
-   },
-   {
-    "label": "Make a decision",
-    "type": "select",
-    "options": [
-     "Reject Null Hypothesis",
-     "Fail to reject Null Hypothesis"
-    ],
-    "correctAnswer": "Fail to reject Null Hypothesis",
-    "uncertain": false
-   }
-  ],
-  "formula": "F = s²(มาก) / s²(น้อย)  ≥ 1 เสมอ\nd.f.N = n ของกลุ่มที่อยู่ตัวเศษ − 1 , d.f.D = n ของกลุ่มตัวส่วน − 1\nTwo-tailed: เปิดตาราง F ที่ α/2 (ไม่ใช่ α)",
-  "steps": {
-   "given": "s1² = 100 กับ n1 = 11, s2² = 100 กับ n2 = 4, α = 0.01, Ha ใช้เครื่องหมาย ≠",
-   "why": "เปรียบเทียบ variance สองกลุ่ม → F-test. Ha เป็น ≠ ไม่ระบุทิศทาง → Two-Tailed Test (การทดสอบสองหาง) จึงต้องแบ่งพื้นที่ปฏิเสธเป็นสองข้าง แต่เพราะบังคับให้ variance ที่มากกว่าอยู่ตัวเศษแล้ว F จึงไม่มีทางต่ำกว่า 1 ทำให้ใช้เฉพาะหางขวาที่พื้นที่ α/2 = 0.005 ได้เลย ไม่ต้องหาค่าวิกฤตหางซ้าย",
-   "substitute": "variance เท่ากันทั้งคู่ (100 = 100) จึงเลือกกลุ่ม 1 เป็นตัวเศษได้ → F = 100 / 100 ; d.f.N = 11 − 1 = 10 ; d.f.D = 4 − 1 = 3 ; เปิดตาราง F ที่ α/2 = 0.005",
-   "calculate": "F = 100 / 100 = 1\nF0.005(10, 3) = 43.69 → เขตปฏิเสธคือ F > 43.69",
-   "conclude": "1 < 43.69 → Fail to reject H0. ค่า F = 1 พอดีคือหลักฐานที่อ่อนที่สุดเท่าที่เป็นไปได้ที่จะค้าน H0 เพราะ F = 1 หมายถึง sample variance สองกลุ่มเท่ากันเป๊ะ ตรงกับสิ่งที่ H0 อ้างพอดี ไม่ว่า α จะเป็นเท่าไรก็ไม่มีทาง reject"
-  }
- },
- {
-  "prompt": "The table shows the prices (in dollars) for a random sample of home theater systems. At α = 0.1, can you conclude that the variances of the prices differ between the two companies? Assume the samples are independent and each population has a normal distribution.<br><br><table><tr><th>Company A</th><th>Company B</th></tr><tr><td>245</td><td>435</td></tr><tr><td>340</td><td>405</td></tr><tr><td>660</td><td>360</td></tr><tr><td>550</td><td>240</td></tr><tr><td>290</td><td>345</td></tr><tr><td></td><td>190</td></tr><tr><td></td><td>565</td></tr></table>",
-  "calcTabs": [
-   "dist",
-   "stat",
-   "calc"
-  ],
-  "subs": [
-   {
-    "label": "Identify statistical test",
-    "type": "select",
-    "options": [
-     "z-test",
-     "t-test",
-     "Chi-squared Test",
-     "F-test"
-    ],
-    "correctAnswer": "F-test",
-    "uncertain": false
-   },
-   {
-    "label": "Identify type of test",
-    "type": "select",
-    "options": [
-     "Left-Tailed Test",
-     "Right-Tailed Test",
-     "Two-Tailed Test"
-    ],
-    "correctAnswer": "Two-Tailed Test",
-    "uncertain": false
-   },
-   {
-    "label": "Find critical value",
-    "type": "number",
-    "correctAnswer": 4.53,
-    "tolerance": 0.01,
-    "uncertain": false
-   },
-   {
-    "label": "Find standardized test statistics",
-    "type": "number",
-    "correctAnswer": 2.06746,
-    "tolerance": 0.001,
-    "uncertain": false
-   },
-   {
-    "label": "Make a decision",
-    "type": "select",
-    "options": [
-     "Reject Null Hypothesis",
-     "Fail to reject Null Hypothesis"
-    ],
-    "correctAnswer": "Fail to reject Null Hypothesis",
-    "uncertain": false
-   }
-  ],
-  "formula": "s² = [ Σx² − (Σx)²/n ] / (n − 1)\nF = s²(มาก) / s²(น้อย)\nd.f.N = n ของกลุ่มตัวเศษ − 1 , d.f.D = n ของกลุ่มตัวส่วน − 1\nTwo-tailed: เปิดตาราง F ที่ α/2",
-  "steps": {
-   "given": "ราคาดิบสองชุด — Company A: 245, 340, 660, 550, 290 (n = 5) และ Company B: 435, 405, 360, 240, 345, 190, 565 (n = 7), α = 0.1, ต้องการสรุปว่า variance ต่างกันหรือไม่",
-   "why": "โจทย์ถามถึง variance ของสองประชากร ไม่ใช่ mean → F-test. คำว่า “differ” แปลว่าไม่ระบุทิศทาง → Two-Tailed Test จึงเปิดตารางที่ α/2 = 0.05. ข้อนี้ต่างจากสองข้อแรกตรงที่ไม่ได้ให้ s² มา ต้องคำนวณ sample variance (ความแปรปรวนของกลุ่มตัวอย่าง) เองก่อน และต้องหารด้วย n − 1 ไม่ใช่ n เพื่อให้เป็น unbiased estimator (ตัวประมาณค่าไม่เอนเอียง) ของ σ² และให้สอดคล้องกับ degrees of freedom (องศาอิสระ) ที่เอาไปเปิดตาราง",
-   "substitute": "Company A: Σx = 2085, Σx² = 997825 → SS = 997825 − 2085²/5 = 997825 − 869445 = 128380\nCompany B: Σx = 2540, Σx² = 1014800 → SS = 1014800 − 2540²/7 = 1014800 − 921657.14 = 93142.86",
-   "calculate": "sA² = 128380 / 4 = 32095\nsB² = 93142.86 / 6 = 15523.81\nsA² มากกว่า จึงขึ้นเป็นตัวเศษ → F = 32095 / 15523.81 = 2.06746\nd.f.N = 5 − 1 = 4 ; d.f.D = 7 − 1 = 6 ; F0.05(4, 6) = 4.53",
-   "conclude": "2.06746 < 4.53 → Fail to reject H0. ที่ α = 0.1 หลักฐานไม่พอจะสรุปว่า variance ของราคาสองบริษัทแตกต่างกัน. จุดที่พลาดง่ายคือลืมหาร α ด้วย 2 (ถ้าเปิดที่ 0.1 ตรง ๆ จะได้ 3.18 ซึ่งก็ยัง fail to reject แต่เป็นการเปิดตารางผิดหลัก) และการสลับตัวเศษ-ตัวส่วนซึ่งจะทำให้ d.f. สลับตามไปด้วย"
-  }
- },
- {
-  "prompt": "For a test of H0 : μ1 = μ2 = μ3 , Ha : At least one mean is different from the others<br>Level of significance α = 0.01<br><br>Sample statistics:<br>N = 12, k = 3<br>MSB = 147, MSW = 27<br><br>Assume the samples are random and independent, and the populations are normally distributed.",
-  "calcTabs": [
-   "dist",
-   "stat",
-   "calc"
-  ],
-  "subs": [
-   {
-    "label": "Identify statistical test",
-    "type": "select",
-    "options": [
-     "z-test",
-     "t-test",
-     "Chi-squared Test",
-     "F-test"
-    ],
-    "correctAnswer": "F-test",
-    "uncertain": false
-   },
-   {
-    "label": "Identify type of test",
-    "type": "select",
-    "options": [
-     "Left-Tailed Test",
-     "Right-Tailed Test",
-     "Two-Tailed Test"
-    ],
-    "correctAnswer": "Right-Tailed Test",
-    "uncertain": false
-   },
-   {
-    "label": "Find critical value",
-    "type": "number",
-    "correctAnswer": 8.02,
-    "tolerance": 0.01,
-    "uncertain": false
-   },
-   {
-    "label": "Find standardized test statistics",
-    "type": "number",
-    "correctAnswer": 5.4444,
-    "tolerance": 0.001,
-    "uncertain": false
-   },
-   {
-    "label": "Make a decision",
-    "type": "select",
-    "options": [
-     "Reject Null Hypothesis",
-     "Fail to reject Null Hypothesis"
-    ],
-    "correctAnswer": "Fail to reject Null Hypothesis",
-    "uncertain": false
-   }
-  ],
-  "formula": "F = MSB / MSW\nd.f.N = k − 1 , d.f.D = N − k\nANOVA เป็น right-tailed เสมอ เปิดตารางที่ α ตรง ๆ",
-  "steps": {
-   "given": "N = 12 (จำนวนข้อมูลทั้งหมด), k = 3 (จำนวนกลุ่ม), MSB = 147 (mean square between groups / ค่าเฉลี่ยกำลังสองระหว่างกลุ่ม), MSW = 27 (mean square within groups / ค่าเฉลี่ยกำลังสองภายในกลุ่ม), α = 0.01",
-   "why": "เปรียบเทียบ mean ของ 3 กลุ่มพร้อมกัน → one-way ANOVA (การวิเคราะห์ความแปรปรวนทางเดียว) ซึ่งใช้สถิติ F ไม่ใช้ t-test เพราะ t เทียบได้ครั้งละ 2 กลุ่มเท่านั้น และการทำ t-test หลายคู่จะทำให้ Type I error (ความผิดพลาดแบบที่ 1) สะสมเกิน α ที่ตั้งไว้. เป็น Right-Tailed Test แม้ Ha จะเขียนเชิง “ต่างกัน” เพราะ F = MSB/MSW ≥ 0 เสมอ และค่าเฉลี่ยที่ต่างกันมีผลดัน MSB ให้ใหญ่ขึ้นทางเดียว หลักฐานค้าน H0 จึงอยู่หางขวาเท่านั้น",
-   "substitute": "F = 147 / 27 ; d.f.N = 3 − 1 = 2 ; d.f.D = 12 − 3 = 9 ; เปิดตาราง F ที่ α = 0.01",
-   "calculate": "F = 147 / 27 = 5.4444\nF0.01(2, 9) = 8.02 → เขตปฏิเสธคือ F > 8.02",
-   "conclude": "5.4444 < 8.02 → Fail to reject H0. ที่ α = 0.01 หลักฐานไม่พอจะสรุปว่ามีค่าเฉลี่ยอย่างน้อยหนึ่งกลุ่มต่างจากกลุ่มอื่น. ข้อนี้ไวต่อ α มาก — ถ้าใช้ α = 0.05 ค่าวิกฤตจะเหลือ 4.26 และ 5.4444 > 4.26 จะกลายเป็น Reject ทันที"
-  }
- },
- {
-  "prompt": "A researcher wishes to see if there is a difference in the fuel economy for city driving for three different types of automobiles: small automobiles, sedans, and luxury automobiles. He randomly samples four small automobiles, five sedans, and three luxury automobiles. The miles per gallon for each is shown. At α = 0.05, test the claim that there is no difference among the means. Assume that each population is normally distributed and that the population variances are equal.<br><br><table><tr><th>Small</th><th>Sedans</th><th>Luxury</th></tr><tr><td>35</td><td>41</td><td>29</td></tr><tr><td>46</td><td>35</td><td>24</td></tr><tr><td>32</td><td>31</td><td>25</td></tr><tr><td>36</td><td>31</td><td></td></tr><tr><td></td><td>39</td><td></td></tr></table>",
-  "calcTabs": [
-   "dist",
-   "stat",
-   "calc"
-  ],
-  "subs": [
-   {
-    "label": "Identify statistical test",
-    "type": "select",
-    "options": [
-     "z-test",
-     "t-test",
-     "Chi-squared Test",
-     "F-test"
-    ],
-    "correctAnswer": "F-test",
-    "uncertain": false
-   },
-   {
-    "label": "Identify type of test",
-    "type": "select",
-    "options": [
-     "Left-Tailed Test",
-     "Right-Tailed Test",
-     "Two-Tailed Test"
-    ],
-    "correctAnswer": "Right-Tailed Test",
-    "uncertain": false
-   },
-   {
-    "label": "Find critical value",
-    "type": "number",
-    "correctAnswer": 4.26,
-    "tolerance": 0.01,
-    "uncertain": false
-   },
-   {
-    "label": "Find standardized test statistics",
-    "type": "number",
-    "correctAnswer": 5.2523,
-    "tolerance": 0.001,
-    "uncertain": false
-   },
-   {
-    "label": "Make a decision",
-    "type": "select",
-    "options": [
-     "Reject Null Hypothesis",
-     "Fail to reject Null Hypothesis"
-    ],
-    "correctAnswer": "Reject Null Hypothesis",
-    "uncertain": false
-   }
-  ],
-  "formula": "SSB = Σ nᵢ (x̄ᵢ − x̄grand)²        MSB = SSB / (k − 1)\nSSW = Σ Σ (x − x̄ᵢ)²              MSW = SSW / (N − k)\nF = MSB / MSW\nd.f.N = k − 1 , d.f.D = N − k",
-  "steps": {
-   "given": "Small (n = 4): 35, 46, 32, 36 | Sedans (n = 5): 41, 35, 31, 31, 39 | Luxury (n = 3): 29, 24, 25 → N = 12, k = 3, α = 0.05 และ claim (ข้ออ้าง) คือ “ไม่มีความแตกต่างระหว่างค่าเฉลี่ย” ซึ่งตรงกับ H0",
-   "why": "เทียบค่าเฉลี่ย 3 กลุ่ม + สมมติว่า population variance เท่ากันและประชากรแจกแจงปกติ → เข้าเงื่อนไข one-way ANOVA พอดี จึงใช้ F-test ซึ่งเป็น right-tailed เสมอ. หลักการเบื้องหลังคือเทียบ “ความผันแปรระหว่างกลุ่ม” กับ “ความผันแปรภายในกลุ่ม” ถ้าค่าเฉลี่ยทุกกลุ่มเท่ากันจริง สองค่านี้จะประมาณ σ² ตัวเดียวกัน ทำให้อัตราส่วนใกล้ 1",
-   "substitute": "x̄(Small) = 149/4 = 37.25 ; x̄(Sedans) = 177/5 = 35.40 ; x̄(Luxury) = 78/3 = 26.00 ; x̄grand = 404/12 = 33.6667\nSSB = 4(37.25 − 33.6667)² + 5(35.40 − 33.6667)² + 3(26.00 − 33.6667)²\nSSW = [Small] + [Sedans] + [Luxury] ของ Σ(x − x̄ᵢ)² แต่ละกลุ่ม",
-   "calculate": "SSB = 4(3.5833)² + 5(1.7333)² + 3(−7.6667)² = 51.361 + 15.022 + 176.333 = 242.717 → MSB = 242.717 / 2 = 121.358\nSSW: Small = 110.75 , Sedans = 83.20 , Luxury = 14.00 → SSW = 207.95 → MSW = 207.95 / 9 = 23.106\nF = 121.358 / 23.106 = 5.2523\nd.f.N = 2 ; d.f.D = 9 ; F0.05(2, 9) = 4.26",
-   "conclude": "5.2523 > 4.26 → ตกในเขตปฏิเสธ → Reject H0. ที่ α = 0.05 มีหลักฐานพอจะปฏิเสธข้ออ้างว่าอัตราสิ้นเปลืองน้ำมันเฉลี่ยของรถทั้งสามประเภทไม่ต่างกัน. ระวังการอ่านโจทย์: claim อยู่ที่ H0 ไม่ใช่ Ha การ reject จึงหมายถึงปฏิเสธ claim ของผู้วิจัย. กลุ่ม Luxury ที่ค่าเฉลี่ยต่ำกว่ากลุ่มอื่นมาก (26.00 เทียบกับ 37.25 และ 35.40) เป็นตัวดัน SSB ให้สูงถึง 73% ของทั้งก้อน"
-  }
- }
-];
+const SECTIONS = [{"title": "ภาพรวมบทและเป้าหมายการเรียนรู้", "body": "บทที่ 7 เราทดสอบสมมติฐาน (hypothesis testing, การทดสอบสมมติฐาน) เกี่ยวกับค่าเฉลี่ยเดียว เทียบกับค่าที่อ้าง แต่คำถามจริงในงานส่วนใหญ่เป็นการเปรียบเทียบสองกลุ่มมากกว่า บทนี้จึงขยายเครื่องมือจากกลุ่มเดียวสู่สองประชากร (two populations) — เทียบค่าเฉลี่ยของสองกลุ่มอิสระ เทียบค่าเฉลี่ยของสองกลุ่มที่จับคู่กัน และเทียบสัดส่วนของสองกลุ่ม โดยตลอดบทใช้ตัวอย่างเดินเรื่องเดียวกันจากทีมพัฒนาแอปสั่งอาหารชื่อ อิ่มดี (ImDee)", "blocks": [{"type": "subheading", "content": "เมื่อศึกษาบทนี้จบ ผู้เรียนจะสามารถ"}, {"type": "note", "content": "1) ตั้งสมมติฐานและทดสอบความต่างของสองค่าเฉลี่ยจากกลุ่มอิสระด้วยสถิติ $t$ ทั้งแบบรวมความแปรปรวน (pooled) และแบบเวลช์ (Welch)\n2) ทดสอบตัวอย่างจับคู่ (paired) โดยวิเคราะห์ผลต่างภายในคู่\n3) ทดสอบความต่างของสองสัดส่วนด้วยสถิติ $z$ และสัดส่วนรวม (pooled $\\hat p$)\n4) ออกแบบและวิเคราะห์การทดสอบ A/B ตั้งแต่ตั้งสมมติฐานจนถึงตีความ\n5) แยกนัยสำคัญทางสถิติ (statistical significance) ออกจากนัยสำคัญเชิงปฏิบัติ (practical significance)\n6) เลือกแบบทดสอบให้ตรงกับลักษณะข้อมูล และหลีกเลี่ยงกับดักที่พบบ่อย"}, {"type": "subheading", "content": "หัวข้อในบทนี้"}, {"type": "table", "content": "<table><thead><tr><th>หัวข้อ</th><th>เนื้อหาโดยย่อ</th></tr></thead><tbody><tr><td>จำแนกกลุ่มอิสระ/ไม่อิสระ</td><td>ขั้นแรกก่อนเลือกวิธีทุกครั้ง</td></tr><tr><td>8.1 ค่าเฉลี่ย เมื่อทราบความแปรปรวน (z)</td><td>ใช้สถิติ $z$ กับ $\\sigma$ ที่ทราบ</td></tr><tr><td>8.2 ค่าเฉลี่ย เมื่อไม่ทราบความแปรปรวน (t)</td><td>ใช้ $t$ แบบเวลช์ (Welch) หรือรวมความแปรปรวน (pooled) ประมาณ $\\sigma$ ด้วย $s$</td></tr><tr><td>8.3 การทดสอบแบบจับคู่ (paired)</td><td>สำหรับข้อมูลก่อน/หลังของหน่วยเดิม</td></tr><tr><td>8.4 การทดสอบสองสัดส่วน</td><td>สถิติ $z$ และสัดส่วนรวม (pooled $\\hat p$)</td></tr><tr><td>A/B testing (เสริม)</td><td>การประยุกต์การทดสอบสองสัดส่วนกับการทดลองออนไลน์</td></tr></tbody></table>"}]}, {"title": "กรณีศึกษา — ปุ่มสั่งอาหารของอิ่มดี (ImDee)", "body": "ทีมนักศึกษากลุ่มหนึ่งกำลังพัฒนาแอปสั่งอาหารชื่อ อิ่มดี (ImDee) ตลอดทั้งเล่มเราจะเดินเรื่องผ่านการตัดสินใจของทีมนี้ คำถามหลักของพวกเขาคือ การเปลี่ยนแปลงที่ทำลงไป ดีขึ้นจริง หรือเป็นเพียงความบังเอิญ", "blocks": [{"type": "example", "content": "คำถามของกรณีศึกษา: ทีมอิ่มดีออกแบบปุ่มสั่งอาหาร สั่งเลย ใหม่ (ปุ่ม B) ให้กดง่ายขึ้น แล้วอยากรู้ว่าผู้ใช้กด สั่งได้ เร็วกว่า ปุ่มแบบเดิม (ปุ่ม A) จริงไหม โดยสุ่มผู้ใช้คนละกลุ่มไปเจอปุ่มคนละแบบ แล้ววัดเวลาที่ใช้กดสั่งจนสำเร็จ ความต่างที่เห็นเป็นของจริงหรือเป็นแค่ความผันแปรของการสุ่ม"}, {"type": "note", "content": "สังเกตว่าตอนนี้เรามี สองชุดข้อมูล (two data sets) ไม่ใช่ชุดเดียว และสิ่งที่สนใจไม่ใช่ค่าเฉลี่ยของแต่ละกลุ่มโดด ๆ แต่คือ ผลต่างของค่าเฉลี่ย $\\mu_A - \\mu_B$"}, {"type": "formula", "label": "ปริมาณที่สนใจตลอดบท", "content": "\\mu_A - \\mu_B \\quad \\text{หรือ} \\quad p_A - p_B"}]}, {"title": "แผนผังเลือกแบบทดสอบสองประชากร", "body": "ก่อนลงรายละเอียด ขอวางแผนที่ทั้งบทไว้ก่อน คำถามแรกที่ต้องตอบเสมอคือ สองกลุ่มที่เทียบกันเป็น อิสระ (independent) หรือ จับคู่ (paired) และข้อมูลเป็นค่าเฉลี่ยหรือสัดส่วน", "blocks": [{"type": "table", "content": "<table><thead><tr><th>ลักษณะข้อมูล</th><th>ตัวอย่างในแอปอิ่มดี</th><th>แบบทดสอบ</th><th>หัวข้อ</th></tr></thead><tbody><tr><td>สองกลุ่มอิสระ ข้อมูลเชิงปริมาณ</td><td>เวลากดสั่งของปุ่ม A กับ B (ผู้ใช้คนละกลุ่ม)</td><td>$z$ (ทราบ $\\sigma$) หรือ $t$ (ไม่ทราบ $\\sigma$)</td><td>8.1–8.2</td></tr><tr><td>จับคู่/วัดซ้ำหน่วยเดิม</td><td>เวลาทำอาหารร้านเดิมก่อน–หลังปรับครัว</td><td>paired $t$</td><td>8.3</td></tr><tr><td>สองกลุ่มอิสระ ข้อมูลสัดส่วน</td><td>อัตราคลิกปุ่มสั่งของดีไซน์ A กับ B</td><td>two-proportion $z$</td><td>8.4</td></tr><tr><td>กระบวนการทดลองออนไลน์ครบวงจร</td><td>A/B test บนผู้ใช้จริงของอิ่มดี</td><td>การประยุกต์สองสัดส่วน</td><td>เสริม</td></tr></tbody></table>"}, {"type": "note", "content": "คำถามชี้ขาดข้อแรกคือ จับคู่หรืออิสระ ถ้าแต่ละค่าในกลุ่มหนึ่งมีคู่ธรรมชาติในอีกกลุ่ม (หน่วยเดียวกันวัดสองครั้ง) ให้ใช้ paired ถ้าเป็นคนละหน่วยที่ไม่เกี่ยวกัน ให้ใช้ two-sample"}]}, {"title": "จำแนกก่อนเลือกวิธี — กลุ่มตัวอย่างอิสระหรือไม่อิสระ", "body": "ก่อนเลือกสูตรใด ต้องตอบคำถามพื้นฐานที่สุดให้ได้ก่อน นั่นคือ สองกลุ่มที่จะเทียบกันเป็น อิสระต่อกัน (independent) หรือ จับคู่กัน (paired/dependent) เพราะสองกรณีนี้ใช้วิธีคนละแบบ", "blocks": [{"type": "note", "content": "นิยาม\nอิสระ (independent): สองกลุ่มถูกสุ่มแยกกัน ค่าหนึ่งในกลุ่ม A ไม่ผูกกับค่าใดในกลุ่ม B (คนละคน คนละเครื่อง)\nไม่อิสระ/จับคู่ (dependent, paired): ข้อมูลมาเป็น คู่ เช่น ก่อน–หลังของหน่วยเดียวกัน หรือจับคู่หน่วยที่คล้ายกัน"}, {"type": "table", "content": "<table><thead><tr><th>สถานการณ์</th><th>คำตอบ</th></tr></thead><tbody><tr><td>เวลาโหลดหน้าเว็บของผู้ใช้ 30 คนบนเบราว์เซอร์ A เทียบกับผู้ใช้อีก 30 คนบนเบราว์เซอร์ B</td><td>อิสระ (คนละกลุ่มผู้ใช้)</td></tr><tr><td>คะแนนสอบก่อนเรียนและหลังเรียนของนักศึกษาคนเดิม 25 คน</td><td>จับคู่ (คนเดิมวัดสองครั้ง)</td></tr><tr><td>เวลาประมวลผลของเซิร์ฟเวอร์เดิม 10 เครื่อง ด้วยอัลกอริทึม A แล้วด้วยอัลกอริทึม B (เครื่องเดิม)</td><td>จับคู่ (เครื่องเดิม)</td></tr><tr><td>ยอดสั่งอาหารของ 50 ร้านในกรุงเทพ เทียบกับ 45 ร้านในเชียงใหม่</td><td>อิสระ (คนละร้าน คนละเมือง)</td></tr><tr><td>ความพึงพอใจของลูกค้า 40 คน ต่อแอปเวอร์ชันเก่า แล้วให้ลูกค้าชุดเดิมลองเวอร์ชันใหม่</td><td>จับคู่ (ลูกค้าชุดเดิม)</td></tr></tbody></table>"}, {"type": "example", "content": "เคล็ดจำ — ถามว่า ค่าหนึ่งในกลุ่ม A มีคู่ที่เจาะจงในกลุ่ม B ไหม ถ้ามี (หน่วยเดียวกันหรือแมตช์คู่) คือ จับคู่ ถ้าไม่มี คือ อิสระ การจำแนกผิดตั้งแต่ต้นทำให้เลือกสูตรผิดทั้งหมด"}]}, {"title": "8.1 การทดสอบค่าเฉลี่ยสองกลุ่มอิสระ เมื่อทราบความแปรปรวน (z)", "body": "สมมติทีมอิ่มดีเก็บเวลากดสั่งของผู้ใช้สองกลุ่มที่ เป็นอิสระต่อกัน คือคนละคน ไม่มีความสัมพันธ์เป็นคู่ เราอยากรู้ว่า ค่าเฉลี่ยของสองกลุ่มต่างกันจริงไหม สิ่งที่สังเกตได้คือผลต่าง $\\bar x_A - \\bar x_B$ ซึ่งก็ ผันแปร (variability) ได้ ถ้าสุ่มใหม่ ความผันแปรของผลต่างวัดด้วย ความคลาดเคลื่อนมาตรฐานของผลต่าง (standard error of the difference) เมื่อสองกลุ่มอิสระ ความแปรปรวนจะ บวกกัน เพราะสำหรับตัวแปรสุ่มอิสระ $Var(X-Y) = Var(X) + Var(Y)$ และเมื่อเรา ทราบความแปรปรวนประชากร $\\sigma^2$ การแจกแจงของผลต่างเป็นโค้งปกติพอดี จึงใช้ $z$ ได้โดยตรง", "blocks": [{"type": "formula", "label": "ความคลาดเคลื่อนมาตรฐานของผลต่าง (ทราบ σ)", "content": "SE_{\\bar x_A - \\bar x_B} = \\sqrt{\\dfrac{\\sigma_A^2}{n_A} + \\dfrac{\\sigma_B^2}{n_B}}"}, {"type": "note", "content": "เงื่อนไขของการทดสอบ $z$ สองค่าเฉลี่ย\n1. สุ่ม — ทั้งสองกลุ่มได้จากการสุ่ม\n2. อิสระ — สองกลุ่มไม่จับคู่กัน\n3. ทราบ $\\sigma$ — ทราบความแปรปรวนประชากรของทั้งสองกลุ่ม และประชากรเป็นปกติ (หรือ $n$ ใหญ่พอตามทฤษฎีบทขีดจำกัดกลาง, central limit theorem)"}, {"type": "formula", "label": "สถิติทดสอบ z", "content": "z = \\dfrac{(\\bar x_A - \\bar x_B) - (\\mu_A - \\mu_B)}{\\sqrt{\\dfrac{\\sigma_A^2}{n_A} + \\dfrac{\\sigma_B^2}{n_B}}} \\quad \\text{ใช้ } \\sigma \\text{ ที่ทราบ}"}, {"type": "example", "content": "ตัวอย่าง — เวลาส่งอาหารสองเขต (ทราบ σ): อิ่มดีทราบจากข้อมูลย้อนหลังว่าส่วนเบี่ยงเบนมาตรฐานประชากร (population standard deviation) ของเวลาส่งอาหารคือ $\\sigma_A = 6.0$ และ $\\sigma_B = 5.5$ นาที สุ่มเขต A ได้ $n_A=45,\\ \\bar x_A = 33.0$ เขต B ได้ $n_B=50,\\ \\bar x_B = 30.1$ ทดสอบที่ $\\alpha = 0.05$ แบบสองหาง\n\n$H_0: \\mu_A - \\mu_B = 0,\\ \\ H_1: \\mu_A - \\mu_B \\neq 0$\n$SE = \\sqrt{6.0^2/45 + 5.5^2/50} = \\sqrt{0.800+0.605} = \\sqrt{1.405} \\approx 1.185$\n$z = \\dfrac{(33.0-30.1)-0}{1.185} = \\dfrac{2.9}{1.185} \\approx 2.45$\nเปิดตาราง $z$ แบบสองหาง $\\alpha=0.05$ (หางละ 0.025) ได้ $z^* = \\pm 1.96$ เนื่องจาก $|z|=2.45 > 1.96$ (p-value ≈ 0.014) จึง ปฏิเสธ $H_0$ — ที่ระดับ 0.05 เวลาส่งอาหารสองเขตต่างกันจริง เขต A ช้ากว่าเขต B เฉลี่ยราว 2.9 นาที"}, {"type": "note", "content": "เส้นแบ่งว่าจะใช้ $z$ หรือ $t$ คือเรา ทราบ $\\sigma$ หรือไม่ ไม่ใช่ขนาดตัวอย่าง เมื่อ ไม่ทราบ $\\sigma$ (กรณีปกติในงานจริง) ต้องประมาณด้วย $s$ แล้วเปลี่ยนไปใช้การแจกแจง $t$ ในหัวข้อ 8.2"}]}, {"title": "8.2 การทดสอบค่าเฉลี่ยสองกลุ่มอิสระ เมื่อไม่ทราบความแปรปรวน (t): เวลช์กับรวมความแปรปรวน", "body": "ในหัวข้อ 8.1 เราสมมติว่า ทราบ ความแปรปรวนประชากร $\\sigma$ แต่ในงานจริงเรามัก ไม่ทราบ $\\sigma$ จึงต้องประมาณด้วย ส่วนเบี่ยงเบนของตัวอย่าง (sample standard deviation) $s$ ความไม่แน่นอนที่เพิ่มเข้ามานี้ทำให้ต้องเปลี่ยนจากโค้งปกติ (z) ไปใช้การแจกแจง t (Student's t-distribution) ที่หางหนากว่า สมมติทีมอิ่มดีเก็บเวลากดสั่งจากผู้ใช้สองกลุ่มที่เป็นอิสระต่อกัน", "blocks": [{"type": "formula", "label": "ความคลาดเคลื่อนมาตรฐานของผลต่าง (ไม่ทราบ σ)", "content": "SE_{\\bar x_A - \\bar x_B} = \\sqrt{\\dfrac{s_A^2}{n_A} + \\dfrac{s_B^2}{n_B}}"}, {"type": "formula", "label": "สถิติทดสอบสองค่าเฉลี่ยอิสระ", "content": "t = \\dfrac{(\\bar x_A - \\bar x_B) - 0}{\\sqrt{\\dfrac{s_A^2}{n_A} + \\dfrac{s_B^2}{n_B}}} \\quad \\text{เมื่อ } H_0: \\mu_A - \\mu_B = 0"}, {"type": "note", "content": "มีสองแนวทางหาองศาอิสระ (degrees of freedom, df) ต่างกัน\nเวลช์ (Welch's t): ไม่สมมติว่าความแปรปรวนสองกลุ่มเท่ากัน ใช้ได้เสมอ เป็นค่าตั้งต้นที่แนะนำ\nรวมความแปรปรวน (pooled t): สมมติ $\\sigma_A^2 = \\sigma_B^2$ แล้วรวมเป็น $s_p^2$ ตัวเดียว แม่นกว่าเล็กน้อยถ้าข้อสมมตินั้นจริง"}, {"type": "formula", "label": "องศาอิสระของเวลช์ (Welch–Satterthwaite)", "content": "df_{Welch} = \\dfrac{\\left(\\dfrac{s_A^2}{n_A}+\\dfrac{s_B^2}{n_B}\\right)^2}{\\dfrac{(s_A^2/n_A)^2}{n_A-1}+\\dfrac{(s_B^2/n_B)^2}{n_B-1}}"}, {"type": "formula", "label": "ความแปรปรวนรวมและ SE แบบ pooled", "content": "s_p^2 = \\dfrac{(n_A-1)s_A^2 + (n_B-1)s_B^2}{n_A+n_B-2}, \\qquad SE_{pool} = s_p\\sqrt{\\dfrac{1}{n_A}+\\dfrac{1}{n_B}}, \\qquad df = n_A+n_B-2"}, {"type": "example", "content": "ตัวอย่าง — A/B ปุ่มสั่งเลย สองดีไซน์ (Welch): กลุ่ม A (ปุ่มเดิม) สุ่มผู้ใช้ $n_A=12$ คน ได้เวลากดสั่งเฉลี่ย $\\bar x_A = 9.2$ วินาที ส่วนเบี่ยงเบนตัวอย่าง $s_A=1.4$ วินาที กลุ่ม B (ปุ่มใหม่ คนละกลุ่มผู้ใช้) $n_B=12,\\ \\bar x_B=7.8,\\ s_B=1.2$ วินาที ทดสอบที่ $\\alpha=0.05$ ว่าปุ่ม A ช้ากว่า B หรือไม่ (ใช้ Welch's t)\n\n$H_0: \\mu_A-\\mu_B=0,\\ \\ H_1: \\mu_A-\\mu_B>0$ (หางขวา)\n$SE=\\sqrt{1.4^2/12+1.2^2/12}=\\sqrt{0.1633+0.1200}=\\sqrt{0.2833}\\approx0.532$ วินาที\n$t=(9.2-7.8)/0.532 = 1.4/0.532 \\approx 2.63$\n$df_{Welch}\\approx21.5$ ปัดลงใช้ $df=21$ เปิดตาราง $t$ ที่ $df=21$ หางขวา $\\alpha=0.05$ ได้ $t^*=1.72$\n$t=2.63>1.72$ (p-value ≈ 0.008) จึง ปฏิเสธ $H_0$ — มีหลักฐานที่ระดับ 0.05 ว่าปุ่มเดิม (A) ทำให้ผู้ใช้กดสั่งช้ากว่าปุ่มใหม่ (B) จริง ปุ่มใหม่ช่วยให้สั่งเร็วขึ้น ไม่ใช่ความบังเอิญ"}, {"type": "example", "content": "ตัวอย่าง — คะแนนความพึงพอใจสองเวอร์ชัน (pooled): กลุ่ม A (เวอร์ชันเดิม) $n_A=10,\\ \\bar x_A=68,\\ s_A=5.0$ กลุ่ม B (เวอร์ชันใหม่) $n_B=10,\\ \\bar x_B=74,\\ s_B=5.4$ เนื่องจาก $s_A\\approx s_B$ และ $n$ เท่ากัน จึงใช้ pooled ได้ ทดสอบสองหางที่ $\\alpha=0.05$\n\n$s_p^2=\\dfrac{9(5.0)^2+9(5.4)^2}{18}=\\dfrac{225+262.44}{18}=27.08,\\ \\ s_p=5.20$\n$SE=5.20\\sqrt{1/10+1/10}=5.20\\times0.447=2.33$\n$t=(68-74)/2.33=-6/2.33\\approx-2.58$ ที่ $df=n_A+n_B-2=18$ (เต็มจำนวนเสมอสำหรับ pooled)\n$t^*=\\pm2.101$ เนื่องจาก $|t|=2.58>2.101$ (p-value ≈ 0.019) จึง ปฏิเสธ $H_0$ — คะแนนความพึงพอใจสองเวอร์ชันต่างกันจริง เวอร์ชันใหม่ได้คะแนนสูงกว่าเฉลี่ยราว 6 คะแนน"}, {"type": "warning", "content": "ทำไม Welch จึงปลอดภัยกว่าเมื่อความแปรปรวนต่างกัน — ตัวอย่างเปรียบเทียบ: ข้อมูลชุดเดียวกันได้ $t=2.236$ เท่ากัน ทั้งสองวิธี (เพราะ $n$ เท่ากัน) แต่ถ้าความแปรปรวนสองกลุ่มต่างกันมาก ($s_A=6.0$ กับ $s_B=2.0$) วิธี Welch จะได้ $df\\approx8.5$ (ปัดเป็น 8) ให้ $t^*=\\pm2.306$ จึง ไม่ปฏิเสธ $H_0$ (p ≈ 0.054) แต่ถ้าใช้ pooled ทั้งที่ความแปรปรวนต่างกันมาก จะได้ $df=n_A+n_B-2=14$ ซึ่งใหญ่เกินจริง ค่าวิกฤตแคบลงเป็น $t^*=\\pm2.145$ ทำให้ ปฏิเสธ $H_0$ ตรงข้ามกับ Welch การใช้ pooled ทั้งที่ความแปรปรวนต่างกันจึง ประเมิน df สูงเกินจริง เสี่ยงสรุปว่าต่างกันทั้งที่หลักฐานยังไม่พอ (ผลบวกลวง, false positive) นี่คือเหตุผลที่ Welch เป็นค่าตั้งต้นที่ปลอดภัยกว่าเสมอ"}, {"type": "table", "content": "<table><thead><tr><th>วิธี</th><th>ข้อดี</th><th>ข้อเสีย</th><th>เมื่อไรใช้</th></tr></thead><tbody><tr><td>Welch (ไม่รวมความแปรปรวน)</td><td>ไม่ต้องสมมติว่าความแปรปรวนสองกลุ่มเท่ากัน คุมระดับ $\\alpha$ ได้ถูกต้องแม้ $n$ หรือ $s$ ต่างกัน ปลอดภัยเสมอ</td><td>$df$ ไม่เป็นจำนวนเต็ม คำนวณด้วยมือยากกว่า พลังน้อยกว่า pooled เล็กน้อย เมื่อความแปรปรวนเท่ากันจริง</td><td>ค่าตั้งต้น — ใช้เมื่อไม่แน่ใจ $s_A$ กับ $s_B$ ต่างกัน หรือ $n_A \\neq n_B$</td></tr><tr><td>Pooled (รวมความแปรปรวน)</td><td>$df=n_A+n_B-2$ เต็ม จึงมีพลังมากกว่าเล็กน้อยถ้าความแปรปรวนเท่ากันจริง ตรงกับสูตรคลาสสิกในตำรา</td><td>ถ้าความแปรปรวนไม่เท่า (โดยเฉพาะเมื่อ $n$ ไม่เท่า) ระดับนัยสำคัญจริงเพี้ยน เสี่ยงสรุปเกินจริง (false positive)</td><td>เมื่อมีเหตุผลเชื่อว่า $\\sigma_A^2 \\approx \\sigma_B^2$ (เช่น สองกลุ่มมาจากกระบวนการเดียวกัน)</td></tr></tbody></table>"}, {"type": "note", "content": "กฎง่าย ๆ — ถ้าส่วนเบี่ยงเบนสองกลุ่มต่างกันไม่เกินราวสองเท่า ($\\tfrac12 \\le s_A/s_B \\le 2$) ถือว่าใกล้เคียง สองวิธีให้ผลใกล้กัน แต่เมื่อไม่แน่ใจให้ใช้ Welch ไว้ก่อนเสมอ"}]}, {"title": "8.3 การทดสอบค่าเฉลี่ยแบบจับคู่ (paired t-test)", "body": "บางครั้งสองกลุ่ม ไม่อิสระ แต่จับคู่กันตามธรรมชาติ เช่น วัดหน่วยเดียวกันสองครั้ง (ก่อน–หลัง) หรือจับคู่หน่วยที่คล้ายกัน กรณีนี้ใช้ two-sample t ไม่ได้ เพราะละเมิดข้อสมมติความเป็นอิสระ", "blocks": [{"type": "note", "content": "ไอเดียหลัก — ยุบเหลือตัวแปรเดียว: แทนที่จะมองสองชุด ให้คำนวณ ผลต่างภายในคู่ (paired difference) $d_i = x_{i,\\text{ก่อน}} - x_{i,\\text{หลัง}}$ แล้วการทดสอบก็กลายเป็นการทดสอบค่าเฉลี่ยเดียวของ $d$ ว่าต่างจากศูนย์หรือไม่ — ซึ่งคือบทที่ 7 นั่นเอง การจับคู่ตัดความแตกต่างระหว่างหน่วยออกไป เหลือเฉพาะผลของการเปลี่ยนแปลงที่เราสนใจ ทำให้ $s_d$ เล็กและการทดสอบ ไวขึ้น (มีพลังมากขึ้น)"}, {"type": "formula", "label": "สถิติทดสอบค่าเฉลี่ยแบบจับคู่", "content": "t = \\dfrac{\\bar d - 0}{s_d/\\sqrt n}, \\qquad df = n-1"}, {"type": "example", "content": "ตัวอย่าง — เวลาทำอาหารก่อน/หลังปรับครัว: อิ่มดีช่วยร้านพันธมิตรปรับขั้นตอนในครัว แล้ววัดเวลาทำอาหารเฉลี่ยของ ร้านเดิม 8 ร้าน ทั้งก่อนและหลังปรับ (หน่วยนาที) ทดสอบที่ $\\alpha=0.05$ ว่าการปรับครัวลดเวลาทำอาหารจริงหรือไม่\n\nผลต่าง $d=\\{2.1,0.9,1.9,0.7,1.4,0.8,1.8,1.2\\}$ รวม $=10.8,\\ \\ \\bar d = 10.8/8 = 1.35$ นาที\n$s_d = \\sqrt{\\sum(d_i-\\bar d)^2/(n-1)} = \\sqrt{2.02/7} = \\sqrt{0.2886} \\approx 0.537$ นาที, $SE = 0.537/\\sqrt8 \\approx 0.190$\n$H_0:\\mu_d=0,\\ H_1:\\mu_d>0$ (หางขวา), $df=7$: $\\ t = 1.35/0.190 \\approx 7.11$\n$t^*=1.895$ ที่ $\\alpha=0.05$ หางขวา เนื่องจาก $t=7.11 \\gg 1.895$ (p-value ≈ 0.0001) จึง ปฏิเสธ $H_0$ อย่างชัดเจน — การปรับครัวลดเวลาทำอาหารจริงเฉลี่ยราว 1.35 นาทีต่อร้าน"}, {"type": "warning", "content": "กฎสำคัญ — ถ้าแต่ละค่าในกลุ่มหนึ่งมีคู่ที่เจาะจงในอีกกลุ่ม (ร้านเดิม ผู้ใช้เดิม) ต้อง ใช้ paired ห้ามใช้ two-sample เพราะจะทิ้งข้อมูลการจับคู่และมักทำให้การทดสอบด้อยพลังลง — ถ้าวิเคราะห์ข้อมูลจับคู่ด้วย two-sample t (ราวกับเป็นสองกลุ่มอิสระ) ความแปรปรวนระหว่างหน่วย (เช่น ร้านที่ทำอาหารเร็วอยู่แล้วก็เร็วทั้งก่อนและหลัง) จะกลบผลของการเปลี่ยนแปลงที่แท้จริง ทำให้ $t$ เล็กลงมากและอาจสรุปผิดว่า ไม่มีผล เปรียบเทียบตัวอย่างข้างต้นที่ลดเวลาทำอาหาร ถ้าวิเคราะห์แบบจับคู่ได้ $SE=0.19$ แต่ถ้ามองเป็นสองกลุ่มอิสระ $SE=0.47$ ใหญ่กว่าราว 2.5 เท่า ทำให้สถิติ $t$ ตกจาก 7.11 เหลือเพียง 2.88"}, {"type": "note", "content": "ข้อสมมติของ paired t-test: (1) ผลต่าง $d$ มาจากการแจกแจงปกติโดยประมาณ หรือ $n$ ใหญ่พอ (ทฤษฎีบทขีดจำกัดกลาง) (2) คู่เป็นอิสระระหว่างกัน (ร้านหนึ่งไม่กระทบอีกร้าน) (3) การวัดในคู่จับกันถูกต้อง ก่อน–หลังต้องเป็นหน่วยเดียวกันจริง\n\nทางเลือกแบบไม่อิงพารามิเตอร์ (nonparametric, ไม่อิงพารามิเตอร์) เมื่อข้อมูลไม่เข้าเงื่อนไขความปกติ: Wilcoxon signed-rank ใช้แทน paired t เมื่อ $d$ ไม่ปกติ (ทดสอบมัธยฐานของผลต่าง), Mann–Whitney U ใช้แทน two-sample t เมื่อกลุ่มไม่ปกติ (เทียบการกระจายสองกลุ่ม), bootstrap/permutation (การสุ่มซ้ำแบบบูตสแตรป/เพอร์มิวเทชัน) สร้างการแจกแจงของสถิติด้วยการสุ่มซ้ำจากข้อมูลจริง ไม่ต้องสมมติรูปแบบ"}, {"type": "table", "content": "<table><thead><tr><th>แบบ</th><th>ข้อดี</th><th>ข้อเสีย</th><th>เมื่อไรใช้</th></tr></thead><tbody><tr><td>จับคู่ (paired)</td><td>ตัดความแปรปรวนระหว่างหน่วยออก ($SE$ เล็กลงมาก) จึงมีพลังสูง ตรวจจับผลเล็กได้ด้วย $n$ น้อย</td><td>เสียองศาอิสระ ($df=n-1$ แทน $n_A+n_B-2$) ต้องมีการจับคู่ตามธรรมชาติจริง ถ้าคู่ไม่สัมพันธ์กันจะเสีย $df$ ฟรีโดยไม่ได้ลดความแปรปรวน</td><td>วัด หน่วยเดียวกัน สองครั้ง (ก่อน/หลัง) หรือจับคู่หน่วยที่คล้ายกันมาก</td></tr><tr><td>อิสระ (independent)</td><td>เรียบง่าย ใช้กับสองกลุ่มคนละชุด $df$ มากกว่า ไม่ต้องออกแบบการจับคู่</td><td>ความแปรปรวน ระหว่างหน่วย เข้าไปปนอยู่ใน $SE$ ทำให้พลังต่ำกว่าเมื่อหน่วยต่างกันมาก ต้องการ $n$ มากกว่าเพื่อพลังเท่ากัน</td><td>สองกลุ่มเป็นอิสระต่อกัน ไม่มีคู่ธรรมชาติ (เช่น ผู้ใช้คนละกลุ่มเจอปุ่มคนละแบบ)</td></tr></tbody></table>"}]}, {"title": "8.4 การทดสอบสองสัดส่วน (two-proportion z-test)", "body": "บ่อยครั้งผลลัพธ์เป็น ใช่/ไม่ใช่ เช่น คลิก/ไม่คลิก สั่งสำเร็จ/ไม่สั่ง แทนที่จะเป็นค่าเฉลี่ย เราจึงเทียบ สองสัดส่วน (two proportions) $p_A$ กับ $p_B$ ด้วยสถิติ $z$", "blocks": [{"type": "note", "content": "ไอเดียหลัก — สิ่งที่สังเกตคือผลต่างสัดส่วน $\\hat p_A - \\hat p_B$ ความคลาดเคลื่อนมาตรฐานของมันคำนวณจาก $p(1-p)/n$ ของแต่ละกลุ่มบวกกัน (เพราะอิสระ)"}, {"type": "formula", "label": "สัดส่วนรวม (pooled p̂)", "content": "\\hat p = \\dfrac{x_A+x_B}{n_A+n_B}"}, {"type": "formula", "label": "สถิติทดสอบสองสัดส่วน", "content": "z = \\dfrac{\\hat p_A - \\hat p_B}{\\sqrt{\\hat p(1-\\hat p)\\left(\\dfrac{1}{n_A}+\\dfrac{1}{n_B}\\right)}}"}, {"type": "note", "content": "ภายใต้ $H_0: p_A=p_B$ สัดส่วนสองกลุ่มเท่ากัน จึงประมาณค่าร่วมด้วย $\\hat p$ ที่รวมความสำเร็จทั้งหมด — การใช้ สัดส่วนรวม $\\hat p$ ในตัวส่วนให้ความคลาดเคลื่อนมาตรฐานที่ถูกต้องที่สุดสำหรับการทดสอบ (ต่างจากการประมาณค่าช่วงความเชื่อมั่นที่แยกคำนวณ $\\hat p_A,\\hat p_B$ เอง)\n\nเงื่อนไขความถูกต้องของการประมาณด้วย $z$: แต่ละกลุ่มควรมีความสำเร็จและความล้มเหลวอย่างน้อยราว 10 ครั้ง ($n\\hat p \\ge 10$ และ $n(1-\\hat p) \\ge 10$) ทั้งสองกลุ่ม"}, {"type": "example", "content": "ตัวอย่าง — อัตราคลิกสองดีไซน์ปุ่ม: ดีไซน์ A แสดง $n_A=500$ ครั้ง มีคลิก $x_A=60$ ครั้ง ดีไซน์ B แสดง $n_B=500$ ครั้ง คลิก $x_B=80$ ครั้ง ทดสอบที่ $\\alpha=0.05$ ว่าอัตราคลิกของ B สูงกว่า A หรือไม่ (หางเดียว)\n\n$\\hat p_A = 60/500=0.120,\\ \\ \\hat p_B=80/500=0.160,\\ \\ \\hat p=(60+80)/1000=0.140$\n$SE=\\sqrt{0.14\\times0.86\\,(1/500+1/500)}\\approx0.0220$\n$z=(0.120-0.160)/0.0220 \\approx -1.82$; $z^*=-1.645$ เนื่องจาก $z=-1.82 < -1.645$ (p-value ≈ 0.034) จึง ปฏิเสธ $H_0$ — อัตราคลิกของดีไซน์ B (16%) สูงกว่า A (12%) จริงที่ระดับ 0.05"}, {"type": "example", "content": "ตัวอย่าง — เมื่อผลต่างไม่นัยสำคัญ (ตัวอย่างเล็ก): เทียบแบนเนอร์โปรโมชันสองแบบ แบบ A แสดง $n_A=200$ คลิก $x_A=44$ (22.0%) แบบ B แสดง $n_B=200$ คลิก $x_B=52$ (26.0%) ทดสอบสองหางที่ $\\alpha=0.05$\n\n$\\hat p = 96/400=0.240,\\ \\ SE=\\sqrt{0.24\\times0.76\\,(1/200+1/200)}\\approx0.0427$\n$z=(0.220-0.260)/0.0427 \\approx -0.94$; $z^*=\\pm1.96$ เนื่องจาก $|z|=0.94<1.96$ (p-value ≈ 0.35) จึง ไม่ปฏิเสธ $H_0$ — ยังไม่มีหลักฐานพอว่าอัตราคลิกสองแบบต่างกัน แม้ผลต่างที่เห็น (4 จุดเปอร์เซ็นต์) จะดูใกล้เคียงกับตัวอย่างแรก (16% เทียบ 12%) แต่ที่นี่ $n$ เล็กกว่ามาก (200 ต่อกลุ่ม แทน 500) ทำให้ $SE$ ใหญ่กว่า สถิติ $z$ จึงเล็กลงจนไม่นัยสำคัญ — นี่คือเหตุผลที่ต้อง วางแผนขนาดตัวอย่างล่วงหน้า (หัวข้อถัดไป) ก่อนสรุปว่า ไม่ต่าง"}]}, {"title": "A/B testing — การประยุกต์การทดสอบสองสัดส่วน (เสริม)", "body": "การทดสอบ A/B (A/B testing) คือการนำการทดลองแบบสุ่มจัดกลุ่ม (randomized experiment) มาใช้กับผู้ใช้จริงทางออนไลน์ มันรวมทุกอย่างในบทนี้ไว้ครบ ตั้งแต่ออกแบบ สุ่ม วัดผล จนถึงทดสอบสมมติฐาน เป็นเครื่องมือหลักที่ทีมอิ่มดีใช้ตัดสินใจ", "blocks": [{"type": "note", "content": "ขั้นตอนของ A/B test: 1) ตั้งคำถามและตัววัด (metric) เลือกตัวชี้วัดหลักหนึ่งตัว เช่น อัตราสั่งสำเร็จหรือเวลากดสั่งเฉลี่ย 2) ตั้งสมมติฐาน $H_0$ ไม่มีความต่าง / $H_1$ variant ดีกว่า (หรือ ต่างจาก) 3) สุ่มแบ่งผู้ใช้ เข้ากลุ่ม A (control) และ B (variant) เพื่อเฉลี่ยปัจจัยแฝงทิ้ง 4) กำหนดขนาดตัวอย่างล่วงหน้า จากผลที่ต้องการตรวจจับ (effect size, ขนาดของผล) และพลังการทดสอบ (power) 5) เก็บข้อมูล แล้วทดสอบ — สัดส่วนใช้ two-proportion z ค่าเฉลี่ยใช้ two-sample t 6) ตีความทั้งสถิติและเชิงปฏิบัติ ก่อนตัดสินใจปล่อยจริง"}, {"type": "note", "content": "ทำไมต้องสุ่มแบ่งผู้ใช้ — การสุ่ม (randomization) ทำให้กลุ่ม A และ B เหมือนกันโดยเฉลี่ยในทุกด้าน ยกเว้นสิ่งที่เราเปลี่ยน ความต่างของตัววัดจึงสรุปได้ว่ามาจาก variant ไม่ใช่ปัจจัยแฝง (confounders, ปัจจัยแฝง) เช่น ช่วงเวลา ประเภทอุปกรณ์ หรือกลุ่มผู้ใช้ — A/B testing เป็นการ ทดลอง ไม่ใช่การสังเกต จึงสรุป เชิงสาเหตุ (causal) ได้ ต่างจากการเทียบยอดสั่งสัปดาห์เก่ากับใหม่คนละช่วงเวลาซึ่งมีปัจจัยแฝงเรื่องเวลาเสมอ"}, {"type": "subheading", "content": "สามคำที่ควรรู้ก่อนออกแบบ"}, {"type": "note", "content": "ขนาดผลขั้นต่ำที่สนใจ (minimum detectable effect): ผลต่างที่เล็กที่สุดที่คุ้มค่าจะตรวจจับ กำหนดจากมุมมองธุรกิจ ไม่ใช่จากข้อมูล\nพลังการทดสอบ (power): โอกาสที่จะจับผลจริงได้ถ้ามันมีอยู่ นิยมตั้งราว 80%\nระดับนัยสำคัญ (α): โอกาสฟ้องผิด (false positive, ผลบวกลวง) นิยม 0.05\n\nหลักคิดสำคัญ (ไม่ต้องใช้สูตร): ยิ่งอยากจับผลที่เล็กลง ยิ่งต้องเก็บข้อมูลมากขึ้น และยิ่งข้อมูลแปรปรวนมาก ยิ่งต้องใช้ตัวอย่างมาก ทีมจึงควรตั้งเป้าผลที่คุ้มค่าจะจับ แล้ววางแผนจำนวนตัวอย่างล่วงหน้าก่อนเริ่มเก็บ ไม่ใช่แอบดูผลกลางคันแล้วรีบสรุป"}, {"type": "example", "content": "กรณีศึกษา A/B แบบครบวงจร: ทีมอิ่มดีอยากรู้ว่าปุ่ม สั่งเลย สีใหม่ (variant B) เพิ่ม อัตราการสั่งสำเร็จ (order rate) เทียบของเดิม (control A) หรือไม่ สุ่มแบ่งทราฟฟิกครึ่งต่อครึ่ง เก็บ 1 สัปดาห์ ได้ผล A: $n_A=4000$ สั่งสำเร็จ 472 ครั้ง (11.8%) B: $n_B=4000$ สั่งสำเร็จ 568 ครั้ง (14.2%)\n\n$H_0:p_A-p_B=0,\\ \\ H_1:p_A-p_B<0$; $\\hat p_A=0.118,\\ \\hat p_B=0.142,\\ \\hat p=1040/8000=0.130$\n$SE=\\sqrt{0.13\\times0.87\\,(1/4000+1/4000)}\\approx0.00752$\n$z=(0.118-0.142)/0.00752 \\approx -3.19$; $z^*=-1.645$ เนื่องจาก $z=-3.19<-1.645$ (p-value ≈ 0.0007) จึง ปฏิเสธ $H_0$ อย่างชัดเจน\nตีความ: B เพิ่มอัตราการสั่งสำเร็จจาก 11.8% เป็น 14.2% (ลิฟต์สัมพัทธ์, relative lift ≈ 20%) มีนัยสำคัญทั้งทางสถิติและเชิงปฏิบัติ ควรพิจารณาปล่อยจริงให้ผู้ใช้อิ่มดีทุกคน"}, {"type": "subheading", "content": "นัยสำคัญทางสถิติ กับ นัยสำคัญเชิงปฏิบัติ"}, {"type": "note", "content": "กับดักใหญ่ที่สุดของ A/B testing คือสับสนระหว่างสองคำถามนี้\nนัยสำคัญทางสถิติ (statistical significance): ถามว่าความต่างที่เห็น น่าจะไม่ใช่ความบังเอิญ ใช่ไหม วัดด้วย p-value\nนัยสำคัญเชิงปฏิบัติ (practical significance): ถามว่าความต่างนั้น ใหญ่พอจะคุ้มค่าในโลกจริงหรือไม่ วัดด้วยขนาดของผล (effect size) และต้นทุน"}, {"type": "warning", "content": "เมื่อ $n$ ใหญ่ขึ้นเรื่อย ๆ ผลต่างเล็กจิ๋วเพียง 0.4 จุดเปอร์เซ็นต์ก็กลายเป็น มีนัยสำคัญทางสถิติ ได้ (เลยเส้น $z^*=1.96$) ทั้งที่ผลในทางปฏิบัติอาจไม่คุ้มค่า — ด้วยผู้ใช้หลักล้าน แม้ลิฟต์เพียง 0.05% ก็อาจมี p-value เล็กมาก แต่ไม่คุ้มความเสี่ยงและต้นทุนการเปลี่ยน ควรกำหนด ขนาดผลขั้นต่ำที่สนใจ (minimum detectable effect) ไว้ก่อนเริ่มทดสอบเสมอ — p-value เล็ก ไม่ได้แปลว่าผลใหญ่ หรือคุ้มค่าเสมอไป"}, {"type": "subheading", "content": "กับดักที่พบบ่อยใน A/B testing"}, {"type": "note", "content": "แอบดูผลแล้วหยุดก่อน (peeking): หยุดทันทีที่เห็น p<0.05 ทำให้ผลบวกลวงพุ่งสูง (การจำลองแสดงว่าอาจพุ่งจาก 5% ไปเกิน 20%) ต้องกำหนดระยะเวลา/ขนาดตัวอย่างล่วงหน้า หรือใช้วิธี sequential testing ที่ออกแบบมาเพื่อการนี้โดยเฉพาะ\nทดสอบหลายตัวพร้อมกัน (multiple testing): ยิ่งทดสอบหลายตัววัด ยิ่งมีโอกาสเจอผลปลอม ต้องปรับ เช่นด้วยวิธี Bonferroni (การปรับบอนเฟอร์โรนี)\nตัวอย่างน้อยเกินไป (underpowered): $n$ เล็กตรวจไม่เจอผลจริง (ดังตัวอย่างแบนเนอร์ข้างต้น)\nปัจจัยแฝงรั่ว: ปล่อย A และ B คนละช่วงเวลา หรือคนละกลุ่มอุปกรณ์ ทำให้ผลต่างปนกับปัจจัยอื่น\nผลแปรตามกลุ่มย่อย (Simpson's paradox, ข้อขัดแย้งของซิมป์สัน): ผลรวมกลับทิศเมื่อแยกกลุ่มย่อย\nสับสนนัยสำคัญทางสถิติกับเชิงปฏิบัติ ตามหัวข้อก่อน\nปรากฏการณ์ความแปลกใหม่ (novelty effect): ของใหม่ดูดีช่วงแรกเพราะแปลกตา แล้วจางหายไปเมื่อผู้ใช้คุ้นเคย"}]}, {"title": "สรุปบทและตารางสูตรรวม", "body": "บทนี้ขยายการทดสอบสมมติฐานจากกลุ่มเดียวสู่การเปรียบเทียบสองกลุ่ม แนวทางคิดทั้งบทเหมือนกันหมด คือถามว่า ผลต่างที่สังเกตได้ ใหญ่กว่าความผันแปรตามธรรมชาติของผลต่างหรือไม่ ต่างกันแค่วิธีคำนวณความคลาดเคลื่อนมาตรฐานของผลต่าง ตามชนิดของข้อมูล", "blocks": [{"type": "subheading", "content": "ขั้นตอนคิดสี่ขั้นเสมอ"}, {"type": "note", "content": "1) อิสระหรือจับคู่ — ถามก่อนเสมอ คู่ธรรมชาติใช้ paired\n2) ค่าเฉลี่ยหรือสัดส่วน — เชิงปริมาณใช้ $t$ (หรือ $z$ ถ้าทราบ $\\sigma$) ส่วนแบบใช่/ไม่ใช่ใช้ $z$\n3) ตั้งสมมติฐานบนผลต่าง แล้วคำนวณ $SE$ ของผลต่างให้ถูกชนิด\n4) ตีความสองชั้น — นัยสำคัญทางสถิติ แล้วนัยสำคัญเชิงปฏิบัติ"}, {"type": "table", "content": "<table><thead><tr><th>กรณี</th><th>เงื่อนไข</th><th>สถิติทดสอบ</th><th>df</th></tr></thead><tbody><tr><td>ค่าเฉลี่ย 2 กลุ่ม ทราบ σ (z)</td><td>อิสระ, ทราบ $\\sigma_A,\\sigma_B$</td><td>$z=\\dfrac{(\\bar x_A-\\bar x_B)-0}{\\sqrt{\\sigma_A^2/n_A+\\sigma_B^2/n_B}}$</td><td>—</td></tr><tr><td>ค่าเฉลี่ย 2 กลุ่ม ไม่ทราบ σ, Welch (t)</td><td>อิสระ, ไม่ทราบ/ไม่เท่ากัน — ค่าตั้งต้น</td><td>$t=\\dfrac{(\\bar x_A-\\bar x_B)-0}{\\sqrt{s_A^2/n_A+s_B^2/n_B}}$</td><td>Welch–Satterthwaite (ทศนิยม, ปัดลง)</td></tr><tr><td>ค่าเฉลี่ย 2 กลุ่ม ไม่ทราบ σ, pooled (t)</td><td>อิสระ, สมมติ $\\sigma_A^2\\approx\\sigma_B^2$</td><td>$t=\\dfrac{(\\bar x_A-\\bar x_B)-0}{s_p\\sqrt{1/n_A+1/n_B}}$</td><td>$n_A+n_B-2$</td></tr><tr><td>จับคู่ (paired t)</td><td>หน่วยเดิมวัดสองครั้ง / จับคู่กัน</td><td>$t=\\dfrac{\\bar d-0}{s_d/\\sqrt n}$</td><td>$n-1$</td></tr><tr><td>สัดส่วน 2 กลุ่ม (z)</td><td>อิสระ, ข้อมูลใช่/ไม่ใช่</td><td>$z=\\dfrac{\\hat p_A-\\hat p_B}{\\sqrt{\\hat p(1-\\hat p)(1/n_A+1/n_B)}}$</td><td>—</td></tr></tbody></table>"}, {"type": "example", "content": "ประโยคที่ควรจำทั้งบท — การทดสอบสองประชากรทุกแบบคือเรื่องเดียวกัน คือถามว่า ผลต่างที่สังเกตได้ ใหญ่กว่าความผันแปรตามธรรมชาติของผลต่างหรือไม่ ต่างกันแค่วิธีคำนวณความคลาดเคลื่อนมาตรฐานของผลต่าง และอย่าลืมว่า p-value เล็ก ไม่เท่ากับ ผลใหญ่"}, {"type": "note", "content": "ฝึกทำโจทย์บทที่ 8 แบบมีเฉลยทีละขั้นตอนได้ที่ [IC Quiz 8.1-8.4: การทดสอบสมมติฐานสองประชากร](%28STATICS%29Practice_by_CLaude_IC_Quiz_8.1-8.4.html)"}]}];
 const INCLUDE_CALC = true;
 
 function decodeCommonEntities(s){
@@ -1288,377 +850,310 @@ function escHtml(str){
   const s = decodeCommonEntities(String(str));
   return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
-
-function sanitizePromptHtml(str){
-  if(str === undefined || str === null) return "";
-  str = String(str);
-  const placeholders = [];
-  let out = str.replace(/<img\b[^>]*>/gi, (m)=>{
-    placeholders.push(m);
-    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
-  });
-  out = out.replace(/<div class="img-caption">[\s\S]*?<\/div>/gi, (m)=>{
-    placeholders.push(m);
-    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
-  });
-  out = out.replace(/<\/?(br|table|thead|tbody|tr|td|th)\b[^>]*>/gi, (m)=>{
-    placeholders.push(m);
-    return "\u0000IMG"+(placeholders.length-1)+"\u0000";
-  });
-  out = decodeCommonEntities(out);
-  out = out.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  out = out.replace(/\u0000IMG(\d+)\u0000/g, (_, idx)=>placeholders[parseInt(idx)]);
-  return out;
-}
-
-let mode = "exercise";
 let calcCurrentSlotId = null;
-let order = "original";
-let displayIndexes = QUESTIONS.map((q,i)=>i);
-let userAnswers = {};
-let checked = {};
 
-let timerMode = "stopwatch";
-let timerSeconds = 0;
-let timerLimit = 0;
-let timerInterval = null;
-let timerRunning = false;
-
-function shuffleArray(arr){
-  const a = arr.slice();
-  for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
-  }
-  return a;
-}
-
-function formatTime(sec){
-  const m = Math.floor(sec/60).toString().padStart(2,"0");
-  const s = Math.floor(sec%60).toString().padStart(2,"0");
-  return m+":"+s;
-}
-
-function updateTimerDisplay(){
-  const displaySec = timerMode==="countdown" ? Math.max(timerLimit - timerSeconds, 0) : timerSeconds;
-  document.getElementById("timerDisplay").textContent = formatTime(displaySec);
-  if(timerMode==="countdown" && timerLimit>0 && timerSeconds>=timerLimit){
-    stopTimer();
-    document.getElementById("timerDisplay").textContent = "หมดเวลา";
-  }
-}
-
-function startTimer(){
-  if(timerRunning) return;
-  if(timerMode==="countdown"){
-    const mins = parseFloat(document.getElementById("countdownMinutes").value);
-    if(mins>0 && timerLimit===0) timerLimit = mins*60;
-  }
-  timerRunning = true;
-  timerInterval = setInterval(()=>{
-    timerSeconds++;
-    updateTimerDisplay();
-  },1000);
-}
-
-function stopTimer(){
-  timerRunning = false;
-  clearInterval(timerInterval);
-}
-
-function resetTimer(){
-  stopTimer();
-  timerSeconds = 0;
-  timerLimit = 0;
-  document.getElementById("countdownMinutes").value = "";
-  updateTimerDisplay();
-}
-
-document.getElementById("timerStartBtn").onclick = startTimer;
-document.getElementById("timerPauseBtn").onclick = stopTimer;
-document.getElementById("timerResetBtn").onclick = resetTimer;
-document.getElementById("timerModeSelect").onchange = (e)=>{
-  timerMode = e.target.value;
-  resetTimer();
-};
-
-function subKey(qIdx, subIdx){
-  return qIdx+"_"+subIdx;
-}
-
-function checkSubAnswer(q, subIdx, value){
-  const sub = q.subs[subIdx];
-  if(sub.type==="number"){
-    const val = parseFloat(value);
-    const tol = sub.tolerance !== undefined ? sub.tolerance : 0.01;
-    return !isNaN(val) && Math.abs(val - sub.correctAnswer) <= tol;
-  }
-  return String(value).trim() === String(sub.correctAnswer).trim();
-}
-
-function questionStatus(qIdx){
-  const q = QUESTIONS[qIdx];
-  const total = q.subs.length;
-  let answeredCount = 0;
-  let correctCount = 0;
-  for(let s=0;s<total;s++){
-    const key = subKey(qIdx,s);
-    if(userAnswers[key] !== undefined && userAnswers[key] !== ""){
-      answeredCount++;
-      if(checked[qIdx] && checkSubAnswer(q,s,userAnswers[key])) correctCount++;
-    }
-  }
-  if(!checked[qIdx]){
-    if(answeredCount===0) return "unanswered";
-    return "partial";
-  }
-  if(correctCount===total) return "correct";
-  return "incorrect";
-}
-
-function renderNavGrid(){
-  const nav = document.getElementById("navGrid");
-  nav.innerHTML = "";
-  displayIndexes.forEach((qIdx, pos)=>{
-    const cell = document.createElement("div");
-    cell.className = "nav-cell";
-    const status = questionStatus(qIdx);
-    if(status==="partial") cell.classList.add("answered");
-    if(status==="correct") cell.classList.add("correct");
-    if(status==="incorrect") cell.classList.add("incorrect");
-    cell.textContent = pos+1;
-    cell.onclick = ()=>{
-      const target = document.getElementById("qcard_"+qIdx);
-      if(target) target.scrollIntoView({behavior:"smooth", block:"start"});
-    };
-    nav.appendChild(cell);
+function renderTOC(){
+  const toc = document.getElementById("tocList");
+  toc.innerHTML = "";
+  SECTIONS.forEach((sec, idx)=>{
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = "#section_"+idx;
+    const hasDiagram = (sec.blocks||[]).some(function(b){ return b.type === "diagram"; });
+    a.textContent = (hasDiagram ? "🔀 " : "") + sec.title;
+    a.dataset.idx = idx;
+    li.appendChild(a);
+    toc.appendChild(li);
   });
 }
 
-function calcParkOutsideMain(){
-  const modal = document.getElementById("calcModal");
+function setupTocPanel(){
+  const panel = document.getElementById("tocPanel");
+  if(panel && window.matchMedia("(max-width:800px)").matches){
+    panel.removeAttribute("open");
+  }
+}
+
+function decodeCommonEntities(s){
+  return s.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,"&");
+}
+function escapeXml(s){
+  const decoded = decodeCommonEntities(String(s==null?"":s));
+  return decoded.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function mdFormat(s){
+  const str = String(s==null?"":s);
+  const codeBlocks = [];
+  let t = str.replace(/```[a-zA-Z0-9]*\n([\s\S]*?)```/g, function(_, code){
+    codeBlocks.push('<pre class="code-block"><code>'+escapeXml(code.replace(/\n$/,""))+'</code></pre>');
+    return " CODEBLOCK"+(codeBlocks.length-1)+" ";
+  });
+  t = escapeXml(t);
+  t = t.replace(/`([^`\n]+?)`/g, "<code>$1</code>");
+  t = t.replace(/\*\*([^*\n]+?)\*\*/g, "<strong>$1</strong>");
+  t = t.replace(/\[([^\]\n]+?)\]\(([^)\s]+?)\)/g, "<a href=\"$2\">$1</a>");
+  t = t.replace(/ CODEBLOCK(\d+) /g, function(_, idx){ return codeBlocks[parseInt(idx)]; });
+  return t;
+}
+function computeReadingTime(){
   const main = document.getElementById("mainArea");
-  if(modal && main.contains(modal)){
-    modal.classList.remove("open");
-    document.body.appendChild(modal);
-    calcCurrentSlotId = null;
+  const chars = (main.textContent || "").replace(/\s+/g, "").length;
+  return Math.max(1, Math.round(chars / 900));
+}
+function fmtTspans(text, x){
+  return String(text==null?"":text).split("\n").map(function(line,i){
+    return '<tspan x="'+x+'" dy="'+(i===0?0:15)+'">'+escapeXml(line)+'</tspan>';
+  }).join("");
+}
+
+function renderDiagramBlock(block, secIdx, blockIdx){
+  const uid = "dg_"+secIdx+"_"+blockIdx;
+  const layout = block.layout || "lifeline";
+  const actors = block.actors || [];
+  const steps = block.steps || [];
+  const n = actors.length;
+  const W = 680;
+  const margin = 76;
+  const nodesX = [];
+  for(let i=0;i<n;i++){ nodesX.push(n===1 ? W/2 : margin + i*((W-2*margin)/Math.max(1,n-1))); }
+  let inner = "";
+  let H = 0;
+
+  if(layout === "flow"){
+    const boxY = 50, boxH = 46;
+    const boxW = Math.min(128, Math.max(70,(W-2*margin)/Math.max(1,n-1)-14));
+    H = 168;
+    actors.forEach(function(a,i){
+      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+boxY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
+      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(boxY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
+    });
+    steps.forEach(function(st,i){
+      const x1 = nodesX[st.from]+boxW/2+3, x2 = nodesX[st.to]-boxW/2-3;
+      const y = boxY+boxH/2;
+      const pid = uid+"_p"+i, mid = uid+"_m"+i;
+      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
+      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(boxY-12)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
+      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
+             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
+             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
+             + '</circle>';
+    });
+  } else {
+    const rowH = 64, topY = 12, boxH = 38;
+    H = topY + boxH + steps.length*rowH + 26;
+    const boxW = Math.min(160, Math.max(80,(W-2*margin)/Math.max(1,n-1)-10));
+    actors.forEach(function(a,i){
+      inner += '<rect class="diagram-node-box" x="'+(nodesX[i]-boxW/2)+'" y="'+topY+'" width="'+boxW+'" height="'+boxH+'" rx="7"></rect>';
+      inner += '<text class="diagram-actor-label" x="'+nodesX[i]+'" y="'+(topY+boxH/2-6)+'" text-anchor="middle">'+fmtTspans(a, nodesX[i])+'</text>';
+      inner += '<line class="diagram-lifeline" x1="'+nodesX[i]+'" y1="'+(topY+boxH)+'" x2="'+nodesX[i]+'" y2="'+(H-8)+'"></line>';
+    });
+    steps.forEach(function(st,i){
+      const y = topY+boxH+22 + i*rowH;
+      const x1 = nodesX[st.from], x2 = nodesX[st.to];
+      const pid = uid+"_p"+i, mid = uid+"_m"+i;
+      inner += '<path id="'+pid+'" class="diagram-arrow-path" d="M '+x1+' '+y+' L '+x2+' '+y+'"></path>';
+      inner += '<text class="diagram-arrow-label" x="'+((x1+x2)/2)+'" y="'+(y-9)+'" text-anchor="middle">'+escapeXml(st.label||"")+'</text>';
+      inner += '<circle id="'+mid+'d" class="diagram-glow-dot" r="6.5" cx="'+x1+'" cy="'+y+'">'
+             + '<animateMotion id="'+mid+'" begin="indefinite" dur="0.75s" fill="freeze" path="M '+x1+' '+y+' L '+x2+' '+y+'"></animateMotion>'
+             + '<animate attributeName="opacity" begin="'+mid+'.begin" dur="0.05s" from="0" to="1" fill="freeze"></animate>'
+             + '<animate attributeName="opacity" begin="'+mid+'.end" dur="0.5s" from="1" to="0" fill="freeze"></animate>'
+             + '</circle>';
+    });
   }
-}
 
-function isFullyCorrect(qIdx){
-  return questionStatus(qIdx) === "correct";
-}
+  const svg = '<svg class="diagram-svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" preserveAspectRatio="xMidYMid meet">'+inner+'</svg>';
 
-function updateScore(){
-  const scoreBox = document.getElementById("scoreBox");
-  const scoreText = document.getElementById("scoreText");
-  let correctCount = 0;
-  QUESTIONS.forEach((q, qIdx)=>{
-    if(checked[qIdx] && isFullyCorrect(qIdx)) correctCount++;
+  let stepsHtml = '<ol class="diagram-steps-list">';
+  steps.forEach(function(st,i){
+    stepsHtml += '<li><span class="step-num">'+(i+1)+'</span><strong>'+escapeXml(st.label||"")+'</strong>'+(st.note?(' — '+escapeXml(st.note)):'')+'</li>';
   });
-  scoreText.textContent = correctCount + "/" + QUESTIONS.length;
-  scoreBox.style.display = "block";
+  stepsHtml += '</ol>';
+
+  return '<div class="diagram-block" id="'+uid+'">'
+       + '<h4><span>🔀 '+escapeXml(block.title||"")+'</span><button class="diagram-play-btn" data-diagram-id="'+uid+'">&#9654; เล่นแอนิเมชัน / Play animation</button></h4>'
+       + '<div class="diagram-svg-wrap">'+svg+'</div>'
+       + stepsHtml
+       + '</div>';
 }
 
-function resetAll(){
-  userAnswers = {};
-  checked = {};
-  render();
+function diagramPlay(containerId){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  const svg = wrap.querySelector('svg');
+  const paths = svg.querySelectorAll('.diagram-arrow-path');
+  const dots = svg.querySelectorAll('.diagram-glow-dot');
+  const items = wrap.querySelectorAll('.diagram-steps-list li');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  items.forEach(function(li){ li.classList.remove('step-active'); });
+  if(reduced){ return; }
+  const stepDur = 850;
+  paths.forEach(function(p){
+    const len = p.getTotalLength();
+    p.style.transition = 'none';
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+  void svg.getBoundingClientRect();
+  paths.forEach(function(p,i){
+    setTimeout(function(){
+      p.style.transition = 'stroke-dashoffset '+(stepDur-100)+'ms ease';
+      p.style.strokeDashoffset = 0;
+      const anim = dots[i] ? dots[i].querySelector('animateMotion') : null;
+      if(anim){ try{ anim.beginElement(); }catch(e){} }
+      if(items[i]) items[i].classList.add('step-active');
+    }, i*stepDur);
+  });
 }
 
-document.getElementById("resetAllBtn").addEventListener("click", ()=>{
-  resetAll();
-});
+function wireDiagramButtons(){
+  document.querySelectorAll('.diagram-play-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ diagramPlay(btn.dataset.diagramId); });
+  });
+}
 
-function renderExercise(){
-  calcParkOutsideMain();
+function renderContent(){
   const main = document.getElementById("mainArea");
   main.innerHTML = "";
-  displayIndexes.forEach((qIdx, pos)=>{
-    const q = QUESTIONS[qIdx];
-    const isChecked = !!checked[qIdx];
+  SECTIONS.forEach((sec, idx)=>{
     const card = document.createElement("div");
-    card.className = "q-card";
-    card.id = "qcard_"+qIdx;
-    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
-    html += '<div class="q-prompt">'+sanitizePromptHtml(q.prompt)+'</div>';
-    q.subs.forEach((sub, subIdx)=>{
-      const key = subKey(qIdx, subIdx);
-      const lockedClass = isChecked ? " locked" : "";
-      let stateClass = "";
-      if(isChecked && userAnswers[key] !== undefined && userAnswers[key] !== ""){
-        stateClass = checkSubAnswer(q, subIdx, userAnswers[key]) ? " correct" : " incorrect";
+    card.className = "section-card";
+    card.id = "section_"+idx;
+    let html = "<h2>"+escapeXml(sec.title)+"</h2>";
+    if(sec.body){
+      html += '<div class="body-text">'+mdFormat(sec.body)+'</div>';
+    }
+    (sec.blocks || []).forEach((block, bi)=>{
+      if(block.type === "note"){
+        html += '<div class="callout callout-note"><span class="callout-title">หมายเหตุ</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "example"){
+        html += '<div class="callout callout-example"><span class="callout-title">ตัวอย่าง</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "warning"){
+        html += '<div class="callout callout-warning"><span class="callout-title">ข้อควรระวัง</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "formula"){
+        html += '<div class="callout callout-formula"><span class="callout-title">'+escapeXml(block.label || "สูตร")+'</span>'+mdFormat(block.content)+'</div>';
+      } else if(block.type === "subheading"){
+        html += '<h3>'+mdFormat(block.content)+'</h3>';
+      } else if(block.type === "table"){
+        html += block.content;
+      } else if(block.type === "image"){
+        html += '<div class="image-block"><img src="'+block.src+'" alt="'+escapeXml(block.alt || "")+'">';
+        if(block.caption){
+          html += '<div class="image-caption">'+escapeXml(block.caption)+'</div>';
+        }
+        html += '</div>';
+      } else if(block.type === "diagram"){
+        html += renderDiagramBlock(block, idx, bi);
       }
-      html += '<div class="sub-item'+lockedClass+stateClass+'" id="sitem_'+key+'">';
-      html += '<label>'+escHtml(sub.label)+'</label>';
-      const disabledAttr = isChecked ? "disabled" : "";
-      if(sub.type==="select"){
-        html += '<select data-key="'+key+'" '+disabledAttr+'>';
-        html += '<option value="">-- เลือก --</option>';
-        sub.options.forEach(opt=>{
-          const selectedAttr = userAnswers[key]===opt ? "selected" : "";
-          html += '<option value="'+escHtml(opt)+'" '+selectedAttr+'>'+escHtml(opt)+'</option>';
-        });
-        html += '</select>';
-      } else {
-        const val = userAnswers[key] !== undefined ? userAnswers[key] : "";
-        html += '<input type="text" data-key="'+key+'" placeholder="กรอกคำตอบ" value="'+escHtml(val)+'" '+disabledAttr+'>';
-      }
-      html += '</div>';
     });
-    html += '<div class="footer-actions">';
-    if(!isChecked){
-      html += '<button class="check-btn" data-qidx="'+qIdx+'">ตรวจคำตอบข้อนี้</button>';
-    }
-    if(q.formula){
-      html += '<button class="secondary hint-btn" data-qidx="'+qIdx+'">💡 คำใบ้</button>';
-    }
-    if(INCLUDE_CALC){
-      html += '<button class="secondary calc-open-btn" data-qidx="'+qIdx+'">🧮 เครื่องคิดเลข</button>';
-    }
-    html += '</div>';
-    if(q.formula){
-      html += '<div class="hint-box" id="hintbox_'+qIdx+'" style="display:none">'+escHtml(q.formula)+'</div>';
-    }
-    if(isChecked && !isFullyCorrect(qIdx)){
-      html += '<div class="reveal-box"><span class="reveal-title">เฉลยคำตอบที่ถูกต้อง</span>';
-      q.subs.forEach(sub=>{
-        html += '<div class="reveal-line"><b>'+escHtml(sub.label)+':</b> '+escHtml(sub.correctAnswer)+'</div>';
-      });
-      html += '</div>';
-    }
-    if(INCLUDE_CALC){
-      html += '<div class="calc-slot" id="calcslot_'+qIdx+'"></div>';
-    }
     card.innerHTML = html;
     main.appendChild(card);
   });
 
-  main.querySelectorAll("select,input").forEach(el=>{
-    el.addEventListener("input", (e)=>{
-      const key = e.target.getAttribute("data-key");
-      userAnswers[key] = e.target.value;
-      renderNavGrid();
+  if(window.renderMathInElement){
+    renderMathInElement(main, {
+      delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}
+      ]
     });
-  });
-
-  main.querySelectorAll(".check-btn").forEach(btn=>{
-    btn.addEventListener("click", (e)=>{
-      const qIdx = parseInt(e.target.getAttribute("data-qidx"));
-      checked[qIdx] = true;
-      renderExercise();
-    });
-  });
-
-  main.querySelectorAll(".hint-btn").forEach(btn=>{
-    btn.addEventListener("click", (e)=>{
-      const qIdx = e.target.getAttribute("data-qidx");
-      const box = document.getElementById("hintbox_"+qIdx);
-      box.style.display = box.style.display === "none" ? "block" : "none";
-    });
-  });
-
-  main.querySelectorAll(".calc-open-btn").forEach(btn=>{
-    btn.addEventListener("click", (e)=>{
-      const qIdx = parseInt(e.target.getAttribute("data-qidx"));
-      const tabs = QUESTIONS[qIdx].calcTabs || ["calc"];
-      calcOpenInline(tabs, "calcslot_"+qIdx);
-    });
-  });
-
-  renderNavGrid();
-  updateScore();
+  }
 }
 
-function renderStepList(steps){
-  const stepDefs = [
-    {key:'given', label:'1. โจทย์ให้อะไรมา', cls:''},
-    {key:'why', label:'2. ทำไมต้องใช้สูตร/วิธีนี้', cls:'step-why'},
-    {key:'substitute', label:'3. แทนค่า', cls:''},
-    {key:'calculate', label:'4. คำนวณ', cls:''},
-    {key:'conclude', label:'5. สรุปผล', cls:''}
-  ];
-  let html = '<div class="step-list">';
-  stepDefs.forEach((def, i)=>{
-    const content = steps[def.key];
-    if(!content) return;
-    html += '<div class="step-item '+def.cls+'"><div class="step-num">'+(i+1)+'</div><div class="step-body">';
-    html += '<div class="step-label">'+def.label+'</div>';
-    html += '<div class="step-content">'+escHtml(content)+'</div>';
-    html += '</div></div>';
-  });
-  html += '</div>';
-  return html;
-}
-
-function renderAnswers(){
-  calcParkOutsideMain();
-  const main = document.getElementById("mainArea");
-  main.innerHTML = "";
-  let correctTotal = 0;
-  let subTotal = 0;
-  displayIndexes.forEach((qIdx, pos)=>{
-    const q = QUESTIONS[qIdx];
-    const card = document.createElement("div");
-    card.className = "q-card";
-    card.id = "qcard_"+qIdx;
-    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
-    html += '<div class="q-prompt">'+sanitizePromptHtml(q.prompt)+'</div>';
-    q.subs.forEach(sub=>{
-      subTotal++;
-      const blockClass = sub.uncertain ? "answer-block flagged" : "answer-block";
-      html += '<div class="sub-item"><label>'+escHtml(sub.label)+'</label>';
-      html += '<div class="'+blockClass+'">';
-      if(sub.uncertain){
-        html += '<div class="flag-badge">⚠ ไม่มั่นใจ 100%</div><br>';
-      }
-      html += '<strong>คำตอบ:</strong> '+escHtml(sub.correctAnswer);
-      html += '</div></div>';
+function setupScrollSpy(){
+  const links = document.querySelectorAll(".toc-list a");
+  const sections = document.querySelectorAll(".section-card");
+  window.addEventListener("scroll", ()=>{
+    let currentIdx = 0;
+    sections.forEach((sec, idx)=>{
+      const rect = sec.getBoundingClientRect();
+      if(rect.top <= 100) currentIdx = idx;
     });
-    if(q.formula || q.steps){
-      html += '<div class="explain-block">';
-      html += '<h4>วิธีทำ</h4>';
-      if(q.formula) html += '<div class="formula">'+escHtml(q.formula)+'</div>';
-      if(q.steps && typeof q.steps === "object"){
-        html += renderStepList(q.steps);
-      } else if(q.steps){
-        html += '<div class="steps">'+escHtml(q.steps)+'</div>';
-      }
-      html += '</div>';
-    }
-    card.innerHTML = html;
-    main.appendChild(card);
+    links.forEach(l=>l.classList.remove("active"));
+    if(links[currentIdx]) links[currentIdx].classList.add("active");
   });
-  document.getElementById("scoreBox").style.display = "none";
-  renderNavGrid();
 }
 
-function render(){
-  if(mode==="exercise") renderExercise();
-  else renderAnswers();
+function setupReveal(){
+  const cards = document.querySelectorAll('.section-card');
+  if(!('IntersectionObserver' in window)){
+    cards.forEach(function(c){ c.classList.add('revealed'); });
+    return;
+  }
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.08, rootMargin:'0px 0px -60px 0px'});
+  cards.forEach(function(c){ io.observe(c); });
 }
 
-document.getElementById("btnExerciseMode").onclick = ()=>{
-  mode = "exercise";
-  document.getElementById("btnExerciseMode").classList.add("active");
-  document.getElementById("btnAnswerMode").classList.remove("active");
-  render();
-};
-document.getElementById("btnAnswerMode").onclick = ()=>{
-  mode = "answer";
-  document.getElementById("btnAnswerMode").classList.add("active");
-  document.getElementById("btnExerciseMode").classList.remove("active");
-  render();
-};
-document.getElementById("orderSelect").onchange = (e)=>{
-  order = e.target.value;
-  displayIndexes = order==="shuffle" ? shuffleArray(QUESTIONS.map((q,i)=>i)) : QUESTIONS.map((q,i)=>i);
-  render();
-};
+let fontScale = parseFloat(localStorage.getItem('statsbook_fontScale')||'1');
+function setFontScale(v){
+  fontScale = Math.min(1.3, Math.max(0.85, Math.round(v*10)/10));
+  try{ localStorage.setItem('statsbook_fontScale', fontScale); }catch(e){}
+  document.documentElement.style.setProperty('--fontScale', fontScale);
+}
 
-displayIndexes = QUESTIONS.map((q,i)=>i);
-render();
-updateTimerDisplay();
+function updateProgress(){
+  const el = document.documentElement;
+  const max = el.scrollHeight - el.clientHeight;
+  const pct = max>0 ? (el.scrollTop/max*100) : 0;
+  const bar = document.getElementById('readProgress');
+  if(bar) bar.style.width = pct+'%';
+  const btt = document.getElementById('backToTop');
+  if(btt){ if(el.scrollTop>420){ btt.classList.add('show'); } else { btt.classList.remove('show'); } }
+}
+
+renderTOC();
+renderContent();
+setupScrollSpy();
+setupReveal();
+setupTocPanel();
+wireDiagramButtons();
+setFontScale(fontScale);
+const readTimeBadge = document.getElementById('readTimeBadge');
+if(readTimeBadge){ readTimeBadge.textContent = '⏱ ~' + computeReadingTime() + ' นาทีในการอ่าน / min read'; }
+
+window.addEventListener('scroll', updateProgress);
+const backToTopBtn = document.getElementById('backToTop');
+if(backToTopBtn){ backToTopBtn.addEventListener('click', function(){ window.scrollTo({top:0,behavior:'smooth'}); }); }
+const fontMinusBtn = document.getElementById('fontMinus');
+if(fontMinusBtn){ fontMinusBtn.addEventListener('click', function(){ setFontScale(fontScale-0.1); }); }
+const fontPlusBtn = document.getElementById('fontPlus');
+if(fontPlusBtn){ fontPlusBtn.addEventListener('click', function(){ setFontScale(fontScale+0.1); }); }
+
+function systemPrefersDark(){
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+function resolvedTheme(t){
+  return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+}
+function applyTheme(t){
+  if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+  else { document.documentElement.removeAttribute('data-theme'); }
+  const btn = document.getElementById('themeToggle');
+  if(btn){
+    const r = resolvedTheme(t);
+    btn.textContent = r === 'dark' ? '☀️' : '🌙';
+    btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+  }
+}
+let bookTheme = 'system';
+try{ bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+applyTheme(bookTheme);
+const themeToggleBtn = document.getElementById('themeToggle');
+if(themeToggleBtn){
+  themeToggleBtn.addEventListener('click', function(){
+    bookTheme = resolvedTheme(bookTheme) === 'dark' ? 'light' : 'dark';
+    try{ localStorage.setItem('book_theme', bookTheme); }catch(e){}
+    applyTheme(bookTheme);
+  });
+}
+
+if(!INCLUDE_CALC){
+  document.getElementById("calcHeaderBtn").style.display = "none";
+}
 
 function erf(x){
   const sign = x<0?-1:1; x=Math.abs(x);
@@ -2654,8 +2149,7 @@ document.getElementById('computeStat').addEventListener('click',()=>{
 
 function statLine(label,val){
   return `<div class="line"><span>${label}</span><span>${(+val).toFixed(6)}</span></div>`;
-}
-function statText(label,val){
+}function statText(label,val){
   return `<div class="line"><span>${label}</span><span>${escHtml(val)}</span></div>`;
 }
 function decisionTag(reject){
@@ -2813,6 +2307,11 @@ document.querySelectorAll('#calcModal .tabbtn').forEach(btn=>{
 document.getElementById("calcModalClose").addEventListener("click", ()=>{
   document.getElementById("calcModal").classList.remove("open");
   calcCurrentSlotId = null;
+});
+
+
+document.getElementById("calcHeaderBtn").addEventListener("click", ()=>{
+  calcOpenInline(["dist","stat","calc"], "calcslot_sidebar");
 });
 
 function fracGCD(a,b){
