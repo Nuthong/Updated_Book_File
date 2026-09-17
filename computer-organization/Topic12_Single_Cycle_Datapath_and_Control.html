@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topic 12: Single-Cycle Datapath &amp; Control</title>
+<meta name="description" content="เอกสารสรุปเนื้อหา 310-2202 — Topic 12: Single-Cycle Datapath &amp; Control">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{
+  --ink:#1e293b; --ink-strong:#0f172a; --muted:#64748b;
+  --primary:#4f46e5; --primary-d:#3730a3; --primary-tint:#eef2ff;
+  --line:#e2e8f0; --surface:#f8fafc; --paper:#f6f4ee;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--paper);}
+body{font-family:'Sarabun','Noto Sans Thai',system-ui,sans-serif;color:var(--ink);}
+code,pre{font-family:'JetBrains Mono',ui-monospace,monospace;}
+a{color:var(--primary);text-underline-offset:2px;}
+
+.layout{display:flex;max-width:1400px;margin:0 auto;min-height:100vh;}
+.sidebar{
+  width:280px;flex-shrink:0;position:sticky;top:0;align-self:flex-start;
+  height:100vh;overflow-y:auto;padding:1.8em 1.3em;background:#fff;
+  border-right:1px solid var(--line);
+}
+.sidebar h2{font-size:1.05rem;color:var(--primary-d);margin:0 0 .3em;}
+.sidebar .subtitle{font-size:.85rem;color:var(--muted);margin:0 0 1.4em;}
+.sidebar nav ul{list-style:none;margin:0;padding:0;}
+.sidebar nav li{margin:0;}
+.sidebar nav a{
+  display:block;padding:.5em .6em;border-radius:6px;color:var(--ink);
+  text-decoration:none;font-size:.92rem;line-height:1.4;border-left:3px solid transparent;
+}
+.sidebar nav a:hover{background:var(--primary-tint);color:var(--primary-d);}
+.sidebar nav a.active{background:var(--primary-tint);color:var(--primary-d);border-left-color:var(--primary);font-weight:600;}
+.sidebar nav .sub{padding-left:1.1em;font-size:.86rem;}
+
+.main{flex:1;min-width:0;padding:2.4em 3em 6em;max-width:900px;}
+.masthead{
+  background:#0F2740;color:#fff;padding:1.8em 2em;border-radius:14px;margin-bottom:2em;
+  border-bottom:4px solid #B7862C;
+}
+.masthead h1{margin:0 0 .3em;font-size:1.7rem;line-height:1.3;}
+.masthead p{margin:0;color:#cbd5e1;font-size:.95rem;}
+
+section.topic-section{margin-bottom:2.6em;padding-left:1.1em;border-left:4px solid var(--primary);}
+section.topic-section > h2{
+  color:var(--primary-d);font-weight:700;font-size:1.55rem;line-height:1.35;
+  margin:0 0 .8em;padding:.5em .7em;border-radius:8px;background:var(--primary-tint);
+  border-left:5px solid var(--primary);
+}
+section.topic-section h3{color:#5b21b6;font-weight:700;font-size:1.25rem;margin:1.6em 0 .5em;
+  padding-left:.5em;border-left:4px solid #c4b5fd;}
+section.topic-section h4{color:#334155;font-weight:600;font-size:1.1rem;margin:1.3em 0 .4em;}
+.content p, .content li, section.topic-section p, section.topic-section li{font-size:1.05rem;line-height:1.75;}
+section.topic-section p{margin:0 0 1em;}
+section.topic-section li{margin:.3em 0;}
+section.topic-section :not(pre) > code{background:#f1f5f9;color:#be185d;padding:.08em .4em;border-radius:5px;font-size:.92em;}
+section.topic-section pre{background:#0f172a;color:#e2e8f0;padding:1em 1.2em;border-radius:8px;overflow-x:auto;font-size:.92rem;line-height:1.6;}
+section.topic-section pre code{background:none;color:inherit;padding:0;}
+
+.callout{border:1px solid var(--line);border-left-width:5px;border-radius:10px;
+  padding:.9em 1.15em;margin:1.3em 0;font-size:.98rem;line-height:1.7;}
+.callout > .cal-label{font-size:.78em;font-weight:700;letter-spacing:.03em;text-transform:uppercase;display:block;margin-bottom:.4em;}
+.callout.note{background:#f0f9ff;border-left-color:#0284c7;} .callout.note .cal-label{color:#0369a1;}
+.callout.tip{background:#ecfdf5;border-left-color:#059669;} .callout.tip .cal-label{color:#047857;}
+.callout.warn{background:#fff1f2;border-left-color:#e11d48;} .callout.warn .cal-label{color:#be123c;}
+.callout.game{background:#fffbeb;border-left-color:#B7862C;} .callout.game .cal-label{color:#92650f;}
+.callout.recap{background:#f5f3ff;border-left-color:#7c3aed;} .callout.recap .cal-label{color:#6d28d9;}
+
+.example{border:1px solid #c7d2fe;border-radius:10px;padding:1em 1.2em;margin:1.4em 0;background:linear-gradient(180deg,#eef2ff 0%,#fff 70%);}
+.example .ex-label{font-weight:700;color:var(--primary-d);font-size:.9rem;margin:0 0 .5em;text-transform:uppercase;letter-spacing:.02em;}
+.example .steps{margin:.6em 0 0;padding-left:1.3em;}
+.example .steps li{margin:.35em 0;}
+.example .answer{margin-top:.7em;padding:.6em .9em;background:#dcfce7;border-left:4px solid #16a34a;border-radius:6px;font-weight:600;}
+
+.qa{border:1px solid #fde68a;border-radius:10px;padding:1em 1.2em;margin:1.4em 0;background:#fffbeb;}
+.qa .q{font-weight:600;margin:0 0 .6em;}
+.qa .a{margin:0;padding-top:.5em;border-top:1px dashed #fbbf24;}
+.qa .a b{color:#92650f;}
+
+table{border-collapse:collapse;width:100%;margin:1.4em 0;font-size:.95rem;}
+thead{background:var(--primary-tint);}
+th,td{border:1px solid var(--line);padding:.55em .75em;text-align:left;vertical-align:top;}
+tbody tr:nth-child(even){background:var(--surface);}
+
+.mermaid{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1em;margin:1.4em 0;text-align:center;}
+
+.refs{margin-top:2.2em;padding:1em 1.2em;border-top:2px solid var(--line);background:var(--surface);
+  border-radius:8px;font-size:.9rem;color:#475569;}
+.refs .rt{font-weight:700;color:var(--ink-strong);margin:0 0 .5em;text-transform:uppercase;font-size:.8rem;letter-spacing:.03em;}
+.refs ul{margin:0;padding-left:1.3em;}
+
+@media (max-width:900px){
+  .layout{flex-direction:column;}
+  .sidebar{position:static;width:100%;height:auto;}
+  .main{padding:1.4em 1.2em 4em;}
+}
+</style>
+
+<style>
+:root{ color-scheme: light dark; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#e4e7ec; --ink-strong:#f1f5f9; --muted:#9aa5b3;
+    --primary:#8ec1f2; --primary-d:#7fb0e0; --primary-tint:#1c2b3d;
+    --line:#333c48; --surface:#1b212b; --paper:#12161d;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e4e7ec; --ink-strong:#f1f5f9; --muted:#9aa5b3;
+  --primary:#8ec1f2; --primary-d:#7fb0e0; --primary-tint:#1c2b3d;
+  --line:#333c48; --surface:#1b212b; --paper:#12161d;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .sidebar{ background:var(--surface); }
+  :root:not([data-theme="light"]) section.topic-section h3{ color:#c4b5fd; border-left-color:#5b21b6; }
+  :root:not([data-theme="light"]) section.topic-section h4{ color:#cbd5e1; }
+  :root:not([data-theme="light"]) section.topic-section :not(pre) > code{ background:#2a2130; color:#f9a8d4; }
+  :root:not([data-theme="light"]) .callout.note{ background:#0f2333; border-left-color:#38bdf8; }
+  :root:not([data-theme="light"]) .callout.note .cal-label{ color:#7dd3fc; }
+  :root:not([data-theme="light"]) .callout.tip{ background:#0f2b21; border-left-color:#34d399; }
+  :root:not([data-theme="light"]) .callout.tip .cal-label{ color:#6ee7b7; }
+  :root:not([data-theme="light"]) .callout.warn{ background:#2d1216; border-left-color:#fb7185; }
+  :root:not([data-theme="light"]) .callout.warn .cal-label{ color:#fca5a5; }
+  :root:not([data-theme="light"]) .callout.game{ background:#2a2112; border-left-color:#e3bd74; }
+  :root:not([data-theme="light"]) .callout.game .cal-label{ color:#e3bd74; }
+  :root:not([data-theme="light"]) .callout.recap{ background:#221a33; border-left-color:#a78bfa; }
+  :root:not([data-theme="light"]) .callout.recap .cal-label{ color:#c4b5fd; }
+  :root:not([data-theme="light"]) .example{ border-color:#4338ca; background:linear-gradient(180deg,#1c2b3d 0%,#12161d 70%); }
+  :root:not([data-theme="light"]) .example .answer{ background:#0f2b21; border-left-color:#34d399; }
+  :root:not([data-theme="light"]) .qa{ border-color:#78350f; background:#2a2112; }
+  :root:not([data-theme="light"]) .qa .a{ border-top-color:#d97706; }
+  :root:not([data-theme="light"]) .qa .a b{ color:#fcd34d; }
+  :root:not([data-theme="light"]) .mermaid{ background:var(--surface); }
+}
+:root[data-theme="dark"] .sidebar{ background:var(--surface); }
+:root[data-theme="dark"] section.topic-section h3{ color:#c4b5fd; border-left-color:#5b21b6; }
+:root[data-theme="dark"] section.topic-section h4{ color:#cbd5e1; }
+:root[data-theme="dark"] section.topic-section :not(pre) > code{ background:#2a2130; color:#f9a8d4; }
+:root[data-theme="dark"] .callout.note{ background:#0f2333; border-left-color:#38bdf8; }
+:root[data-theme="dark"] .callout.note .cal-label{ color:#7dd3fc; }
+:root[data-theme="dark"] .callout.tip{ background:#0f2b21; border-left-color:#34d399; }
+:root[data-theme="dark"] .callout.tip .cal-label{ color:#6ee7b7; }
+:root[data-theme="dark"] .callout.warn{ background:#2d1216; border-left-color:#fb7185; }
+:root[data-theme="dark"] .callout.warn .cal-label{ color:#fca5a5; }
+:root[data-theme="dark"] .callout.game{ background:#2a2112; border-left-color:#e3bd74; }
+:root[data-theme="dark"] .callout.game .cal-label{ color:#e3bd74; }
+:root[data-theme="dark"] .callout.recap{ background:#221a33; border-left-color:#a78bfa; }
+:root[data-theme="dark"] .callout.recap .cal-label{ color:#c4b5fd; }
+:root[data-theme="dark"] .example{ border-color:#4338ca; background:linear-gradient(180deg,#1c2b3d 0%,#12161d 70%); }
+:root[data-theme="dark"] .example .answer{ background:#0f2b21; border-left-color:#34d399; }
+:root[data-theme="dark"] .qa{ border-color:#78350f; background:#2a2112; }
+:root[data-theme="dark"] .qa .a{ border-top-color:#d97706; }
+:root[data-theme="dark"] .qa .a b{ color:#fcd34d; }
+:root[data-theme="dark"] .mermaid{ background:var(--surface); }
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:1.2em;}
+.back-to-index{
+  display:inline-block;font-size:12.5px;color:var(--primary-d);text-decoration:none;
+  opacity:0.9;
+}
+.back-to-index:hover{opacity:1;text-decoration:underline;}
+@media print{.back-to-index{display:none;}}
+.theme-toggle-btn{
+  border:1.5px solid var(--line);background:#fff;color:var(--primary-d);
+  width:32px;height:32px;border-radius:6px;font-size:14px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+:root[data-theme="dark"] .theme-toggle-btn{ background:var(--surface); }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .theme-toggle-btn{ background:var(--surface); }}
+.theme-toggle-btn:hover{background:var(--primary-tint);}
+@media print{.theme-toggle-btn{display:none;}}
+.read-time{font-size:.78rem;color:var(--muted);margin:-1em 0 1.2em;}
+@media print{
+  .sidebar{display:none;}
+  .layout{display:block;}
+  .main{max-width:none;padding:0;}
+}
+</style>
+
+<script>
+(function(){
+  function systemPrefersDark(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function resolvedTheme(t){
+    return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+    else { document.documentElement.removeAttribute('data-theme'); }
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      var r = resolvedTheme(t);
+      btn.textContent = r === 'dark' ? '\u2600\ufe0f' : '\ud83c\udf19';
+      btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+    }
+  }
+  window.__bookTheme = 'system';
+  try{ window.__bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+  applyTheme(window.__bookTheme);
+  document.addEventListener('DOMContentLoaded', function(){
+    applyTheme(window.__bookTheme);
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      btn.addEventListener('click', function(){
+        window.__bookTheme = resolvedTheme(window.__bookTheme) === 'dark' ? 'light' : 'dark';
+        try{ localStorage.setItem('book_theme', window.__bookTheme); }catch(e){}
+        applyTheme(window.__bookTheme);
+      });
+    }
+    window.__resolvedTheme = resolvedTheme;
+  });
+})();
+</script>
+
+<script>
+(function(){
+  function computeReadingTime(){
+    var main = document.querySelector('.main');
+    var chars = (main.textContent || '').replace(/\s+/g, '').length;
+    return Math.max(1, Math.round(chars / 900));
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var badge = document.getElementById('readTimeBadge');
+    if(badge){ badge.textContent = '⏱ ~' + computeReadingTime() + ' นาทีในการอ่าน / min read'; }
+  });
+})();
+</script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="topbar"><a class="back-to-index" href="index.html">&larr; สารบัญทั้งหมด / All Chapters</a><button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button></div>
+    <h2>Topic 12: Single-Cycle Datapath &amp; Control</h2>
+    <p class="subtitle">310-2202 โครงสร้างระบบคอมพิวเตอร์ — สรุปเนื้อหา Topic 12</p>
+<p class="read-time" id="readTimeBadge"></p>
+    <nav id="toc">
+      <ul>
+        <li><a href="#sec-overview">ภาพรวม Topic 12</a></li>
+        <li><a href="#sec-121">12.1 จากวงรอบคำสั่งสู่บล็อกฮาร์ดแวร์</a></li>
+        <li><a href="#sec-122">12.2 สร้าง Datapath ทีละกลุ่มคำสั่ง</a></li>
+        <li><a href="#sec-123">12.3 หน่วยควบคุม (Control Unit)</a></li>
+        <li><a href="#sec-124">12.4 ทำไม Single-Cycle ถูกต้องแต่ช้า</a></li>
+
+      </ul>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="masthead">
+      <h1>Topic 12: Single-Cycle Datapath &amp; Control</h1>
+      <p>310-2202 โครงสร้างระบบคอมพิวเตอร์ — สรุปเนื้อหา Topic 12</p>
+    </div>
+<section class="topic-section" id="sec-overview">
+<h2>ภาพรวม Topic 12 — Single-Cycle Datapath &amp; Control</h2>
+<p>ครั้งนี้เราสร้าง "ฮาร์ดแวร์จริง" ที่รันคำสั่ง RV32I — เปลี่ยนวงรอบ FETCH-DECODE-EXECUTE เป็นบล็อกที่ต่อสายกัน (PC, instruction memory, register file, ALU, immediate generator, data memory, mux, adder) สร้าง datapath ทีละกลุ่มคำสั่ง พร้อมหน่วยควบคุมที่ถอด opcode เป็นสัญญาณ และเข้าใจว่าทำไม single-cycle ถูกต้องแต่ช้า</p>
+<p><b>เมื่อจบครั้งนี้ ผู้เรียนจะสามารถ:</b> ระบุบล็อกของ single-cycle datapath และเส้นทางข้อมูลของแต่ละชนิดคำสั่ง (R/lw/sw/beq/jal) · อธิบายสัญญาณควบคุม (RegWrite/ALUSrc/MemRead/MemWrite/Branch/ALUOp/PCSrc) · อธิบาย critical path และเหตุผลที่ single-cycle ช้า (จูงใจสู่ pipelining)</p>
+<div class="callout recap"><span class="cal-label">ถ้าจำได้ประโยคเดียว</span>วงรอบ FETCH-DECODE-EXECUTE กลายเป็นสายไฟจริงได้ และสัญญาณควบคุมคือสิ่งที่บอกว่าคำสั่งไหนใช้เส้นทางใด</div>
+<table>
+<thead><tr><th>หัวข้อ</th><th>เนื้อหา</th></tr></thead>
+<tbody>
+<tr><td>12.1</td><td>เปลี่ยนวงรอบ FETCH-DECODE-EXECUTE เป็นบล็อกฮาร์ดแวร์ 8 ชนิด แล้วต่อเป็น datapath ภาพรวม</td></tr>
+<tr><td>12.2</td><td>สร้าง datapath ทีละกลุ่มคำสั่ง R-type → lw/sw → beq → jal/jalr เห็นว่า mux แต่ละตัวเกิดตรงไหนเพราะอะไร</td></tr>
+<tr><td>12.3</td><td>หน่วยควบคุม: opcode → สัญญาณ 8 ตัว แล้ว ALU control ถอด funct เป็น operation</td></tr>
+<tr><td>12.4</td><td>ทำไม single-cycle ถูกต้องแต่ช้า: critical path ของ lw กำหนด clock period และมองผ่าน Iron Law</td></tr>
+</tbody>
+</table>
+<div class="callout game"><span class="cal-label">🎮 เครื่องมือแนะนำ</span>Ripes — เปิดมุมมอง single-cycle processor แล้วรันทีละคำสั่ง สังเกตสัญญาณควบคุม (RegWrite/ALUSrc/MemRead/…) สว่างตามชนิดคำสั่ง และเส้นทางข้อมูลไหลผ่าน mux/ALU/memory</div>
+</section>
+
+<section class="topic-section" id="sec-121">
+<h2>12.1 จากวงรอบคำสั่งสู่บล็อกฮาร์ดแวร์</h2>
+
+<h3>วงรอบ FETCH-DECODE-EXECUTE คือบล็อกฮาร์ดแวร์จริง</h3>
+<p>ก่อนหน้านี้เราเห็นวงรอบคำสั่ง (instruction cycle) เป็นขั้นตอนที่ CPU ทำซ้ำ: FETCH → DECODE → EXECUTE ใน Topic นี้เราจะเปลี่ยนแต่ละขั้นให้เป็น<b>บล็อกฮาร์ดแวร์จริง</b> แล้วต่อสายเข้าด้วยกันเป็นทางเดินข้อมูล (datapath) — ขั้นตอนเหล่านี้ไม่ต้องรอขอบนาฬิกาคั่นระหว่างขั้น ฮาร์ดแวร์วางบล็อกเรียงต่อกัน แล้วสัญญาณไหลผ่านทุกบล็อกตามลำดับให้จบภายในหนึ่งคาบเดียว</p>
+<div class="callout note"><span class="cal-label">แนวคิดกุญแจ: ขั้นตอน (เวลา) → บล็อก (พื้นที่)</span>FETCH-DECODE-EXECUTE เป็นการ "เล่าเรื่อง" ว่า CPU ทำอะไร ฮาร์ดแวร์จริงไม่รอให้ขั้นหนึ่งจบก่อนแล้วค่อยเริ่มขั้นถัดไป แต่ต่อบล็อกทั้งหมดเป็นสายเดียว สัญญาณไฟฟ้าไหลผ่านตามลำดับ combinational ภายในหนึ่งคาบนาฬิกา นี่คือที่มาของชื่อ single-cycle (หนึ่งคำสั่งจบในหนึ่ง clock)</div>
+
+<p><b>FETCH</b> (ดึงคำสั่ง): PC (program counter) เก็บที่อยู่คำสั่งปัจจุบัน → ป้อนให้ instruction memory อ่านคำสั่ง 32 บิตออกมา พร้อมกันมี adder บวก PC+4 เตรียมที่อยู่คำสั่งถัดไป (RV32I คำสั่งยาว 4 ไบต์เสมอ) · <b>DECODE</b> (ถอดรหัส): แยกฟิลด์ออกจากคำสั่ง 32 บิต — หมายเลข rs1, rs2, rd ส่งเข้า register file เพื่ออ่านค่า ส่วนบิต immediate ส่งเข้า immediate generator เพื่อขยายเป็นค่า 32 บิต ฟิลด์ opcode/funct ส่งให้หน่วยควบคุม · <b>EXECUTE</b> (ปฏิบัติการ): ALU คำนวณ (บวก/ลบ/AND/เปรียบเทียบ) แล้วผลลัพธ์อาจใช้เป็นที่อยู่เข้า data memory (สำหรับ load/store) หรือเขียนกลับเข้า register file</p>
+
+<h3>บล็อกพื้นฐาน 8 ชนิดของ single-cycle datapath</h3>
+<table>
+<thead><tr><th>บล็อก</th><th>หน้าที่</th><th>ชนิด</th></tr></thead>
+<tbody>
+<tr><td>PC</td><td>เก็บที่อยู่คำสั่งปัจจุบัน อัปเดตทุกขอบนาฬิกา</td><td>state (มี clock)</td></tr>
+<tr><td>Instruction memory</td><td>รับที่อยู่ → คืนคำสั่ง 32 บิต (อ่านอย่างเดียว)</td><td>combinational (อ่าน)</td></tr>
+<tr><td>Register file</td><td>อ่าน 2 พอร์ต (rs1, rs2) พร้อมกัน, เขียน 1 พอร์ต (rd)</td><td>state + อ่าน combinational</td></tr>
+<tr><td>ALU</td><td>คำนวณเลขคณิต/ตรรกะ ตาม ALU control</td><td>combinational</td></tr>
+<tr><td>Immediate generator</td><td>ดึง imm จากคำสั่ง แล้ว sign-extend เป็น 32 บิต</td><td>combinational</td></tr>
+<tr><td>Data memory</td><td>load (อ่าน) / store (เขียน) ข้อมูลในหน่วยความจำ</td><td>state + อ่าน combinational</td></tr>
+<tr><td>Mux</td><td>เลือกหนึ่งจากหลายเส้นทางข้อมูลตามสัญญาณควบคุม</td><td>combinational</td></tr>
+<tr><td>Adder</td><td>บวกที่อยู่ (PC+4, PC+imm สำหรับ branch)</td><td>combinational</td></tr>
+</tbody>
+</table>
+<p>บล็อกทั้งแปดต่อกันเป็นวง: PC ป้อนที่อยู่ให้ Instruction memory คำสั่งที่อ่านได้ส่งเลขรีจิสเตอร์ให้ Registers ค่าที่อ่านได้เข้า ALU และผลของ ALU กลายเป็น Address ของ Data memory แล้ววนกลับมาที่ PC ทางตัวบวก — ที่มา: Patterson &amp; Hennessy, Computer Organization and Design (RISC-V Edition) รูปที่ 4.1</p>
+
+<div class="callout note"><span class="cal-label">state vs combinational</span>บล็อกที่ "จำค่า" และอัปเดตตามขอบนาฬิกา (PC, register file, memory) เป็น state element บล็อกที่คำนวณผลทันทีจาก input โดยไม่จำอะไร (ALU, mux, adder, immediate generator) เป็น combinational ค่าใหม่ของ state element ทุกตัวถูก "ล็อกเข้า" พร้อมกันที่ขอบนาฬิกาเดียวกัน นี่คือกลไกที่ทำให้หนึ่งคำสั่งจบพอดีในหนึ่งคาบ</div>
+
+<div class="qa"><div class="q">เหตุใด instruction memory และ register file (พอร์ตอ่าน) จึงทำงานแบบ combinational คือไม่ต้องรอขอบนาฬิกาก่อนคืนค่า</div><div class="a"><b>ตอบ:</b> เพราะภายในคาบเดียวต้องได้คำสั่งและค่ารีจิสเตอร์ป้อนให้ ALU คำนวณทัน พอร์ตอ่านจึงคืนค่าตามที่อยู่ที่ป้อนทันที (ทั้งสองบล็อกยังมีหน่วยความจำเก็บค่าจริงอยู่ภายใน เป็น state element เพียงแต่ "ส่วนอ่าน" ทำงานแบบ combinational — ถ้าการอ่านต้องรอขอบนาฬิกาอีกชั้นจะทำงานครบไม่ทันในหนึ่ง clock)</div></div>
+
+<div class="qa"><div class="q">ถ้าทั้ง instruction memory และ data memory ต้องทำงานในคาบเดียวกัน ทำไม single-cycle จึงนิยมแยกเป็นสองหน่วยความจำคนละก้อน</div><div class="a"><b>ตอบ:</b> เพราะในคาบเดียว FETCH ต้องอ่านคำสั่งจาก instruction memory ขณะที่ load/store ต้องเข้าถึง data memory พร้อมกัน ถ้าใช้หน่วยความจำก้อนเดียวที่มีพอร์ตเดียว จะอ่านสองที่ในคาบเดียวไม่ได้ (โครงสร้างชนกัน) การแยกสองก้อนทำให้ทั้ง FETCH และ MEM เกิดขนานกันได้ในหนึ่งคาบ</div></div>
+
+<h3>ต่อบล็อกเป็น datapath ภาพรวม</h3>
+<div class="mermaid">
+flowchart LR
+  PC["PC"] --> IM["Instructionmemory"]
+  PC --> ADD4["adder (+4)"]
+  IM --> RF["Register fileอ่าน 2 / เขียน 1"]
+  IM --> IMM["Immediategenerator"]
+  RF -->|rs1| ALU["ALU"]
+  RF -->|rs2| MUXB["mux ขา B"]
+  IMM --> MUXB
+  MUXB --> ALU
+  ALU --> DM["Datamemory"]
+  ALU --> WBMUX["mux write-back"]
+  DM --> WBMUX
+  ADD4 --> WBMUX
+  WBMUX -->|rd| RF
+  IMM --> ADDBR["adder (PC+imm)"]
+  PC --> ADDBR
+  ADD4 --> PCMUX["mux ขา PC"]
+  ADDBR --> PCMUX
+  PCMUX --> PC
+</div>
+<p>ลำดับการไหลในหนึ่งคาบ: PC ชี้ที่อยู่ → instruction memory คืนคำสั่ง 32 บิต → คำสั่งถูกแยกฟิลด์ (rs1,rs2 → register file; imm → immediate generator) → mux หน้า input ที่สองของ ALU เลือกว่าจะใช้ค่าจาก rs2 หรือค่า immediate → ALU คำนวณ → ผลลัพธ์เป็นค่าที่จะเขียนกลับ register file หรือที่อยู่เข้า data memory → mux หน้าพอร์ตเขียนของ register file เลือกจะเขียนผล ALU หรือข้อมูลจาก data memory (load) หรือค่า PC+4 (jal/jalr) → adder บวก PC+4 และอีก adder บวก PC+imm สำหรับ branch/jump → mux หน้า PC เลือกหนึ่งในนั้น แล้วล็อกเข้า PC ที่ขอบนาฬิกาถัดไป (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 4.2)</p>
+
+<h3>register file: ทำไม 2 พอร์ตอ่าน 1 พอร์ตเขียน</h3>
+<p>คำสั่งแบบ R ของ RV32I (เช่น add x1,x2,x3) ต้องอ่านรีจิสเตอร์ต้นทาง<b>สองตัวพร้อมกัน</b> (rs1, rs2) ในคาบเดียว จึงต้องมี <b>2 พอร์ตอ่าน</b> ที่ทำงานขนานกัน และคำสั่งหนึ่งเขียนผลกลับได้มากสุดหนึ่งปลายทาง (rd) จึงมี <b>1 พอร์ตเขียน</b> การเขียนเกิดที่ขอบนาฬิกา ส่วนการอ่านคืนค่าทันที</p>
+
+<h3>mux และ adder: กาวที่เชื่อมบล็อก</h3>
+<p>mux สำคัญมีสามจุด (สัญญาณสั่งมาจากหน่วยควบคุม 12.3):</p>
+<table>
+<thead><tr><th>mux อยู่ที่</th><th>เลือกระหว่าง</th><th>สัญญาณสั่ง</th></tr></thead>
+<tbody>
+<tr><td>ขา B ของ ALU</td><td>rs2 / immediate</td><td>ALUSrc</td></tr>
+<tr><td>write-back (หน้าพอร์ตเขียน rd)</td><td>ผล ALU / ค่า load / PC+4</td><td>MemToReg</td></tr>
+<tr><td>หน้า PC</td><td>PC+4 / PC+imm / rs1+imm (jalr)</td><td>PCSrc</td></tr>
+</tbody>
+</table>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — ไล่ lw x5, 48(x2) ผ่าน datapath ครบทุกบล็อก</div>
+<p>กำหนด x2 = 100, หน่วยความจำที่ที่อยู่ 148 เก็บค่า 777, รหัสเครื่อง 0x03012283, PC ปัจจุบัน = 200</p>
+<ol class="steps">
+<li>FETCH: PC=200 → instruction memory คืน 0x03012283 = lw x5,48(x2) · adder(+4) คำนวณ 200+4=204</li>
+<li>DECODE: rs1=x2, rd=x5, imm=48 (I-format, sign-extend) · register file อ่าน x2=100 · immediate generator ขยาย imm→48</li>
+<li>mux ขา B: ALUSrc เลือก imm (ไม่ใช่ rs2) → ป้อน 48 เข้า ALU input ที่สอง</li>
+<li>EXECUTE/ALU: บวก 100+48=148 ← ที่อยู่ของหน่วยความจำที่จะโหลด</li>
+<li>MEM: MemRead=1 → อ่าน data memory ที่ address 148 → ได้ค่า 777</li>
+<li>WRITE-BACK: write-back mux เลือก "ค่าจาก data memory" (ไม่ใช่ผล ALU) → 777, RegWrite=1 → เขียน 777 ลง x5</li>
+<li>เลือก PC ถัดไป: lw ไม่ใช่ branch/jump → PC mux เลือก PC+4=204</li>
+</ol>
+<div class="answer">สรุป: x5 ← 777, PC ถัดไป = 204 — ALU ของ lw ให้ "ที่อยู่" (148) ไม่ใช่คำตอบ คำตอบ (777) ออกมาจาก data memory จึงต้องมี mux หน้าพอร์ตเขียนเลือกขา memory ก่อนลง x5 (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 4.24)</div></div>
+
+<div class="qa"><div class="q">ในการรัน lw x5, 8(x6) บน single-cycle datapath บล็อกใดทำงานตามลำดับให้ได้ค่าโหลดมาเขียนลง x5</div><div class="a"><b>ตอบ:</b> register file (อ่าน x6) → mux ขา B เลือก imm → ALU บวกหา address → data memory อ่าน → write-back mux เลือกค่าจาก data memory → เขียนลง x5 — lw เป็น I-format จึงเลือก imm เข้า ALU ไม่ใช่ rs2 และปลายทางต้องมาจาก data memory ไม่ใช่ผล ALU (ถ้าเลือกผล ALU จะได้แค่ที่อยู่ x6+8 ไม่ใช่ข้อมูลที่โหลด)</div></div>
+
+<div class="refs"><div class="rt">อ้างอิง</div><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 4</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-122">
+<h2>12.2 สร้าง Datapath ทีละกลุ่มคำสั่ง</h2>
+
+<h3>วิธีสร้างแบบ COD: ค่อย ๆ เพิ่มทีละชนิดคำสั่ง</h3>
+<p>วิธีสร้าง datapath แบบ COD (Patterson &amp; Hennessy) คือ<b>ค่อย ๆ เพิ่มทีละชนิดคำสั่ง</b>: เริ่มจากชิ้นส่วนที่ทุกคำสั่งใช้ร่วมกัน (instruction fetch) แล้วถามทีละกลุ่มว่า "คำสั่งนี้ต้องการ wire/mux/หน่วยใหม่อะไรเพิ่ม" ทำให้เห็นว่า mux และสัญญาณควบคุมแต่ละตัวมีไว้เพื่ออะไร แทนที่จะจ้องวงจรสำเร็จทั้งก้อน</p>
+<div class="callout note"><span class="cal-label">กติกาการเพิ่มทีละชนิด</span>เมื่อคำสั่งใหม่ต้องการ "แหล่งข้อมูล" ที่ต่างจากของเดิมเข้าจุดเดียวกัน เราไม่สร้างจุดนั้นซ้ำ แต่เพิ่ม mux มาเลือก แล้วให้ control unit เป็นคนสั่งว่าเลือกขาไหน ดังนั้นจำนวน mux ที่เพิ่มขึ้น คือ "ความหลากหลาย" ของชนิดคำสั่งที่ datapath รองรับ</div>
+
+<h3>ชิ้นส่วนร่วม (instruction fetch)</h3>
+<p>ทุกคำสั่งเริ่มเหมือนกัน: ใช้ PC ชี้ instruction memory เพื่ออ่านคำสั่ง 32 บิต แล้วเตรียม PC ของรอบถัดไปด้วย PC+4 (คำสั่งยาว 4 byte เสมอใน RV32I — ต่างจาก LC-3 ที่นับที่อยู่เป็น word จึงบวก +1)</p>
+
+<h3>ขั้นที่ 1: R-type (add, sub, and, or, slt)</h3>
+<p>รูปแบบ: rd = rs1 (op) rs2 ต้องการ register file (อ่าน 2 พอร์ต rs1,rs2 พร้อมกัน เขียน 1 พอร์ตที่ rd) ต่อเข้า ALU ซึ่งทำ op ตาม funct3/funct7 แล้วเขียนผลกลับ register file สิ่งที่เพิ่ม: register file + ALU + สาย rs1/rs2 → ALU → rd และสัญญาณ <b>RegWrite</b> (อนุญาตเขียน rd) กับ <b>ALUControl</b> (เลือกว่า ALU ทำ add/sub/and/…) — ยังไม่มี mux ที่ไหนเลยเพราะทุกขามีแหล่งข้อมูลทางเดียว</p>
+<div class="mermaid">
+flowchart LR
+  INST["คำสั่ง"] --> RF["Register Filers1, rs2 → rd"]
+  RF -->|"data1"| ALU["ALU"]
+  RF -->|"data2"| ALU
+  ALU -->|"ผลลัพธ์"| RF
+  CTRL["ALUControl"] --> ALU
+</div>
+<p>ซ้ายคือ register file: ช่อง Read register 1, Read register 2 และ Write register กว้าง 5 บิต ให้ Read data 1 กับ Read data 2 ออกมาสองค่าพร้อมกัน ส่วน RegWrite คุมพอร์ตเขียนอย่างเดียว ขวาคือ ALU ที่รับ ALU operation 4 บิตแล้วให้ ALU result กับธง Zero — ยังไม่มี mux เลยเพราะทุกขามีแหล่งข้อมูลทางเดียว (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 4.7)</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — add x5, x6, x7 ผ่านบล็อกที่มีแค่ R-type</div>
+<p>x6=7, x7=32, รหัสเครื่อง 0x007302B3</p>
+<ol class="steps">
+<li>FETCH: PC → instruction memory คืน 0x007302B3 · ตัวบวก+4 เตรียม PC+4 ขนานกัน</li>
+<li>แยกฟิลด์: rs1=6, rs2=7, rd=5, funct3=000, funct7=0000000</li>
+<li>register file อ่าน x6=7, x7=32</li>
+<li>ALU: ALUControl สั่ง add → 7+32=39</li>
+<li>เขียนกลับ: RegWrite=1 → x5←39 ที่ขอบนาฬิกา, PC←PC+4</li>
+</ol>
+<div class="answer">จำนวน mux ที่ต้องตัดสินใจ = 0 — ทุกจุดมีแหล่งข้อมูลทางเดียว (ขา B ของ ALU มาจาก rs2 เท่านั้น พอร์ตเขียน rd มาจากผล ALU เท่านั้น) พอเพิ่ม lw ในขั้นถัดไป สองจุดนี้จะมีแหล่งที่สอง — และ mux จะเกิดตรงนั้นพอดี</div></div>
+
+<h3>ขั้นที่ 2: เพิ่ม lw / sw</h3>
+<p>load/store เป็นรูปแบบ I และ S: ที่อยู่ = rs1 + immediate เกิดความต้องการใหม่ 3 อย่าง: <b>ImmGen</b> (ดึง immediate จากคำสั่งแล้ว sign-extend เป็น 32 บิต — lw ดึงแบบ I-type, sw ดึงแบบ S-type) · ALU ต้องรับ immediate เป็นตัวตั้งที่ 2 แทน rs2 → เพิ่ม <b>ALUSrc mux</b> ที่ขาเข้าที่สองของ ALU (R-type เลือก rs2 ส่วน lw/sw เลือก immediate) · <b>Data Memory</b> — lw อ่าน (MemRead) เอาค่ากลับมาเขียน rd, sw เขียน (MemWrite) ค่าจาก rs2 ลงหน่วยความจำ (sw ไม่เขียน rd) และเพราะค่าที่จะเขียนกลับ rd มาได้จาก 2 ทาง (ผล ALU สำหรับ R-type, ค่าจาก memory สำหรับ lw) จึงต้องเพิ่ม <b>MemtoReg mux</b> หน้าพอร์ตเขียนของ register file</p>
+
+<table>
+<thead><tr><th>สิ่งที่เพิ่ม</th><th>ทำไม</th><th>สัญญาณ</th></tr></thead>
+<tbody>
+<tr><td>ImmGen</td><td>lw/sw ต้องมี imm 32 บิต</td><td>—</td></tr>
+<tr><td>ALUSrc mux</td><td>ขา B ของ ALU มีสองแหล่ง (rs2 / imm)</td><td>ALUSrc</td></tr>
+<tr><td>Data Memory</td><td>lw อ่าน / sw เขียน</td><td>MemRead, MemWrite</td></tr>
+<tr><td>MemtoReg mux</td><td>พอร์ตเขียน rd มีสองแหล่ง (ALU / memory)</td><td>MemToReg</td></tr>
+</tbody>
+</table>
+<p>โครง R-type เดิมไม่ถูกรื้อ เพียงแทรก mux เข้าไป — นับกล่อง Mux ได้สองกล่อง: ALUSrc (ขา 0=Read data 2, ขา 1=ค่าจาก Imm Gen) และ MemtoReg (ขา 1=Read data จาก Data memory, ขา 0=ALU result) (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 4.10)</p>
+<div class="mermaid">
+flowchart LR
+  RF["Register File"] -->|"data1 = rs1"| ALU["ALU"]
+  RF -->|"data2 = rs2"| MUX1{"ALUSrcmux"}
+  IMM["ImmGen"] --> MUX1
+  MUX1 --> ALU
+  ALU -->|"ที่อยู่"| DM["DataMemory"]
+  RF -->|"rs2 = ค่าที่จะ store"| DM
+  DM -->|"ค่าที่ load"| MUX2{"MemtoRegmux"}
+  ALU -->|"ผล R-type"| MUX2
+  MUX2 -->|"เขียนกลับ"| RF
+</div>
+
+<div class="qa"><div class="q">เพราะเหตุใดการเพิ่ม lw จึงทำให้ต้องมี MemtoReg mux ที่พอร์ตเขียนของ register file</div><div class="a"><b>ตอบ:</b> เพราะค่าที่เขียนกลับ rd มาได้จากสองแหล่ง คือผล ALU (R-type) กับค่าจาก data memory (lw) จึงมี mux เลือก — mux เลือกเส้นทางข้อมูล ไม่ได้ทำหน้าที่หน่วงเวลา (ไม่ใช่เพราะ data memory ช้ากว่า ALU)</div></div>
+
+<div class="qa"><div class="q">นับจำนวน mux ที่ต้องเพิ่มเข้า datapath เมื่อขยายจาก R-type ล้วน ไปรองรับ lw และ sw (ยังไม่นับ branch)</div><div class="a"><b>ตอบ:</b> 2 ตัว — (1) ALUSrc mux เลือก rs2 หรือ immediate ป้อนขาที่สองของ ALU เพื่อคำนวณที่อยู่ rs1+imm และ (2) MemtoReg mux เลือกผล ALU หรือค่าจาก data memory ไปเขียน rd สำหรับ sw: ที่อยู่ = rs1+imm ใช้ ALUSrc mux ตัวเดิม (ไม่เพิ่ม), ค่าที่เขียน = rs2 ต่อสายตรงเข้าพอร์ต write-data ของ Data Memory, sw ไม่เขียน rd จึง RegWrite=0 ไม่แตะ MemtoReg mux</div></div>
+
+<h3>ขั้นที่ 3: เพิ่ม beq (branch)</h3>
+<p>beq rs1, rs2, label: ถ้า rs1==rs2 ให้กระโดดไปที่ PC+offset (PC-relative, offset เป็น signed 13 บิต ทวีคูณของ 2) ถ้าไม่เท่ากันไป PC+4 ตามปกติ ความต้องการใหม่: <b>เปรียบเทียบ rs1 กับ rs2</b> — ตั้ง ALU ทำ subtract แล้วดูธง <b>Zero</b> (Zero=1 เมื่อ rs1−rs2=0) ใช้ ALU ตัวเดิม ไม่ต้องเพิ่มตัวเปรียบเทียบ (branch ป้อน rs2 เข้า ALU ดังนั้น ALUSrc=0) · <b>Branch adder</b> (ตัวบวกแยก) คำนวณ PC+immediate ขนานไปกับ PC+4 · <b>PCSrc mux</b> ที่ทางเข้า PC เลือกระหว่าง PC+4 กับ PC+offset สัญญาณเลือกคือ <b>PCSrc = Branch AND Zero</b> — กระโดดเฉพาะเมื่อเป็นคำสั่ง branch และเงื่อนไขเป็นจริง</p>
+<div class="mermaid">
+flowchart LR
+  PC["PC"] --> ADD4["+4"]
+  PC --> BADD["branch adderPC + imm"]
+  IMM["ImmGen"] --> BADD
+  ADD4 --> PMUX{"PCSrcmux"}
+  BADD --> PMUX
+  ALU["ALU (sub)"] -->|"Zero"| AND["Branch AND Zero"]
+  AND --> PMUX
+  PMUX -->|"PC รอบถัดไป"| PC
+</div>
+<p>ImmGen ที่มีอยู่ถูกใช้ซ้ำ เพียงเพิ่มรูปแบบ B-type — beq จึงไม่เพิ่ม ALU หรือพอร์ตรีจิสเตอร์ใหม่เลย ของใหม่จริงมีแค่ branch adder, PCSrc mux และเกต AND ของ Branch กับ Zero (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 4.9, 4.25)</p>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — beq x5, x6, L ที่ address 0x40, offset +16</div>
+<ol class="steps">
+<li>x5=7, x6=7: register file ส่ง rs1=7, rs2=7</li>
+<li>ALU ทำ subtract → 7−7=0 → Zero=1</li>
+<li>control ถอด opcode 1100011 (beq) → Branch=1</li>
+<li>PCSrc = Branch AND Zero = 1 AND 1 = 1 → เลือกขากระโดด</li>
+<li>branch adder: PC+imm = 0x40+16 = 0x50 → PC ถัดไป = 0x50</li>
+</ol>
+<div class="answer">ถ้า x6=9 แทน: 7−9=−2≠0 → Zero=0 → PCSrc=1 AND 0=0 → mux เลือก PC+4=0x44 ทั้งที่ Branch ยังเป็น 1 — สาย Branch มาจากการถอด opcode ส่วนธง Zero มาจาก ALU ทั้งสองต้องเป็น 1 พร้อมกันจึงจะกระโดด</div></div>
+
+<div class="qa"><div class="q">เหตุใดสัญญาณเลือกของ PCSrc mux ในกรณี beq จึงเป็น Branch AND Zero แทนที่จะเป็น Branch เพียงอย่างเดียว</div><div class="a"><b>ตอบ:</b> เพราะ Branch บอกแค่ว่าเป็นคำสั่ง branch แต่ยังต้องดู Zero ว่า rs1 เท่ากับ rs2 จริงหรือไม่ จึงจะตัดสินกระโดด (beq เป็น conditional branch ไม่ใช่ unconditional)</div></div>
+
+<h3>ขั้นที่ 4: เพิ่ม jal และ jalr (jump)</h3>
+<p>สองคำสั่งนี้ "กระโดดเสมอ" (unconditional) และต้องเก็บ return address = PC+4 ลง rd</p>
+<table>
+<thead><tr><th>คำสั่ง</th><th>ที่อยู่เป้าหมาย</th><th>ใครคำนวณ</th><th>ค่าที่เขียนลง rd</th></tr></thead>
+<tbody>
+<tr><td>jal rd, label (J-type)</td><td>PC + imm (PC-relative)</td><td>branch adder ตัวเดิม</td><td>PC + 4</td></tr>
+<tr><td>jalr rd, rs1, imm (I-type)</td><td>rs1 + imm (บิตล่างสุดบังคับเป็น 0)</td><td>ALU (ALUSrc เลือก immediate)</td><td>PC + 4</td></tr>
+</tbody>
+</table>
+<p>ผลต่อ datapath มีสองจุด: <b>ทางเข้า PC มีสามแหล่ง</b> (PC+4, PC+imm, ผล ALU) — PCSrc mux ขยายเป็นหลายขา และสาย Jump=1 บังคับเลือกขากระโดดโดยไม่ดู Zero · <b>พอร์ตเขียน rd มีแหล่งที่สาม</b> คือ PC+4 — write-back mux ขยายอีกหนึ่งขา</p>
+<div class="mermaid">
+flowchart LR
+  ADD4["PC+4"] --> WBMUX{"write-back mux"}
+  ALU["ALU result"] --> WBMUX
+  DM["Data Memory"] --> WBMUX
+  WBMUX -->|"เขียน rd"| RF["Register File"]
+  ADD4 --> PMUX{"PCSrcmux (หลายขา)"}
+  BADD["PC+imm"] --> PMUX
+  ALU -->|"rs1+imm (jalr)"| PMUX
+  PMUX -->|"PC ถัดไป"| PCN["PC"]
+</div>
+<p>ของใหม่ในผังนี้มีแค่สองขา — ขา PC+4 ที่เข้า write-back mux (สำหรับเก็บ return address) และขาผล ALU ที่เข้า PCSrc mux (สำหรับ jalr) ที่เหลือเป็นบล็อกเดิมทั้งหมด</p>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — jal x1,L ที่ 0x40 (offset +8) แล้ว jalr x0,0(x1)</div>
+<ol class="steps">
+<li>jal x1,L (PC=0x40, imm=+8): ตัวบวก+4 = 0x44 (return address) · branch adder PC+imm=0x48 (เป้าหมาย) · Jump=1 → PCSrc mux เลือก PC+imm → PC ถัดไป=0x48 · RegWrite=1, write-back mux เลือกขา PC+4 → x1←0x44</li>
+<li>jalr x0,0(x1) (x1=0x44,imm=0): ALUSrc=1: ALU บวก rs1+imm=0x44+0=0x44 · Jump=1 → PCSrc mux เลือกขา "ผล ALU" → PC ถัดไป=0x44 · rd=x0 → เขียน PC+4 ลง x0 ไม่มีผล — นี่คือ ret นั่นเอง</li>
+</ol>
+<div class="answer">สรุป: x1=0x44, jal ไป 0x48, jalr กลับมา 0x44 — ค่า 0x44 ทำหน้าที่ต่อกันสองรอบ: รอบของ jal เขียนมันลง x1 เป็น return address แล้วรอบของ jalr อ่านค่าเดิมนี้จาก x1 มาใช้เป็นที่อยู่เป้าหมาย</div></div>
+
+<div class="qa"><div class="q">ข้อใดอธิบายความต่างของการคำนวณที่อยู่เป้าหมายระหว่าง jal กับ jalr ได้ถูกต้อง</div><div class="a"><b>ตอบ:</b> jal ใช้ PC+immediate (PC-relative) ใช้ branch adder เดิมได้ แต่ jalr ใช้ rs1+immediate (register-indirect) ต้องให้ ALU คำนวณ (ALUSrc เลือก immediate) เพราะมาคนละแหล่ง ทางเข้า PC จึงต้องมี mux เลือกระหว่าง PC+4, PC+imm และ ALU result</div></div>
+
+<h3>สรุปภาพรวม: แต่ละชนิดเพิ่มอะไร</h3>
+<table>
+<thead><tr><th>ชนิดคำสั่ง</th><th>หน่วย/สายใหม่</th><th>mux ที่เพิ่ม</th><th>control ใหม่</th></tr></thead>
+<tbody>
+<tr><td>R-type</td><td>register file, ALU</td><td>—</td><td>RegWrite, ALUControl</td></tr>
+<tr><td>lw / sw</td><td>ImmGen, data memory</td><td>ALUSrc, MemtoReg</td><td>MemRead, MemWrite</td></tr>
+<tr><td>beq</td><td>branch adder (PC+imm)</td><td>PCSrc (หน้า PC)</td><td>Branch (+ ลอจิก AND กับ Zero)</td></tr>
+<tr><td>jal / jalr</td><td>(ใช้ adder/ALU เดิม)</td><td>ขยาย PCSrc + write-back mux (เพิ่มขา PC+4)</td><td>Jump, jalr-select</td></tr>
+</tbody>
+</table>
+
+<div class="qa"><div class="q">หลังเพิ่มครบทั้ง jal และ jalr แล้ว write-back mux มีแหล่งข้อมูลป้อนเข้ากี่ทาง สำหรับชุดคำสั่งที่สอนใน Topic นี้ (R-type, lw, sw, beq, jal/jalr)</div><div class="a"><b>ตอบ:</b> 3 แหล่ง — (1) ผลลัพธ์ ALU สำหรับ R-type/I-arith (2) ค่าที่อ่านจาก data memory สำหรับ lw (3) PC+4 = return address สำหรับ jal/jalr</div></div>
+
+<div class="refs"><div class="rt">อ้างอิง</div><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 4</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-123">
+<h2>12.3 หน่วยควบคุม (Control Unit)</h2>
+
+<h3>ถอด opcode เป็นสัญญาณควบคุม</h3>
+<p>datapath ใน 12.2 มี mux, หน่วยความจำ และ register file ที่ทำได้ทุกอย่าง — แต่จะทำ<b>อะไร</b>ขึ้นกับชนิดของคำสั่ง <b>หน่วยควบคุม (control unit)</b> คือวงจรเชิงรวม (combinational) ที่รับ opcode (7 บิต) แล้วผลิต<b>สัญญาณควบคุม (control signal)</b> ไปสั่งทุก mux และทุก enable ให้ตรงกับคำสั่งนั้น</p>
+<div class="callout note"><span class="cal-label">แนวคิดกุญแจ: control เป็นฟังก์ชันของ opcode ล้วน ๆ</span>ใน single-cycle คำสั่งทั้ง 32 บิตถูกอ่านมาครบตั้งแต่ต้นคาบ หน่วยควบคุมหลักดูแค่ opcode 7 บิตก็รู้ชนิดคำสั่ง จึงตั้ง RegWrite/ALUSrc/MemRead/MemWrite ได้ทันที ส่วนการเลือกว่า ALU จะบวก/ลบ/AND ต้องดู funct3/funct7 เพิ่ม งานนี้แยกไปให้ ALU control</div>
+
+<table>
+<thead><tr><th>สัญญาณ</th><th>ค่า 0 หมายถึง</th><th>ค่า 1 หมายถึง</th><th>คำสั่งที่ตั้ง 1</th></tr></thead>
+<tbody>
+<tr><td>RegWrite</td><td>ไม่เขียน register file</td><td>เขียนค่ากลับที่ rd ปลายคาบ</td><td>R-type, addi, lw, jal/jalr</td></tr>
+<tr><td>ALUSrc</td><td>ขา B ของ ALU = rs2</td><td>ขา B ของ ALU = immediate</td><td>addi, lw, sw, jalr</td></tr>
+<tr><td>MemRead</td><td>ไม่อ่าน data memory</td><td>อ่าน data memory ตามที่อยู่จาก ALU</td><td>lw</td></tr>
+<tr><td>MemWrite</td><td>ไม่เขียน data memory</td><td>เขียนค่า rs2 ลง data memory</td><td>sw</td></tr>
+<tr><td>MemToReg</td><td>เขียนกลับผล ALU</td><td>เขียนกลับค่าที่อ่านจาก memory</td><td>lw (เป็น X เมื่อ RegWrite=0)</td></tr>
+<tr><td>Branch</td><td>ไม่ใช่ branch</td><td>"อาจ" กระโดด — ต้องรวมกับธง Zero ก่อน</td><td>beq/bne</td></tr>
+<tr><td>Jump</td><td>ไม่ใช่ jump</td><td>กระโดดแน่นอน</td><td>jal, jalr</td></tr>
+<tr><td>ALUOp (2 บิต)</td><td colspan="2">00=สั่งบวก · 01=สั่งลบ · 10=ให้ ALU control ไปดู funct</td><td>lw/sw=00, branch=01, R/I-type=10</td></tr>
+</tbody>
+</table>
+<p>PCSrc ไม่ใช่ output ของหน่วยควบคุมโดยตรง แต่คำนวณจาก <b>PCSrc = (Branch AND Zero) OR Jump</b> — ดีไซน์ที่มี jal/jalr ขยาย write-back mux เป็นสามขา บางตำราจึงเรียก MemToReg ว่า WBSel เป็นสัญญาณตัวเดียวกัน</p>
+
+<div class="qa"><div class="q">Branch ต่างจาก PCSrc อย่างไร</div><div class="a"><b>ตอบ:</b> Branch เป็น output ของหน่วยควบคุม (มาจาก opcode=beq/bne/...) ส่วน PCSrc เป็น output ของวงจร AND/OR เล็ก ๆ ที่รวม Branch เข้ากับ Zero ของ ALU — beq จะกระโดดก็ต่อเมื่อ Branch=1 <i>และ</i> rs1−rs2=0 พร้อมกัน</div></div>
+
+<div class="qa"><div class="q">คำสั่ง lw ตั้งสัญญาณกี่ตัวเป็น 1 ในบรรดา RegWrite, ALUSrc, MemRead, MemWrite, MemToReg, Branch, Jump</div><div class="a"><b>ตอบ:</b> 4 ตัว — RegWrite=1 (เขียนค่ากลับ rd), ALUSrc=1 (บวก offset กับฐาน), MemRead=1 (อ่าน data memory), MemToReg=1 (เขียนกลับค่าที่อ่านจาก memory) ส่วน MemWrite, Branch, Jump เป็น 0 — lw คือคำสั่งที่เปิดสัญญาณมากที่สุดในกลุ่มนี้ เพราะวิ่งผ่านทุกบล็อกของ datapath</div></div>
+
+<div class="mermaid">
+flowchart LR
+    INSTR["คำสั่ง 32 บิต"] --> OPC["opcode (7)"]
+    INSTR --> FUNC["funct3 (3) + funct7 บิต30"]
+    OPC --> MC["หน่วยควบคุมหลัก (main control)"]
+    MC --> S1["RegWrite / ALUSrc"]
+    MC --> S2["MemRead / MemWrite / MemToReg"]
+    MC --> S3["Branch / Jump"]
+    MC --> AO["ALUOp (2 บิต)"]
+    AO --> ALUC["ALU control (decoder ชั้นสอง)"]
+    FUNC --> ALUC
+    ALUC --> OP["ALU operation 4 บิต"]
+    MC -.- NOTE["PCSrc = (Branch AND Zero) OR Jump"]
+</div>
+<p>วงรี Control รับแค่ opcode 7 บิต แล้วแตกออกเป็นเจ็ดสาย ปลายสายทุกเส้นไปจบที่ mux หรือพอร์ต enable ส่วนเกต AND ที่รวม Branch กับ Zero เป็นตัวเลือกของ mux หน้า PC คือ PCSrc (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 4.20, 4.21)</p>
+
+<h3>ALU control: decoder สองชั้น</h3>
+<p>หน่วยควบคุมหลักไม่บอก ALU ตรง ๆ ว่าทำอะไร มันส่งแค่ <b>ALUOp</b> 2 บิตแบบหยาบ วงจรเล็กชื่อ <b>ALU control</b> เป็น decoder ชั้นสอง: รับ ALUOp + funct3 + บิต 30 ของ funct7 แล้วผลิตสัญญาณ ALU operation 4 บิต บิต 30 คือตัวแยก add/sub และ srl/sra</p>
+<div class="mermaid">
+flowchart LR
+    AO["ALUOp (2)"] --> DEC["ALU control"]
+    F3["funct3 (3)"] --> DEC
+    F7["funct7 บิต 30"] --> DEC
+    DEC --> OUT["ALU op: add/sub/and/or/slt/shift"]
+    AO -.- A1["00 → add เสมอ"]
+    AO -.- A2["01 → sub เสมอ"]
+    AO -.- A3["10 → ดู funct"]
+</div>
+<div class="callout note"><span class="cal-label">เหตุผลที่แยกสองชั้น</span>ถ้าให้หน่วยควบคุมหลักถอด funct3/funct7 ทั้งหมดเอง ตารางจะใหญ่และซ้ำซ้อน การมี ALUOp เป็น "คำสั่งระดับสูง" ทำให้ตารางหลักเล็ก แล้วผลักรายละเอียดการเลือก operation ของกลุ่มคำนวณไปไว้ที่ ALU control ที่เดียว</div>
+<table>
+<thead><tr><th>ALUOp</th><th>ชนิดคำสั่ง</th><th>ALU ทำอะไร</th><th>ดู funct ไหม</th></tr></thead>
+<tbody>
+<tr><td>00</td><td>lw, sw</td><td>บวก (ฐาน + offset)</td><td>ไม่ดู</td></tr>
+<tr><td>01</td><td>branch (beq/bne/...)</td><td>ลบ (เพื่อหา Zero)</td><td>ไม่ดู</td></tr>
+<tr><td>10</td><td>R-type / I-type คำนวณ</td><td>ตาม funct3 (+funct7 บิต30)</td><td>ดู</td></tr>
+</tbody>
+</table>
+<div class="callout warn"><span class="cal-label">ข้อควรระวัง — บทบาทของ funct7 บิต 30</span>เมื่อ ALUOp=10 และ funct3=000 (add/sub) หรือ 101 (srl/sra) ALU control ดูบิต 30 เพื่อแยก add(0)/sub(1) และ srl(0)/sra(1) แต่สำหรับ I-type คำนวณ (addi) บิต 30 เป็นส่วนหนึ่งของ immediate ไม่ใช่ funct7 — ALU control จึงรู้จาก opcode ว่าคำสั่งนี้เป็น I-type แล้วไม่ใช้บิต 30 มาแยก add/sub จำง่าย ๆ ว่าการแยก add กับ sub ดูบิต 30 ได้เฉพาะ R-type</div>
+
+<h3>ตารางค่าสัญญาณควบคุมต่อชนิดคำสั่ง</h3>
+<table>
+<thead><tr><th>คำสั่ง</th><th>RegWrite</th><th>ALUSrc</th><th>MemRead</th><th>MemWrite</th><th>MemToReg</th><th>Branch</th><th>Jump</th><th>ALUOp</th></tr></thead>
+<tbody>
+<tr><td>R-type</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>10</td></tr>
+<tr><td>I-type คำนวณ (addi/andi/slti)</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>10</td></tr>
+<tr><td>lw</td><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>00</td></tr>
+<tr><td>sw</td><td>0</td><td>1</td><td>0</td><td>1</td><td>X</td><td>0</td><td>0</td><td>00</td></tr>
+<tr><td>beq / branch</td><td>0</td><td>0</td><td>0</td><td>0</td><td>X</td><td>1</td><td>0</td><td>01</td></tr>
+<tr><td>jal</td><td>1</td><td>X</td><td>0</td><td>0</td><td>PC+4</td><td>0</td><td>1</td><td>X</td></tr>
+<tr><td>jalr</td><td>1</td><td>1</td><td>0</td><td>0</td><td>PC+4</td><td>0</td><td>1</td><td>00</td></tr>
+</tbody>
+</table>
+<p>(X = don't care; ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 4.22)</p>
+<p>สามจุดที่มักสับสน: <b>sw</b>: MemToReg=X เพราะ RegWrite=0 ไม่มีการเขียนกลับ · <b>beq</b>: ALUOp=01 สั่งลบเพื่อหา Zero แล้ว PCSrc=Branch AND Zero ตัดสินจริง · <b>jal</b>: ALUSrc/ALUOp=X เพราะเป้าหมายมาจาก adder (PC+imm) ไม่ใช่ ALU ส่วน jalr ต้องใช้ ALU บวก rs1+imm จึงตั้ง ALUSrc=1, ALUOp=00</p>
+<div class="callout tip"><span class="cal-label">don't care มีประโยชน์จริง</span>ช่อง X (เช่น MemToReg ของ sw/beq) คือสัญญาณที่ "ผลลัพธ์ไม่ขึ้นกับมัน" เพราะ RegWrite=0 อยู่แล้ว ไม่มีการเขียนกลับ การปล่อยเป็น don't care ช่วยให้วงจรถอดรหัสง่ายขึ้น (logic minimization) โดยไม่กระทบความถูกต้อง</div>
+
+<div class="qa"><div class="q">สำหรับคำสั่ง beq หน่วยควบคุมควรตั้ง ALUOp เป็นค่าใด และเพราะอะไร</div><div class="a"><b>ตอบ:</b> 01 เพราะต้องให้ ALU ลบ rs1−rs2 เพื่อให้ได้สัญญาณ Zero มาตัดสินการกระโดด (ถ้าผลเป็น 0 แปลว่า rs1=rs2 จึงกระโดด) ALUOp=10 ใช้กับกลุ่มคำนวณ R/I ต่างหาก และ ALUOp=00 ใช้กับ lw/sw</div></div>
+
+<div class="qa"><div class="q">จากตารางค่าสัญญาณ ในบรรดาคำสั่งทั้ง 7 แถว มีกี่คำสั่งที่ตั้ง MemWrite=1</div><div class="a"><b>ตอบ:</b> 1 คำสั่ง — มีเพียง sw ที่เขียน data memory ที่เหลือ MemWrite=0 ทั้งหมด</div></div>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — ไล่สัญญาณควบคุมของ sub x5,x6,x7 (0x407302B3, funct7 บิต30=1)</div>
+<ol class="steps">
+<li>ถอด opcode=0110011 → R-type → เข้าแถว R-type ของตารางค่าสัญญาณ</li>
+<li>อ่านสัญญาณหลัก: RegWrite=1, ALUSrc=0, MemRead=0, MemWrite=0, MemToReg=0, Branch=0, Jump=0, ALUOp=10</li>
+<li>ALU control: ALUOp=10 → ดู funct3=000 (กลุ่ม add/sub) → ดูบิต 30 ต่อ: funct7 บิต 30=1 → เลือก sub (ถ้าเป็น 0 จะเป็น add)</li>
+<li>ALU operation สุดท้าย = SUB (รหัส 4 บิตตามตำรา: AND 0000, OR 0001, add 0010, subtract 0110) → คำนวณ x6−x7 → เขียนกลับ x5</li>
+</ol>
+<div class="answer">ถ้าเปลี่ยนเป็น add x5,x6,x7 ทุกอย่างเหมือนเดิม ยกเว้น funct7 บิต 30=0 → ALU op=ADD (x6+x7) — นี่คือสาเหตุที่ add/sub ใช้แถวตารางหลักแถวเดียวกัน ต่างกันแค่บิต 30 (รหัสเครื่อง: sub=0x407302B3, add=0x007302B3)</div></div>
+
+<div class="refs"><div class="rt">อ้างอิง</div><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 4</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-124">
+<h2>12.4 ทำไม Single-Cycle ถูกต้องแต่ช้า</h2>
+
+<h3>ถูกต้องด้วยความเรียบ แต่ช้าด้วย critical path</h3>
+<p>ดาต้าพาธแบบ <b>single-cycle</b> ทำทุกคำสั่งให้เสร็จภายใน<b>หนึ่งสัญญาณนาฬิกา (one clock cycle)</b>: ปลายไซเคิลค่าทั้งหมดถูกเขียนกลับ (register file, PC, memory) แล้วไซเคิลใหม่จึงเริ่ม แบบนี้<b>ถูกต้องเสมอ</b> เพราะไม่มีคำสั่งสองตัวซ้อนทับกันในเวลาเดียว จึงไม่มี hazard ใด ๆ ให้กังวล ราคาที่จ่ายคือความเร็ว: สัญญาณนาฬิกาต้องยาวพอให้<b>คำสั่งที่ช้าที่สุด</b>ทำงานครบทุกขั้นภายในไซเคิลเดียว นั่นคือ clock period ต้องครอบ <b>critical path</b> = เส้นทางหน่วงเวลา (propagation delay) ที่ยาวที่สุดในวงจร</p>
+<div class="callout note"><span class="cal-label">critical path คืออะไร</span>เส้นทางสัญญาณจาก register/PC ตัวหนึ่ง ผ่านวงจร combinational ไปจนถึง register/หน่วยความจำที่จะถูกเขียน ที่ใช้เวลารวมมากที่สุด clock period ต้องไม่สั้นกว่าเวลานี้ ไม่งั้นค่ายังไม่นิ่งตอน clock edge ผลลัพธ์จะผิด</div>
+
+<h3>คำสั่งที่ยาวที่สุดคือ lw</h3>
+<div class="mermaid">
+flowchart LR
+    PC["PC"] --> IMEM["Instruction Memory (อ่านคำสั่ง)"]
+    IMEM --> RF["Register File (อ่าน rs1)"]
+    RF --> ALU["ALU (rs1 + imm = ที่อยู่)"]
+    ALU --> DMEM["Data Memory (อ่านข้อมูล)"]
+    DMEM --> WB["Write-back (เขียนลง rd)"]
+</div>
+<p>เส้นทางของ lw คือ PC → IMEM → register read → ALU → DMEM → write-back ต่อกันเป็นอนุกรม คำสั่งอื่นสั้นกว่า เช่นกลุ่ม R (add) ไม่แตะ data memory จึงข้ามขั้น DMEM ไปได้ ส่วน sw ไม่มี write-back เข้า register file แต่ในเครื่อง single-cycle clock period ถูกตั้งตาม lw ที่ยาวสุด</p>
+
+<div class="qa"><div class="q">ในเครื่อง single-cycle คำสั่งใดมักเป็นตัวกำหนด critical path</div><div class="a"><b>ตอบ:</b> lw เพราะต้องวิ่ง regread → ALU → DMEM → write-back ต่อกันเป็นอนุกรม รวม delay ยาวที่สุด — add เป็น R-type ที่ "ข้าม DMEM" ได้ เส้นทางจึงสั้นกว่า และ beq ไม่มี write-back เข้า register file (RegWrite=0) และไม่แตะ DMEM เส้นทางจึงสั้นกว่า lw เช่นกัน</div></div>
+
+<h3>ทุกคำสั่งใช้เวลาเท่ากัน แม้คำสั่งที่สั้น</h3>
+<p>เพราะ clock period คงที่ตาม critical path ของ lw คำสั่งที่ "ทำงานน้อย" จึง<b>ไม่ได้เร็วขึ้น</b> มันแค่นั่งรอจน clock edge ถัดไปมาถึง เวลาที่เกินจากงานจริงคือ<b>เวลาว่างเปล่า (slack ที่เสียไป)</b></p>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — คำนวณ clock period จากเวลาหน่วงแต่ละบล็อก</div>
+<p>กำหนด: IMEM 200 ps, register read 100 ps, ALU 200 ps, DMEM 200 ps, register write 100 ps</p>
+<table>
+<thead><tr><th>คำสั่ง</th><th>IMEM</th><th>regread</th><th>ALU</th><th>DMEM</th><th>regwrite</th><th>รวม (ps)</th></tr></thead>
+<tbody>
+<tr><td>R-type (add)</td><td>200</td><td>100</td><td>200</td><td>—</td><td>100</td><td>600</td></tr>
+<tr><td>lw</td><td>200</td><td>100</td><td>200</td><td>200</td><td>100</td><td>800</td></tr>
+<tr><td>sw</td><td>200</td><td>100</td><td>200</td><td>200</td><td>—</td><td>700</td></tr>
+<tr><td>beq</td><td>200</td><td>100</td><td>200</td><td>—</td><td>—</td><td>500</td></tr>
+</tbody>
+</table>
+<div class="answer">clock period = 800 ps ตามแถวที่ยาวสุด (lw) — add เสร็จที่ 600 ps แล้วนั่งรอ slack 200 ps เปล่า ๆ, sw ใช้จริง 700 ps เสีย slack 100 ps, beq ใช้จริง 500 ps เสีย slack มากสุดถึง 300 ps ทั้งที่โปรแกรมจริงใช้ beq บ่อยมาก (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 4.28)</div></div>
+
+<h3>CPI = 1 แต่ clock ยาว — มอง Iron Law</h3>
+<p>เครื่อง single-cycle มี <b>CPI (Cycles Per Instruction) = 1</b> ซึ่งดูดีในแง่หนึ่ง แต่ราคาคือ <b>clock period ยาวมาก</b> นำมาประกอบกับสมการพื้นฐานของสมรรถนะ (Iron Law of Performance):</p>
+<div class="callout recap"><span class="cal-label">Iron Law</span>CPU time = IC × CPI × clock period (IC = จำนวนคำสั่ง, CPI = ไซเคิลต่อคำสั่ง, clock period = ความยาวหนึ่งไซเคิล) — single-cycle ทำให้ CPI ต่ำสุด (=1) แต่ดัน clock period สูงสุด เพราะถูกล็อกไว้ที่ critical path ของ lw ผลคูณรวมจึงยังไม่ดี — เราจ่ายราคา clock ยาวให้ทุกคำสั่งรวมถึงคำสั่งสั้นที่ไม่ต้องการ</div>
+<p>นี่คือแรงจูงใจสู่ <b>pipelining (Topic 13)</b>: แทนที่จะรอให้ lw วิ่งครบเส้นทางในไซเคิลเดียว เราซอยเส้นทางเป็นช่วง (stage) สั้น ๆ แล้วตั้ง clock period ตาม<b>stage ที่ยาวที่สุด</b> (ไม่ใช่ผลรวมทั้งเส้น) clock period สั้นลงมาก แลกกับ CPI ที่สูงกว่า 1 เล็กน้อยจาก hazard — แต่ผลคูณ Iron Law โดยรวมดีขึ้นชัดเจน (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 4.29)</p>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — speedup ของ pipeline เทียบ single-cycle</div>
+<p>โปรแกรมมี IC = 1,000,000 คำสั่ง single-cycle: CPI=1, clock period=800 ps เทียบกับ pipeline: clock period=200 ps แต่ CPI จริง=1.25 เพราะ hazard</p>
+<ol class="steps">
+<li>single-cycle: 1,000,000 × 1 × 800 ps = 800,000,000 ps = 800 µs</li>
+<li>pipeline: 1,000,000 × 1.25 × 200 ps = 250,000,000 ps = 250 µs</li>
+<li>speedup = 800 µs / 250 µs = 3.2 เท่า</li>
+</ol>
+<div class="answer">เช็กด้วยอัตราส่วน: clock ดีขึ้น 800/200=4 เท่า, CPI แย่ลง 1.25 เท่า → 4/1.25 = 3.2 — pipeline เสีย CPI (1→1.25) แต่ได้ clock สั้นลง 4 เท่า กำไรจาก clock ชนะการเสีย CPI นี่คือเหตุผลที่ CPU จริงเลือก pipeline</div></div>
+
+<div class="qa"><div class="q">เหตุใดเครื่อง single-cycle ที่มี CPI = 1 จึงยังถือว่าช้า</div><div class="a"><b>ตอบ:</b> เพราะ clock period ถูกตั้งตาม critical path ของ lw ที่ยาวสุด คำสั่งสั้นจึงต้องใช้เวลายาวเท่ากันด้วย — ตาม Iron Law (CPU time = IC×CPI×clock) clock ที่ยาวจึงฉุดสมรรถนะแม้ CPI จะต่ำสุดแล้วก็ตาม</div></div>
+
+<div class="qa"><div class="q">ถ้าซอยเส้นทางของ lw เป็น 5 ช่วง (IF, ID, EX, MEM, WB) clock period ใหม่จะถูกตั้งตามอะไร และจะสั้นลงประมาณเท่าใดเทียบกับ 800 ps</div><div class="a"><b>ตอบ:</b> ตั้งตาม stage ที่ยาวที่สุด (ในตัวอย่างคือ IMEM/ALU/DMEM stage ราว 200 ps) ไม่ใช่ผลรวมทั้งเส้น (800 ps) จึงสั้นลงเหลือราว 1 ใน 4 (800→200 ps) ทำให้ throughput สูงขึ้นมากแม้ latency ของคำสั่งเดี่ยวยังใกล้เคียงเดิม นี่คือหัวใจของ pipelining</div></div>
+
+<div class="callout game"><span class="cal-label">🎮 เครื่องมือแนะนำ</span>Ripes — เลือกโปรเซสเซอร์ single-cycle แล้วรันทีละคำสั่ง เปรียบเทียบ lw กับ add แล้วดูว่าบล็อกใดถูกใช้/ข้าม เพื่อเข้าใจว่าทำไม lw จึงกำหนด critical path</div>
+
+<div class="refs"><div class="rt">อ้างอิง</div><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 4</li></ul></div>
+</section>
+
+
+  </main>
+</div>
+<script>
+(function(){
+  var mermaidDivs = Array.prototype.slice.call(document.querySelectorAll('.mermaid'));
+  mermaidDivs.forEach(function(el){ el.setAttribute('data-mermaid-src', el.textContent); });
+  function currentMermaidTheme(){
+    var rt = (window.__resolvedTheme ? window.__resolvedTheme(window.__bookTheme) : 'light');
+    return rt === 'dark' ? 'dark' : 'default';
+  }
+  function renderMermaid(){
+    if (typeof mermaid === 'undefined') return;
+    mermaidDivs.forEach(function(el){
+      el.removeAttribute('data-processed');
+      el.innerHTML = el.getAttribute('data-mermaid-src');
+    });
+    mermaid.initialize({ startOnLoad: false, theme: currentMermaidTheme(), securityLevel: 'loose' });
+    mermaid.run({ querySelector: '.mermaid' });
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    renderMermaid();
+    var btn = document.getElementById('themeToggle');
+    if(btn){ btn.addEventListener('click', function(){ setTimeout(renderMermaid, 30); }); }
+  });
+})();
+</script>
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); }).filter(Boolean);
+  function onScroll(){
+    var pos = window.scrollY + 120;
+    var current = null;
+    targets.forEach(function(t){ if (t.offsetTop <= pos) current = t; });
+    links.forEach(function(a){ a.classList.remove('active'); });
+    if (current){
+      var link = document.querySelector('#toc a[href="#' + current.id + '"]');
+      if (link) link.classList.add('active');
+    }
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+})();
+</script>
+</body>
+</html>
