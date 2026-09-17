@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topic 11: RV32I ISA &amp; Assembly</title>
+<meta name="description" content="เอกสารสรุปเนื้อหา 310-2202 — Topic 11: RV32I ISA &amp; Assembly">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{
+  --ink:#1e293b; --ink-strong:#0f172a; --muted:#64748b;
+  --primary:#4f46e5; --primary-d:#3730a3; --primary-tint:#eef2ff;
+  --line:#e2e8f0; --surface:#f8fafc; --paper:#f6f4ee;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--paper);}
+body{font-family:'Sarabun','Noto Sans Thai',system-ui,sans-serif;color:var(--ink);}
+code,pre{font-family:'JetBrains Mono',ui-monospace,monospace;}
+a{color:var(--primary);text-underline-offset:2px;}
+
+.layout{display:flex;max-width:1400px;margin:0 auto;min-height:100vh;}
+.sidebar{
+  width:280px;flex-shrink:0;position:sticky;top:0;align-self:flex-start;
+  height:100vh;overflow-y:auto;padding:1.8em 1.3em;background:#fff;
+  border-right:1px solid var(--line);
+}
+.sidebar h2{font-size:1.05rem;color:var(--primary-d);margin:0 0 .3em;}
+.sidebar .subtitle{font-size:.85rem;color:var(--muted);margin:0 0 1.4em;}
+.sidebar nav ul{list-style:none;margin:0;padding:0;}
+.sidebar nav li{margin:0;}
+.sidebar nav a{
+  display:block;padding:.5em .6em;border-radius:6px;color:var(--ink);
+  text-decoration:none;font-size:.92rem;line-height:1.4;border-left:3px solid transparent;
+}
+.sidebar nav a:hover{background:var(--primary-tint);color:var(--primary-d);}
+.sidebar nav a.active{background:var(--primary-tint);color:var(--primary-d);border-left-color:var(--primary);font-weight:600;}
+.sidebar nav .sub{padding-left:1.1em;font-size:.86rem;}
+
+.main{flex:1;min-width:0;padding:2.4em 3em 6em;max-width:900px;}
+.masthead{
+  background:#0F2740;color:#fff;padding:1.8em 2em;border-radius:14px;margin-bottom:2em;
+  border-bottom:4px solid #B7862C;
+}
+.masthead h1{margin:0 0 .3em;font-size:1.7rem;line-height:1.3;}
+.masthead p{margin:0;color:#cbd5e1;font-size:.95rem;}
+
+section.topic-section{margin-bottom:2.6em;padding-left:1.1em;border-left:4px solid var(--primary);}
+section.topic-section > h2{
+  color:var(--primary-d);font-weight:700;font-size:1.55rem;line-height:1.35;
+  margin:0 0 .8em;padding:.5em .7em;border-radius:8px;background:var(--primary-tint);
+  border-left:5px solid var(--primary);
+}
+section.topic-section h3{color:#5b21b6;font-weight:700;font-size:1.25rem;margin:1.6em 0 .5em;
+  padding-left:.5em;border-left:4px solid #c4b5fd;}
+section.topic-section h4{color:#334155;font-weight:600;font-size:1.1rem;margin:1.3em 0 .4em;}
+.content p, .content li, section.topic-section p, section.topic-section li{font-size:1.05rem;line-height:1.75;}
+section.topic-section p{margin:0 0 1em;}
+section.topic-section li{margin:.3em 0;}
+section.topic-section :not(pre) > code{background:#f1f5f9;color:#be185d;padding:.08em .4em;border-radius:5px;font-size:.92em;}
+section.topic-section pre{background:#0f172a;color:#e2e8f0;padding:1em 1.2em;border-radius:8px;overflow-x:auto;font-size:.92rem;line-height:1.6;}
+section.topic-section pre code{background:none;color:inherit;padding:0;}
+
+.callout{border:1px solid var(--line);border-left-width:5px;border-radius:10px;
+  padding:.9em 1.15em;margin:1.3em 0;font-size:.98rem;line-height:1.7;}
+.callout > .cal-label{font-size:.78em;font-weight:700;letter-spacing:.03em;text-transform:uppercase;display:block;margin-bottom:.4em;}
+.callout.note{background:#f0f9ff;border-left-color:#0284c7;} .callout.note .cal-label{color:#0369a1;}
+.callout.tip{background:#ecfdf5;border-left-color:#059669;} .callout.tip .cal-label{color:#047857;}
+.callout.warn{background:#fff1f2;border-left-color:#e11d48;} .callout.warn .cal-label{color:#be123c;}
+.callout.game{background:#fffbeb;border-left-color:#B7862C;} .callout.game .cal-label{color:#92650f;}
+.callout.recap{background:#f5f3ff;border-left-color:#7c3aed;} .callout.recap .cal-label{color:#6d28d9;}
+
+.example{border:1px solid #c7d2fe;border-radius:10px;padding:1em 1.2em;margin:1.4em 0;background:linear-gradient(180deg,#eef2ff 0%,#fff 70%);}
+.example .ex-label{font-weight:700;color:var(--primary-d);font-size:.9rem;margin:0 0 .5em;text-transform:uppercase;letter-spacing:.02em;}
+.example .steps{margin:.6em 0 0;padding-left:1.3em;}
+.example .steps li{margin:.35em 0;}
+.example .answer{margin-top:.7em;padding:.6em .9em;background:#dcfce7;border-left:4px solid #16a34a;border-radius:6px;font-weight:600;}
+
+.qa{border:1px solid #fde68a;border-radius:10px;padding:1em 1.2em;margin:1.4em 0;background:#fffbeb;}
+.qa .q{font-weight:600;margin:0 0 .6em;}
+.qa .a{margin:0;padding-top:.5em;border-top:1px dashed #fbbf24;}
+.qa .a b{color:#92650f;}
+
+table{border-collapse:collapse;width:100%;margin:1.4em 0;font-size:.95rem;}
+thead{background:var(--primary-tint);}
+th,td{border:1px solid var(--line);padding:.55em .75em;text-align:left;vertical-align:top;}
+tbody tr:nth-child(even){background:var(--surface);}
+
+.mermaid{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1em;margin:1.4em 0;text-align:center;}
+
+.refs{margin-top:2.2em;padding:1em 1.2em;border-top:2px solid var(--line);background:var(--surface);
+  border-radius:8px;font-size:.9rem;color:#475569;}
+.refs .rt{font-weight:700;color:var(--ink-strong);margin:0 0 .5em;text-transform:uppercase;font-size:.8rem;letter-spacing:.03em;}
+.refs ul{margin:0;padding-left:1.3em;}
+
+@media (max-width:900px){
+  .layout{flex-direction:column;}
+  .sidebar{position:static;width:100%;height:auto;}
+  .main{padding:1.4em 1.2em 4em;}
+}
+</style>
+
+<style>
+:root{ color-scheme: light dark; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#e4e7ec; --ink-strong:#f1f5f9; --muted:#9aa5b3;
+    --primary:#8ec1f2; --primary-d:#7fb0e0; --primary-tint:#1c2b3d;
+    --line:#333c48; --surface:#1b212b; --paper:#12161d;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e4e7ec; --ink-strong:#f1f5f9; --muted:#9aa5b3;
+  --primary:#8ec1f2; --primary-d:#7fb0e0; --primary-tint:#1c2b3d;
+  --line:#333c48; --surface:#1b212b; --paper:#12161d;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .sidebar{ background:var(--surface); }
+  :root:not([data-theme="light"]) section.topic-section h3{ color:#c4b5fd; border-left-color:#5b21b6; }
+  :root:not([data-theme="light"]) section.topic-section h4{ color:#cbd5e1; }
+  :root:not([data-theme="light"]) section.topic-section :not(pre) > code{ background:#2a2130; color:#f9a8d4; }
+  :root:not([data-theme="light"]) .callout.note{ background:#0f2333; border-left-color:#38bdf8; }
+  :root:not([data-theme="light"]) .callout.note .cal-label{ color:#7dd3fc; }
+  :root:not([data-theme="light"]) .callout.tip{ background:#0f2b21; border-left-color:#34d399; }
+  :root:not([data-theme="light"]) .callout.tip .cal-label{ color:#6ee7b7; }
+  :root:not([data-theme="light"]) .callout.warn{ background:#2d1216; border-left-color:#fb7185; }
+  :root:not([data-theme="light"]) .callout.warn .cal-label{ color:#fca5a5; }
+  :root:not([data-theme="light"]) .callout.game{ background:#2a2112; border-left-color:#e3bd74; }
+  :root:not([data-theme="light"]) .callout.game .cal-label{ color:#e3bd74; }
+  :root:not([data-theme="light"]) .callout.recap{ background:#221a33; border-left-color:#a78bfa; }
+  :root:not([data-theme="light"]) .callout.recap .cal-label{ color:#c4b5fd; }
+  :root:not([data-theme="light"]) .example{ border-color:#4338ca; background:linear-gradient(180deg,#1c2b3d 0%,#12161d 70%); }
+  :root:not([data-theme="light"]) .example .answer{ background:#0f2b21; border-left-color:#34d399; }
+  :root:not([data-theme="light"]) .qa{ border-color:#78350f; background:#2a2112; }
+  :root:not([data-theme="light"]) .qa .a{ border-top-color:#d97706; }
+  :root:not([data-theme="light"]) .qa .a b{ color:#fcd34d; }
+  :root:not([data-theme="light"]) .mermaid{ background:var(--surface); }
+}
+:root[data-theme="dark"] .sidebar{ background:var(--surface); }
+:root[data-theme="dark"] section.topic-section h3{ color:#c4b5fd; border-left-color:#5b21b6; }
+:root[data-theme="dark"] section.topic-section h4{ color:#cbd5e1; }
+:root[data-theme="dark"] section.topic-section :not(pre) > code{ background:#2a2130; color:#f9a8d4; }
+:root[data-theme="dark"] .callout.note{ background:#0f2333; border-left-color:#38bdf8; }
+:root[data-theme="dark"] .callout.note .cal-label{ color:#7dd3fc; }
+:root[data-theme="dark"] .callout.tip{ background:#0f2b21; border-left-color:#34d399; }
+:root[data-theme="dark"] .callout.tip .cal-label{ color:#6ee7b7; }
+:root[data-theme="dark"] .callout.warn{ background:#2d1216; border-left-color:#fb7185; }
+:root[data-theme="dark"] .callout.warn .cal-label{ color:#fca5a5; }
+:root[data-theme="dark"] .callout.game{ background:#2a2112; border-left-color:#e3bd74; }
+:root[data-theme="dark"] .callout.game .cal-label{ color:#e3bd74; }
+:root[data-theme="dark"] .callout.recap{ background:#221a33; border-left-color:#a78bfa; }
+:root[data-theme="dark"] .callout.recap .cal-label{ color:#c4b5fd; }
+:root[data-theme="dark"] .example{ border-color:#4338ca; background:linear-gradient(180deg,#1c2b3d 0%,#12161d 70%); }
+:root[data-theme="dark"] .example .answer{ background:#0f2b21; border-left-color:#34d399; }
+:root[data-theme="dark"] .qa{ border-color:#78350f; background:#2a2112; }
+:root[data-theme="dark"] .qa .a{ border-top-color:#d97706; }
+:root[data-theme="dark"] .qa .a b{ color:#fcd34d; }
+:root[data-theme="dark"] .mermaid{ background:var(--surface); }
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:1.2em;}
+.back-to-index{
+  display:inline-block;font-size:12.5px;color:var(--primary-d);text-decoration:none;
+  opacity:0.9;
+}
+.back-to-index:hover{opacity:1;text-decoration:underline;}
+@media print{.back-to-index{display:none;}}
+.theme-toggle-btn{
+  border:1.5px solid var(--line);background:#fff;color:var(--primary-d);
+  width:32px;height:32px;border-radius:6px;font-size:14px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+:root[data-theme="dark"] .theme-toggle-btn{ background:var(--surface); }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .theme-toggle-btn{ background:var(--surface); }}
+.theme-toggle-btn:hover{background:var(--primary-tint);}
+@media print{.theme-toggle-btn{display:none;}}
+.read-time{font-size:.78rem;color:var(--muted);margin:-1em 0 1.2em;}
+@media print{
+  .sidebar{display:none;}
+  .layout{display:block;}
+  .main{max-width:none;padding:0;}
+}
+</style>
+
+<script>
+(function(){
+  function systemPrefersDark(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function resolvedTheme(t){
+    return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+    else { document.documentElement.removeAttribute('data-theme'); }
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      var r = resolvedTheme(t);
+      btn.textContent = r === 'dark' ? '\u2600\ufe0f' : '\ud83c\udf19';
+      btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+    }
+  }
+  window.__bookTheme = 'system';
+  try{ window.__bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+  applyTheme(window.__bookTheme);
+  document.addEventListener('DOMContentLoaded', function(){
+    applyTheme(window.__bookTheme);
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      btn.addEventListener('click', function(){
+        window.__bookTheme = resolvedTheme(window.__bookTheme) === 'dark' ? 'light' : 'dark';
+        try{ localStorage.setItem('book_theme', window.__bookTheme); }catch(e){}
+        applyTheme(window.__bookTheme);
+      });
+    }
+    window.__resolvedTheme = resolvedTheme;
+  });
+})();
+</script>
+
+<script>
+(function(){
+  function computeReadingTime(){
+    var main = document.querySelector('.main');
+    var chars = (main.textContent || '').replace(/\s+/g, '').length;
+    return Math.max(1, Math.round(chars / 900));
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var badge = document.getElementById('readTimeBadge');
+    if(badge){ badge.textContent = '⏱ ~' + computeReadingTime() + ' นาทีในการอ่าน / min read'; }
+  });
+})();
+</script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="topbar"><a class="back-to-index" href="index.html">&larr; สารบัญทั้งหมด / All Chapters</a><button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button></div>
+    <h2>Topic 11: RV32I ISA &amp; Assembly</h2>
+    <p class="subtitle">310-2202 โครงสร้างระบบคอมพิวเตอร์ — สรุปเนื้อหา Topic 11</p>
+<p class="read-time" id="readTimeBadge"></p>
+    <nav id="toc">
+      <ul>
+        <li><a href="#sec-overview">ภาพรวม Topic 11</a></li>
+        <li><a href="#sec-111">11.1 Register File และ ABI</a></li>
+        <li><a href="#sec-112">11.2 หกรูปแบบคำสั่ง (R/I/S/B/U/J)</a></li>
+        <li><a href="#sec-113">11.3 เข้ารหัส/ถอดรหัส และ Pseudo-instructions</a></li>
+        <li><a href="#sec-114">11.4 Calling Convention ครบวง + Recursion</a></li>
+        <li><a href="#sec-115">11.5 ส่วนขยาย M (คูณ/หาร) และ F (จุดลอยตัว)</a></li>
+
+      </ul>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="masthead">
+      <h1>Topic 11: RV32I ISA &amp; Assembly</h1>
+      <p>310-2202 โครงสร้างระบบคอมพิวเตอร์ — สรุปเนื้อหา Topic 11</p>
+    </div>
+<section class="topic-section" id="sec-overview">
+<h2>ภาพรวม Topic 11 — RV32I ISA และ Assembly</h2>
+<p>เจาะลึก ISA (instruction set architecture, ชุดคำสั่ง) ของ RISC-V RV32I: รีจิสเตอร์ 32 ตัวและ ABI (Application Binary Interface — ข้อตกลงระหว่างซอฟต์แวร์ เช่น ชื่อ ra/sp/a0–a7), หกรูปแบบคำสั่ง (R/I/S/B/U/J), การเข้ารหัส/ถอดรหัสระดับบิต, pseudo-instructions ที่ assembler ขยายให้, calling convention ครบวง (prologue/epilogue, stack frame, การส่ง argument/return value) และปิดท้ายด้วยเลขคณิตของเครื่อง: ส่วนขยาย M (คูณ/หาร) และ F (เลขจุดลอยตัว)</p>
+<p><b>เมื่อจบ Topic นี้ ผู้เรียนจะสามารถ:</b> ใช้รีจิสเตอร์ตามชื่อ ABI และอธิบาย caller-saved กับ callee-saved · แยกหกรูปแบบคำสั่ง R/I/S/B/U/J และฟิลด์ของมัน · ถอด/เข้ารหัสคำสั่งพื้นฐาน ใช้ pseudo-instruction และเขียนซับรูทีนตาม calling convention · อธิบายว่าวงจรคูณ (เลื่อนแล้วบวก, shift-add) หาร (ลบแล้วคืนค่า, restoring division) และบวกเลขจุดลอยตัว (สี่ขั้น + guard/round/sticky bit) ของส่วนขยาย M และ F ทำงานอย่างไร</p>
+<div class="callout recap"><span class="cal-label">ถ้าจำได้ประโยคเดียว</span>RV32I มีคำสั่งเพียงหกรูปแบบ ทุกอย่างที่เหลือสร้างจากหกแบบนี้กับข้อตกลงการเรียกฟังก์ชัน</div>
+<table>
+<thead><tr><th>หัวข้อ</th><th>เนื้อหา</th></tr></thead>
+<tbody>
+<tr><td>11.1</td><td>รู้จักรีจิสเตอร์ทั้ง 32 ตัว ชื่อ ABI และกติกา caller-saved เทียบ callee-saved</td></tr>
+<tr><td>11.2</td><td>หกรูปแบบคำสั่ง R/I/S/B/U/J และการจัดเรียงบิตของ immediate</td></tr>
+<tr><td>11.3</td><td>เข้ารหัส/ถอดรหัสคำสั่งเป็นบิตจริง และ pseudo-instructions ที่ assembler ขยายให้</td></tr>
+<tr><td>11.4</td><td>calling convention ครบวง: prologue/epilogue, stack frame และตัวอย่าง recursion</td></tr>
+<tr><td>11.5</td><td>เลขคณิตของเครื่อง: ส่วนขยาย M (คูณ/หาร) และ F (เลขจุดลอยตัว)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="topic-section" id="sec-111">
+<h2>11.1 Register File และ ABI ของ RV32I</h2>
+
+<h3>32 รีจิสเตอร์ x0–x31 และทำไมต้องใช้ฟิลด์ 5 บิต</h3>
+<p>RV32I มีชุดรีจิสเตอร์ทั่วไป (general-purpose register) 32 ตัว ชื่อ <code>x0</code>–<code>x31</code> แต่ละตัวกว้าง 32 บิตเท่าความกว้างของ word ใช้ฟิลด์ 5 บิตในคำสั่งเพื่อเลือกรีจิสเตอร์ (เพราะ 2^5 = 32) นี่คือ "พื้นที่ทำงานความเร็วสูง" ของ CPU ที่ ALU อ่าน/เขียนได้ในรอบสัญญาณนาฬิกาเดียว เร็วกว่าการเข้าถึง memory มาก คำสั่งคำนวณจึงระบุ operand ด้วยเลขรีจิสเตอร์ 5 บิตแทนที่อยู่ memory เต็ม ๆ ทำให้คำสั่งสั้นและ datapath เร็ว (ถ้ามีรีจิสเตอร์ 8 ตัวแบบ LC-3 จะใช้แค่ 3 บิต)</p>
+<div class="callout note"><span class="cal-label">CPU ใช้ยังไง</span>ฮาร์ดแวร์เห็นรีจิสเตอร์เป็นแค่ x0–x31 ส่วน ABI คือกติกาฝั่งซอฟต์แวร์ที่บอกว่าใครใช้ตัวไหน และใครต้องรักษาค่าตอน call/return ถ้าไม่มีกติกานี้ compiler กับไลบรารีคนละเจ้าจะประกอบกันไม่ติด</div>
+
+<h3>x0 = 0 เสมอ (hardwired zero — ต่อสายตายตัว)</h3>
+<p>ในมุมฮาร์ดแวร์ x1–x31 เหมือนกันหมด ใช้แทนกันได้อิสระ มีเพียง <b>x0 ที่พิเศษ</b> เพราะถูก hardwired ให้มีค่า 0 เสมอ อ่าน x0 ได้ 0 ทุกครั้ง เขียนลงไปก็ถูกทิ้ง สมบัติข้อเดียวนี้ให้ idiom ฟรีหลายแบบ: NOP, คัดลอกค่า และเทียบกับศูนย์</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — ไล่ผลของลำดับคำสั่งที่อาศัย x0</div>
+<p>กำหนดค่าเริ่มต้น x7 = 25 และ x6 = 99 ไล่ผลของ (1) <code>add x6, x7, x0</code> (2) <code>addi x0, x0, 0</code> (3) <code>beq x6, x7, DONE</code> ทีละคำสั่ง</p>
+<ol class="steps">
+<li>คำสั่ง 1: x0 = 0 เสมอ → x6 ← 25 + 0 = 25 — นี่คือ "คัดลอกค่า" x7 → x6 (เท่ากับ pseudo <code>mv x6, x7</code>) ตอนนี้ x6 = 25, x7 = 25</li>
+<li>คำสั่ง 2: คำนวณ 0 + 0 = 0 แล้วเขียนลง x0 ซึ่ง hardwired = 0 เขียนไม่ติด → ค่าถูกทิ้ง เป็น NOP มาตรฐาน</li>
+<li>คำสั่ง 3: x6 = 25, x7 = 25 → เท่ากัน → กระโดดไป DONE</li>
+</ol>
+<div class="answer">สรุป: x6 = 25, x7 = 25 — คำสั่ง 1 คัดลอก, คำสั่ง 2 เป็น NOP, คำสั่ง 3 เทียบค่า ทั้งสามอาศัย x0 = 0 โดยไม่เปลืองรีจิสเตอร์จริง</div></div>
+
+<h3>ABI: ตั้งชื่อและหน้าที่ให้รีจิสเตอร์</h3>
+<p>ฮาร์ดแวร์มองรีจิสเตอร์ (ยกเว้น x0) เท่ากันหมด แต่ระดับซอฟต์แวร์มี <b>ABI (Application Binary Interface)</b> เป็นข้อตกลงร่วมที่กำหนด "ชื่อ ABI" และ "หน้าที่" ให้แต่ละตัว เพื่อให้โค้ดจากคนละ compiler/คนละไลบรารีเรียกกันได้ถูกต้อง การเขียน assembly จึงนิยมใช้ชื่อ ABI (เช่น sp, ra, a0) แทนเลข x ดิบ เพราะสื่อ "บทบาท" ของค่าได้ชัดกว่า</p>
+<table>
+<thead><tr><th>รีจิสเตอร์</th><th>ชื่อ ABI</th><th>หน้าที่</th><th>ใครรักษาค่าข้าม call</th></tr></thead>
+<tbody>
+<tr><td>x0</td><td>zero</td><td>ค่าศูนย์เสมอ (hardwired)</td><td>— (คงที่)</td></tr>
+<tr><td>x1</td><td>ra</td><td>return address</td><td>caller-saved</td></tr>
+<tr><td>x2</td><td>sp</td><td>stack pointer</td><td>callee-saved</td></tr>
+<tr><td>x3</td><td>gp</td><td>global pointer</td><td>(พิเศษ)</td></tr>
+<tr><td>x4</td><td>tp</td><td>thread pointer</td><td>(พิเศษ)</td></tr>
+<tr><td>x5–x7</td><td>t0–t2</td><td>temporary</td><td>caller-saved</td></tr>
+<tr><td>x8</td><td>s0 / fp</td><td>saved / frame pointer</td><td>callee-saved</td></tr>
+<tr><td>x9</td><td>s1</td><td>saved</td><td>callee-saved</td></tr>
+<tr><td>x10–x17</td><td>a0–a7</td><td>argument / return value</td><td>caller-saved</td></tr>
+<tr><td>x18–x27</td><td>s2–s11</td><td>saved</td><td>callee-saved</td></tr>
+<tr><td>x28–x31</td><td>t3–t6</td><td>temporary</td><td>caller-saved</td></tr>
+</tbody>
+</table>
+<p>สรุปกลุ่มให้จำง่าย: <b>a0–a7</b> ส่ง argument (และ a0/a1 รับ return value), <b>t0–t6</b> เป็น temporary, <b>s0–s11</b> เป็น saved, <b>ra</b> เก็บที่อยู่กลับ, <b>sp</b> ชี้ยอด stack ส่วน <b>gp/tp</b> เป็นรีจิสเตอร์พิเศษที่ตั้งค่าตอนเริ่มโปรแกรม (gp ชี้ฐานพื้นที่ข้อมูล global, tp ชี้ thread-local storage) และปกติโค้ดทั่วไปไม่แตะ นับรวม: callee-saved 13 ตัว (sp กับ s0–s11), caller-saved 16 ตัว (ra, t0–t6, a0–a7), พิเศษ 3 ตัว (zero, gp, tp) รวม 32 พอดี — ที่มา: Patterson &amp; Hennessy, Computer Organization and Design (RISC-V Edition) รูปที่ 2.14</p>
+
+<div class="callout game"><span class="cal-label">🎮 เกมในต้นฉบับ</span>ตัวจำลองให้คลิกช่อง x0–x31 ดูชื่อ ABI/หน้าที่ แล้วกดปุ่ม callee-saved/caller-saved/พิเศษ เพื่อไฮไลต์แต่ละกลุ่มและนับจำนวนช่องที่สว่าง (13/16/3) และคลิกช่อง x8 ดูว่ารีจิสเตอร์ตัวเดียวมีสองชื่อ s0/fp</div>
+
+<h3>Pseudo-instruction ที่อาศัย x0: mv, li, neg, nop</h3>
+<p>RV32I ไม่มีคำสั่ง move, load-immediate หรือ negate แยกต่างหาก — assembler ขยาย pseudo-instruction เหล่านี้เป็นคำสั่งจริงที่อาศัย x0 ทั้งสิ้น</p>
+<table>
+<thead><tr><th>pseudo ที่เขียน</th><th>assembler ขยายเป็น</th><th>ความหมาย</th></tr></thead>
+<tbody>
+<tr><td><code>mv x6, x7</code></td><td><code>addi x6, x7, 0</code></td><td>x6 ← x7 + 0 (คัดลอกค่า)</td></tr>
+<tr><td><code>li x10, 25</code></td><td><code>addi x10, x0, 25</code></td><td>x10 ← 0 + 25 (ใส่ค่าคงที่)</td></tr>
+<tr><td><code>neg x5, x6</code></td><td><code>sub x5, x0, x6</code></td><td>x5 ← 0 - x6 (กลับเครื่องหมาย)</td></tr>
+<tr><td><code>nop</code></td><td><code>addi x0, x0, 0</code></td><td>คำนวณ 0 + 0 แล้วเขียนลง x0 ซึ่งไม่ติด</td></tr>
+</tbody>
+</table>
+<p>ขยายความ: คำสั่งคำนวณใดก็ตามที่ rd = x0 เช่น <code>add x0, x5, x6</code> ก็คำนวณแล้วผลถูกทิ้งเหมือนกัน จึงเป็น NOP โดยอัตโนมัติ — datapath ไม่ต้องมีเส้นทางพิเศษสำหรับ "ไม่เขียนผล"</p>
+
+<h3>เช็กว่าเป็นศูนย์หรือไม่: สองท่า beq กับ sltiu</h3>
+<p>ต้องการรู้ว่า x6 เป็นศูนย์หรือไม่ มีสองท่า: <b>ท่า branch</b> — <code>beq x6, x0, IS_ZERO</code> ให้ผลเป็น "ทิศทางการกระโดด" ทันที กับ <b>ท่าคำนวณเป็นค่า</b> — <code>sltiu x5, x6, 1</code> (assembler ตั้งชื่อ pseudo ว่า <code>seqz x5, x6</code>) ให้ค่า 0/1 เก็บไว้คำนวณต่อได้</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — sltiu x5, x6, 1 เมื่อ x6 = 0, 7, 0xFFFFFFFD</div>
+<p>กติกา sltiu: x5 ← 1 ถ้า x6 น้อยกว่า 1 แบบ <b>unsigned</b> ไม่เช่นนั้น x5 ← 0 (เลข unsigned ที่น้อยกว่า 1 มีตัวเดียวคือ 0)</p>
+<ol class="steps">
+<li>x6 = 0 → 0 น้อยกว่า 1 จริง → x5 = 1</li>
+<li>x6 = 7 → 7 ไม่น้อยกว่า 1 → x5 = 0</li>
+<li>x6 = 0xFFFFFFFD → มองแบบ unsigned คือ 4294967293 → ไม่น้อยกว่า 1 → x5 = 0 (ไม่ใช่ −3 เพราะ sltiu ไม่มอง sign)</li>
+</ol>
+<div class="answer">x5 = 1 เฉพาะเมื่อ x6 = 0 → นี่คือ is-zero flag ตัว u ใน sltiu แปลว่า unsigned ถ้าต้องการเทียบแบบ signed ต้องใช้ slti แทน</div></div>
+
+<div class="qa"><div class="q">assembler ขยาย pseudo <code>neg x5, x6</code> (กลับเครื่องหมาย) เป็นคำสั่งจริงใด</div><div class="a"><b>ตอบ:</b> <code>sub x5, x0, x6</code> — 0 − x6 คือค่าลบของ x6 ตรงตามนิยาม negate (รหัสเครื่อง 0x406002B3) ระวังลำดับ operand: <code>sub x5, x6, x0</code> ผิด เพราะ x6 − 0 = x6 เท่ากับคัดลอกค่าเฉย ๆ</div></div>
+
+<div class="refs"><div class="rt">อ้างอิง</div><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 2</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-111b">
+<h3>Caller-saved เทียบ Callee-saved — ใครรับผิดชอบรักษาค่ารีจิสเตอร์ข้าม call</h3>
+<p>หัวใจของ calling convention ใน ABI คือกติกาว่า <b>"ใครรับผิดชอบรักษาค่ารีจิสเตอร์ข้าม subroutine call"</b> เพราะ subroutine ที่เรียก (callee) กับผู้เรียก (caller) ใช้รีจิสเตอร์ชุดเดียวกัน ถ้าไม่มีข้อตกลง ค่าจะทับกันมั่ว ABI จึงแบ่งรีจิสเตอร์เป็นสองกลุ่ม</p>
+<table>
+<thead><tr><th>กลุ่ม</th><th>รีจิสเตอร์</th><th>callee ทับได้ไหม</th><th>ใครต้องเซฟ</th><th>เซฟเมื่อไร</th></tr></thead>
+<tbody>
+<tr><td>caller-saved</td><td>t0–t6, a0–a7, ra</td><td>ได้ตามใจ</td><td>caller</td><td>ก่อน jal ถ้ายังต้องใช้ค่าหลัง call แล้วโหลดคืนหลังกลับ</td></tr>
+<tr><td>callee-saved</td><td>s0–s11, sp</td><td>ไม่ได้</td><td>callee</td><td>ใน prologue ก่อนใช้ แล้วคืนใน epilogue (sp ต้องกลับชี้ที่เดิม)</td></tr>
+</tbody>
+</table>
+<p>เป็นการประนีประนอม (trade-off) เพื่อลดงานเซฟโดยรวม ถ้าทุกตัวเป็น callee-saved จะเซฟ/รีสโตร์เปลืองแม้กับค่าที่ caller ไม่สนใจแล้ว ถ้าทุกตัวเป็น caller-saved ก็เปลืองอีกแบบ การแบ่งครึ่งให้ compiler วางตัวแปร "อายุยาว" (ต้องอยู่รอด call) ไว้ใน s-register และตัวแปร "อายุสั้น" ไว้ใน t-register จึงเซฟเฉพาะที่จำเป็น — <b>ra</b> อยู่ฝั่ง Preserved จากมุม caller เพราะตอน ret ค่า ra ต้องชี้จุดเดิม (จึงต้อง sw ra ใน prologue) แต่จัดในตารางฝั่ง caller-saved เพราะ jal ของตัวเองทับ ra ทันที จึงต้องเซฟก่อนเรียกซ้อน — สองมุมนี้พูดเรื่องเดียวกัน — ที่มา: Patterson &amp; Hennessy, Computer Organization and Design (RISC-V Edition) รูปที่ 2.11</p>
+
+<h4>โครงร่าง subroutine ตามมาตรฐาน ABI</h4>
+<pre><code># func: เซฟเฉพาะ callee-saved ที่จะใช้จริง และ ra ถ้าจะเรียกต่อ
+func:
+    addi sp, sp, -16      # จองเฟรมบน stack (sp ชี้ลงต่ำเพราะ stack โตลงล่าง)
+    sw   ra, 12(sp)       # เซฟ ra ถ้าภายในจะเรียก subroutine อีกที
+    sw   s0, 8(sp)        # เซฟ s0 เพราะเป็น callee-saved และกำลังจะใช้
+    # ... ตัวงาน: ใช้ a0-a7 รับ argument, t0-t6 เป็นที่พักชั่วคราว ...
+    # ... ผลลัพธ์ใส่ a0 (และ a1 ถ้าต้องคืน 2 ค่า) ...
+    lw   s0, 8(sp)        # restore s0 คืน
+    lw   ra, 12(sp)       # restore ra คืน
+    addi sp, sp, 16       # คืนพื้นที่ stack (sp กลับที่เดิม)
+    ret                   # = jalr x0, 0(ra) กระโดดกลับตามที่อยู่ใน ra</code></pre>
+<p>สังเกตว่า t-register ในตัวงานไม่ต้องเซฟ เพราะ caller รู้อยู่แล้วว่ามันเป็น caller-saved ส่วน a0 ที่ใช้คืนผล ก็ไม่ต้องเซฟกลับเพราะ a-register เป็น caller-saved เช่นกัน</p>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — เห็นภาพ: callee-saved ถูกฝากไว้ตรงไหนบน stack</div>
+<p>สมมุติก่อนเข้า func ค่า sp = 0x7FFFFFF0 ไล่ prologue สามคำสั่งแรกทีละขั้น</p>
+<ol class="steps">
+<li><code>addi sp, sp, -16</code> (0xFF010113) — sp ← 0x7FFFFFF0 − 16 = 0x7FFFFFE0 จองเฟรมกว้าง 16 ไบต์ (ABI ของ RISC-V กำหนดให้ sp เกาะแนว 16 ไบต์เสมอ แม้ใช้จริงแค่ 8 ไบต์)</li>
+<li><code>sw ra, 12(sp)</code> (0x00112623) — เก็บ ra ลงที่ 0x7FFFFFE0 + 12 = 0x7FFFFFEC</li>
+<li><code>sw s0, 8(sp)</code> (0x00812423) — เก็บ s0 ลงที่ 0x7FFFFFE0 + 8 = 0x7FFFFFE8</li>
+</ol>
+<pre>ที่อยู่สูง
+              +--------------------+
+ 0x7FFFFFF0   |   (caller frame)   |   ← sp เดิม ก่อน prologue
+              +--------------------+
+ 0x7FFFFFEC   |  ra        12(sp)  |  ┐
+ 0x7FFFFFE8   |  s0         8(sp)  |  │  เฟรมของ func กว้าง 16 ไบต์
+ 0x7FFFFFE4   |  (pad)      4(sp)  |  │  4(sp), 0(sp) เผื่อไว้ให้ sp เกาะแนว 16
+ 0x7FFFFFE0   |  (pad)      0(sp)  |  ┘  ← sp ใหม่
+              +--------------------+
+ที่อยู่ต่ำ    (เฟรมของฟังก์ชันที่ถูกเรียกซ้อนถัดไป จะงอกลงทางนี้)</pre>
+<div class="answer">epilogue ทำย้อนกลับทีละขั้น: lw s0 (0x00812403) → lw ra (0x00C12083) → addi sp, sp, 16 (0x01010113) ได้ sp = 0x7FFFFFF0 เท่าเดิมเป๊ะ — นี่คือความหมายของ "stack สมดุล"</div></div>
+
+<h4>เรียกซ้อนสองชั้น: ใครต้องเซฟ ra</h4>
+<p>สมมุติ main เรียก A และ A เรียก B (B เป็น leaf ไม่เรียกใครต่อ) <code>jal ra, A</code> ของ main อยู่ที่ 0x1000 และ <code>jal ra, B</code> ของ A อยู่ที่ 0x2010</p>
+<table>
+<thead><tr><th>เหตุการณ์</th><th>ra (ในรีจิสเตอร์)</th><th>ช่อง 12(sp) ในเฟรมของ A</th></tr></thead>
+<tbody>
+<tr><td>main รัน jal ที่ 0x1000</td><td>0x1004</td><td>—</td></tr>
+<tr><td>A เซฟ ra (prologue)</td><td>0x1004</td><td>0x1004</td></tr>
+<tr><td>A รัน jal ที่ 0x2010</td><td>0x2014</td><td>0x1004</td></tr>
+<tr><td>B ret</td><td>0x2014 (กระโดดกลับเข้า A)</td><td>0x1004</td></tr>
+<tr><td>A โหลด ra คืน (epilogue)</td><td>0x1004</td><td>—</td></tr>
+<tr><td>A ret</td><td>กระโดดไป 0x1004 ใน main</td><td>—</td></tr>
+</tbody>
+</table>
+<div class="callout warn"><span class="cal-label">กับดักคลาสสิก</span>ถ้า A ลืมเซฟ ra: ตอน A ret จะกระโดดไป 0x2014 ซึ่งอยู่กลางตัว A เอง → โปรแกรมวนกลับเข้าตัวเองไม่รู้จบ กฎจำง่าย: ฟังก์ชันใดมี jal/call อยู่ข้างใน (non-leaf) ต้องเซฟ ra ใน prologue เสมอ ส่วน leaf function ไม่ต้องเซฟ ra เลย (ในตัวอย่างนี้ A ต้องเซฟ เพราะเป็นฟังก์ชันเดียวที่มี jal ข้างในซึ่งจะทับ ra ส่วน B เป็น leaf ไม่ต้อง)</div>
+
+<div class="qa"><div class="q">subroutine A เก็บค่าไว้ 2 ตัว — ค่าแรก 100 ใน t3 และค่าที่สอง 200 ใน s3 — จากนั้น A เรียก B โดย B เขียนทับทุกรีจิสเตอร์ที่มันมีสิทธิ์ทับ เมื่อ B return กลับมา ค่าใน t3 กับ s3 เชื่อถือได้หรือไม่</div><div class="a"><b>ตอบ:</b> t3 อยู่กลุ่ม t → caller-saved → B ทับได้ → หลัง return เชื่อถือไม่ได้ ส่วน s3 อยู่กลุ่ม s → callee-saved → B ต้องเซฟ/คืน → หลัง return ยัง 200 เท่าเดิม ดังนั้น A ต้องเซฟค่า 100 ใน t3 ลง stack เองก่อน jal (หรือย้ายไป s-register ตั้งแต่แรก) ส่วนค่า 200 ใน s3 ไม่ต้องทำอะไร ABI รักษาให้</div></div>
+
+<div class="refs"><div class="rt">อ้างอิง</div><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 2</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-112">
+<h2>11.2 หกรูปแบบคำสั่ง (Instruction Formats)</h2>
+
+<h3>ทำไมคำสั่งยาวเท่ากันหมด แต่ต้องมีหกรูปแบบ</h3>
+<p>ทุกคำสั่งของ RV32I ยาว <b>32 บิตเท่ากันหมด (fixed-length)</b> นี่คือหัวใจของปรัชญา RISC: decoder รู้ขนาดคำสั่งทันทีโดยไม่ต้องอ่านต่อ จึงดึงคำสั่งถัดไปและทำ pipeline (Topic 12+) ได้ง่าย แต่คำสั่งต่างชนิดต้องการข้อมูลต่างกัน — บางตัวใช้รีจิสเตอร์สามตัว บางตัวต้องการ immediate ก้อนใหญ่ RV32I จึงจัดการวางบิตเป็น <b>หกรูปแบบ (six instruction formats): R, I, S, B, U, J</b></p>
+<div class="callout note"><span class="cal-label">แนวคิดกุญแจ</span>RV32I ออกแบบให้ฟิลด์ opcode, rd, rs1, rs2, funct3 อยู่ตำแหน่งบิตเดิมในทุกรูปแบบที่มีฟิลด์นั้น ผลคือฮาร์ดแวร์อ่านหมายเลขรีจิสเตอร์ออกมาได้ทันทีแบบขนาน โดยยังไม่ต้องรู้ว่าเป็นคำสั่งชนิดใด ลดความซับซ้อนของวงจรถอดรหัส</div>
+
+<table>
+<thead><tr><th>ฟิลด์</th><th>บิต</th><th>กว้าง</th><th>หน้าที่</th><th>มีในรูปแบบ</th></tr></thead>
+<tbody>
+<tr><td>opcode</td><td>6–0</td><td>7</td><td>กลุ่ม/รูปแบบของคำสั่ง ตัวแรกที่ decoder อ่าน</td><td>ทุกแบบ</td></tr>
+<tr><td>rd</td><td>11–7</td><td>5</td><td>รีจิสเตอร์ปลายทาง</td><td>R, I, U, J</td></tr>
+<tr><td>funct3</td><td>14–12</td><td>3</td><td>แยกคำสั่งใน opcode เดียวกัน (add/sll, beq/bne)</td><td>R, I, S, B</td></tr>
+<tr><td>rs1</td><td>19–15</td><td>5</td><td>ต้นทางตัวที่ 1 / base</td><td>R, I, S, B</td></tr>
+<tr><td>rs2</td><td>24–20</td><td>5</td><td>ต้นทางตัวที่ 2</td><td>R, S, B</td></tr>
+<tr><td>funct7</td><td>31–25</td><td>7</td><td>แยกคู่ที่ opcode+funct3 ชนกัน (add 0000000 / sub 0100000)</td><td>R</td></tr>
+<tr><td>imm</td><td>ต่างกันตามรูปแบบ</td><td>12/20</td><td>ค่าคงที่ฝังในคำสั่ง</td><td>I, S, B, U, J</td></tr>
+</tbody>
+</table>
+
+<h3>ตารางสรุปหกรูปแบบ</h3>
+<table>
+<thead><tr><th>รูปแบบ</th><th>ใช้กับ</th><th>มี imm?</th><th>จุดเด่น</th></tr></thead>
+<tbody>
+<tr><td>R</td><td>reg-reg: add, sub, and, or, sll, slt</td><td>ไม่มี</td><td>ใช้ rs1, rs2, rd ครบ + funct7</td></tr>
+<tr><td>I</td><td>addi, lw, jalr, ecall</td><td>12 บิต</td><td>rs1 + imm → rd (ไม่มี rs2)</td></tr>
+<tr><td>S</td><td>store: sw, sh, sb</td><td>12 บิต</td><td>เก็บ rs2 ลงที่ (rs1 + imm) ไม่มี rd</td></tr>
+<tr><td>B</td><td>branch: beq, bne, blt, bge</td><td>13 บิต (signed, PC-relative)</td><td>เทียบ rs1 กับ rs2 แล้วกระโดด</td></tr>
+<tr><td>U</td><td>lui, auipc</td><td>20 บิตบน</td><td>สร้างค่าคงที่ก้อนใหญ่ → rd</td></tr>
+<tr><td>J</td><td>jal</td><td>21 บิต (signed)</td><td>กระโดดไกล + เก็บ return addr ลง rd</td></tr>
+</tbody>
+</table>
+<p>ที่มา: Patterson &amp; Hennessy, Computer Organization and Design (RISC-V Edition) รูปที่ 2.19</p>
+
+<h3>ขั้นตอนเข้ารหัส 4 ขั้น (ใช้ได้ทุกรูปแบบ)</h3>
+<ol class="steps">
+<li><b>แยก operand</b> — อ่านคำสั่งแล้วระบุให้ครบว่าอะไรคือ rd, rs1, rs2 และ immediate (ถ้ามี)</li>
+<li><b>แปลงเป็นบิตต่อฟิลด์</b> — เปิดค่า opcode/funct3/funct7 ของคำสั่งนั้น แปลงหมายเลขรีจิสเตอร์เป็นฐานสอง 5 บิต และแปลง immediate เป็นฐานสองตามจำนวนบิตที่รูปแบบกำหนด (ค่าลบต้องเขียนเป็น two's complement ก่อน)</li>
+<li><b>วางตามผัง</b> — นำบิตของแต่ละฟิลด์ไปวางลงตำแหน่งที่รูปแบบกำหนด เรียงจากบิต 31 ลงมาถึงบิต 0</li>
+<li><b>อ่านเป็นฐานสิบหก</b> — จับกลุ่มทีละ 4 บิตจากขวาสุด แปลงแต่ละกลุ่มเป็นเลขฐานสิบหกหนึ่งหลัก ได้คำตอบ 8 หลัก</li>
+</ol>
+<div class="callout warn"><span class="cal-label">จุดพลาดบ่อย</span>ลืมแปลงค่าลบเป็น two's complement และวางฟิลด์สลับตำแหน่ง (โดยเฉพาะ rs1 กับ rs2) วิธีกันพลาด: วาดผังฟิลด์เป็นช่องเปล่าก่อน แล้วเติมบิตทีละช่องเหมือนเติมตาราง</div>
+
+<h3>รูปแบบ R — register-register</h3>
+<p>คำสั่งคำนวณที่ทำงานกับรีจิสเตอร์ล้วน ๆ: <code>rd = rs1 (op) rs2</code> ผังบิต: <code>funct7(7) | rs2(5) | rs1(5) | funct3(3) | rd(5) | opcode(7)</code></p>
+<pre><code>add  x1, x2, x3   # x1 = x2 + x3
+sub  x1, x2, x3   # x1 = x2 - x3   (funct3 เดียวกับ add แต่ funct7 ต่าง)
+sll  x1, x2, x3   # shift left logical
+slt  x1, x2, x3   # set less than: x1 = (x2 น้อยกว่า x3) ? 1 : 0
+and  x1, x2, x3   # x1 = x2 &amp; x3
+or   x1, x2, x3   # x1 = x2 | x3</code></pre>
+<p>ทุกตัวข้างบนใช้ opcode เดียวกัน (กลุ่ม OP) แล้วแยกด้วย funct3 คู่ที่ funct3 ชนกัน (add/sub และ srl/sra) แยกเพิ่มด้วย funct7 — นี่คือเหตุผลที่รูปแบบ R ต้องมี funct7: opcode 7 บิต + funct3 3 บิต ยังไม่พอแยกทุกคำสั่งคำนวณ</p>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — เข้ารหัส add x1, x2, x3 เป็น 32 บิต</div>
+<p>รู้ว่า add มี opcode = 0110011, funct3 = 000, funct7 = 0000000</p>
+<ol class="steps">
+<li>แยก operand: rd=x1, rs1=x2, rs2=x3</li>
+<li>แปลงบิต: opcode=0110011, rd=00001, funct3=000, rs1=00010, rs2=00011, funct7=0000000</li>
+<li>วางตามผัง (บิต 31→0): 0000000 00011 00010 000 00001 0110011</li>
+<li>จับกลุ่ม 4 บิต: 0000 0000 0011 0001 0000 0000 1011 0011</li>
+</ol>
+<div class="answer">คำตอบ = 0x003100B3 — ถ้าเปลี่ยนเป็น sub x1, x2, x3 มีแค่ funct7 เปลี่ยนเป็น 0100000 → ได้ 0x403100B3 ต่างกันแค่หลักหน้าสุด</div></div>
+
+<h3>รูปแบบ I — immediate / load / jalr</h3>
+<p>รูปแบบ I แทน rs2 และ funct7 ด้วย <b>immediate 12 บิต</b> (บิต 31–20) ใส่ค่าคงที่มีเครื่องหมายช่วง −2048 ถึง +2047 ได้ในคำสั่งเดียว ใช้กับสามงานหลัก:</p>
+<pre><code>addi x1, x2, 5     # คำนวณกับค่าคงที่: x1 = x2 + 5
+lw   x1, 8(x2)     # load: x1 = MEM[x2 + 8]   (imm คือ offset)
+jalr x1, 0(x2)     # กระโดดทางอ้อม: PC = x2 + 0, เก็บ return addr ลง x1
+ecall              # system call (หมายเลขบริการอยู่ใน a7)</code></pre>
+<p>สังเกตว่า lw และ addi ใช้รูปแบบเดียวกัน เพราะทั้งคู่ต้องการ "base register + offset → ปลายทางเดียว" ทำให้ตารางถอดรหัสของ RV32I เล็กและสม่ำเสมอ ส่วน slli ก็ยืมรูปแบบ I เช่นกัน โดยฟิลด์ imm ใช้แค่ 5 บิตล่างเป็น shamt (shift amount, จำนวนตำแหน่งที่เลื่อน — รีจิสเตอร์ 32 บิตเลื่อนได้มากสุด 31 ตำแหน่ง) วางที่บิต 24–20 (ตำแหน่งเดียวกับ rs2 ของรูปแบบ R) ส่วนบิต 31–25 เป็นรหัสคงที่: slli/srli ใช้ 0000000 ส่วน srai ใช้ 0100000</p>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — addi t0, zero, -1 (immediate ติดลบ)</div>
+<ol class="steps">
+<li>แยก operand: t0=x5, zero=x0 → rd=x5, rs1=x0, imm=-1</li>
+<li>เขียน -1 แบบ two's complement 12 บิต: +1 = 000000000001 → กลับบิต 111111111110 → บวกหนึ่ง = 111111111111</li>
+<li>วางตามผัง I: 111111111111 00000 000 00101 0010011</li>
+<li>อ่านฐานสิบหก: 1111 1111 1111 0000 0000 0010 1001 0011</li>
+</ol>
+<div class="answer">คำตอบ = 0xFFF00293 — sign bit ของ imm ตกที่บิต 31 ของคำสั่งพอดี เห็นคำสั่งขึ้นต้นด้วย 0xFFF เมื่อไร ให้เดาไว้ก่อนว่า immediate เป็นค่าลบ</div></div>
+
+<h3>รูปแบบ S — store (imm ถูกแตกเป็นสองท่อน)</h3>
+<p><code>sw x3, 8(x2)</code> ต้องการสองรีจิสเตอร์ต้นทาง (rs1=base, rs2=ค่าที่จะเก็บ) และ immediate offset แต่<b>ไม่มี rd</b> เพราะไม่เขียนผลลงรีจิสเตอร์ เนื่องจาก rs1/rs2 ต้องอยู่บิต 19–15 และ 24–20 เหมือนรูปแบบ R (เพื่อให้ decoder อ่านรีจิสเตอร์ได้แบบขนาน) และช่องบิต 11–7 (เดิมเป็น rd) ว่างอยู่ RV32I จึง<b>แตก immediate 12 บิตเป็นสองท่อน</b>: imm[11:5] ไปช่องบิต 31–25 และ imm[4:0] ไปช่องบิต 11–7 — รวมกันยังเป็นค่า 12 บิตเดิม แค่กระจายตำแหน่ง (ตอนเขียน assembly ยังเขียน offset เป็นก้อนเดียวเหมือนเดิม การฉีกเป็นงานของ assembler)</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — sw x5, -4(x2)</div>
+<ol class="steps">
+<li>แยก operand: rs2=x5, rs1=x2, imm=-4</li>
+<li>-4 ใน 12 บิต two's complement = 111111111100 → ฉีก: imm[11:5]=1111111 (sign bit อยู่ท่อนนี้), imm[4:0]=11100</li>
+<li>วางตามผัง S (imm[11:5]|rs2|rs1|funct3|imm[4:0]|opcode): 1111111 00101 00010 010 11100 0100011</li>
+<li>อ่านฐานสิบหก: 1111 1110 0101 0001 0010 1110 0010 0011</li>
+</ol>
+<div class="answer">คำตอบ = 0xFE512E23 — sign bit ของ imm (บิตที่ 11 ของ imm) ตกที่บิต 31 ของคำสั่งเสมอ store offset ติดลบจึงขึ้นต้นด้วย 0xF เหมือน addi ค่าลบ</div></div>
+
+<h3>รูปแบบ B — branch (PC-relative, signed 13 บิต)</h3>
+<p><code>beq x1, x2, LABEL</code> เปรียบเทียบ rs1 กับ rs2 (ไม่มี rd) offset เป็น PC-relative มีเครื่องหมาย บวกเข้ากับที่อยู่ของคำสั่ง branch เอง เราพูดว่า immediate ของ branch มี <b>13 บิต</b> แต่เก็บจริงเพียง 12 บิต เพราะคำสั่ง RV32I ทุกตัว align ที่ขอบ 2 byte เสมอ บิตล่างสุด (bit 0) ของ offset จึงเป็น 0 เสมอ ฮาร์ดแวร์ไม่ต้องเก็บมัน — ครอบคลุมระยะกระโดดประมาณ −4096 ถึง +4094 byte imm ของรูปแบบ B ถูกแยกเป็น 4 กล่อง (สับบิต, scramble): imm[12] ที่บิต 31, imm[10:5] ที่บิต 30–25, imm[4:1] ที่บิต 11–8, และ imm[11] ที่โดดเดี่ยวอยู่บิต 7</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — beq x1, x2, 8</div>
+<ol class="steps">
+<li>แยก operand: rs1=x1, rs2=x2, offset=+8 → imm 13 บิต = 0000000001000</li>
+<li>แจกแจง: imm[12]=0, imm[11]=0, imm[10:5]=000000, imm[4:1]=0100, imm[0]=0 (ไม่เก็บ)</li>
+<li>วางตามผัง B: บิต31=imm[12]=0, บิต30–25=imm[10:5]=000000, บิต24–20=rs2=00010, บิต19–15=rs1=00001, บิต14–12=funct3=000, บิต11–8=imm[4:1]=0100, บิต7=imm[11]=0, บิต6–0=opcode=1100011</li>
+<li>อ่านฐานสิบหก: 0000 0000 0010 0000 1000 0100 0110 0011</li>
+</ol>
+<div class="answer">คำตอบ = 0x00208463</div></div>
+
+<h3>รูปแบบ U — upper immediate 20 บิต</h3>
+<p>immediate 12 บิตของ I/S ใส่ค่าคงที่ 32 บิตเต็มไม่ได้ รูปแบบ U แก้ด้วยการเก็บ <b>immediate 20 บิตบน</b> (วางตรง ๆ ที่บิต 31–12) มีแค่ rd ไม่มีรีจิสเตอร์ต้นทาง: <code>lui x1, 0x12345</code> วาง 0x12345 ลงบิต [31:12] บิตล่าง 12 บิตเป็น 0, <code>auipc x1, 0x12345</code> บวก (0x12345 &lt;&lt; 12) เข้ากับ PC ของคำสั่งนี้ คู่ lui+addi (หรือ auipc+addi) จึงประกอบกันเป็นค่าคงที่/ที่อยู่ 32 บิตได้: 20 บิตบนจาก U + 12 บิตล่างจาก I</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — lui x5, 0x12345</div>
+<ol class="steps">
+<li>แยก operand: rd=x5, imm(20 บิตบน)=0x12345</li>
+<li>แปลงบิต: 0x12345 → 0001 0010 0011 0100 0101, rd=00101</li>
+<li>วางตามผัง U (imm[31:12]|rd|opcode): 00010010001101000101 00101 0110111</li>
+<li>อ่านฐานสิบหก: 0001 0010 0011 0100 0101 0010 1011 0111</li>
+</ol>
+<div class="answer">คำตอบ = 0x123452B7 — ผลตอนรัน x5 = 0x12345000 (20 บิตบนคือ 0x12345 ส่วน 12 บิตล่างเป็น 0)</div></div>
+
+<h3>รูปแบบ J — jump 21 บิต</h3>
+<p><code>jal x1, LABEL</code> (jump and link) กระโดดไกลแบบ PC-relative และเก็บที่อยู่คืน (PC+4) ลง rd immediate เป็น signed 21 บิต เก็บจริง 20 บิต (บิต 0 = 0 เสมอ) ครอบคลุมระยะประมาณ ±1 MB เรียงในคำสั่งเป็น imm[20|10:1|11|19:12] ที่บิต 31–12 — <code>jal x0, LABEL</code> เขียนลง x0 คือทิ้ง return address = กระโดดอย่างเดียว (เท่ากับ pseudo <code>j LABEL</code>)</p>
+
+<h3>ทำไม immediate ถูกจัดเรียง (scramble)</h3>
+<p>ถ้าดูดิบ ๆ immediate ของ S, B, U, J ดูยุ่งเหยิง แต่เป็นผลของการตัดสินใจออกแบบสามขั้น:</p>
+<ol class="steps">
+<li><b>ตรึงฟิลด์รีจิสเตอร์ไว้ที่เดิมก่อน</b> — rs1 บิต 19–15, rs2 บิต 24–20, rd บิต 11–7 เหมือนกันทุกรูปแบบ เพื่อให้ decoder ส่งหมายเลขรีจิสเตอร์เข้า register file ได้ทันที ผลพวงคือ immediate ของ S/B ถูกบังคับให้แตกเป็นสองท่อนล้อมรอบฟิลด์รีจิสเตอร์</li>
+<li><b>ตรึง sign bit ไว้ที่บิต 31 เสมอ</b> — บิตบนสุดของ immediate (imm[11] ของ I/S, imm[12] ของ B, imm[31] ของ U, imm[20] ของ J) ถูกวางที่บิต 31 ของคำสั่งทุกรูปแบบ sign-extend จึงเป็นวงจรเดียว ไม่ต้องมี mux เลือกว่าบิตไหนคือ sign</li>
+<li><b>บิตที่เหลือจัดให้น้ำหนักเดียวกันอยู่ตำแหน่งเดิมให้มากที่สุด</b> — เช่น imm[10:5] อยู่บิต 30–25 เหมือนกันทั้ง I, S, B, J</li>
+</ol>
+<pre>│31        25│24    20│19    15│14  12│11        7│6      0│
+R:    │   funct7   │  rs2   │  rs1   │  f3  │     rd    │ opcode │
+I:    │      imm[11:0]      │  rs1   │  f3  │     rd    │ opcode │
+S:    │ imm[11:5]  │  rs2   │  rs1   │  f3  │  imm[4:0] │ opcode │
+B:    │imm[12|10:5]│  rs2   │  rs1   │  f3  │imm[4:1|11]│ opcode │
+U:    │              imm[31:12]             │     rd    │ opcode │
+J:    │        imm[20|10:1|11|19:12]        │     rd    │ opcode │</pre>
+<div class="callout recap"><span class="cal-label">หลักการ scramble ในประโยคเดียว</span>รักษาตำแหน่งบิตให้คงที่ข้ามรูปแบบ (โดยเฉพาะ sign bit ที่บิต 31) สำคัญกว่าการเรียง immediate ให้สวย — ที่มา: Patterson &amp; Hennessy, Computer Organization and Design (RISC-V Edition) รูปที่ 2.17/2.18</div>
+
+<h3>ทำไมต้อง sign-extend</h3>
+<p>immediate ใน RV32I (ยกเว้นบางคำสั่ง shift) เป็นค่ามีเครื่องหมาย (signed, two's complement) ก่อนนำไปคำนวณกับรีจิสเตอร์ 32 บิต ต้องขยายให้ครบ 32 บิตด้วยสองขั้น: อ่านบิตบนสุดของ immediate (sign bit) แล้วคัดลอกบิตนั้นไปเติมบิตบนที่เหลือทั้งหมด ผลคือค่าคงเดิม เช่น <code>addi x1, x2, -1</code> ได้ −1 จริง (0xFFFFFFFF) ไม่ใช่เลขบวกใหญ่ (ถ้าเผลอเติม 0 แทนจะได้เลขบวกผิดมหาศาล) รูปแบบ U ไม่ต้อง sign-extend เพราะวาง 20 บิตลงบิต [31:12] ตรง ๆ แล้วเติม 0 ที่บิตล่าง</p>
+
+<div class="qa"><div class="q">offset ของคำสั่ง branch (รูปแบบ B) มองเป็น signed 13 บิตที่บิตล่างสุดเป็น 0 เสมอ ระยะกระโดดไปข้างหน้าที่ไกลที่สุดเป็นกี่ byte</div><div class="a"><b>ตอบ:</b> signed 13 บิต ให้ค่าบวกมากสุด = 2^12 − 1 = 4095 แต่บิตล่างสุดถูกบังคับเป็น 0 (align 2 byte) ค่าบวกมากสุดที่ลงตัวคือ 4094 byte (ฝั่งลบไปได้ถึง −4096)</div></div>
+
+<div class="refs"><div class="rt">อ้างอิง</div><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 2</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-113">
+<h2>11.3 เข้ารหัส/ถอดรหัส และ Pseudo-instructions</h2>
+
+<h3>Decode: หั่นเลข 32 บิตกลับเป็น fields</h3>
+<p>สำหรับ CPU ไม่มี "คำสั่ง add" เป็นข้อความ มีแต่เลข 32 บิตที่ดึงจากหน่วยความจำทุกไซเคิล <b>decode</b> หั่นก้อนนี้ตามตำแหน่งบิต: opcode คืออะไร อ่านรีจิสเตอร์เบอร์ไหน (rs1, rs2) เขียนเบอร์ไหน (rd) ให้ ALU ทำอะไร (funct3/funct7) — ทั้งหมดกลายเป็นสัญญาณควบคุม datapath opcode อยู่ที่บิตล่างสุด 7 บิต (บิต 6-0) เสมอทุกรูปแบบ ฮาร์ดแวร์อ่าน opcode ก่อนเพื่อรู้รูปแบบ แล้วจึงตีความบิตที่เหลือถูก — encode (assembler แปลงข้อความเป็นบิต) กับ decode (ฮาร์ดแวร์แปลงบิตกลับเป็น fields) คือกระบวนการกลับทางกัน ใช้กติกาเดียวกันคือ "ช่องไหนอยู่บิตไหน"</p>
+
+<h3>บันไดถอดรหัส: ขั้นตอนมาตรฐาน 4 ขั้น</h3>
+<ol class="steps">
+<li><b>ดู opcode 7 บิตล่าง</b> (บิต 6-0) → รู้กลุ่มคำสั่งและรูปแบบที่ต้องใช้หั่นบิตที่เหลือ</li>
+<li><b>หั่น fields</b> ตามผังของรูปแบบนั้น (rs1/rs2/rd/funct3/funct7 อยู่ตำแหน่งตายตัว)</li>
+<li><b>ประกอบ immediate</b> (ถ้ามี) — บางรูปแบบเก็บท่อนเดียว บางรูปแบบต้องนำสองท่อนมาต่อกัน แล้ว sign-extend เป็น 32 บิต</li>
+<li><b>เขียนกลับเป็น assembly</b> จาก fields ที่ได้</li>
+</ol>
+<table>
+<thead><tr><th>opcode (บิต 6-0)</th><th>กลุ่ม</th><th>รูปแบบ</th></tr></thead>
+<tbody>
+<tr><td>0010011</td><td>OP-IMM (addi, srli, srai, ...)</td><td>I-type</td></tr>
+<tr><td>0000011</td><td>LOAD (lw, lb, ...)</td><td>I-type</td></tr>
+<tr><td>0100011</td><td>STORE (sw, sb, ...)</td><td>S-type</td></tr>
+<tr><td>0110011</td><td>OP (add, sub, ...)</td><td>R-type</td></tr>
+</tbody>
+</table>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — ถอดรหัส 0xFE512E23 (imm สองท่อน + sign-extend)</div>
+<ol class="steps">
+<li>opcode 7 บิตล่าง: 0xFE512E23 = 1111 1110 0101 0001 0010 1110 0010 0011 → opcode = 0100011 → กลุ่ม STORE → S-type</li>
+<li>หั่น fields S-type (ไม่มี rd! บิต 11-7 เป็น imm ท่อนล่าง): imm[11:5]=1111111, rs2=00101→x5, rs1=00010→x2, funct3=010 (SW)</li>
+<li>ประกอบ imm สองท่อน: 1111111 ต่อ 11100 = 111111111100 = 0xFFC, บิต 11=1 → sign-extend: 0xFFC − 0x1000 = −4</li>
+</ol>
+<div class="answer">คำตอบ: sw x5, -4(x2) — ความหมาย: Mem[x2 − 4] ← x5 (จุดพลาดบ่อย: หลงอ่านบิต 11-7 เป็น rd จะได้ x28 ซึ่งผิด เพราะ store ไม่เขียนรีจิสเตอร์ ยืมตำแหน่งนั้นเก็บ imm ท่อนล่างแทน)</div></div>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — ถอดรหัส 0x407302B3 (จุดหลอกที่ funct7)</div>
+<ol class="steps">
+<li>opcode: 0100 0000 0111 0011 0000 0010 1011 0011 → opcode=0110011 → R-type</li>
+<li>หั่น fields: funct7=0100000, rs2=00111→x7, rs1=00110→x6, funct3=000, rd=00101→x5</li>
+<li>R-type ไม่มี immediate แต่ต้องอ่าน funct7 ให้ครบ: funct3=000 + funct7=0100000 (0x20) → SUB (ถ้า funct7=0000000 ที่ funct3 เดียวกันจะเป็น ADD — 0x007302B3 คือ add x5,x6,x7)</li>
+</ol>
+<div class="answer">คำตอบ: sub x5, x6, x7 — add กับ sub มี opcode และ funct3 เหมือนกันทุกบิต ต่างกันแค่ funct7 (บิต 30) กับดักเดียวกันนี้ใช้แยก srli/srai ด้วย</div></div>
+
+<div class="qa"><div class="q">ถอดรหัส 0x4062D293 — opcode = 0010011 (OP-IMM), funct3 = 101, บิต 31-25 = 0100000 ได้คำสั่งใด</div><div class="a"><b>ตอบ:</b> srai x5, x5, 6 — ในกลุ่ม shift ขวา บิต 31-25 = 0100000 เลือก srai (เลื่อนขวาแบบคงเครื่องหมาย) ถ้าเป็น 0000000 จะเป็น srli แทน (เข้ารหัสได้ 0x0062D293 ต่างกันแค่บิต 30)</div></div>
+
+<h3>Pseudo-instruction = ทางลัดที่ assembler ขยายให้</h3>
+<p>pseudo-instruction ไม่มี opcode ของตัวเอง ฮาร์ดแวร์ไม่เคยเห็น มันถูกแปลงตั้งแต่ตอน assemble ตัวที่พบบ่อย:</p>
+<table>
+<thead><tr><th>pseudo</th><th>ขยายเป็นคำสั่งจริง</th><th>ความหมาย</th></tr></thead>
+<tbody>
+<tr><td>mv rd, rs</td><td>addi rd, rs, 0</td><td>คัดลอกค่า rs → rd</td></tr>
+<tr><td>nop</td><td>addi x0, x0, 0</td><td>ไม่ทำอะไร (no operation)</td></tr>
+<tr><td>j offset</td><td>jal x0, offset</td><td>กระโดดไม่มีเงื่อนไข ทิ้ง return address</td></tr>
+<tr><td>ret</td><td>jalr x0, 0(ra)</td><td>กลับจากซับรูทีน (กระโดดไปที่ ra)</td></tr>
+<tr><td>li rd, imm</td><td>addi หรือ lui+addi</td><td>โหลดค่าคงที่</td></tr>
+<tr><td>la rd, symbol</td><td>auipc + addi</td><td>โหลดที่อยู่ของ symbol (PC-relative)</td></tr>
+</tbody>
+</table>
+<p>สี่ตัวแรกขยายเป็นคำสั่งเดียว เพราะใช้ทางลัดสองทาง — "บวกด้วย 0 แล้วได้ค่าเดิม" (mv) และ "เขียนผลลง x0 ที่ผูกค่าเป็นศูนย์เสมอ เท่ากับทิ้งผล" (nop, j, ret) เพื่อให้โค้ดอ่านง่ายและสื่อเจตนาชัด โดยไม่ต้องเพิ่ม opcode ในฮาร์ดแวร์ ISA จึงคงเล็กและถอดรหัสง่าย ภาระความสะดวกย้ายไปอยู่ที่ assembler แทน</p>
+
+<div class="qa"><div class="q">assembler ขยาย pseudo-instruction ret เป็นคำสั่งจริงใด</div><div class="a"><b>ตอบ:</b> jalr x0, 0(ra) (รหัสเครื่อง 0x00008067) — กระโดดไปยังที่อยู่ใน ra (x1) โดยเขียน return address ใหม่ลง x0 ซึ่งถูกทิ้ง</div></div>
+
+<h3>ค่าคงที่ใหญ่ และที่อยู่ PC-relative: ทำไมต้องสองคำสั่ง</h3>
+<p>คำสั่ง RV32I หนึ่งคำสั่งยาว 32 บิต แต่ใส่ immediate ได้แค่ส่วนหนึ่ง (I-type ได้ 12 บิต) จึงใส่ค่าคงที่เต็ม 32 บิตในคำสั่งเดียวไม่ได้ ต้องแบ่งเป็น "20 บิตบน + 12 บิตล่าง": <code>lui rd, imm20</code> วางค่า 20 บิตที่บิต 31-12 ของ rd เติม 0 ที่บิตล่าง ตามด้วย <code>addi rd, rd, lo12</code> เติมส่วนล่าง 12 บิต ได้ค่าครบ 32 บิต สำหรับ "ที่อยู่" ที่ต้องย้ายตามตำแหน่งโปรแกรม (PC-relative) ใช้ <code>auipc</code> แทน lui — นำ 20 บิตบวกกับ PC ปัจจุบัน</p>
+<div class="callout warn"><span class="cal-label">ระวังบิตที่ 11: hi อาจถูกบวกชดเชย 1</span>immediate ของ addi กว้าง 12 บิตและถูก sign-extend ถ้าบิตที่ 11 ของส่วนล่างเป็น 1 ค่าที่บวกจะกลายเป็นลบ assembler จึงบวก "ส่วนบน 20 บิต" เพิ่ม 1 เพื่อชดเชย</div>
+
+<h3>บันได li: assembler เลือกวิธีขยายอย่างไร</h3>
+<p>เมื่อ assembler เจอ <code>li rd, imm</code> ตัดสินใจตามลำดับนี้เสมอ: (1) ค่าอยู่ในช่วง −2048 ถึง 2047 → ใช้ addi ตัวเดียว (2) ค่าเกินช่วงนั้น แต่ 12 บิตล่างเป็นศูนย์ทั้งหมด → ใช้ lui ตัวเดียว (3) นอกนั้น → ต้องใช้ lui+addi สองคำสั่ง และต้องตรวจบิตที่ 11 ของท่อนล่างว่าต้องชดเชยหรือไม่</p>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — li t0, 0x12345FFF (ต้องชดเชยบิต 11)</div>
+<ol class="steps">
+<li>แยกสองท่อน: บน (บิต 31-12) = 0x12345, ล่าง (บิต 11-0) = 0xFFF</li>
+<li>ตรวจบิต 11 ของท่อนล่าง: 0xFFF = 1111 1111 1111 → บิต 11 = 1 → addi sign-extend มองเป็น −1 (ไม่ใช่ +4095)</li>
+<li>ลองแบบไม่ชดเชย: lui t0,0x12345 (0x12345000) + addi t0,t0,-1 = 0x12344FFF (ผิด! ขาดไป 0x1000 พอดี)</li>
+<li>ชดเชยที่ส่วนบน: hi = 0x12345 + 1 = 0x12346 → lui t0,0x12346 (0x12346000) + addi t0,t0,-1 = 0x12345FFF (ถูก)</li>
+</ol>
+<div class="answer">การ +1 ที่ hi คือการ "จ่ายเผื่อ" ไว้ล่วงหน้า 0x1000 เพื่อให้ addi ที่ติดลบดึงกลับลงมาพอดีค่าเป้าหมาย</div></div>
+
+<h3>la ผ่าน auipc: ไล่เลขด้วย PC จริง</h3>
+<p>สมมุติ <code>la t0, msg</code> วางที่ address 0x10000 และ label msg อยู่ที่ 0x12345</p>
+<ol class="steps">
+<li>หา offset จากตำแหน่งคำสั่ง (PC-relative): offset = 0x12345 − 0x10000 = 0x2345</li>
+<li>แยก offset เป็นสองท่อน: บน=0x2, ล่าง=0x345, บิต 11 ของ 0x345=0 → ไม่ต้องชดเชย</li>
+<li><code>auipc t0, 0x2</code> → t0 = PC + (0x2&lt;&lt;12) = 0x10000 + 0x2000 = 0x12000</li>
+<li><code>addi t0, t0, 0x345</code> → t0 = 0x12000 + 0x345 = 0x12345 (ชี้ msg พอดี)</li>
+</ol>
+<p>เทียบกับ li: lui/addi ได้ "เลขที่อยู่ตายตัว" แต่ auipc ได้ "ที่อยู่อิง PC" — ถ้าย้ายโปรแกรมทั้งก้อนไป address อื่น ระยะ 0x2345 ยังเท่าเดิม la จึงยังชี้ msg ถูกโดยไม่ต้องแก้เลขสักตัว</p>
+
+<div class="refs"><div class="rt">อ้างอิง</div><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 2</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-114">
+<h2>11.4 Calling Convention ครบวง และ Recursion</h2>
+
+<h3>Calling convention: กติกาเรียก subroutine ระดับ ABI</h3>
+<p><b>Calling convention</b> กำหนดว่า: argument ส่งทางไหน, return value คืนทางไหน, return address เก็บที่ไหน, และใครรับผิดชอบเซฟ register ตัวใด เมื่อทุกฝ่าย (compiler/library/โค้ดเรา) ทำตามกติกาเดียวกัน โค้ดคนละทีมจึงเรียกข้ามกันได้ ซีพียูไม่ "รู้จัก" ฟังก์ชัน มันมีแค่คำสั่งกระโดด (jal/jalr) รีจิสเตอร์ และหน่วยความจำ — calling convention คือชั้นข้อตกลงที่ทำให้ของดิบ ๆ นี้กลายเป็นการเรียกฟังก์ชันซ้อนกันลึก ๆ ได้จริง</p>
+<p><b>argument</b> ส่งใน a0–a7 (x10–x17) ได้ถึง 8 ตัวแรกผ่านรีจิสเตอร์ เกินนั้นส่งผ่าน stack · <b>return value</b> คืนใน a0 (และ a1 สำหรับค่า 64 บิตหรือคู่ค่า) — a0/a1 ทำหน้าที่สองอย่าง: รับ argument ขาเข้าและส่งค่าคืนขากลับ · <b>return address</b> เก็บใน ra (x1) โดยอัตโนมัติเมื่อใช้ jal/jalr</p>
+<pre><code># ฝั่งผู้เรียก (caller): เตรียม argument แล้วเรียก
+    li   a0, 6          # argument ตัวที่ 1 → a0
+    li   a1, 7          # argument ตัวที่ 2 → a1
+    jal  ra, mul_func   # กระโดดไป mul_func, เซฟ PC+4 ลง ra อัตโนมัติ
+    # หลังกลับมา ผลลัพธ์อยู่ใน a0</code></pre>
+
+<div class="qa"><div class="q">ฟังก์ชัน int g(int p, int q) — argument q อยู่รีจิสเตอร์ใด และผลลัพธ์ส่งคืนทางใด</div><div class="a"><b>ตอบ:</b> q อยู่ a1 (argument เริ่มนับที่ a0: p→a0, q→a1) ผลใน a0 เสมอ (ค่าคืนตัวแรกอยู่ a0 ไม่ใช่ a ตัวสุดท้ายที่ใช้)</div></div>
+
+<h3>Prologue และ Epilogue: กรอบของทุก subroutine</h3>
+<p>subroutine มาตรฐานห่อตัวงานด้วย <b>prologue</b> (ตอนเข้า) และ <b>epilogue</b> (ตอนออก) เพื่อจองพื้นที่ทำงานบน stack และคืนค่า callee-saved register ให้ครบก่อนกลับ Prologue: จอง stack frame ด้วย <code>addi sp, sp, -N</code> (เลื่อน sp ลง เพราะ stack โตลงทาง address ต่ำ) แล้ว sw เซฟ ra กับ s-register ที่จะใช้ Epilogue: lw restore ค่ากลับ, คืนพื้นที่ด้วย <code>addi sp, sp, +N</code>, แล้ว ret</p>
+<div class="callout warn"><span class="cal-label">กฎเหล็กของ sp</span>sp เป็น callee-saved subroutine ต้องคืน sp ให้เท่าค่าตอนเข้าเป๊ะ ๆ ก่อน return ทุกครั้ง ถ้า addi sp,sp,-N ตอนเข้า ก็ต้อง addi sp,sp,+N ตอนออกด้วยตัวเลข N เท่ากัน ไม่งั้น caller จะหา frame ของตัวเองไม่เจอและโปรแกรมพังทั้งสาย (RISC-V ไม่มีคำสั่ง push อัตโนมัติ ต้องเลื่อน sp เอง)</div>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — ครบวงจร 4 ขั้นตอนด้วย address จริง</div>
+<p>สมมุติ sp ตอนเข้า = 0x7FFFFFF0 และ caller เรียกด้วย jal ที่ address 0x00010100 ดังนั้น ra ขาเข้า = 0x00010104</p>
+<pre><code>func:
+    addi sp, sp, -16    # ขั้น 1: sp 0x7FFFFFF0 → 0x7FFFFFE0
+    sw   ra, 12(sp)     # ขั้น 2: MEM[0x7FFFFFEC] = ra = 0x00010104
+    sw   s0, 8(sp)      # ขั้น 2: MEM[0x7FFFFFE8] = s0 เดิมของ caller
+    # ...เนื้องาน...    # ขั้น 3: jal ได้ตามสบาย เพราะ ra/s0 เดิมปลอดภัยแล้ว
+    lw   s0, 8(sp)      # ขั้น 4: กู้ s0 คืน
+    lw   ra, 12(sp)     # ขั้น 4: กู้ ra คืน = 0x00010104
+    addi sp, sp, 16     # ขั้น 4: sp 0x7FFFFFE0 → 0x7FFFFFF0 (เท่าตอนเข้า)
+    ret                 # ขั้น 4: PC = ra = 0x00010104 กลับ caller</code></pre>
+<div class="answer">ขั้น 1–2 คือ prologue, ขั้น 4 คือ epilogue ที่ทำ "ย้อนกลับทุกอย่าง" ของขั้น 1–2 แบบกระจกเงา — offset 12(sp)/8(sp) ตอนเซฟกับตอนกู้คืนเป็นตัวเดียวกัน sp จึงกลับที่เดิมและ ra ได้ค่าเดิมครบ (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 2.10)</div></div>
+
+<h3>Leaf vs Non-leaf</h3>
+<p><b>Leaf function</b>: ไม่เรียกใครต่อ จึงไม่มีใครมาทับ ra ของมัน — ถ้าใช้แค่ t-register (caller-saved) อาจไม่ต้องเซฟ ra หรือสร้าง stack frame เลย ทำงานเสร็จ ret ได้ทันที <b>Non-leaf function</b>: เรียก subroutine อื่นต่อ การ jal ครั้งใหม่จะทับ ra เดิม จึงต้องเซฟ ra ลง stack ใน prologue แล้ว restore ก่อน return เสมอ</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — double(x) เป็น leaf ล้วน ไม่ต้องแตะ stack เลย</div>
+<pre><code>double:                 # int double(int x) — x มาใน a0, คืนผลใน a0
+    add  a0, a0, a0     # a0 = x + x
+    ret                 # กลับได้ทันที ไม่ต้องเก็บกวาดอะไร</code></pre>
+<div class="answer">เช็กลิสต์ 2 ข้อของฟังก์ชันที่ไม่ต้องแตะ stack: (1) ไม่เรียก subroutine อื่นต่อ (เป็น leaf) → ไม่มี jal มาทับ ra (2) ใช้แต่ register ฝั่ง caller-saved (a0–a7, t0–t6) → ไม่ต้องเซฟ s-register ใด double ผ่านทั้งสองข้อ → เหลือเนื้องาน + ret รวม 2 คำสั่งจบ</div></div>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — add_double(x,y) = double(x) + y เรียกฟังก์ชันอื่นหนึ่งครั้ง</div>
+<p>มีของ 2 อย่างที่ต้อง "รอดข้าม" การเรียก double: return address ของเราเอง (ra) และค่า y ที่ยังต้องใช้หลังกลับมา</p>
+<pre><code>add_double:                     # a0 = x, a1 = y
+    addi sp, sp, -16    # ขั้น 1: จอง frame 16 ไบต์
+    sw   ra, 12(sp)     # ขั้น 2: เซฟ ra — เดี๋ยว jal จะทับ
+    sw   s0, 8(sp)      # ขั้น 2: เซฟ s0 เดิม — เราจะยืม s0 ใช้
+    mv   s0, a1         # ขั้น 3: ย้าย y ไปที่ปลอดภัยข้าม call
+    jal  ra, double     # ขั้น 3: เรียก double(x) → ผลใน a0
+    add  a0, a0, s0     # ขั้น 3: a0 = double(x) + y
+    lw   s0, 8(sp)      # ขั้น 4: กู้ s0 คืนให้ caller
+    lw   ra, 12(sp)     # ขั้น 4: กู้ ra คืน
+    addi sp, sp, 16     # ขั้น 4: คืน sp เท่าตอนเข้า
+    ret                 # ขั้น 4: กลับ caller</code></pre>
+<div class="answer">ให้ x=7, y=5: หลัง jal ra,double ค่า ra ถูกทับ (ทับ 0x00010054) แต่เซฟไว้แล้วบน stack ใน double: a0=14, ret กลับมา a0=14+5=19 แล้ว epilogue restore s0/ra/sp ครบ — ค่า y เก็บใน s0 ไม่ใช่ t0 เพราะ double มีสิทธิ์ทับ t-register ได้เสมอ ค่าที่ต้องรอดข้าม call ต้องอยู่ใน s-register หรือบน stack เท่านั้น</div></div>
+
+<div class="qa"><div class="q">จากโค้ด add_double ถ้าลืมเซฟ ra (ตัดบรรทัด sw/lw ra ทิ้ง) เมื่อรันมาถึง ret ท้ายฟังก์ชันจะเกิดอะไรขึ้น</div><div class="a"><b>ตอบ:</b> ret กระโดดไปที่คำสั่งถัดจาก jal ใน add_double เอง วนทำท่อนท้ายฟังก์ชันซ้ำไม่รู้จบ — jal เขียน address ของคำสั่งถัดไป (PC+4) ทับ ra เสมอ ไม่ได้ช่วยเก็บค่าเก่าลง stack ให้ ปัญหาหลักคือกลับผิดที่ ไม่ใช่แค่ค่าคำตอบเพี้ยน</div></div>
+
+<h3>Recursion: stack frame ซ้อนกันชั้นต่อชั้น</h3>
+<p><b>Recursion</b> คือ subroutine ที่เรียกตัวเอง — เป็นกรณีพิเศษของ non-leaf จึงต้องเซฟ ra ทุกครั้ง และต้องเก็บค่าที่ "ยังจำเป็นหลังการเรียกซ้ำ" ไว้ใน register แบบ callee-saved (เช่น s0) หรือบน stack เพราะการเรียกซ้ำจะทับ a0/ra</p>
+<pre><code># int fact(int n)  — n อยู่ใน a0, คืนผลใน a0
+fact:
+    addi sp, sp, -16    # prologue: จอง frame
+    sw   ra, 12(sp)     #   เซฟ ra (non-leaf เพราะเรียกตัวเอง)
+    sw   s0, 8(sp)      #   เซฟ s0 (callee-saved) เพื่อจำค่า n ข้ามการเรียกซ้ำ
+    li   t0, 2
+    blt  a0, t0, base   # ถ้า n น้อยกว่า 2 (คือ n = 1) ไปที่ base case
+    mv   s0, a0         # จำ n ไว้ใน s0 (a0 จะถูกทับตอนเรียกซ้ำ)
+    addi a0, a0, -1     # เตรียม argument: n-1
+    jal  ra, fact       # เรียก fact(n-1) → ผลกลับมาใน a0
+    mul  a0, a0, s0     # a0 = fact(n-1) * n   (mul อยู่ใน extension M)
+    j    done
+base:
+    li   a0, 1          # base case: fact(1) = 1
+done:
+    lw   s0, 8(sp)      # epilogue: restore s0, ra
+    lw   ra, 12(sp)
+    addi sp, sp, 16     #   คืน frame
+    ret</code></pre>
+<p>จุดสำคัญ: <code>li t0,2</code> + <code>blt a0,t0,base</code> — RV32I ไม่มี branch ที่เทียบกับค่าคงที่ตรง ๆ จึงต้องเอา 2 ใส่ t0 ก่อน · <code>mv s0,a0</code> ต้องมาก่อน <code>addi a0,a0,-1</code> เสมอ — จำ n ไว้ก่อนแล้วค่อยเตรียม n-1 ถ้าสลับกันจะกลายเป็นจำ n-1 แทน</p>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — trace fact(3) เต็มรูป: ขาลง push, ขาขึ้น unwind + คูณสะสม</div>
+<table>
+<thead><tr><th>ชั้น</th><th>เรียก</th><th>ra ที่เซฟ</th><th>s0 ที่เซฟ (n ของชั้นก่อน)</th><th>a0 ขาไป</th><th>a0 ขากลับ</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>fact(3)</td><td>0x00010104 (กลับ main)</td><td>0x00000000 ของ main</td><td>3</td><td>6</td></tr>
+<tr><td>2</td><td>fact(2)</td><td>0x00010020 (กลับกลาง fact)</td><td>3 = n ชั้น 1</td><td>2</td><td>2</td></tr>
+<tr><td>3</td><td>fact(1)</td><td>0x00010020 (กลับกลาง fact)</td><td>2 = n ชั้น 2</td><td>1</td><td>1</td></tr>
+</tbody>
+</table>
+<ol class="steps">
+<li>ขาลง: แต่ละชั้นเซฟ s0 ของผู้เรียกลง frame ก่อน แล้วค่อยตั้ง s0 = n ของตัวเอง จนถึง fact(1) ซึ่งเป็น base case (a0=1) ไม่เรียกต่อ</li>
+<li>ขาขึ้น (unwind): ชั้น 3 คืนค่า a0=1, กู้ s0=2, ret → ชั้น 2 ทำ mul: a0=1×2=2, กู้ s0=3, ret → ชั้น 1 ทำ mul: a0=2×3=6, กู้ s0=0 ของ main, ret กลับ main</li>
+</ol>
+<div class="answer">ผลสุดท้ายใน a0 = 6 (= 3×2×1) ra ของชั้น 2 กับชั้น 3 เท่ากัน (0x00010020) เพราะถูกเรียกจาก jal บรรทัดเดียวกันกลางตัว fact ส่วนชั้น 1 ถูกเรียกจาก main — ค่า n แต่ละชั้นถูกฝากคนละ address บน stack จึงไม่มีวันทับกัน นี่คือหัวใจที่ทำให้ recursion ทำงานได้บนรีจิสเตอร์ชุดเดียว</div></div>
+
+<div class="qa"><div class="q">เรียก fact(5) โดย sp ตอนอยู่ใน main คือ 0x7FFFFFF0 และแต่ละชั้นจอง frame 16 ไบต์เท่ากันหมด ขณะลงลึกสุด (อยู่ใน fact(1)) ค่า sp เป็นเท่าใด</div><div class="a"><b>ตอบ:</b> ตอนลึกสุดมี frame ซ้อนกัน 5 ชั้น (fact(5) ถึง fact(1)) รวม 5×16=80 ไบต์ → sp = 0x7FFFFFF0 − 80 = 0x7FFFFFA0 (จุดพลาดบ่อยคือนับแค่ 4 ชั้น ลืมว่า fact(1) ก็รัน prologue จองเฟรมของตัวเองก่อนเช็ก base case)</div></div>
+
+<h3>Modular ISA: base เล็ก + extension ตามงาน</h3>
+<div class="mermaid">
+flowchart LR
+  I["RV32I base(integer, บังคับมี)"] --> M["+ M : mul/div"]
+  I --> F["+ F : float 32-bit"]
+  I --> D["+ D : float 64-bit"]
+  I --> A["+ A : atomic"]
+  I --> C["+ C : compressed 16-bit"]
+</div>
+<p>หัวใจของ RISC-V คือออกแบบเป็นโมดูล: มี base ขนาดเล็กที่ทุกชิปต้องมี แล้วเลือกเสริม extension ตามความต้องการของงาน base I มี 51 คำสั่ง ส่วนขยาย M เติม 13, A เติม 22, F เติม 30, D เติม 32, C เติม 36 คำสั่ง (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 2.42)</p>
+<table>
+<thead><tr><th>ส่วนขยาย</th><th>ความหมาย</th></tr></thead>
+<tbody>
+<tr><td>RV32I</td><td>base integer ISA ทุกชิป RISC-V (32 บิต) ต้องมี</td></tr>
+<tr><td>M</td><td>คูณ/หาร (mul, div, rem) — base ไม่มีคูณ/หารฮาร์ดแวร์</td></tr>
+<tr><td>F / D</td><td>floating point single (32 บิต) / double (64 บิต) ตาม IEEE 754 พร้อม register ชุด f0–f31</td></tr>
+<tr><td>A</td><td>atomic (load-reserved/store-conditional) สำหรับ synchronization บนระบบหลายคอร์</td></tr>
+<tr><td>C</td><td>compressed คำสั่ง 16 บิตสำหรับคำสั่งที่ใช้บ่อย ช่วยลดขนาดโค้ด</td></tr>
+</tbody>
+</table>
+<div class="callout recap"><span class="cal-label">base RV32I ก็ Turing-complete แล้ว</span>extension ทุกตัวเป็นเรื่องของ "ความเร็ว/ความสะดวก/ขนาดโค้ด" ไม่ใช่ "ความสามารถในการคำนวณ" ถ้าไม่มี M ก็คูณ/หารด้วยซอฟต์แวร์ได้ (loop บวก/เลื่อนบิตซ้ำ) ถ้าไม่มี F ก็จำลอง float ด้วยจำนวนเต็มได้ ทิศทางความเข้ากันได้เป็นแบบ subset ⊂ superset: โปรแกรม base ล้วน ๆ รันบนชิปที่มี extension เพิ่มได้ แต่ถ้าใช้ mul/float ไปรันบนชิป RV32I เปล่า จะเจอ illegal instruction เพราะ CPU ไม่รู้จัก opcode นั้น</div>
+
+<div class="refs"><div class="rt">อ้างอิง</div><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 2</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-115">
+<h2>11.5 เลขคณิตของเครื่อง: ส่วนขยาย M (คูณ/หาร) และ F (จุดลอยตัว)</h2>
+
+<h3>คำสั่งทั้ง 8 ของส่วนขยาย M</h3>
+<p>RV32I base ไม่มีคำสั่งคูณ — คูณได้ด้วยซอฟต์แวร์ (ลูปบวกและเลื่อนบิต) แต่ช้ากว่าฮาร์ดแวร์หลายสิบเท่า ส่วนขยาย M จึงเพิ่มคำสั่ง 8 ตัว: <b>mul</b> ผลคูณ 32 บิตล่าง · <b>mulh</b> ผลคูณ 32 บิตบน (มีเครื่องหมายทั้งคู่) · <b>mulhu</b> บิตบนแบบไม่มีเครื่องหมาย · <b>mulhsu</b> บิตบนแบบตัวตั้งมีเครื่องหมาย ตัวคูณไม่มี · <b>div</b> ผลหารมีเครื่องหมาย · <b>divu</b> ผลหารไม่มีเครื่องหมาย · <b>rem</b> เศษมีเครื่องหมาย · <b>remu</b> เศษไม่มีเครื่องหมาย</p>
+
+<h3>คูณอย่างไรด้วยวงจร — เลื่อนแล้วบวก (shift-add)</h3>
+<p>หลักการเดียวกับคูณเลขยกกำลังสิบด้วยมือ แต่ฐานสองง่ายกว่า เพราะแต่ละหลักของตัวคูณเป็นได้แค่ 0 หรือ 1 ทำซ้ำเท่าจำนวนบิตของตัวคูณ รอบละสามจังหวะ: (1) ดูบิตต่ำสุดของตัวคูณ ถ้าเป็น 1 บวกตัวตั้งเข้าผลสะสม (2) เลื่อนตัวตั้งไปทางซ้ายหนึ่งบิต (คูณสอง) (3) เลื่อนตัวคูณไปทางขวาหนึ่งบิต</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — 6 × 5 (0110 × 0101) ด้วยวิธีเลื่อนแล้วบวก</div>
+<table>
+<thead><tr><th>รอบ</th><th>bit0</th><th>ผลสะสม</th><th>ตัวตั้งหลังเลื่อน</th><th>การกระทำ</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>1</td><td>6</td><td>6 → 12</td><td>บวก 6</td></tr>
+<tr><td>2</td><td>0</td><td>6</td><td>12 → 24</td><td>ไม่บวก</td></tr>
+<tr><td>3</td><td>1</td><td>30</td><td>24 → 48</td><td>บวก 24</td></tr>
+<tr><td>4</td><td>0</td><td>30</td><td>48 → 96</td><td>ไม่บวก</td></tr>
+</tbody>
+</table>
+<div class="answer">ผลคูณ = 30 ✓ (รอบที่ 3 บวก 24 ไม่ใช่ 6 เพราะตัวตั้งถูกเลื่อนมาแล้วสองครั้ง เท่ากับบวก 6×4 ซึ่งคือน้ำหนักของบิตตำแหน่งที่สามพอดี)</div></div>
+
+<h3>มุมเลขคณิตกับมุมฮาร์ดแวร์ — อัลกอริทึมเดียวกัน วงจรต่างกัน</h3>
+<p>ถ้าสร้างวงจรตามตารางข้างบนตรง ๆ (มุมเลขคณิต) ต้องมีตัวบวกกว้างเท่าผลลัพธ์และรีจิสเตอร์ตัวตั้งกว้างเท่ากัน เพราะมันเลื่อนซ้ายเรื่อย ๆ ฮาร์ดแวร์จริงพลิกกลับด้าน (มุมฮาร์ดแวร์): ให้ <b>ผลคูณเลื่อนขวา</b> แทนที่จะให้ตัวตั้งเลื่อนซ้าย</p>
+<table>
+<thead><tr><th></th><th>ใครเลื่อน</th><th>ใครนิ่ง</th><th>ตัวบวกที่ต้องใช้</th></tr></thead>
+<tbody>
+<tr><td>มุมเลขคณิต</td><td>ตัวตั้งเลื่อนซ้าย</td><td>ผลสะสม</td><td>8 บิต</td></tr>
+<tr><td>มุมฮาร์ดแวร์</td><td>ผลคูณเลื่อนขวา</td><td>ตัวตั้ง</td><td>4 บิต เหลือครึ่งเดียว</td></tr>
+</tbody>
+</table>
+<p>เคล็ดของมุมฮาร์ดแวร์คือใช้รีจิสเตอร์ผลคูณ 8 บิตตัวเดียว ครึ่งขวาเริ่มต้นเป็นตัวคูณ บวกตัวตั้งเข้าครึ่งซ้ายเท่านั้น จึงต้องการตัวบวกแค่ 4 บิต เลื่อนขวาหนึ่งบิตทุกรอบ ตัวคูณจึงถูกกินหายไปทางขวา ขณะที่ผลคูณค่อย ๆ งอกเข้ามาแทนที่ — กุญแจ: "แทนที่จะเลื่อนตัวตั้งขึ้นไปหาผลสะสม ก็เลื่อนผลสะสมลงมาหาตัวตั้งแทน" ผลลัพธ์เท่ากันเป๊ะแต่ตัวบวกไม่ต้องกว้างตามอีกต่อไป (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 3.3 และ 3.5)</p>
+<p>ชิปจริงไม่ทำแบบวนทีละรอบ (32 รอบสำหรับ 32 บิตช้าเกินไป) แต่ "คลี่ลูป" ออกเป็นตัวบวกหลายสิบตัวต่อกันเป็นชั้นทำงานขนานกัน ได้ผลคูณใน 3-4 ไซเคิล ผลลัพธ์เหมือนกันเป๊ะกับการไล่ทีละรอบ</p>
+
+<h3>คูณด้วยค่าคงที่ — บ่อยครั้งไม่ต้องใช้ mul เลย</h3>
+<p>การเลื่อนซ้ายหนึ่งบิตคือการคูณสอง ดังนั้นการคูณด้วยกำลังสองใช้ slli คำสั่งเดียวจบ และตัวคูณอื่นก็แตกเป็นผลบวกของกำลังสองได้ — คอมไพเลอร์ทำให้อัตโนมัติเมื่อตัวคูณเป็นค่าคงที่</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — x × 10 โดยไม่ใช้ mul (แตก 10 = 8 + 2)</div>
+<pre><code>slli  t0, a0, 3        # t0 ← x × 8
+slli  t1, a0, 1        # t1 ← x × 2
+add   a0, t0, t1       # a0 ← x × 10</code></pre>
+<div class="answer">ตรวจกับ x=7: (7×8)+(7×2) = 56+14 = 70 ✓ — สามคำสั่งนี้จบใน 3 ไซเคิล ขณะที่ mul ตัวเดียวกินราว 3-4 ไซเคิล พอ ๆ กัน แต่บนชิปจิ๋วที่ไม่มี M นี่คือทางเดียวและเร็วกว่าลูปบวกมหาศาล</div></div>
+
+<h3>ผลคูณ 64 บิต — ทำไมต้องมีทั้ง mul และ mulh</h3>
+<p>คูณเลข 32 บิตสองตัว ผลลัพธ์ยาวได้ถึง 64 บิต แต่รีจิสเตอร์กว้างแค่ 32 บิต RISC-V จึงแยกเป็นสองคำสั่ง: mul ให้ครึ่งล่าง mulh ให้ครึ่งบน คำสั่งคูณของ RISC-V ไม่ยกข้อผิดพลาดใด ๆ เมื่อผลล้น วิธีตรวจ overflow ตามตำราคือรัน mulh ควบกับ mul — ถ้าบิตบนทั้ง 32 บิตเป็นแค่สำเนาบิตเครื่องหมายของครึ่งล่าง แปลว่าผลจริงอยู่ใน 32 บิต ไม่ล้น (RISC-V ไม่มีธงสถานะแบบ N/Z/P ของ LC-3 การตรวจจึงเป็นหน้าที่ของซอฟต์แวร์)</p>
+<p>ทำไมต้องมีทั้ง mulh/mulhu/mulhsu: ครึ่งล่างของผลคูณไม่สนเครื่องหมาย (คณิตศาสตร์มอดุโล 2^32 ให้บิตเหมือนกันเสมอ) จึงมี mul ตัวเดียวพอ แต่ครึ่งบนขึ้นกับการตีความ (signed/unsigned) จึงต้องแยกให้ครบทุกคู่การตีความ</p>
+
+<h3>หารอย่างไรด้วยวงจร — ลบ ลอง แล้วคืนค่า (restoring division)</h3>
+<p>การหารคือหารยาวฐานสอง: ดึงบิตของตัวตั้งลงมาทีละบิต แล้วถามว่า "ลบตัวหารได้ไหม" — ลบได้ บิตผลหารเป็น 1 ลบแล้วติดลบ ต้องคืนค่าเดิม (restore) บิตผลหารเป็น 0</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — 13 ÷ 4 (1101 ÷ 100) ด้วย restoring division</div>
+<table>
+<thead><tr><th>bit</th><th>R</th><th>R−4</th><th>q</th><th>R'</th><th>หมายเหตุ</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>1</td><td>−3</td><td>0</td><td>1</td><td>ติดลบ → คืนค่าเดิม</td></tr>
+<tr><td>1</td><td>3</td><td>−1</td><td>0</td><td>3</td><td>ติดลบ → คืนค่าเดิม</td></tr>
+<tr><td>0</td><td>6</td><td>2</td><td>1</td><td>2</td><td>ลบได้ เก็บ 2</td></tr>
+<tr><td>1</td><td>5</td><td>1</td><td>1</td><td>1</td><td>ลบได้ เก็บ 1</td></tr>
+</tbody>
+</table>
+<div class="answer">ผลหาร = 0011 = 3 เศษ = 1 ✓ (3×4+1=13) — ความสัมพันธ์ที่ฮาร์ดแวร์รักษาไว้เสมอ: ตัวตั้ง = ผลหาร×ตัวหาร+เศษ (div ให้ผลหาร, rem ให้เศษ)</div></div>
+
+<h3>วงจรหารสองรุ่น — เหมือนฝั่งคูณเป๊ะ ๆ</h3>
+<table>
+<thead><tr><th></th><th>ใครเลื่อน</th><th>ใครนิ่ง</th><th>ALU ที่ต้องใช้</th><th>ตอนติดลบ</th><th>จำนวนรอบ</th></tr></thead>
+<tbody>
+<tr><td>FIGURE 3.8 แบบแรก</td><td>ตัวหารเลื่อนขวา</td><td>เศษ</td><td>8 บิต</td><td>ต้องบวกตัวหารกลับคืนจริง ๆ</td><td>5 รอบ (n+1)</td></tr>
+<tr><td>FIGURE 3.11 แบบปรับปรุง</td><td>เศษเลื่อนซ้าย</td><td>ตัวหาร</td><td>4 บิต</td><td>แค่ไม่เขียนกลับ ไม่เสียงานเพิ่ม</td><td>4 รอบ (n)</td></tr>
+</tbody>
+</table>
+<p>รูปแบบการปรับปรุงเหมือนฝั่งคูณเป๊ะ ๆ — ให้รีจิสเตอร์ผลลัพธ์เป็นฝ่ายเลื่อน แล้วยัดตัวดำเนินการที่เหลือเข้าไปในครึ่งที่ว่าง เคล็ดที่มองข้ามง่าย: Fig 3.11 ไม่ต้องบวกกลับจริงเมื่อคืนค่า — มันจะเขียนผลกลับก็ต่อเมื่อผลไม่ติดลบ ถ้าติดลบก็แค่ไม่เขียน Remainder จึงคงค่าเดิมโดยไม่ต้องทำอะไรเลย ชิปจริงจึงมักใช้วงจรก้อนเดียวกันทำทั้งคูณและหาร (ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 3.8 และ 3.11)</p>
+
+<h3>หารเลขติดลบ — ตัดเข้าหาศูนย์ และเศษตามเครื่องหมายตัวตั้ง</h3>
+<p>ผลหาร −13 ÷ 4 ควรเป็น −3 หรือ −4? RISC-V (เช่นเดียวกับภาษา C) เลือก <b>ตัดเข้าหาศูนย์ (truncate toward zero)</b></p>
+<div class="example"><div class="ex-label">ตัวอย่าง — −13 ÷ 4</div>
+<ol class="steps">
+<li>ค่าจริง −3.25 ตัดเข้าหาศูนย์ → ผลหาร −3</li>
+<li>เศษ = ตัวตั้ง − ผลหาร×ตัวหาร = −13 − (−3×4) = −13+12 = −1</li>
+</ol>
+<div class="answer">div ตอบ −3, rem ตอบ −1 ตรวจเอกลักษณ์: (−3)×4+(−1) = −13 ✓ — กติกาจำง่าย: เศษมีเครื่องหมายเดียวกับตัวตั้งเสมอ (คนละแบบกับ Python ที่ปัดลงเสมอ: −13 // 4 = −4 และ −13 % 4 = 3)</div></div>
+<div class="callout warn"><span class="cal-label">หารด้วยศูนย์ — RISC-V เลือกไม่หยุดโปรแกรม</span>x ÷ 0: div ได้ −1 (บิตเป็น 1 ทั้งหมด), divu ได้ 2^32−1, rem ได้ x เดิม, remu ได้ x เดิม — ไม่มี trap ไม่มีธง สเปกกำหนดผลตายตัวเพื่อให้วงจรง่ายและพฤติกรรมทายได้ (กรณีล้นเพียงกรณีเดียวของ div: (−2^31)÷(−1) ผลหารตอบ −2^31 เศษตอบ 0)</div>
+
+<h3>ส่วนขยาย F: รีจิสเตอร์ชุดใหม่ทั้งชุด</h3>
+<p>ส่วนขยาย F ไม่ได้แค่เพิ่มคำสั่ง แต่เพิ่มรีจิสเตอร์จุดลอยตัว 32 ตัวแยกจาก x0–x31 ไปเลย คือ f0–f31 (กว้าง 32 บิต ส่วนขยาย D ขยายเป็น 64 บิต) เหตุผลเชิงวิศวกรรม: วงจร FPU อยู่คนละมุมของชิปกับ ALU จำนวนเต็ม แยกรีจิสเตอร์แล้วไม่ต้องแย่งพอร์ตอ่านเขียนกัน คำสั่งหลัก: โหลด/สโตร์ flw, fsw · คำนวณ fadd.s, fsub.s, fmul.s, fdiv.s, fsqrt.s · เปรียบเทียบ (ผลเขียนลงรีจิสเตอร์ x) feq.s, flt.s, fle.s · แปลงชนิด fcvt.w.s (float→int), fcvt.s.w (int→float) — ต่อท้าย .s คือ single (32 บิต), .d คือ double (64 บิต)</p>
+<div class="qa"><div class="q">ทำไมคำสั่งเปรียบเทียบอย่าง flt.s x5, f1, f2 จึงเขียนผลลง x5 ฝั่งจำนวนเต็ม ไม่ใช่ฝั่ง f</div><div class="a"><b>ตอบ:</b> เพราะผลเปรียบเทียบมีไว้ใช้ตัดสินใจกระโดด และคำสั่ง branch ทั้งหมดอ่านรีจิสเตอร์ x เท่านั้น การส่งผลลง x จึงต่อเข้ากลไก control flow ได้ทันที</div></div>
+
+<h3>สี่ขั้นของการบวกเลขจุดลอยตัว</h3>
+<p>การบวกจำนวนเต็มจบในวงจรเดียว แต่บวกเลขจุดลอยตัวเป็นงานสี่จังหวะ เพราะตัวเลขสองตัวอาจอยู่คนละสเกลกัน:</p>
+<ol class="steps">
+<li><b>จัดเลขชี้กำลัง (align)</b> — เลื่อนซิกนิฟิแคนด์ของตัวที่เลขชี้กำลังน้อยกว่าไปขวา จนเลขชี้กำลังเท่ากัน</li>
+<li><b>บวกซิกนิฟิแคนด์</b></li>
+<li><b>normalize</b> — เลื่อนผลให้กลับมาอยู่ในรูป 1.xxx (เลื่อนซ้ายหลายบิตถ้าผลใกล้ศูนย์ หรือเลื่อนขวาหนึ่งบิตถ้าบวกแล้วทด)</li>
+<li><b>ปัดเศษ</b> — เพราะขั้น 1 กับ 3 ทำให้บิตงอกเกินความจุของส่วนเศษ</li>
+</ol>
+<p>(ที่มา: Patterson &amp; Hennessy, COD RISC-V Edition รูปที่ 3.14)</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — 0.5 + (−0.4375) เก็บเศษ 3 บิต</div>
+<ol class="steps">
+<li>ตั้งต้น: 0.5 = 1.000×2⁻¹, −0.4375 = −1.110×2⁻²</li>
+<li>ขั้น 1: เลขชี้กำลังต่างกัน 1 → เลื่อน −1.110×2⁻² ไปขวาหนึ่งบิต ได้ −0.111×2⁻¹</li>
+<li>ขั้น 2: 1.000 − 0.111 = 0.001 × 2⁻¹</li>
+<li>ขั้น 3: ผลไม่อยู่ในรูป 1.xxx → เลื่อนซ้าย 3 บิต ลดเลขชี้กำลังลง 3 → 1.000×2⁻⁴</li>
+<li>ขั้น 4: เศษไม่เกินความจุ ไม่ต้องปัด</li>
+</ol>
+<div class="answer">คำตอบ = 1.000×2⁻⁴ = 0.0625 ✓ (0.5−0.4375=0.0625 พอดี) เก็บลงรีจิสเตอร์ f จริง (เศษ 23 บิต): บิตเครื่องหมาย=0, ฟิลด์เลขชี้กำลัง = −4+127=123=01111011, ส่วนเศษ=0 ทั้งหมด → 0x3D800000</div></div>
+
+<h3>guard, round, sticky — สามบิตที่กันคำตอบเพี้ยน</h3>
+<p>ขั้นจัดเลขชี้กำลังเลื่อนบิตหลุดออกไปทางขวา ถ้าทิ้งบิตเหล่านั้นทันที ผลบวกจะเพี้ยนสะสม IEEE 754 จึงให้ฮาร์ดแวร์ถือบิตแถมไว้สามตัว: <b>guard (G)</b> บิตแรกถัดจากความจุ ตัวชี้ขาดว่าจะปัดขึ้นหรือไม่ · <b>round (R)</b> บิตที่สอง · <b>sticky (S)</b> OR ของบิตที่เหลือทั้งหมดที่หลุดไป (จำว่า "เคยมีอะไรหลุดไปบ้างไหม")</p>
+<p>กติกาปัดแบบปริยาย (round to nearest, ties to even): GRS เกิน 100 → ปัดขึ้น · GRS ต่ำกว่า 100 → ปัดทิ้ง · GRS เท่ากับ 100 พอดี → เสมอกัน เลือกฝั่งที่บิตต่ำสุดเป็นศูนย์</p>
+<div class="qa"><div class="q">ผลบวกก่อนปัดคือ 1.011 | G=1 R=0 S=0 (เก็บเศษ 3 บิต) ตามกติกา round to nearest, ties to even ต้องปัดอย่างไร</div><div class="a"><b>ตอบ:</b> GRS=100 คือครึ่งพอดีเป๊ะ (เสมอกัน) กติกา ties-to-even เลือกตัวเลือกที่บิตต่ำสุดเป็น 0: ระหว่าง 1.011 (ลงท้าย 1) กับ 1.100 (ลงท้าย 0) จึงเลือก 1.100 — กันอคติสะสม เพราะถ้าเสมอแล้วปัดขึ้นทุกครั้ง ค่าเฉลี่ยของข้อมูลจะค่อย ๆ ลอยขึ้น</div></div>
+<div class="callout note"><span class="cal-label">ตัวอย่างที่บิต sticky เปลี่ยนคำตอบจริง</span>16.0 + 1.125 → ผลก่อนปัด 1.0001001×2⁴ เก็บ 1.000 เหลือ G=1, R=0 และบิต 1 ที่หลุดไปไกลกว่า R ทำให้ S=1 → GRS=101 (ไม่ใช่ 100) ถ้าไม่ OR รวมไว้เป็น sticky ฮาร์ดแวร์จะเข้าใจผิดว่าเสมอกันพอดี ทั้งที่ค่าจริงเกินครึ่ง — ผลจึงปัดขึ้นเป็น 18 ไม่ใช่ 16</div>
+
+<h3>การคูณง่ายกว่าการบวก — ไม่ต้องจัดเลขชี้กำลัง</h3>
+<p>การคูณข้ามขั้นจัดเลขชี้กำลังไปได้เลย เพราะกำลังของสองคูณกันคือเอาเลขชี้กำลังมาบวกกันตรง ๆ สามจังหวะจบ: บวกเลขชี้กำลัง · คูณซิกนิฟิแคนด์ · จัดเครื่องหมายด้วย XOR</p>
+<div class="qa"><div class="q">ทำไมขั้น "จัดเลขชี้กำลัง" จึงจำเป็นกับการบวก แต่ไม่จำเป็นกับการคูณ</div><div class="a"><b>ตอบ:</b> บวกได้ก็ต่อเมื่อหลักเดียวกันตรงกัน (เหมือนบวกเลขทศนิยมต้องตั้งจุดตรงกัน) จึงต้องเลื่อนให้เลขชี้กำลังเท่ากันก่อน แต่การคูณมีสมบัติ (a×2^m)(b×2^n) = ab×2^(m+n) — ซิกนิฟิแคนด์คูณกัน เลขชี้กำลังบวกกัน แยกอิสระจากกันได้เลย</div></div>
+
+<h3>fused multiply-add และการไม่มีสมบัติเปลี่ยนหมู่</h3>
+<p>ระยะห่างระหว่างเลขจุดลอยตัวสองตัวที่อยู่ติดกันเรียกว่า <b>ulp (unit in the last place)</b> ความเพี้ยนสะสมได้เมื่อคำนวณต่อเนื่องหลายขั้น จึงมีคำสั่ง <b>fused multiply-add</b> (<code>fmadd.s f1, f2, f3, f4</code> คือ f1 ← f2×f3+f4): คูณและบวกด้วยความละเอียดเต็มภายใน แล้วปัดครั้งเดียวตอนจบ แทนที่จะปัดสองครั้งถ้าใช้ fmul ตามด้วย fadd</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — ลำดับการบวกเปลี่ยนคำตอบได้จริง (16.0 + 1.0 + 1.0)</div>
+<ol class="steps">
+<li>ลำดับที่หนึ่ง (16+1)+1: 16+1 → จัดเลขชี้กำลัง → เก็บ 1.000 | GRS=100 เสมอพอดี → ties-to-even เลือก 1.000×2⁴=16 (การบวก 1 หายไปทั้งก้อน!) แล้ว +1 อีกครั้งเหมือนเดิม → ได้ 16</li>
+<li>ลำดับที่สอง 16+(1+1): 1+1=2 พอดีเป๊ะ ไม่ต้องปัด แล้ว 16+2=18 พอดีเป๊ะ ไม่ต้องปัด</li>
+</ol>
+<div class="answer">คำตอบ: 16 กับ 18 — สลับวงเล็บแล้วคำตอบต่างกัน 2 หน่วย นี่คือเหตุผลที่การบวกเลขจุดลอยตัวไม่มีสมบัติการเปลี่ยนหมู่ (associativity) และเหตุผลที่การเรียงลำดับการบวกใน GPU ทำให้ผลเทรนโมเดล machine learning ไม่ตรงกันข้ามเครื่อง — โปรแกรมรวมเงินหรือรวม gradient ที่บวกค่าเล็กจำนวนมากเข้าตัวสะสมใหญ่ จึงนิยมรวมค่าเล็กด้วยกันก่อน แล้วค่อยบวกเข้าตัวสะสมใหญ่</div></div>
+
+<div class="refs"><div class="rt">อ้างอิง</div><ul>
+<li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 3 (หัวข้อ 3.3–3.5)</li>
+<li>Y. Patt และ S. Patel, <i>Introduction to Computing Systems</i> — บทที่ 2 (การแทนค่า IEEE 754)</li>
+</ul></div>
+</section>
+
+
+  </main>
+</div>
+<script>
+(function(){
+  var mermaidDivs = Array.prototype.slice.call(document.querySelectorAll('.mermaid'));
+  mermaidDivs.forEach(function(el){ el.setAttribute('data-mermaid-src', el.textContent); });
+  function currentMermaidTheme(){
+    var rt = (window.__resolvedTheme ? window.__resolvedTheme(window.__bookTheme) : 'light');
+    return rt === 'dark' ? 'dark' : 'default';
+  }
+  function renderMermaid(){
+    if (typeof mermaid === 'undefined') return;
+    mermaidDivs.forEach(function(el){
+      el.removeAttribute('data-processed');
+      el.innerHTML = el.getAttribute('data-mermaid-src');
+    });
+    mermaid.initialize({ startOnLoad: false, theme: currentMermaidTheme(), securityLevel: 'loose' });
+    mermaid.run({ querySelector: '.mermaid' });
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    renderMermaid();
+    var btn = document.getElementById('themeToggle');
+    if(btn){ btn.addEventListener('click', function(){ setTimeout(renderMermaid, 30); }); }
+  });
+})();
+</script>
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); }).filter(Boolean);
+  function onScroll(){
+    var pos = window.scrollY + 120;
+    var current = null;
+    targets.forEach(function(t){ if (t.offsetTop <= pos) current = t; });
+    links.forEach(function(a){ a.classList.remove('active'); });
+    if (current){
+      var link = document.querySelector('#toc a[href="#' + current.id + '"]');
+      if (link) link.classList.add('active');
+    }
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+})();
+</script>
+</body>
+</html>

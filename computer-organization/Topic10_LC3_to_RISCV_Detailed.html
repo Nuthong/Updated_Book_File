@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topic 10: สะพาน LC-3 → RISC-V (RV32I)</title>
+<meta name="description" content="เอกสารสรุปเนื้อหา 310-2202 — Topic 10: สะพาน LC-3 → RISC-V (RV32I)">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root{
+  --ink:#1e293b; --ink-strong:#0f172a; --muted:#64748b;
+  --primary:#4f46e5; --primary-d:#3730a3; --primary-tint:#eef2ff;
+  --line:#e2e8f0; --surface:#f8fafc; --paper:#f6f4ee;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--paper);}
+body{font-family:'Sarabun','Noto Sans Thai',system-ui,sans-serif;color:var(--ink);}
+code,pre{font-family:'JetBrains Mono',ui-monospace,monospace;}
+a{color:var(--primary);text-underline-offset:2px;}
+
+.layout{display:flex;max-width:1400px;margin:0 auto;min-height:100vh;}
+.sidebar{
+  width:280px;flex-shrink:0;position:sticky;top:0;align-self:flex-start;
+  height:100vh;overflow-y:auto;padding:1.8em 1.3em;background:#fff;
+  border-right:1px solid var(--line);
+}
+.sidebar h2{font-size:1.05rem;color:var(--primary-d);margin:0 0 .3em;}
+.sidebar .subtitle{font-size:.85rem;color:var(--muted);margin:0 0 1.4em;}
+.sidebar nav ul{list-style:none;margin:0;padding:0;}
+.sidebar nav li{margin:0;}
+.sidebar nav a{
+  display:block;padding:.5em .6em;border-radius:6px;color:var(--ink);
+  text-decoration:none;font-size:.92rem;line-height:1.4;border-left:3px solid transparent;
+}
+.sidebar nav a:hover{background:var(--primary-tint);color:var(--primary-d);}
+.sidebar nav a.active{background:var(--primary-tint);color:var(--primary-d);border-left-color:var(--primary);font-weight:600;}
+.sidebar nav .sub{padding-left:1.1em;font-size:.86rem;}
+
+.main{flex:1;min-width:0;padding:2.4em 3em 6em;max-width:900px;}
+.masthead{
+  background:#0F2740;color:#fff;padding:1.8em 2em;border-radius:14px;margin-bottom:2em;
+  border-bottom:4px solid #B7862C;
+}
+.masthead h1{margin:0 0 .3em;font-size:1.7rem;line-height:1.3;}
+.masthead p{margin:0;color:#cbd5e1;font-size:.95rem;}
+
+section.topic-section{margin-bottom:2.6em;padding-left:1.1em;border-left:4px solid var(--primary);}
+section.topic-section > h2{
+  color:var(--primary-d);font-weight:700;font-size:1.55rem;line-height:1.35;
+  margin:0 0 .8em;padding:.5em .7em;border-radius:8px;background:var(--primary-tint);
+  border-left:5px solid var(--primary);
+}
+section.topic-section h3{color:#5b21b6;font-weight:700;font-size:1.25rem;margin:1.6em 0 .5em;
+  padding-left:.5em;border-left:4px solid #c4b5fd;}
+section.topic-section h4{color:#334155;font-weight:600;font-size:1.1rem;margin:1.3em 0 .4em;}
+.content p, .content li, section.topic-section p, section.topic-section li{font-size:1.05rem;line-height:1.75;}
+section.topic-section p{margin:0 0 1em;}
+section.topic-section li{margin:.3em 0;}
+section.topic-section :not(pre) > code{background:#f1f5f9;color:#be185d;padding:.08em .4em;border-radius:5px;font-size:.92em;}
+section.topic-section pre{background:#0f172a;color:#e2e8f0;padding:1em 1.2em;border-radius:8px;overflow-x:auto;font-size:.92rem;line-height:1.6;}
+section.topic-section pre code{background:none;color:inherit;padding:0;}
+
+.callout{border:1px solid var(--line);border-left-width:5px;border-radius:10px;
+  padding:.9em 1.15em;margin:1.3em 0;font-size:.98rem;line-height:1.7;}
+.callout > .cal-label{font-size:.78em;font-weight:700;letter-spacing:.03em;text-transform:uppercase;display:block;margin-bottom:.4em;}
+.callout.note{background:#f0f9ff;border-left-color:#0284c7;} .callout.note .cal-label{color:#0369a1;}
+.callout.tip{background:#ecfdf5;border-left-color:#059669;} .callout.tip .cal-label{color:#047857;}
+.callout.warn{background:#fff1f2;border-left-color:#e11d48;} .callout.warn .cal-label{color:#be123c;}
+.callout.game{background:#fffbeb;border-left-color:#B7862C;} .callout.game .cal-label{color:#92650f;}
+.callout.recap{background:#f5f3ff;border-left-color:#7c3aed;} .callout.recap .cal-label{color:#6d28d9;}
+
+.example{border:1px solid #c7d2fe;border-radius:10px;padding:1em 1.2em;margin:1.4em 0;background:linear-gradient(180deg,#eef2ff 0%,#fff 70%);}
+.example .ex-label{font-weight:700;color:var(--primary-d);font-size:.9rem;margin:0 0 .5em;text-transform:uppercase;letter-spacing:.02em;}
+.example .steps{margin:.6em 0 0;padding-left:1.3em;}
+.example .steps li{margin:.35em 0;}
+.example .answer{margin-top:.7em;padding:.6em .9em;background:#dcfce7;border-left:4px solid #16a34a;border-radius:6px;font-weight:600;}
+
+.qa{border:1px solid #fde68a;border-radius:10px;padding:1em 1.2em;margin:1.4em 0;background:#fffbeb;}
+.qa .q{font-weight:600;margin:0 0 .6em;}
+.qa .a{margin:0;padding-top:.5em;border-top:1px dashed #fbbf24;}
+.qa .a b{color:#92650f;}
+
+table{border-collapse:collapse;width:100%;margin:1.4em 0;font-size:.95rem;}
+thead{background:var(--primary-tint);}
+th,td{border:1px solid var(--line);padding:.55em .75em;text-align:left;vertical-align:top;}
+tbody tr:nth-child(even){background:var(--surface);}
+
+.mermaid{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1em;margin:1.4em 0;text-align:center;}
+
+.refs{margin-top:2.2em;padding:1em 1.2em;border-top:2px solid var(--line);background:var(--surface);
+  border-radius:8px;font-size:.9rem;color:#475569;}
+.refs .rt{font-weight:700;color:var(--ink-strong);margin:0 0 .5em;text-transform:uppercase;font-size:.8rem;letter-spacing:.03em;}
+.refs ul{margin:0;padding-left:1.3em;}
+
+@media (max-width:900px){
+  .layout{flex-direction:column;}
+  .sidebar{position:static;width:100%;height:auto;}
+  .main{padding:1.4em 1.2em 4em;}
+}
+</style>
+
+<style>
+:root{ color-scheme: light dark; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#e4e7ec; --ink-strong:#f1f5f9; --muted:#9aa5b3;
+    --primary:#8ec1f2; --primary-d:#7fb0e0; --primary-tint:#1c2b3d;
+    --line:#333c48; --surface:#1b212b; --paper:#12161d;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e4e7ec; --ink-strong:#f1f5f9; --muted:#9aa5b3;
+  --primary:#8ec1f2; --primary-d:#7fb0e0; --primary-tint:#1c2b3d;
+  --line:#333c48; --surface:#1b212b; --paper:#12161d;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .sidebar{ background:var(--surface); }
+  :root:not([data-theme="light"]) section.topic-section h3{ color:#c4b5fd; border-left-color:#5b21b6; }
+  :root:not([data-theme="light"]) section.topic-section h4{ color:#cbd5e1; }
+  :root:not([data-theme="light"]) section.topic-section :not(pre) > code{ background:#2a2130; color:#f9a8d4; }
+  :root:not([data-theme="light"]) .callout.note{ background:#0f2333; border-left-color:#38bdf8; }
+  :root:not([data-theme="light"]) .callout.note .cal-label{ color:#7dd3fc; }
+  :root:not([data-theme="light"]) .callout.tip{ background:#0f2b21; border-left-color:#34d399; }
+  :root:not([data-theme="light"]) .callout.tip .cal-label{ color:#6ee7b7; }
+  :root:not([data-theme="light"]) .callout.warn{ background:#2d1216; border-left-color:#fb7185; }
+  :root:not([data-theme="light"]) .callout.warn .cal-label{ color:#fca5a5; }
+  :root:not([data-theme="light"]) .callout.game{ background:#2a2112; border-left-color:#e3bd74; }
+  :root:not([data-theme="light"]) .callout.game .cal-label{ color:#e3bd74; }
+  :root:not([data-theme="light"]) .callout.recap{ background:#221a33; border-left-color:#a78bfa; }
+  :root:not([data-theme="light"]) .callout.recap .cal-label{ color:#c4b5fd; }
+  :root:not([data-theme="light"]) .example{ border-color:#4338ca; background:linear-gradient(180deg,#1c2b3d 0%,#12161d 70%); }
+  :root:not([data-theme="light"]) .example .answer{ background:#0f2b21; border-left-color:#34d399; }
+  :root:not([data-theme="light"]) .qa{ border-color:#78350f; background:#2a2112; }
+  :root:not([data-theme="light"]) .qa .a{ border-top-color:#d97706; }
+  :root:not([data-theme="light"]) .qa .a b{ color:#fcd34d; }
+  :root:not([data-theme="light"]) .mermaid{ background:var(--surface); }
+}
+:root[data-theme="dark"] .sidebar{ background:var(--surface); }
+:root[data-theme="dark"] section.topic-section h3{ color:#c4b5fd; border-left-color:#5b21b6; }
+:root[data-theme="dark"] section.topic-section h4{ color:#cbd5e1; }
+:root[data-theme="dark"] section.topic-section :not(pre) > code{ background:#2a2130; color:#f9a8d4; }
+:root[data-theme="dark"] .callout.note{ background:#0f2333; border-left-color:#38bdf8; }
+:root[data-theme="dark"] .callout.note .cal-label{ color:#7dd3fc; }
+:root[data-theme="dark"] .callout.tip{ background:#0f2b21; border-left-color:#34d399; }
+:root[data-theme="dark"] .callout.tip .cal-label{ color:#6ee7b7; }
+:root[data-theme="dark"] .callout.warn{ background:#2d1216; border-left-color:#fb7185; }
+:root[data-theme="dark"] .callout.warn .cal-label{ color:#fca5a5; }
+:root[data-theme="dark"] .callout.game{ background:#2a2112; border-left-color:#e3bd74; }
+:root[data-theme="dark"] .callout.game .cal-label{ color:#e3bd74; }
+:root[data-theme="dark"] .callout.recap{ background:#221a33; border-left-color:#a78bfa; }
+:root[data-theme="dark"] .callout.recap .cal-label{ color:#c4b5fd; }
+:root[data-theme="dark"] .example{ border-color:#4338ca; background:linear-gradient(180deg,#1c2b3d 0%,#12161d 70%); }
+:root[data-theme="dark"] .example .answer{ background:#0f2b21; border-left-color:#34d399; }
+:root[data-theme="dark"] .qa{ border-color:#78350f; background:#2a2112; }
+:root[data-theme="dark"] .qa .a{ border-top-color:#d97706; }
+:root[data-theme="dark"] .qa .a b{ color:#fcd34d; }
+:root[data-theme="dark"] .mermaid{ background:var(--surface); }
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:1.2em;}
+.back-to-index{
+  display:inline-block;font-size:12.5px;color:var(--primary-d);text-decoration:none;
+  opacity:0.9;
+}
+.back-to-index:hover{opacity:1;text-decoration:underline;}
+@media print{.back-to-index{display:none;}}
+.theme-toggle-btn{
+  border:1.5px solid var(--line);background:#fff;color:var(--primary-d);
+  width:32px;height:32px;border-radius:6px;font-size:14px;cursor:pointer;
+  font-family:'Sarabun',sans-serif;display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+:root[data-theme="dark"] .theme-toggle-btn{ background:var(--surface); }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .theme-toggle-btn{ background:var(--surface); }}
+.theme-toggle-btn:hover{background:var(--primary-tint);}
+@media print{.theme-toggle-btn{display:none;}}
+.read-time{font-size:.78rem;color:var(--muted);margin:-1em 0 1.2em;}
+@media print{
+  .sidebar{display:none;}
+  .layout{display:block;}
+  .main{max-width:none;padding:0;}
+}
+</style>
+
+<script>
+(function(){
+  function systemPrefersDark(){
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function resolvedTheme(t){
+    return (t === 'light' || t === 'dark') ? t : (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    if(t === 'light' || t === 'dark'){ document.documentElement.setAttribute('data-theme', t); }
+    else { document.documentElement.removeAttribute('data-theme'); }
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      var r = resolvedTheme(t);
+      btn.textContent = r === 'dark' ? '\u2600\ufe0f' : '\ud83c\udf19';
+      btn.title = r === 'dark' ? 'สลับเป็นโหมดสว่าง / Switch to light mode' : 'สลับเป็นโหมดมืด / Switch to dark mode';
+    }
+  }
+  window.__bookTheme = 'system';
+  try{ window.__bookTheme = localStorage.getItem('book_theme') || 'system'; }catch(e){}
+  applyTheme(window.__bookTheme);
+  document.addEventListener('DOMContentLoaded', function(){
+    applyTheme(window.__bookTheme);
+    var btn = document.getElementById('themeToggle');
+    if(btn){
+      btn.addEventListener('click', function(){
+        window.__bookTheme = resolvedTheme(window.__bookTheme) === 'dark' ? 'light' : 'dark';
+        try{ localStorage.setItem('book_theme', window.__bookTheme); }catch(e){}
+        applyTheme(window.__bookTheme);
+      });
+    }
+    window.__resolvedTheme = resolvedTheme;
+  });
+})();
+</script>
+
+<script>
+(function(){
+  function computeReadingTime(){
+    var main = document.querySelector('.main');
+    var chars = (main.textContent || '').replace(/\s+/g, '').length;
+    return Math.max(1, Math.round(chars / 900));
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var badge = document.getElementById('readTimeBadge');
+    if(badge){ badge.textContent = '⏱ ~' + computeReadingTime() + ' นาทีในการอ่าน / min read'; }
+  });
+})();
+</script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="topbar"><a class="back-to-index" href="index.html">&larr; สารบัญทั้งหมด / All Chapters</a><button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button></div>
+    <h2>Topic 10: สะพาน LC-3 → RISC-V (RV32I)</h2>
+    <p class="subtitle">310-2202 โครงสร้างระบบคอมพิวเตอร์ — เอกสารสรุปเนื้อหา — ฉบับละเอียด อัปเดต 17 ก.ย. 2569 (ฉบับแรกดูได้ที่ Topic 10 ด้านบน อัปโหลด 5 ก.ย. 2569)</p>
+<p class="read-time" id="readTimeBadge"></p>
+    <nav id="toc">
+      <ul>
+        <li><a href="#sec-overview">ภาพรวม Topic 10</a></li>
+        <li><a href="#sec-101">10.1 ทำไมต้องย้ายจาก LC-3 ไป RISC-V RV32I</a></li>
+        <li><a href="#sec-102">10.2 ตารางแมปคำสั่ง LC-3 ↔ RV32I</a></li>
+        <li><a href="#sec-103">10.3 สิ่งที่ RV32I มีแต่ LC-3 ไม่มี</a></li>
+        <li><a href="#sec-104">10.4 Little-Endian, Addressing และตัวอย่างเขียนใหม่</a></li>
+
+      </ul>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="masthead">
+      <h1>Topic 10: สะพาน LC-3 → RISC-V (RV32I)</h1>
+      <p>310-2202 โครงสร้างระบบคอมพิวเตอร์ — เอกสารสรุปเนื้อหา</p>
+    </div>
+<section class="topic-section" id="sec-overview">
+<h2>ภาพรวม Topic 10 — สะพาน LC-3 → RISC-V (RV32I)</h2>
+<p>หลังเข้าใจหลักการครบจาก LC-3 (เครื่อง 16-bit เพื่อการสอน) Topic นี้ข้ามไปสู่ ISA (instruction set architecture, ชุดคำสั่ง) จริงระดับอุตสาหกรรม คือ <b>RISC-V RV32I</b> (32-bit, มาตรฐานเปิด, มี toolchain ครบ) โดยทำ "พจนานุกรม" แมปทุกแนวคิดของ LC-3 เป็น RV32I ดูสิ่งที่ LC-3 ไม่มีแล้ว RISC-V เติมเต็ม และฝึกเขียนโปรแกรม LC-3 เดิมใหม่เป็น RV32I</p>
+<p><b>เมื่อจบ Topic นี้ ผู้เรียนจะสามารถ:</b> อธิบายเหตุผลที่ก้าวจาก LC-3 ไป RV32I และข้อดีของ ISA แบบ modular/เปิด · แมปคำสั่ง LC-3 ↔ RV32I (ADD→add, BR→beq/bne, JSR→jal, TRAP→ecall) · อธิบายสิ่งที่ LC-3 ขาด (x0, ABI, mul/shift/float, little-endian) และเขียนโปรแกรม LC-3 ใหม่เป็น RV32I</p>
+<div class="callout recap"><span class="cal-label">ถ้าจำได้ประโยคเดียว</span>ก้าวจาก LC-3 ไป RISC-V ไม่ใช่การเริ่มใหม่ แต่เป็นแนวคิดเดิมที่ขยายให้ใช้งานจริงได้</div>
+<table>
+<thead><tr><th>หัวข้อ</th><th>เนื้อหา</th></tr></thead>
+<tbody>
+<tr><td>10.1</td><td>ทำไมต้องย้าย — LC-3 ให้หลักการอะไรไว้ ขาดอะไร และ RV32I เติมเต็มตรงไหน พร้อมตารางเทียบครบทุกมิติ</td></tr>
+<tr><td>10.2</td><td>คำสั่ง LC-3 ที่รู้จัก เขียนเป็น RV32I อย่างไร — ตารางแมปครบทั้งกลุ่มคำนวณ/ลอจิก/หน่วยความจำ และกลุ่ม address/branch/control</td></tr>
+<tr><td>10.3</td><td>RV32I มีอะไรที่ LC-3 ไม่เคยมี — รีจิสเตอร์แบบมีบทบาท (ABI), calling convention ผ่าน sp/ra, คูณ/หาร/เลื่อนบิต/ทศนิยม และแนวคิด modular ISA</td></tr>
+<tr><td>10.4</td><td>ข้อมูลวางในหน่วยความจำแบบไหน — little-endian, การอ้างที่อยู่รายไบต์ และตัวอย่างเขียนโปรแกรม LC-3 เดิมใหม่เป็น RV32I เต็มโปรแกรม</td></tr>
+</tbody>
+</table>
+<div class="callout game"><span class="cal-label">🎮 เครื่องมือ RISC-V ต้นฉบับแนะนำให้ลองเล่นคู่กับเนื้อหานี้</span>
+<b>Venus</b> — เขียน RISC-V assembly แล้วรันในเบราว์เซอร์ ดูค่า register/memory ทีละคำสั่ง (ไม่ต้องติดตั้ง) ·
+<b>rvcodec.js</b> — พิมพ์คำสั่ง RV32I แล้วเห็นการเข้ารหัสเป็นบิตแยกทุกฟิลด์ ·
+<b>Compiler Explorer</b> — เขียนภาษา C แล้วดูมันกลายเป็น RISC-V assembly แบบสด ·
+<b>Ripes</b> — โปรแกรมเดสก์ท็อป เห็น datapath/pipeline/cache เคลื่อนไหวจริง (เหมาะกับ Topic 12–13)
+<br>เอกสารต้นฉบับมีตาราง/พจนานุกรมแบบคลิกเลือกคำสั่ง LC-3 เพื่อดูคำแปล RV32I ทันที — สาระของพจนานุกรมนี้ถูกรวมไว้ในตารางแมปคำสั่งหัวข้อ 10.2 ด้านล่างแล้ว</div>
+</section>
+
+<section class="topic-section" id="sec-101">
+<h2>10.1 ทำไมต้องย้ายจาก LC-3 ไป RISC-V RV32I</h2>
+
+<h3>LC-3 คืออะไร และทำไมมันพอแค่ระดับ "เครื่องสอน"</h3>
+<p>LC-3 เป็นเครื่องสอน (educational machine) ขนาด 16-bit: คำสั่ง รีจิสเตอร์ และที่อยู่หน่วยความจำกว้าง 16 บิตทั้งหมด มีรีจิสเตอร์ทั่วไป 8 ตัว (R0–R7) ชุดคำสั่งเล็กมากราว 15 opcode (ADD, AND, NOT, LD/ST, LDR/STR, LDI/STI, LEA, BR, JMP/JSR, TRAP) ความกว้างคำสั่งคงที่ 16 บิต มี opcode 4 บิตด้านบนทำให้ถอดรหัสด้วยมือได้ง่าย เหมาะกับการเรียน datapath และ FSM ของหน่วยควบคุม</p>
+<p><b>จุดแข็ง:</b> เล็ก โปร่งใส ไม่มีรายละเอียดกวนใจ เหมาะกับการ "เห็นทั้งเครื่อง" ตั้งแต่ logic gate, datapath, control ไปจนถึง assembly</p>
+<p><b>ข้อจำกัดที่ทำให้ไปต่อไม่ได้:</b> (1) ไม่มี toolchain ระดับใช้งานจริง — มีแค่ assembler/simulator เพื่อการเรียน ไม่มีคอมไพเลอร์ C จริง ไม่มี OS ไม่มี ecosystem (2) ไม่มี career transfer — ไม่มีชิป LC-3 ขายจริง ทักษะไม่ถ่ายโอนสู่อุตสาหกรรม (3) สเกลไม่ขึ้น — 16 บิต + รีจิสเตอร์น้อย + คำสั่งน้อย ทำให้ต่อยอดไปเรื่อง pipeline, cache, virtual memory แบบเครื่องสมัยใหม่ได้ลำบาก</p>
+<div class="mermaid">
+flowchart LR
+  A["LC-3 16-bit เครื่องสอน"] --> B{"พอสำหรับหลักการพื้นฐาน?"}
+  B -->|"ใช่"| C["datapath, control, assembly เบื้องต้น"]
+  B -->|"ไม่พอ"| D["toolchain จริง, career, สเกลขึ้น?"]
+  D --> E["ต้องไป RISC-V RV32I"]
+</div>
+<div class="callout note"><span class="cal-label">ทำไมต้องรู้ + CPU ใช้ยังไง</span>ความกว้างของ address และคำสั่งไม่ใช่แค่ตัวเลขบนกระดาษ แต่เป็นข้อจำกัดทางฟิสิกส์ที่เดินสายไปทั้ง datapath จริง: CPU ต้องมีเส้นลวด (bus) และตัวบวกใน PC/MAR กว้างเท่าจำนวนบิตของ address ถ้ากว้าง 16 บิต วงจรจะแตะหน่วยความจำได้แค่ 2^16 ตำแหน่ง ไม่ว่าจะติดแรมมาเท่าไร การกระโดดไป 32 บิตคือการขยาย "ระยะเอื้อม" ของทั้งชิป</div>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — ขยาย address space กี่เท่า</div>
+<p>LC-3 ใช้ address กว้าง 16 บิต ส่วน RV32I ใช้ 32 บิต แต่ละเครื่องระบุที่อยู่ได้กี่ตำแหน่ง และ RV32I มากกว่ากี่เท่า</p>
+<ol class="steps">
+<li>จำนวนตำแหน่งที่ address n บิตระบุได้ = 2^n</li>
+<li>LC-3: n=16 → 2^16 = 65,536 ตำแหน่ง (64 Ki word = ~64 KiB)</li>
+<li>RV32I: n=32 → 2^32 = 4,294,967,296 ตำแหน่ง (byte-addressable = 4 GiB)</li>
+<li>มากกว่ากี่เท่า = 2^32 / 2^16 = 2^16 = 65,536 เท่า</li>
+</ol>
+<div class="answer">สรุป: เพิ่ม address จาก 16 เป็น 32 บิต ขยายพื้นที่ที่อยู่ขึ้น 65,536 เท่า</div></div>
+
+<h3>เทียบกันชัด ๆ: LC-3 กับ RV32I ครบทุกมิติ</h3>
+<table>
+<thead><tr><th>มิติ</th><th>LC-3 (เครื่องสอน)</th><th>RV32I (ISA จริง)</th></tr></thead>
+<tbody>
+<tr><td>ความกว้างข้อมูล/รีจิสเตอร์</td><td>16 บิต</td><td>32 บิต</td></tr>
+<tr><td>ความกว้างคำสั่ง</td><td>16 บิตคงที่</td><td>32 บิตคงที่ (ในฐาน I)</td></tr>
+<tr><td>จำนวน/ชื่อรีจิสเตอร์</td><td>8 ตัว: R0–R7</td><td>32 ตัว: x0–x31 (x0 = ศูนย์เสมอ, มีชื่อ ABI เช่น zero, ra, sp, a0, t0)</td></tr>
+<tr><td>ขนาด address space</td><td>2^16 = 65,536 ตำแหน่ง (ทีละ word 16 บิต)</td><td>2^32 ไบต์ = 4 GiB (รายไบต์)</td></tr>
+<tr><td>จำนวนคำสั่ง</td><td>ราว 15 opcode</td><td>ราว 40 คำสั่งในฐาน (ยังไม่นับส่วนขยาย)</td></tr>
+<tr><td>ความกว้าง immediate</td><td>5 บิตใน ADD/AND (−16..+15), offset 6/9/11 บิต</td><td>12 บิตในกลุ่มคำนวณ/load/store (−2048..+2047), 20 บิตใน lui/jal</td></tr>
+<tr><td>คูณ/หาร</td><td>ไม่มี — ต้องเขียนลูปบวกซ้ำ</td><td>ฐาน I ไม่มี แต่เติมส่วนขยาย M ได้ (mul, div, rem)</td></tr>
+<tr><td>เลื่อนบิต</td><td>ไม่มีคำสั่งเลื่อนบิตเลย</td><td>มีครบ: sll, srl, sra และแบบ immediate slli/srli/srai</td></tr>
+<tr><td>วิธีเรียกระบบ</td><td>TRAP พร้อมเวกเตอร์ เช่น x20 (GETC), x21 (OUT), x25 (HALT)</td><td>ecall คำสั่งเดียว โดยใส่หมายเลขบริการไว้ในรีจิสเตอร์</td></tr>
+</tbody>
+</table>
+<p><b>วิธีอ่านตารางนี้:</b> (1) จำคู่ตัวเลขเชิงขนาดก่อน — 16→32 บิต และ 8→32 register คือหัวใจของการย้าย (2) แถวคูณ/หาร เลื่อนบิต immediate คือความต่างเชิงความสามารถ — 10.3 เจาะต่อ (3) แถว TRAP↔ecall คือความต่างเชิงวิธีคุยกับระบบ — 10.2 เจาะต่อ</p>
+
+<h3>ตัวอย่าง: โปรแกรมเดียวกัน เขียนสองภาษา</h3>
+<p>โจทย์: บวกเลข 1 ถึง 5 แล้วเก็บผลรวมลงตัวแปรในหน่วยความจำ</p>
+<pre><code>; LC-3: รวม 1+2+3+4+5 เก็บลง RESULT
+        .ORIG x3000
+        AND R1, R1, #0      ; R1 = sum = 0
+        AND R2, R2, #0      ; ล้าง R2 ก่อน
+        ADD R2, R2, #1      ; R2 = i = 1
+LOOP    ADD R1, R1, R2      ; sum = sum + i
+        ADD R2, R2, #1      ; i = i + 1
+        ADD R3, R2, #-6     ; R3 = i - 6 (ตั้ง condition code)
+        BRn LOOP            ; ถ้า R3 ติดลบ วนต่อ
+        ST  R1, RESULT      ; เก็บ sum
+        HALT
+RESULT  .FILL x0000
+        .END</code></pre>
+<pre><code># RV32I: รวม 1+2+3+4+5 เก็บลง result
+        .data
+result: .word 0
+        .text
+        addi t0, zero, 0    # t0 = sum = 0
+        addi t1, zero, 1    # t1 = i = 1
+        addi t2, zero, 5    # t2 = ค่าสุดท้าย
+loop:   add  t0, t0, t1     # sum = sum + i
+        addi t1, t1, 1      # i = i + 1
+        bge  t2, t1, loop   # ถ้า i ยังไม่เกิน 5 วนต่อ
+        la   t3, result
+        sw   t0, 0(t3)      # เก็บ sum
+        addi a0, zero, 10   # หมายเลขบริการ exit
+        ecall</code></pre>
+<p><b>สามจุดต่างสำคัญ:</b> (1) <b>รีจิสเตอร์ค่าศูนย์ (x0/zero)</b> — LC-3 ไม่มี ต้องล้างด้วย AND #0 ก่อนเสมอ RV32I ตั้งค่าคงที่ได้ในคำสั่งเดียวด้วย <code>addi rd, zero, ค่า</code> (2) <b>branch เทียบรีจิสเตอร์ตรง ๆ</b> — LC-3 ตัดสินใจจาก condition code (N,Z,P) ที่คำสั่งก่อนหน้าตั้งไว้ RV32I ใส่การเปรียบเทียบไว้ในตัว branch เอง (3) <b>เข้าถึงหน่วยความจำผ่านรีจิสเตอร์ฐาน</b> — LC-3 อ้าง label ตรง ๆ ได้ (PC-relative) RV32I ต้องมีที่อยู่ในรีจิสเตอร์ก่อนแล้วบวก offset แลกกับระยะเอื้อมทั้ง 4 GiB</p>
+<div class="qa"><p class="q">Q: เมื่อโปรแกรมทั้งสองฉบับรันจบ ตัวแปรผลลัพธ์เก็บค่าเท่าไร</p><p class="a"><b>A:</b> 15 — ลูปบวกสะสม 1+2+3+4+5 = 15 (ตรวจจากตารางไล่ค่า t0/R1: 1, 3, 6, 10, 15)</p></div>
+
+<h3>RV32I ให้อะไรที่ LC-3 ไม่ให้</h3>
+<ul>
+<li><b>32-bit จริง</b> — ข้อมูล/รีจิสเตอร์/ที่อยู่กว้าง 32 บิต มีรีจิสเตอร์ทั่วไป 32 ตัว (x0-x31, x0 ผูกค่าเป็นศูนย์เสมอ) ความกว้างคำสั่งฐานคงที่ 32 บิต</li>
+<li><b>ISA แบบ modular และเปิด (open standard)</b> — แยกเป็น "ฐาน + ส่วนขยาย" RV32I คือฐานจำนวนเต็ม แล้วเติม M (คูณ/หาร), A (atomic), F/D (floating-point), C (compressed) ต่อเมื่อจำเป็น เป็นมาตรฐานเปิดที่ใครก็นำไปออกแบบได้โดยไม่ติดค่าลิขสิทธิ์</li>
+<li><b>toolchain ครบจริง</b> — ใช้ได้กับ GCC และ LLVM/Clang, รัน Linux ได้, มี simulator หลายระดับ เช่น Spike (golden model), QEMU (emulation ทั้งระบบ), Ripes (visualizer เชิงการศึกษา)</li>
+<li><b>career transfer จริง</b> — ทักษะ RISC-V ถ่ายโอนตรงไปสู่ชิปและงานจริงในตลาด</li>
+<li><b>สเกลได้โดยไม่เปลี่ยน ISA</b> — เริ่มจาก RV32I ระดับ intro แล้วไต่ไปจนถึง microarchitecture ละเอียดบน gem5 ได้ โดยยังเป็น ISA เดิม</li>
+</ul>
+<p>ถึงจะเป็น ISA จริง แต่ฐาน RV32I มีจำนวนคำสั่งไม่มาก จัดกลุ่มเป็นไม่กี่ format ตามหลักการ — R (register-register), I (immediate/load), S (store), B (branch), U (upper immediate), J (jump) — ความสม่ำเสมอนี้ทำให้ถอดรหัสและสอนเป็นระบบได้:</p>
+<pre><code># LC-3: บวก R1 = R2 + R3
+ADD R1, R2, R3
+# RISC-V RV32I: บวก x1 = x2 + x3 (รูปแบบ R-type)
+add x1, x2, x3</code></pre>
+<div class="example"><div class="ex-label">ตัวอย่าง — ทำไมต้องใช้ 5 บิตเลือกรีจิสเตอร์</div>
+<p>LC-3 ใช้ 3 บิตเลือกรีจิสเตอร์ (8 ตัว) ส่วน RV32I ต้องเลือกได้ 32 ตัว ต้องใช้กี่บิต</p>
+<ol class="steps">
+<li>จำนวนรีจิสเตอร์ที่เลือกได้ = 2^(จำนวนบิต)</li>
+<li>4 บิต → 2^4 = 16 ตัว (น้อยไป)</li>
+<li>5 บิต → 2^5 = 32 ตัว (พอดีกับ x0–x31)</li>
+</ol>
+<div class="answer">5 บิตคือจำนวนน้อยที่สุดที่พอ — คำสั่ง R-type จึงมี field เลือกรีจิสเตอร์ 3 ชุด (rd, rs1, rs2) ชุดละ 5 บิต = 15 บิต</div></div>
+<div class="mermaid">
+flowchart LR
+  R["RV32I (ฐาน)"] --> M["+M คูณ/หาร"]
+  R --> F["+F/D ทศนิยม"]
+  R --> C["+C compressed"]
+  R --> S["intro → Ripes → gem5, ISA เดิม สเกลขึ้น"]
+</div>
+
+<h3>บันไดอ่านโค้ด RV32I สามระดับ</h3>
+<p>วิธีอ่านโค้ด RV32I: (1) อ่านชื่อคำสั่งก่อนว่าอยู่กลุ่มไหน — คำนวณ (add/addi), หน่วยความจำ (lw/sw), หรือควบคุมทิศทาง (beq/jal) (2) หาปลายทางของผลลัพธ์ — กลุ่มคำนวณ/load เขียนลงรีจิสเตอร์ rd แต่ sw เขียนลงหน่วยความจำ (3) ไล่ค่าทีละบรรทัดลงตาราง อย่าข้ามบรรทัด</p>
+<div class="example"><div class="ex-label">ระดับ 1 (ง่าย) — คำนวณล้วน</div>
+<pre><code>addi x5, x0, 7      # x5 = 0 + 7
+add  x6, x5, x5     # x6 = x5 + x5</code></pre>
+<div class="answer">x5 = 7, x6 = 14 — สังเกต: add rd,rs,rs (บวกตัวเอง) คือสำนวนมาตรฐานของ "คูณ 2" เหมือน LC-3 (ADD R1,R1,R1)</div></div>
+<div class="example"><div class="ex-label">ระดับ 2 (กลาง) — มี lw/sw</div>
+<p>หน่วยความจำ: 0x1000=10, 0x1004=20 (RV32I อ้างที่อยู่รายไบต์ word ถัดไปกระโดดทีละ 4)</p>
+<pre><code>lui  x5, 1          # x5 = 0x1000 (สร้างที่อยู่ฐาน)
+lw   x6, 0(x5)      # x6 = M[x5+0] = 10
+lw   x7, 4(x5)      # x7 = M[x5+4] = 20
+add  x28, x6, x7    # x28 = 30
+sw   x28, 8(x5)     # เขียน 30 ลง M[x5+8] = 0x1008</code></pre>
+<div class="answer">x28 = 30, M[0x1008] = 30 — lw/sw คือญาติของ LDR/STR ใน LC-3 (base+offset เหมือนกัน) ต่างที่ offset นับเป็นไบต์</div></div>
+<div class="example"><div class="ex-label">ระดับ 3 (ยาก) — ลูปสั้นที่มี beq กับ jal</div>
+<pre><code>addi x5, x0, 0      # x5 = ตัวนับ เริ่มที่ 0
+addi x6, x0, 8      # x6 = ค่าเป้าหมาย
+loop:   addi x5, x5, 2      # เพิ่มตัวนับทีละ 2
+        beq  x5, x6, done   # ถ้า x5 == x6 ออกจากลูป
+        jal  x0, loop       # กระโดดกลับไป loop เสมอ
+done:</code></pre>
+<div class="answer">x5 ไล่ค่า 2,4,6,8 — สามรอบแรก beq ไม่กระโดด รอบที่ 4 ได้ x5=8=x6 พอดี beq กระโดดออก รวมรัน 4 รอบ x5 จบที่ 8 — jal x0,loop คือ "กระโดดไม่มีเงื่อนไข" (ทิ้ง return address ลง x0) เทียบได้กับ BRnzp ของ LC-3</div></div>
+<p>สังเกต: ลูปนี้คือโครงเดียวกับลูป LC-3 ทุกประการ (นับ → เทียบ → วน) — พร้อมเข้าตารางแมปคำสั่งของ 10.2 แล้ว</p>
+<div class="refs"><p class="rt">อ้างอิง</p><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 2</li><li>Y. Patt และ S. Patel, <i>Introduction to Computing Systems</i> — ส่วน LC-3 (บทที่ 1–9)</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-102">
+<h2>10.2 ตารางแมปคำสั่ง LC-3 ↔ RV32I</h2>
+<p>หัวข้อนี้สร้าง "พจนานุกรม" ระหว่างคำสั่งของ LC-3 กับคำสั่งจริงของ RISC-V RV32I ทุกอย่างที่ LC-3 ทำได้ RV32I ก็ทำได้ แต่ RV32I ออกแบบมาให้ "ตรงไปตรงมา" และเป็นมาตรฐานอุตสาหกรรมมากกว่า LC-3 มี 16 บิต รีจิสเตอร์ 8 ตัว ส่วน RV32I มี 32 บิต รีจิสเตอร์ 32 ตัว โดย x0 ถูกฮาร์ดไวร์เป็นค่า 0 เสมอ</p>
+<div class="callout note"><span class="cal-label">ทำไมต้องรู้ + CPU ใช้ยังไง</span>ตัว CPU จริงไม่ได้ "เข้าใจ" คำสั่งเชิงแนวคิด มันถอดรหัส opcode จริงในฮาร์ดแวร์แล้วสั่ง ALU/หน่วยความจำทำงาน การเทียบ LC-3 กับ RV32I ทีละคำสั่งทำให้เห็นว่า opcode ที่ RV32I "มี" กับ "ไม่มี" (เช่น ไม่มี NOT โดยตรง) บังคับให้ compiler ต้องเลือกลำดับคำสั่งจริงที่ CPU รันได้ — จำเป็นสำหรับตอนสร้าง datapath ในโปรเจกต์ปลายภาค</div>
+
+<h3>กลุ่มที่ 1: เลขคณิตและตรรกะ (Arithmetic / Logic)</h3>
+<p>LC-3 มีคำสั่งคำนวณเพียง 3 ตัว: ADD, AND, NOT — แมปตรงตัวได้เกือบทั้งหมด:</p>
+<table><thead><tr><th>LC-3</th><th>ความหมาย</th><th>RV32I ที่เทียบเท่า</th></tr></thead><tbody>
+<tr><td>ADD R1,R2,R3</td><td>บวกรีจิสเตอร์</td><td>add x1,x2,x3</td></tr>
+<tr><td>ADD R1,R2,#5</td><td>บวกค่าคงที่ (imm5)</td><td>addi x1,x2,5</td></tr>
+<tr><td>AND R1,R2,R3</td><td>และระดับบิต</td><td>and x1,x2,x3</td></tr>
+<tr><td>AND R1,R2,#0</td><td>เคลียร์เป็น 0</td><td>andi x1,x2,0 (หรือ mv x1,x0)</td></tr>
+<tr><td>NOT R1,R2</td><td>กลับบิตทุกบิต</td><td>xori x1,x2,-1</td></tr>
+</tbody></table>
+<p><b>จุดที่ต้องเน้น:</b> RV32I ไม่มี opcode สำหรับ NOT โดยตรง เพราะค่า -1 ใน two's complement คือ 0xFFFFFFFF (ทุกบิตเป็น 1) เมื่อ XOR แต่ละบิตกับ 1 บิตนั้นจะกลับค่าเสมอ ตรงตามนิยาม NOT พอดี — assembler มี pseudo-instruction <code>not x1,x2</code> ที่ขยายเป็น <code>xori x1,x2,-1</code> ให้อัตโนมัติ</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — xori เป็น NOT จริงหรือ</div>
+<p>x2 (8 บิตล่าง) = 1010 0101 หาผลของ xori x1,x2,-1</p>
+<ol class="steps">
+<li>-1 = 0xFFFFFFFF → ทุกบิตเป็น 1 (8 บิตล่างของ mask = 1111 1111)</li>
+<li>XOR ทีละบิต (a XOR 1 = NOT a): 1010 0101 XOR 1111 1111 = 0101 1010</li>
+<li>ตรวจ: กลับทุกบิตของ 1010 0101 = 0101 1010 ✓ ตรงกัน</li>
+</ol>
+<div class="answer">x1 (8 บิตล่าง) = 0101 1010 = 0x5A — NOT กระทำทั้ง 32 บิต บิตบนที่เดิมเป็น 0 กลับเป็น 1 ทั้งหมดด้วย</div></div>
+
+<h3>กลุ่มที่ 2: เข้าถึงหน่วยความจำ (Load / Store)</h3>
+<p>จุดต่างเชิงปรัชญาที่สำคัญที่สุด: LC-3 มีโหมดที่อยู่หลายแบบ (PC-relative และ base+offset) ส่วน RV32I เป็น <b>load-store architecture</b> อย่างเคร่งครัด — คำสั่งคำนวณทำงานกับรีจิสเตอร์เท่านั้น การแตะหน่วยความจำต้องผ่าน load/store เสมอ</p>
+<table><thead><tr><th>LC-3</th><th>โหมด</th><th>RV32I ที่เทียบเท่า</th></tr></thead><tbody>
+<tr><td>LDR R1,R2,#off</td><td>base + offset</td><td>lw x1, off(x2)</td></tr>
+<tr><td>STR R1,R2,#off</td><td>base + offset</td><td>sw x1, off(x2)</td></tr>
+<tr><td>LD R1,LABEL</td><td>PC-relative</td><td>ต้องคำนวณที่อยู่ก่อน แล้ว lw</td></tr>
+<tr><td>ST R1,LABEL</td><td>PC-relative</td><td>คำนวณที่อยู่ก่อน แล้ว sw</td></tr>
+</tbody></table>
+<p>LD/ST ของ LC-3 (PC-relative) ไม่มีคู่ตรงใน RV32I ต้องสร้างที่อยู่ของ LABEL ไว้ในรีจิสเตอร์ก่อน (กลุ่มที่ 3) แล้วจึง lw/sw ผ่าน base register นั้น</p>
+<div class="callout warn"><span class="cal-label">กับดักอันดับหนึ่ง: offset นับหน่วยต่างกัน</span>LC-3 เป็น word-addressable — offset ใน LDR/STR นับเป็น "จำนวน word" ส่วน RV32I เป็น byte-addressable — offset ใน lw/sw นับเป็น "จำนวน byte" และหนึ่ง word ของ RV32I กว้าง 4 byte ขั้นตอนแปล offset: อ่าน offset ของ LC-3 → คูณด้วย 4 → ตรวจว่าอยู่ในช่วง imm12 (−2048..+2047) แล้วจึงเขียน lw/sw</div>
+<table><thead><tr><th>LC-3 offset (word)</th><th>คูณ 4</th><th>RV32I offset (byte)</th><th>ตัวอย่าง</th></tr></thead><tbody>
+<tr><td>#3</td><td>3×4</td><td>12</td><td>LDR R1,R2,#3 → lw x1,12(x2)</td></tr>
+<tr><td>#10</td><td>10×4</td><td>40</td><td>LDR R1,R2,#10 → lw x1,40(x2)</td></tr>
+<tr><td>#-2</td><td>(-2)×4</td><td>-8</td><td>STR R5,R2,#-2 → sw x5,-8(x2)</td></tr>
+</tbody></table>
+<div class="example"><div class="ex-label">ตัวอย่างยาก — แปลบล็อกโหลด-AND-เก็บ</div>
+<pre><code>; LC-3 (R2 = base ของบล็อกข้อมูล)
+LDR R1, R2, #0    ; R1 ← MEM[R2+0]
+LDR R3, R2, #1    ; R3 ← MEM[R2+1]  (mask)
+AND R4, R1, R3    ; R4 = R1 AND R3
+STR R4, R2, #2    ; MEM[R2+2] ← R4</code></pre>
+<div class="answer">แปลเป็น:
+<pre style="margin-top:.6em">lw  x1, 0(x2)     # offset 0×4=0
+lw  x3, 4(x2)     # offset 1×4=4  ← จุดพลาดบ่อยที่สุด
+and x4, x1, x3
+sw  x4, 8(x2)     # offset 2×4=8</pre></div></div>
+<p><b>ทำไมต้อง load-store discipline:</b> การบังคับให้คำสั่งคำนวณแตะเฉพาะรีจิสเตอร์ ทำให้แต่ละคำสั่งมีงานชัดเจน คงที่ สั้น เหมาะกับ pipeline (Topic 11+) เพราะขั้นตอน execute ไม่ต้องรอ memory access พร้อมกัน — เป็นหัวใจของปรัชญา RISC</p>
+
+<h3>กลุ่มที่ 3: สร้างที่อยู่ / ค่าคงที่ใหญ่ (LEA, immediate ใหญ่)</h3>
+<p>LC-3 ใช้ <code>LEA R1,LABEL</code> โหลด "ที่อยู่" แบบ PC-relative ในคำสั่งเดียว ใน RV32I การได้ที่อยู่/ค่าคงที่เต็ม 32 บิตต้องแบ่งสองขั้น เพราะคำสั่งยาว 32 บิต ใส่ immediate เต็ม 32 บิตในคำสั่งเดียวไม่ได้</p>
+<table><thead><tr><th>LC-3</th><th>ความหมาย</th><th>RV32I ที่เทียบเท่า</th></tr></thead><tbody>
+<tr><td>LEA R1,LABEL</td><td>ที่อยู่แบบ PC-relative</td><td>auipc x1,hi; addi x1,x1,lo</td></tr>
+<tr><td>(ค่าคงที่ใหญ่)</td><td>โหลดค่าคงที่ 32 บิต</td><td>lui x1,hi; addi x1,x1,lo</td></tr>
+</tbody></table>
+<p><code>lui x1,imm20</code> (load upper immediate): วางค่า 20 บิตไว้ที่บิตบนของรีจิสเตอร์ (บิต 31-12) แล้วเติม 0 บิตล่าง <code>auipc x1,imm20</code> (add upper immediate to PC): เหมือน lui แต่บวกผลเข้ากับ PC ปัจจุบัน ได้ที่อยู่ PC-relative ตรงกับวิญญาณของ LEA จากนั้นใช้ addi เติมส่วนล่าง 12 บิตให้ครบ — assembler ปรับส่วนบน 20 บิตชดเชยการ sign-extend ของส่วนล่างให้อัตโนมัติ ผู้เรียนไม่ต้องคำนวณเอง</p>
+
+<h3>กลุ่มที่ 4: กระโดดแบบมีเงื่อนไข (Branch)</h3>
+<p>ความต่างเชิงแนวคิดที่ใหญ่ที่สุด: LC-3 ใช้ <b>condition codes</b> (N,Z,P) ที่ถูกตั้งอัตโนมัติทุกครั้งที่เขียนค่าลงรีจิสเตอร์ แล้ว BRn/BRz/BRp ตรวจ flag เหล่านี้ ส่วน RV32I ใช้ <b>compare-and-branch</b>: ไม่มี flag เก็บไว้ คำสั่ง branch เปรียบเทียบรีจิสเตอร์สองตัวในตัวเดียวแล้วตัดสินใจกระโดดทันที</p>
+<table><thead><tr><th>LC-3</th><th>เงื่อนไข (เทียบ rs กับ 0)</th><th>RV32I ที่เทียบเท่า</th><th>pseudo</th></tr></thead><tbody>
+<tr><td>BRn LABEL</td><td>น้อยกว่า 0</td><td>blt rs,x0,LABEL</td><td>bltz rs,LABEL</td></tr>
+<tr><td>BRz LABEL</td><td>เท่ากับ 0</td><td>beq rs,x0,LABEL</td><td>beqz rs,LABEL</td></tr>
+<tr><td>BRp LABEL</td><td>มากกว่า 0</td><td>blt x0,rs,LABEL</td><td>bgtz rs,LABEL</td></tr>
+<tr><td>BRnz LABEL</td><td>น้อยกว่าหรือเท่ากับ 0</td><td>bge x0,rs,LABEL</td><td>blez rs,LABEL</td></tr>
+<tr><td>BRnp LABEL</td><td>ไม่เท่ากับ 0</td><td>bne rs,x0,LABEL</td><td>bnez rs,LABEL</td></tr>
+<tr><td>BRzp LABEL</td><td>มากกว่าหรือเท่ากับ 0</td><td>bge rs,x0,LABEL</td><td>bgez rs,LABEL</td></tr>
+<tr><td>BRnzp LABEL</td><td>กระโดดเสมอ</td><td>jal x0,LABEL</td><td>j LABEL</td></tr>
+</tbody></table>
+<p>จุดสังเกต: (1) BRp/BRnz ต้องสลับ rs ไปฝั่งขวา เพราะ RV32I มีแต่ blt/bge ไม่มี bgt/ble ตรง ๆ (2) BRnzp คือเงื่อนไขที่จริงเสมอ จึงกลายเป็น jump ธรรมดา <code>jal x0,LABEL</code> (ทิ้ง return address ลง x0)</p>
+<div class="example"><div class="ex-label">สูตรแปล branch แบบ 1-2-3 (idiom "เทียบกับศูนย์")</div>
+<ol class="steps">
+<li>หารีจิสเตอร์ที่ตั้ง CC ล่าสุด — มองย้อนจาก BR ขึ้นไป คำสั่งที่เขียนค่าล่าสุดคือตัวตั้ง N/Z/P</li>
+<li>แปลงเงื่อนไข flag เป็นการเทียบกับศูนย์: z="เท่ากับ 0", n="น้อยกว่า 0", p="มากกว่า 0"</li>
+<li>เลือกคำสั่ง branch จากตาราง โดยวาง x0 ในตำแหน่งของ "ศูนย์"</li>
+</ol>
+<div class="answer">ตัวอย่าง: <code>ADD R1,R1,#0</code> แล้ว <code>BRz ZERO_CASE</code> → rs=x1, เงื่อนไข "เท่ากับ 0" → <code>beq x1,x0,ZERO_CASE</code> (บรรทัด ADD ไม่ต้องแปลเลย เพราะหน้าที่เดียวคือตั้ง flag ซึ่ง RV32I ไม่ใช้)</div></div>
+<p><b>signed กับ unsigned:</b> blt/bge เทียบแบบมีเครื่องหมาย ส่วน bltu/bgeu เทียบแบบไม่มีเครื่องหมาย ขณะที่ N flag ของ LC-3 ตีความผลเป็น signed เสมอ ข้อควรระวัง: <code>bltu rs,x0</code> เป็นเท็จเสมอ (ไม่มีค่า unsigned ใดน้อยกว่า 0) ส่วน <code>bgeu rs,x0</code> เป็นจริงเสมอ</p>
+<div class="example"><div class="ex-label">ตัวอย่างยาก — แปลลูปนับถอยหลัง (ไม่พึ่ง flag ค้าง)</div>
+<pre><code>LOOP  ADD R2, R2, #-1   ; ตั้ง CC จากผลลัพธ์
+      BRp LOOP          ; วนถ้าผลลัพธ์มากกว่า 0</code></pre>
+<ol class="steps">
+<li>BRp วน "ถ้าผลล่าสุด (R2) มากกว่า 0" (signed)</li>
+<li>"R2 มากกว่า 0" = "0 น้อยกว่า R2" (สลับตัวถูกเทียบเพราะไม่มี bgt ตรง ๆ)</li>
+<li>เลือก blt โดยวาง 0 เป็น rs1: <code>blt x0, x2, LOOP</code></li>
+</ol>
+<div class="answer"><pre>LOOP: addi x2, x2, -1     # x2 = x2 - 1
+      blt  x0, x2, LOOP   # วนถ้า 0 < x2</pre></div></div>
+
+<h3>กลุ่มที่ 5: เรียกซับรูทีนและกลับ (Call / Return)</h3>
+<table><thead><tr><th>LC-3</th><th>ความหมาย</th><th>RV32I ที่เทียบเท่า</th></tr></thead><tbody>
+<tr><td>JSR LABEL</td><td>เรียกซับรูทีน (PC-relative)</td><td>jal x1, LABEL</td></tr>
+<tr><td>JSRR R2</td><td>เรียกซับรูทีน (ผ่านรีจิสเตอร์)</td><td>jalr x1, 0(x2)</td></tr>
+<tr><td>RET</td><td>กลับจากซับรูทีน</td><td>jalr x0, 0(x1)</td></tr>
+</tbody></table>
+<p>ทั้งสอง ISA เก็บ "ที่อยู่กลับ" ไว้ในรีจิสเตอร์ — LC-3 ใช้ R7 ส่วน RV32I ใช้ x1 (ชื่อ ra = return address) <code>jal x1,LABEL</code>: กระโดดไป LABEL พร้อมเก็บที่อยู่คำสั่งถัดไปลง x1 <code>jalr x0,0(x1)</code>: กระโดดกลับไปยัง ra โดยทิ้ง return address ใหม่ลง x0 (assembler มี pseudo <code>ret</code>)</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — ไล่ค่า ra ด้วยที่อยู่จริง</div>
+<p><code>jal x1, my_func</code> อยู่ที่ 0x1000, my_func อยู่ที่ 0x1010 (+16 byte)</p>
+<div class="answer">ra = PC ของ jal + 4 = 0x1004 (ที่อยู่คำสั่งถัดจาก jal เสมอ ไม่ใช่ที่อยู่ my_func) — jalr x0,0(x1) ที่ 0x1014 พากลับไป PC=0x1004 (นี่คือ ret) — LC-3 ทำแบบเดียวกันเป๊ะ ต่างแค่ RV32I บวก 4 (หนึ่งคำสั่ง=4 byte) ส่วน LC-3 บวก 1 (นับที่อยู่เป็น word)</div></div>
+
+<h3>กลุ่มที่ 6: เรียกบริการระบบ (Trap)</h3>
+<table><thead><tr><th>LC-3</th><th>ความหมาย</th><th>RV32I ที่เทียบเท่า</th></tr></thead><tbody>
+<tr><td>TRAP x25 (HALT)</td><td>เรียกบริการ OS/firmware</td><td>ecall</td></tr>
+<tr><td>GETC/OUT/PUTS</td><td>บริการ I/O ผ่าน trap vector</td><td>ecall (ผ่าน OS convention)</td></tr>
+</tbody></table>
+<p>LC-3 ใช้ TRAP พร้อม trap vector (x20=GETC, x21=OUT, x25=HALT) เพื่อข้ามไปยังรูทีนบริการ RV32I ใช้คำสั่งเดียวคือ <b>ecall</b> โดยหมายเลขบริการและพารามิเตอร์ถูกส่งผ่านรีจิสเตอร์ตามข้อตกลง (a7 = หมายเลข syscall, a0-a6 = อาร์กิวเมนต์) ขั้นตอน: ใส่อาร์กิวเมนต์ลง a0 → ใส่หมายเลขบริการลง a7 → เรียก ecall</p>
+<table><thead><tr><th>บริการ</th><th>a7</th><th>อาร์กิวเมนต์/ผลลัพธ์</th><th>trap vector LC-3 เทียบเคียง</th></tr></thead><tbody>
+<tr><td>พิมพ์จำนวนเต็ม</td><td>1</td><td>a0 = ค่าที่จะพิมพ์</td><td>(ไม่มีตรง ๆ)</td></tr>
+<tr><td>พิมพ์สตริง</td><td>4</td><td>a0 = ที่อยู่สตริง</td><td>TRAP x22 (PUTS)</td></tr>
+<tr><td>อ่านจำนวนเต็ม</td><td>5</td><td>ผลกลับใน a0</td><td>(ไม่มีตรง ๆ)</td></tr>
+<tr><td>จบโปรแกรม</td><td>10</td><td>-</td><td>TRAP x25 (HALT)</td></tr>
+<tr><td>พิมพ์อักขระ</td><td>11</td><td>a0 = รหัสอักขระ</td><td>TRAP x21 (OUT)</td></tr>
+<tr><td>อ่านอักขระ</td><td>12</td><td>ผลกลับใน a0</td><td>TRAP x20 (GETC)</td></tr>
+</tbody></table>
+<div class="callout warn"><span class="cal-label">ecall ไม่ใช่คำสั่ง "จบโปรแกรม"</span>ecall แปลว่า "ขอบริการจากระบบ" เฉย ๆ พอระบบทำเสร็จก็คืนการควบคุมกลับมาคำสั่งถัดไปแล้วเดินต่อ เหมือนเรียกฟังก์ชัน สิ่งที่ตัดสินว่าเกิดอะไรขึ้นคือ<b>เลขใน a7</b> ไม่ใช่ตัวคำสั่ง ecall เอง (ทุกครั้งมีรหัสเครื่องเดียวกันคือ 0x00000073) มีเพียงบริการหมายเลข 10 (จบโปรแกรม) เท่านั้นที่ไม่คืนกลับมา</div>
+<div class="qa"><p class="q">Q: โปรแกรมเรียก ecall 4 ครั้งติดกัน (a7=1,11,1,10) ตามด้วย 3 คำสั่งอีก มีคำสั่งกี่คำสั่งที่ถูกรันจริงจากทั้งหมด 14 คำสั่ง</p><p class="a"><b>A:</b> 11 คำสั่ง — ecall ที่ a7=10 (คำสั่งที่ 11) จบโปรแกรมทันที สามคำสั่งสุดท้ายไม่ถูกแตะเลย</p></div>
+
+<h3>ทบทวนความเข้าใจ</h3>
+<div class="qa"><p class="q">Q: ความต่างหลักของการ branch ระหว่าง LC-3 กับ RV32I คืออะไร</p><p class="a"><b>A:</b> LC-3 ตรวจ flag N/Z/P ที่ตั้งไว้ก่อน (condition-code) ส่วน RV32I เทียบรีจิสเตอร์สองตัวในคำสั่ง branch เดียว (compare-and-branch) ไม่มี flag เก็บค้างเลย</p></div>
+<div class="qa"><p class="q">Q: คำสั่งใดเทียบเท่า JSR (เก็บ return address ที่ x1 แล้วกระโดดไปซับรูทีน)</p><p class="a"><b>A:</b> jal x1, LABEL — ส่วน jalr x0,0(x1) คือ ret (เทียบเท่า RET) ไม่ใช่การเรียก</p></div>
+<div class="refs"><p class="rt">อ้างอิง</p><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 2</li><li>Y. Patt และ S. Patel, <i>Introduction to Computing Systems</i> — ส่วน LC-3 (บทที่ 1–9)</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-103">
+<h2>10.3 สิ่งที่ RV32I มีแต่ LC-3 ไม่มี</h2>
+
+<h3>คูณ/หาร และ barrel shift</h3>
+<p>LC-3 base ไม่มีคำสั่งคูณ/หารเป็น primitive ต้องเขียนลูปบวกซ้ำ และไม่มีคำสั่งเลื่อนบิตหลายตำแหน่งในจังหวะเดียว RISC-V เติมเต็มสองเรื่องนี้:</p>
+<ul>
+<li><b>Barrel shift อยู่ใน base RV32I เลย</b> — sll (shift left logical), srl (shift right logical, เติม 0), sra (shift right arithmetic, เติม sign bit รักษาเครื่องหมาย) เลื่อนได้หลายตำแหน่งในคำสั่งเดียว มีเวอร์ชัน immediate (slli/srli/srai) ช่วง 0–31 (5 บิต)</li>
+<li><b>คูณ/หารอยู่ใน extension M</b> (ไม่ใช่ base) — mul, mulh/mulhu/mulhsu (32 บิตบนของผลคูณ), div/divu, rem/remu ถ้าชิปไม่มี M ต้องคูณ/หารด้วยซอฟต์แวร์เหมือน LC-3</li>
+</ul>
+<div class="example"><div class="ex-label">ตัวอย่าง — srai กับ srli ให้ผลไม่เหมือนกัน</div>
+<p>x6 = -16 (0xFFFFFFF0) หาผลของ srai x5,x6,2 เทียบกับ srli x5,x6,2</p>
+<ol class="steps">
+<li>srai (arithmetic — เติมซ้ำ sign bit=1 ทางซ้าย): ผล = 0xFFFFFFFC = -4 (ตรวจ: -16÷4=-4 ✓)</li>
+<li>srli (logical — เติม 0 ทางซ้าย): ผล = 0x3FFFFFFC = 1,073,741,820 (กลายเป็นเลขบวกมหึมา เพราะ 0 ทำลายบิตเครื่องหมาย)</li>
+</ol>
+<div class="answer">สรุป: เลขมีเครื่องหมาย เลื่อนขวาด้วย srai · เลขไม่มีเครื่องหมาย เลื่อนขวาด้วย srli — LC-3 ไม่มีคำสั่งเลื่อนขวาเลยสักแบบ</div></div>
+
+<div class="example"><div class="ex-label">ตัวอย่าง — คูณด้วยซอฟต์แวร์ (LC-3) เทียบ mul คำสั่งเดียว</div>
+<pre><code>; LC-3: R2 = R0 × 12 (R1 เริ่มต้น = 12 ใช้เป็นตัวนับ)
+      AND R2, R2, #0
+LOOP  ADD R2, R2, R0
+      ADD R1, R1, #-1
+      BRp LOOP</code></pre>
+<table><thead><tr><th></th><th>LC-3 ลูปบวกซ้ำ</th><th>RV32IM mul</th></tr></thead><tbody>
+<tr><td>คำสั่งในโปรแกรม (static)</td><td>4</td><td>1</td></tr>
+<tr><td>คำสั่งที่ execute จริง (คูณ 12)</td><td>37</td><td>1</td></tr>
+<tr><td>ไซเคิลโดยประมาณ</td><td>~185 (5 ไซเคิล/คำสั่ง)</td><td>1–3</td></tr>
+<tr><td>ถ้าตัวคูณเป็น 1000</td><td>3001 คำสั่ง — โตตามค่าตัวคูณ</td><td>1 คำสั่งเท่าเดิม</td></tr>
+</tbody></table>
+<div class="answer">เวลาทำงานของลูปโตตาม "ค่า" ของตัวคูณ ส่วน mul ใช้วงจรคูณจริงจึงใช้เวลาคงที่ — เหตุผลที่ extension M คุ้มทรานซิสเตอร์สำหรับงานที่คูณบ่อย</div></div>
+
+<div class="example"><div class="ex-label">ตัวอย่างยาก — คูณแบบ shift-add ด้วย RV32I ล้วน (ไม่มี M ก็คูณฉลาดได้)</div>
+<p>คูณ 6×5 มองตัวคูณ 5=101 ฐานสอง แล้ว 6×5 = 6×4 + 6×1 (บวกเฉพาะตำแหน่งบิตที่เป็น 1)</p>
+<pre><code>addi x12, x0, 0      # ผลสะสม = 0
+LOOP:   andi x5, x11, 1      # ดูบิตต่ำสุดของตัวคูณ
+        beq  x5, x0, SKIP    # บิตเป็น 0 → ไม่ต้องบวก
+        add  x12, x12, x10   # บิตเป็น 1 → บวกตัวตั้ง
+SKIP:   slli x10, x10, 1     # ตัวตั้ง × 2
+        srli x11, x11, 1     # ตัวคูณเลื่อนขวา
+        bne  x11, x0, LOOP</code></pre>
+<div class="answer">x10=6(ตัวตั้ง), x11=5=101(ตัวคูณ): รอบ1 บิต=1→x12=6, x10=12,x11=2 · รอบ2 บิต=0→x12=6เท่าเดิม, x10=24,x11=1 · รอบ3 บิต=1→x12=6+24=30, x10=48,x11=0 หมดบิต → x12=30=6×5 ✓ (วนแค่ 3 รอบ = จำนวนบิตของตัวคูณ) — เทียบตัวคูณ=1000: บวกซ้ำ 1000 รอบ, shift-add 10 รอบ (โตตามจำนวนบิต), mul 1 คำสั่งจบ</div></div>
+
+<h3>Stack discipline ผ่าน sp</h3>
+<p>LC-3 ไม่มี stack pointer มาตรฐาน (Topic 8 นิยม R6 กันเอง) RISC-V ยกระดับเป็น ABI: <b>sp</b> (x2) คือ stack pointer อย่างเป็นทางการ <b>fp</b> (x8=s0) ชี้ frame ปัจจุบัน stack โตลงทาง address ต่ำ push คือ <code>addi sp,sp,-k</code> แล้ว sw · pop คือ lw แล้ว <code>addi sp,sp,+k</code> ฮาร์ดแวร์ไม่มีคำสั่ง push/pop แยก — สอดคล้องปรัชญา RISC ที่ให้คำสั่งน้อย เรียบง่าย แล้วประกอบเอา</p>
+
+<h3>Floating point: extension F (และ D)</h3>
+<p>LC-3 ไม่มีเลขทศนิยมเลย RISC-V แยกเป็น extension: <b>F</b> = single-precision (32 บิต) เพิ่ม register f0–f31 และคำสั่งอย่าง fadd.s, fmul.s, flw/fsw ตามมาตรฐาน IEEE 754 · <b>D</b> = double-precision (64 บิต) ต่อยอดจาก F การแยกออกจาก base ทำให้ไมโครคอนโทรลเลอร์เล็ก ๆ ที่ไม่ต้องใช้ทศนิยมประหยัดทรานซิสเตอร์ได้</p>
+
+<h3>Modular ISA: base + extensions</h3>
+<p>หัวใจที่ทำให้ RISC-V ต่างจาก LC-3 และ ISA เก่า ๆ: ออกแบบเป็นโมดูล มี base เล็ก ๆ บังคับ แล้วเลือกเสริม extension ตามงาน</p>
+<div class="mermaid">
+flowchart LR
+  I["RV32I base (~40 คำสั่ง บังคับมี)"] --> M["+ M (mul/div)"]
+  I --> F["+ F (float 32-bit)"]
+  I --> D["+ D (float 64-bit)"]
+  I --> A["+ A (atomic)"]
+  I --> C["+ C (compressed 16-bit)"]
+</div>
+<p><b>RV32I</b> = base integer ISA ~40 คำสั่ง ทุกชิปต้องมี · <b>M</b>=คูณ/หาร · <b>F</b>=float single · <b>D</b>=float double · <b>A</b>=atomic (multi-core/concurrency) · <b>C</b>=compressed (คำสั่ง 16 บิตที่ใช้บ่อย ลดขนาดโค้ด) ทิศทางรันเป็น subset⊂superset: โปรแกรม base ล้วนรันบนชิปที่มี extension เพิ่มได้สบาย แต่ถ้าใช้ mul/float ไปรันบนชิป base เปล่า จะเจอ illegal instruction</p>
+<div class="callout note"><span class="cal-label">ทำไมต้องรู้ + CPU ใช้ยังไง</span>modular ISA กำหนดว่าจะมีทรานซิสเตอร์ชุดไหนอยู่บนซิลิคอนจริง: barrel shifter เป็นวงจรใน ALU ที่ขยับทุกบิตพร้อมกันในหนึ่งรอบสัญญาณนาฬิกา ส่วนตัวคูณ/หาร (M) และหน่วยทศนิยม (F/D) เป็นบล็อกฮาร์ดแวร์ใหญ่ที่กินพื้นที่/ไฟ — ไมโครคอนโทรลเลอร์ในเครื่องซักผ้าอาจเอาแค่ RV32I เปล่า ส่วน CPU เซิร์ฟเวอร์ใส่ครบ M/F/D/A</div>
+
+<h3>จาก 8 register สู่ 32 register</h3>
+<div class="callout note"><span class="cal-label">ทำไมต้องรู้ + CPU ใช้ยังไง</span>calling convention คือกติกาที่ทำให้โค้ดจากคนละไฟล์/ภาษา/compiler เรียกฟังก์ชันกันได้จริงบน CPU เดียวกัน CPU เห็นแค่คำสั่ง jal/jalr ที่กระโดดไป-กลับ และ register file 32 ตัวที่ทุกส่วนของโปรแกรมใช้ร่วมกัน ถ้าไม่มีข้อตกลงว่าใครรักษาค่า register ตัวไหน ค่าจะถูกทับพังทันทีที่ call ข้ามฟังก์ชัน</div>
+<p>LC-3 มี register แค่ 8 ตัว (3 บิตเลือก) RV32I มี 32 register (5 บิต เพราะ 2^5=32) กว้าง 32 บิตเท่ากัน การมี register มากขึ้นช่วยลดการ spill ค่าลง memory: compiler เก็บตัวแปรที่ใช้บ่อยไว้บน register ได้มากกว่า</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — total=(a+b)+(c+d)+(e+f) บน 8 กับ 32 register</div>
+<p>ฝั่ง RV32I: a..f มาใน a0–a5 ตาม ABI อยู่แล้ว งานจบใน register ไม่แตะ memory เลย (5 คำสั่ง) ฝั่ง LC-3: register เหลือ scratch แค่ R0,R1 ตัวแปรทั้ง 6 ต้องอยู่ใน memory และผลรวมย่อยต้อง spill ลง memory ชั่วคราว</p>
+<table><thead><tr><th></th><th>LC-3 (8 register)</th><th>RV32I (32 register)</th></tr></thead><tbody>
+<tr><td>จำนวนคำสั่ง</td><td>15</td><td>5</td></tr>
+<tr><td>แตะ memory ฝั่งข้อมูล</td><td>10 ครั้ง</td><td>0 ครั้ง</td></tr>
+</tbody></table>
+<div class="answer">ค่าที่ต้อง "มีชีวิตพร้อมกัน" มีสูงสุด 9 ค่า มากกว่า register ว่างจริงของ LC-3 จึงถูกบังคับ spill เสมอ ส่วน RV32I มี 32 ตัว ค่าทั้งหมดอยู่บน register ได้ถาวรตลอดฟังก์ชัน — ความต่างไม่ได้อยู่ที่จำนวนคำสั่งอย่างเดียว แต่อยู่ที่การแตะ memory ซึ่งช้ากว่า register หลายเท่า</div></div>
+
+<p><b>x0:</b> register ที่ถูก hardwired เป็นศูนย์ อ่านได้ค่า 0 เสมอ เขียนทับไม่ได้ ประโยชน์: ทำ NOP ด้วย <code>addi x0,x0,0</code>, ก็อปปี้ค่าด้วย <code>add x6,x7,x0</code>, เทียบกับศูนย์ด้วย <code>beq x5,x0,LABEL</code> โดยไม่เปลือง register จริง</p>
+
+<h3>ABI: register แต่ละตัวมีหน้าที่</h3>
+<div class="callout game"><span class="cal-label">🎮 ในต้นฉบับมี widget "rvregs" ให้คลิกดู register แต่ละตัว</span>ตารางด้านล่างสรุปสาระของ widget นี้ครบแล้ว — ชื่อ ABI, หน้าที่ และใครรักษาค่าของแต่ละ register</div>
+<table><thead><tr><th>register</th><th>ชื่อ ABI</th><th>หน้าที่</th><th>ใครรักษาค่า</th></tr></thead><tbody>
+<tr><td>x0</td><td>zero</td><td>ค่าศูนย์เสมอ</td><td>— (คงที่)</td></tr>
+<tr><td>x1</td><td>ra</td><td>return address</td><td>caller-saved</td></tr>
+<tr><td>x2</td><td>sp</td><td>stack pointer</td><td>callee-saved</td></tr>
+<tr><td>x3</td><td>gp</td><td>global pointer</td><td>reserved (ตั้งค่าตอน startup)</td></tr>
+<tr><td>x4</td><td>tp</td><td>thread pointer</td><td>reserved (ตั้งค่าตอน startup)</td></tr>
+<tr><td>x5–x7</td><td>t0–t2</td><td>temporary</td><td>caller-saved</td></tr>
+<tr><td>x8</td><td>s0 / fp</td><td>saved / frame pointer</td><td>callee-saved</td></tr>
+<tr><td>x9</td><td>s1</td><td>saved</td><td>callee-saved</td></tr>
+<tr><td>x10–x17</td><td>a0–a7</td><td>argument / return value</td><td>caller-saved</td></tr>
+<tr><td>x18–x27</td><td>s2–s11</td><td>saved</td><td>callee-saved</td></tr>
+<tr><td>x28–x31</td><td>t3–t6</td><td>temporary</td><td>caller-saved</td></tr>
+</tbody></table>
+<p>สรุปจำง่าย: argument/return value → a0–a7, temporary → t0–t6, saved → s0–s11, return address → ra, stack pointer → sp, fp คือชื่อแฝงของ s0</p>
+
+<h3>Caller-saved vs Callee-saved</h3>
+<p>หัวใจของ calling convention: ใครรับผิดชอบเก็บค่า register ข้าม subroutine call — <b>Caller-saved</b> (t0–t6, a0–a7, ra): callee มีสิทธิ์ทับได้ตามใจ ถ้า caller ยังต้องใช้ค่าต้องเซฟเองก่อนเรียก · <b>Callee-saved</b> (s0–s11, sp): callee ต้องเซฟค่าเดิมลง stack ตอนเข้า แล้ว restore ก่อน return การแบ่งสองกลุ่มเป็นการประนีประนอม (trade-off) ให้ compiler วางตัวแปร "อายุยาว" ไว้ใน s-register และตัวแปร "อายุสั้น" ไว้ใน t-register ลดงานเซฟโดยรวม</p>
+<div class="example"><div class="ex-label">ขั้นตอนตัดสินใจเลือกกลุ่ม register (ใช้ได้ทุกครั้ง)</div>
+<ol class="steps">
+<li>เป็นอาร์กิวเมนต์/ค่าคืนหรือไม่ → ใช่: ใช้ a0–a7 เท่านั้น</li>
+<li>ไม่ใช่ → ต้องรอดข้าม call หรือไม่ → ไม่ข้าม: ใช้ t0–t6 (ถูกที่สุด ไม่มีภาระเซฟ)</li>
+<li>ต้องรอดข้าม call → ใช้ s0–s11 และทำหน้าที่ callee ให้ครบ (เซฟก่อนใช้ restore ก่อน return)</li>
+</ol>
+<div class="answer">ตัวอย่าง: ค่า address ชั่วคราวไม่มี call คั่น → t0 · sum สะสมในลูปที่เรียก print ทุกรอบ → s1 (ต้องรอดข้าม call) · อาร์กิวเมนต์ w,h ของ area(w,h) → a0,a1 ผลลัพธ์กลับใน a0</div></div>
+<pre><code># โครงร่าง subroutine RISC-V ตามมาตรฐาน ABI
+func:
+    addi sp, sp, -16     # จองเฟรมบน stack
+    sw   ra, 12(sp)      # เซฟ return address
+    sw   s0, 8(sp)       # เซฟ s0 (callee-saved)
+    # ... ตัวงาน ...
+    lw   s0, 8(sp)       # restore s0
+    lw   ra, 12(sp)      # restore ra
+    addi sp, sp, 16      # คืนพื้นที่ stack
+    ret                  # = jalr x0, 0(ra)</code></pre>
+<div class="example"><div class="ex-label">ตัวอย่างยาก — push/pop ผ่าน sp พร้อมผัง stack</div>
+<p>ฟังก์ชัน calc ใช้ s0,s1 และเรียกฟังก์ชันลูก (ต้องเซฟ ra ด้วย) เข้าฟังก์ชันตอน sp=0x9000, ra=0x40C, s0เดิม=0x11, s1เดิม=0x22</p>
+<pre><code>calc:
+    addi sp, sp, -16     # (1) จองเฟรม 16 byte
+    sw   ra, 12(sp)      # (2)
+    sw   s0, 8(sp)       # (3)
+    sw   s1, 4(sp)       # (4)
+    # ... ตัวงาน ...
+    lw   s1, 4(sp)       # (5) pop ย้อนลำดับ
+    lw   s0, 8(sp)       # (6)
+    lw   ra, 12(sp)      # (7)
+    addi sp, sp, 16      # (8)
+    ret</code></pre>
+<div class="answer">sp ใหม่ = 0x9000-16 = 0x8FF0 · address 0x8FFC=0x40C(ra), 0x8FF8=0x11(s0), 0x8FF4=0x22(s1) · หลัง pop ทั้งหมดกลับมาค่าเดิมทุกตัว sp กลับเป็น 0x9000 — pop ต้องย้อนลำดับ push เสมอ และ offset ตอน lw ต้องตรงกับตอน sw ทุกตัว ถ้าสลับช่องเดียว ค่าที่ restore จะสลับกันทั้งเฟรมโดยไม่มี error เตือน</div></div>
+
+<h3>ทบทวนความเข้าใจ</h3>
+<div class="qa"><p class="q">Q: ความสามารถใดอยู่ใน base RV32I ตั้งแต่แรก (ไม่ต้องเพิ่ม extension)</p><p class="a"><b>A:</b> การเลื่อนบิตหลายตำแหน่งด้วย sll/srl/sra — mul/div/rem อยู่ใน extension M ส่วน float อยู่ใน extension F/D</p></div>
+<div class="qa"><p class="q">Q: register กลุ่มใดที่ "callee ต้องเซฟ/รีสโตร์เองถ้าจะใช้"</p><p class="a"><b>A:</b> s0–s11 (saved) — t0–t6 และ a0–a7 เป็น caller-saved ซึ่ง callee มีสิทธิ์ทับได้</p></div>
+<div class="refs"><p class="rt">อ้างอิง</p><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 2</li><li>Y. Patt และ S. Patel, <i>Introduction to Computing Systems</i> — ส่วน LC-3 (บทที่ 1–9)</li></ul></div>
+</section>
+
+<section class="topic-section" id="sec-104">
+<h2>10.4 Little-Endian, Addressing และตัวอย่างเขียนใหม่</h2>
+
+<h3>โมเดลหน่วยความจำ: LC-3 vs RV32I</h3>
+<div class="callout note"><span class="cal-label">ทำไมต้องรู้ + CPU ใช้ยังไง</span>ทุกครั้งที่รัน lw/sw วงจร address generation ใน datapath จะบวก base register กับ offset แล้วส่งค่าออก address bus การที่ RV32I เป็น byte-addressable ทำให้ต้องบวกทีละ 4 เพื่อเดินอาเรย์ word และต้องมีวงจรเลือกขนาด (byte/halfword/word) พร้อมตรรกะ sign/zero extend ก่อนเขียนลงรีจิสเตอร์</div>
+<p><b>Word-addressable (LC-3):</b> หนึ่งที่อยู่ชี้ไปยังหนึ่ง word ขนาด 16 บิต เพิ่มที่อยู่ทีละ 1 คือเลื่อนไปอีกหนึ่ง word เต็ม ๆ ไม่มีแนวคิด "ทีละ byte" ในระดับ ISA พื้นฐาน<br><b>Byte-addressable (RV32I):</b> หนึ่งที่อยู่ชี้ไปยังหนึ่ง byte หนึ่ง word 32 บิต = 4 byte ดังนั้น word ที่อยู่ติดกันห่างกัน 4 (เช่น 0x1000, 0x1004, 0x1008...) เดินอาเรย์ของ word จึงบวกทีละ 4 ไม่ใช่ทีละ 1</p>
+<div class="mermaid">
+flowchart LR
+    subgraph LC3["LC-3 (word-addressable)"]
+      A0["addr 0"] --> A1["addr 1"] --> A2["addr 2"]
+      A0 -.- W0["word 16 บิต"]
+      A1 -.- W1["word 16 บิต"]
+    end
+    subgraph RV["RV32I (byte-addressable)"]
+      B0["addr 0"] --> B1["addr 1"] --> B2["addr 2"] --> B3["addr 3"] --> B4["addr 4"]
+      B0 -.- WB["word = 4 byte (addr 0..3)"]
+      B4 -.- WB2["word ถัดไปที่ addr 4"]
+    end
+</div>
+<p>โปรแกรมจริงต้องจัดการข้อมูลหลายขนาด (ตัวอักษร 1 byte, จำนวนเต็มสั้น 2 byte, word 4 byte) การกำหนดที่อยู่ทีละ byte ทำให้เข้าถึงข้อมูลแต่ละขนาดได้ตรง ๆ RV32I จึงมีคำสั่ง load/store หลายขนาด: <b>lw/sw</b> — word (4 byte) · <b>lh/lhu/sh</b> — halfword (2 byte; lh sign-extend, lhu zero-extend) · <b>lb/lbu/sb</b> — byte (1 byte; lb sign-extend, lbu zero-extend) คำสั่งที่ดึงข้อมูลเล็กกว่า 32 บิตต้องเลือกว่าจะขยายเครื่องหมายหรือขยายด้วยศูนย์ — จุดนี้ไม่มีใน LC-3 เพราะทุกอย่าง 16 บิตเท่ากันหมด</p>
+
+<h3>Addressing mode: base + offset</h3>
+<pre><code># RV32I: โหลด word จาก (x10+8) ไปที่ x5
+lw   x5, 8(x10)
+sw   x6, 0(x10)</code></pre>
+<p>immediate offset เป็นค่า 12 บิตแบบมีเครื่องหมาย ครอบคลุมช่วง -2048 ถึง +2047 byte เทียบกับ LDR/STR ของ LC-3 (base+offset6) ที่แนวคิดเดียวกันแต่ offset แคบกว่าและนับเป็น word</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — คำนวณที่อยู่สมาชิกอาเรย์</div>
+<p>อาเรย์ A (int 32 บิต) เริ่ม base=0x2000 (x10) หาที่อยู่ A[5]</p>
+<ol class="steps">
+<li>แต่ละ word=4 byte → ระยะห่างระหว่างสมาชิก=4 byte</li>
+<li>addr(A[i]) = base + 4×i</li>
+<li>i=5: offset=4×5=20=0x14 → addr=0x2000+0x14=0x2014</li>
+</ol>
+<div class="answer"><code>lw x5, 20(x10)</code> — ถ้าคิดแบบ word-addressable (LC-3) จะได้ 0x2005 ผิด! (ตกกลาง byte ของ A[1])</div></div>
+
+<h3>Little-Endian: byte เรียงอย่างไรในหน่วยความจำ</h3>
+<div class="callout note"><span class="cal-label">ทำไมต้องรู้ + CPU ใช้ยังไง</span>endianness กำหนดว่าฮาร์ดแวร์วางบิตของ word ลงในแต่ละ byte ของหน่วยความจำอย่างไร ถ้าเข้าใจผิดจะอ่านค่าสลับหัวท้ายทันที — สำคัญเฉพาะเมื่อเข้าถึงข้อมูลก้อนเดียวกันด้วยขนาดต่างกัน หรือส่งข้อมูลข้ามเครื่อง ไม่กระทบเลขคณิตปกติที่อ่าน/เขียนเป็น word เต็มทั้งคู่ LC-3 ไม่มีประเด็นนี้ เพราะ word 16 บิตเป็นหน่วยที่อยู่เดียวที่เล็กที่สุด</div>
+<p>RV32I มาตรฐานเป็น <b>little-endian</b>: กติกา 3 ขั้น — (1) หั่นค่าใน register เป็น 4 byte จากต่ำสุดไปสูงสุด (2) วาง byte ต่ำสุดที่ address ต่ำสุด ไล่ byte ถัดไปทีละ 1 (3) อ่านกลับทำย้อนทาง</p>
+<div class="example"><div class="ex-label">ตัวอย่าง — sw หนึ่งครั้งแล้วส่องรายไบต์</div>
+<p>x5=0x11223344, x10=0x1000, รัน sw x5,0(x10)</p>
+<table><thead><tr><th>address</th><th>byte ที่เก็บ</th><th>หมายเหตุ</th></tr></thead><tbody>
+<tr><td>0x1000</td><td>0x44</td><td>least-significant byte</td></tr>
+<tr><td>0x1001</td><td>0x33</td><td></td></tr>
+<tr><td>0x1002</td><td>0x22</td><td></td></tr>
+<tr><td>0x1003</td><td>0x11</td><td>most-significant byte</td></tr>
+</tbody></table>
+<div class="answer">ผังหน่วยความจำ little-endian ดู "กลับหัว" เมื่อเทียบกับลำดับที่เขียนบนกระดาษ (0x11 ที่เห็นก่อนตามสายตา กลับไปอยู่ address สูงสุด)</div></div>
+<div class="example"><div class="ex-label">ตัวอย่าง — lb กับ lbu อ่าน byte เดียวกัน ได้คนละค่า</div>
+<p>หน่วยความจำที่ 0x1000 เก็บ 0xFF รัน lb x5,0(x10) และ lbu x6,0(x10)</p>
+<div class="answer">lb sign-extend: บิตสูงสุด(บิต7)=1 → ติดลบ → x5=0xFFFFFFFF=-1 · lbu zero-extend: x6=0x000000FF=255 — byte ในหน่วยความจำเป็นก้อนบิตเฉย ๆ ไม่มีเครื่องหมายติดตัว คำสั่งโหลดต่างหากที่เลือกการตีความ</div></div>
+<div class="example"><div class="ex-label">ตัวอย่างยาก — โจทย์ย้อนกลับจาก byte dump</div>
+<p>debugger แสดง 0x2000: 78 56 34 12 — รัน lw x5,0(x10) (x10=0x2000) บนเครื่อง little-endian vs big-endian ได้ค่าใด</p>
+<table><thead><tr><th>กติกาเครื่อง</th><th>วิธีประกอบ</th><th>ค่า word</th></tr></thead><tbody>
+<tr><td>little-endian</td><td>byte ที่ address ต่ำ = byte ต่ำของค่า</td><td>0x12345678</td></tr>
+<tr><td>big-endian</td><td>byte ที่ address ต่ำ = byte สูงของค่า</td><td>0x78563412</td></tr>
+</tbody></table>
+<div class="answer">byte ชุดเดียวกันแท้ ๆ ให้ word คนละค่า — การส่งข้อมูล binary ข้ามเครื่องต่างตระกูลต้องตกลง endianness กันก่อนเสมอ</div></div>
+
+<h3>PC-relative addressing</h3>
+<p>ทั้งสอง ISA ใช้ที่อยู่อ้างอิงกับ PC สำหรับกระโดด/กระโดดมีเงื่อนไข เพื่อให้โค้ดย้ายที่อยู่ได้ (position-independent) และ encode ระยะกระโดดด้วยบิตน้อย LC-3: BR, JSR, LD, LDI, LEA ใช้ PCoffset9/11 บวกกับ PC ที่ชี้คำสั่งถัดไป RV32I: branch และ jal ใช้ offset ที่บวกกับที่อยู่ของคำสั่ง branch เอง (ไม่ใช่ PC+4) และ offset เป็นหน่วย byte เป็นพหุคูณของ 2 เสมอ</p>
+
+<h3>ขั้นตอนแปลโปรแกรม LC-3 → RV32I อย่างเป็นระบบ (5 ขั้น)</h3>
+<ol class="steps">
+<li><b>แมปตัวแปร → รีจิสเตอร์</b> — ทำตารางก่อนว่ารีจิสเตอร์ LC-3 แต่ละตัวถือค่าอะไร จับคู่กับรีจิสเตอร์ RV32I ให้ครบก่อนแปลแม้แต่บรรทัดเดียว</li>
+<li><b>แปลงคำสั่งเข้าถึงหน่วยความจำ (offset×4)</b> — LDR/STR → lw/sw</li>
+<li><b>แปลง branch</b> — หาว่า condition code มาจากรีจิสเตอร์ตัวไหน แล้วเขียนการเปรียบเทียบให้ชัด (บ่อยครั้งคือเทียบกับ x0)</li>
+<li><b>แปลง call/return</b> — JSR label → jal x1,label · RET → jalr x0,0(x1)</li>
+<li><b>ตรวจด้วย trace</b> — เดินโปรแกรมทั้งสองเวอร์ชันด้วยข้อมูลทดสอบเดียวกัน เทียบค่าทุกตัวแปรทุกรอบ</li>
+</ol>
+
+<div class="example"><div class="ex-label">ตัวอย่างเขียนใหม่เต็มโปรแกรม — บวกสมาชิกอาเรย์ด้วยลูป</div>
+<pre><code>; LC-3: R1=base, R2=N, R0=ผลรวม
+        AND R0, R0, #0
+        ADD R2, R2, #0
+LOOP    BRz DONE
+        LDR R3, R1, #0
+        ADD R0, R0, R3
+        ADD R1, R1, #1      ; เดินตัวชี้ +1 word
+        ADD R2, R2, #-1
+        BRnzp LOOP
+DONE    HALT</code></pre>
+<pre><code># RV32I: x10=base, x11=N, x12=ผลรวม
+        addi x12, x0, 0
+loop:   beq  x11, x0, done
+        lw   x13, 0(x10)
+        add  x12, x12, x13
+        addi x10, x10, 4     # เดินตัวชี้ +4 byte
+        addi x11, x11, -1
+        jal  x0, loop
+done:</code></pre>
+<table><thead><tr><th>จุดตรวจ</th><th>x10</th><th>x11</th><th>x12</th></tr></thead><tbody>
+<tr><td>ก่อนเข้าลูป</td><td>0x2000</td><td>3</td><td>0</td></tr>
+<tr><td>จบรอบ 1 (อ่าน 10)</td><td>0x2004</td><td>2</td><td>10</td></tr>
+<tr><td>จบรอบ 2 (อ่าน 20)</td><td>0x2008</td><td>1</td><td>30</td></tr>
+<tr><td>จบรอบ 3 (อ่าน 30)</td><td>0x200C</td><td>0</td><td>60</td></tr>
+</tbody></table>
+<div class="answer">รอบ 4: beq x11,x0 เห็น x11=0 → กระโดดออกไป done, x12=60=10+20+30 ✓</div></div>
+<div class="mermaid">
+flowchart TD
+    S["sum ← 0"] --> C{"N == 0 ?"}
+    C -- "ใช่" --> D["done: ผลรวมพร้อมใช้"]
+    C -- "ไม่" --> L["โหลดสมาชิก, sum += สมาชิก"]
+    L --> P["ตัวชี้ += 4 byte, N -= 1"]
+    P --> C
+</div>
+<p><b>จุดต่างชัดเจน:</b> (1) LC-3 เดินตัวชี้ +1 แต่ RV32I เดิน +4 byte เพราะ word ห่างกัน 4 byte (2) เคลียร์ศูนย์: LC-3 ใช้ AND #0, RV32I ใช้ addi ร่วมกับ x0 (3) วนลูปไม่มีเงื่อนไขใน RV32I ใช้ jal x0,loop</p>
+
+<div class="callout tip"><span class="cal-label">เกริ่นโปรเจกต์ปลายภาค: สร้าง CPU RV32I subset</span>ความเข้าใจเรื่องโมเดลหน่วยความจำ endianness และ addressing เป็นพื้นฐานของโปรเจกต์ปลายภาค — ออกแบบและจำลอง CPU ที่รัน RV32I subset ขอบเขตแนะนำ: รองรับกลุ่มคำสั่งหลัก (add, sub, and, or, xor, slt, addi, lw, sw, beq, bne, blt, jal, jalr), datapath แบบ single-cycle ก่อนแล้วค่อยขยายเป็น pipeline, หน่วยความจำต้องเป็น byte-addressable และ little-endian ให้ตรงมาตรฐาน</div>
+
+<h3>ทบทวนความเข้าใจ</h3>
+<div class="qa"><p class="q">Q: เก็บ 0x11223344 ด้วย sw ที่ address A บน RV32I (little-endian) แล้วอ่าน lbu จาก A+0 ได้ค่าใด</p><p class="a"><b>A:</b> 0x44 — least-significant byte อยู่ address ต่ำสุดเสมอ</p></div>
+<div class="qa"><p class="q">Q: ลูปบวกอาเรย์เวอร์ชัน RV32I ต้องเพิ่มตัวชี้ครั้งละกี่ byte เพื่อเลื่อนไป word ถัดไป</p><p class="a"><b>A:</b> 4 byte (word=32 บิต=4 byte) เทียบกับ LC-3 ที่เลื่อนทีละ 1 เพราะ word-addressable</p></div>
+<div class="refs"><p class="rt">อ้างอิง</p><ul><li>D. Patterson และ J. Hennessy, <i>Computer Organization and Design (RISC-V Edition)</i> — บทที่ 2</li><li>Y. Patt และ S. Patel, <i>Introduction to Computing Systems</i> — ส่วน LC-3 (บทที่ 1–9)</li></ul></div>
+</section>
+
+
+  </main>
+</div>
+<script>
+(function(){
+  var mermaidDivs = Array.prototype.slice.call(document.querySelectorAll('.mermaid'));
+  mermaidDivs.forEach(function(el){ el.setAttribute('data-mermaid-src', el.textContent); });
+  function currentMermaidTheme(){
+    var rt = (window.__resolvedTheme ? window.__resolvedTheme(window.__bookTheme) : 'light');
+    return rt === 'dark' ? 'dark' : 'default';
+  }
+  function renderMermaid(){
+    if (typeof mermaid === 'undefined') return;
+    mermaidDivs.forEach(function(el){
+      el.removeAttribute('data-processed');
+      el.innerHTML = el.getAttribute('data-mermaid-src');
+    });
+    mermaid.initialize({ startOnLoad: false, theme: currentMermaidTheme(), securityLevel: 'loose' });
+    mermaid.run({ querySelector: '.mermaid' });
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    renderMermaid();
+    var btn = document.getElementById('themeToggle');
+    if(btn){ btn.addEventListener('click', function(){ setTimeout(renderMermaid, 30); }); }
+  });
+})();
+</script>
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); }).filter(Boolean);
+  function onScroll(){
+    var pos = window.scrollY + 120;
+    var current = null;
+    targets.forEach(function(t){ if (t.offsetTop <= pos) current = t; });
+    links.forEach(function(a){ a.classList.remove('active'); });
+    if (current){
+      var link = document.querySelector('#toc a[href="#' + current.id + '"]');
+      if (link) link.classList.add('active');
+    }
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+})();
+</script>
+</body>
+</html>
