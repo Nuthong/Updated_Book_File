@@ -65,6 +65,11 @@ header p{margin:0;font-size:14px;color:#C9C2AE;}
 :root[data-theme="dark"] .chapter-title{color:var(--navy);}
 .chapter-desc{font-size:13px;color:var(--text-soft);margin-top:3px;}
 .chapter-arrow{font-size:18px;color:var(--accent2);flex-shrink:0;}
+.section-divider{margin:26px 0 4px;padding-top:14px;border-top:2px solid var(--border);}
+.section-divider h2{margin:0 0 3px;font-size:15px;color:var(--navy-deep);}
+:root[data-theme="dark"] .section-divider h2{color:var(--navy);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .section-divider h2{color:var(--navy);}}
+.section-divider p{margin:0;font-size:12.5px;color:var(--text-soft);}
 footer{text-align:center;padding:20px;font-size:12px;color:var(--text-soft);}
 </style>
 </head>
@@ -242,6 +247,59 @@ footer{text-align:center;padding:20px;font-size:12px;color:var(--text-soft);}
   <div class="chapter-info">
     <div class="chapter-title">Topic 12: Single-Cycle Datapath &amp; Control (V3 — มีแบบฝึกหัดโต้ตอบ)</div>
     <div class="chapter-desc">ฉบับล่าสุด — มีตัวจำลอง Datapath แบบโต้ตอบและคำถามแบบคลิกตอบ (อัปโหลด 17 ก.ย. 2569)</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+
+<div class="section-divider">
+  <h2>สรุปเสริมจากหนังสือ Patterson &amp; Hennessy</h2>
+  <p>Computer Organization and Design (RISC-V Edition) — เนื้อหาคู่ขนานกับ Topic ด้านบน แต่อิงตำราเล่มนี้โดยตรง ละเอียดกว่าและครอบคลุมกว้างกว่า</p>
+</div>
+<a class="chapter-card" href="PH_Chapter1_Computer_Abstractions_and_Technology.html">
+  <div class="chapter-icon">📘</div>
+  <div class="chapter-info">
+    <div class="chapter-title">P&amp;H บทที่ 1: Computer Abstractions and Technology</div>
+    <div class="chapter-desc">การนิยามสมรรถนะ (performance), Response Time/Throughput, Power, Multiprocessors, Benchmarks</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="PH_Chapter2_Instructions_Language_of_the_Computer.html">
+  <div class="chapter-icon">📘</div>
+  <div class="chapter-info">
+    <div class="chapter-title">P&amp;H บทที่ 2: Instructions — Language of the Computer</div>
+    <div class="chapter-desc">ชุดคำสั่ง RISC-V, ตัวถูกดำเนินการแบบรีจิสเตอร์/หน่วยความจำ, การแทนคำสั่งและข้อมูล (41 หัวข้อย่อย ละเอียดที่สุด)</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="PH_Chapter3_Arithmetic_for_Computers.html">
+  <div class="chapter-icon">📘</div>
+  <div class="chapter-info">
+    <div class="chapter-title">P&amp;H บทที่ 3: Arithmetic for Computers</div>
+    <div class="chapter-desc">การบวก/ลบเลขจำนวนเต็มและ overflow, เลขคณิตมัลติมีเดีย (SIMD), การคูณ/หาร, จุดลอยตัว</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="PH_Chapter4_The_Processor.html">
+  <div class="chapter-icon">📘</div>
+  <div class="chapter-info">
+    <div class="chapter-title">P&amp;H บทที่ 4: The Processor</div>
+    <div class="chapter-desc">Datapath แบบ Single-Cycle และ Pipelined, Control Unit, ปัญหาสมรรถนะและ Hazard</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="PH_Chapter5_Large_and_Fast_Memory_Hierarchy.html">
+  <div class="chapter-icon">📘</div>
+  <div class="chapter-info">
+    <div class="chapter-title">P&amp;H บทที่ 5: Large and Fast — Exploiting Memory Hierarchy</div>
+    <div class="chapter-desc">หลักการ Locality, ลำดับชั้นหน่วยความจำ, เทคโนโลยี Memory/DRAM, Cache</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="PH_Chapter6_Parallel_Processors_Client_to_Cloud.html">
+  <div class="chapter-icon">📘</div>
+  <div class="chapter-info">
+    <div class="chapter-title">P&amp;H บทที่ 6: Parallel Processors from Client to Cloud</div>
+    <div class="chapter-desc">Serial vs Parallel, ความยากของการเขียนโปรแกรมขนาน, สถาปัตยกรรมมัลติคอร์</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
