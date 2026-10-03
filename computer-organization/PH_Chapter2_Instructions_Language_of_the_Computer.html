@@ -1586,7 +1586,7 @@ function renderContent(){
     let html = "<h2>"+escHtml(sec.title)+"</h2>";
     const games = sec.games || [];
     games.forEach((g,gi)=>{
-      html += renderGameHtml(idx, gi, g);
+      if(g.type === "predict") html += renderGameHtml(idx, gi, g);
     });
     if(sec.body){
       html += '<div class="body-text">'+escHtml(sec.body)+'</div>';
