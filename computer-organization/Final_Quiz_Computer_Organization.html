@@ -733,6 +733,17 @@ header .view-controls .vc-sep{width:1px;background:rgba(242,239,230,0.3);}
 .back-to-index:hover{opacity:1;text-decoration:underline;}
 @media print{.back-to-index{display:none;}}
 </style>
+
+<style>
+.practice-status{margin-top:10px;font-size:0.84375rem;color:var(--text-soft);line-height:1.6;}
+.practice-status:empty{display:none;}
+.practice-status b.ok{color:var(--correct);} .practice-status b.ng{color:var(--incorrect);}
+.q-card .q-prompt .rad label .pmk{font-weight:700;margin-left:6px;}
+.q-card .q-prompt .rad label.pick-correct .pmk{color:var(--correct);}
+.q-card .q-prompt .rad label.pick-incorrect .pmk{color:var(--incorrect);}
+.q-card .q-prompt .rad .pmk-blank{display:block;font-size:0.8125rem;color:var(--text-soft);margin:2px 0 0 8px;}
+@media print{.practice-btn,.practice-status{display:none !important;}}
+</style>
 </head>
 <body>
 
@@ -1065,6 +1076,7 @@ let order = "original";
 let displayIndexes = QUESTIONS.map((q,i)=>i);
 let userAnswers = {};
 let checked = {};
+let practice = {};
 
 let timerMode = "stopwatch";
 let timerSeconds = 0;
@@ -1355,9 +1367,78 @@ function updateScore(){
   scoreBox.style.display = "block";
 }
 
+/* ===== practice check: re-checkable, no lock, no reveal, not scored ===== */
+function runPractice(qIdx){
+  const q = QUESTIONS[qIdx];
+  const prev = practice[qIdx];
+  const res = {};
+  q.subs.forEach((sub, s)=>{
+    const v = userAnswers[subKey(qIdx, s)];
+    res[s] = (v === undefined || v === "") ? null : checkSubAnswer(q, s, v);
+  });
+  practice[qIdx] = {count: (prev ? prev.count : 0) + 1, res: res, stale: {}};
+  applyPractice(qIdx);
+}
+
+// state: true = correct, false = wrong, null = blank, undefined = clear mark
+function practiceMarkSub(qIdx, s, state){
+  const wrap = document.getElementById("sitem_"+subKey(qIdx, s));
+  if(!wrap) return;
+  wrap.querySelectorAll(".pmk").forEach(m=>m.remove());
+  if(wrap.classList.contains("rad")){
+    wrap.querySelectorAll("label").forEach(l=>l.classList.remove("pick-correct","pick-incorrect"));
+    if(state === undefined) return;
+    if(state === null){ wrap.insertAdjacentHTML("beforeend", '<span class="pmk pmk-blank">— ยังไม่ได้เลือก</span>'); return; }
+    const inp = wrap.querySelector('input[type=radio]:checked');
+    if(!inp) return;
+    const lab = inp.closest("label");
+    lab.classList.add(state ? "pick-correct" : "pick-incorrect");
+    lab.insertAdjacentHTML("beforeend", '<span class="pmk">'+(state ? '✓' : '✗')+'</span>');
+    return;
+  }
+  wrap.classList.remove("correct","incorrect");
+  if(state === undefined) return;
+  if(state !== null) wrap.classList.add(state ? "correct" : "incorrect");
+  wrap.insertAdjacentHTML("beforeend", '<span class="mk pmk">'+(state === null ? '?' : (state ? '✓' : '✗'))+'</span>');
+}
+
+function applyPractice(qIdx){
+  const p = practice[qIdx];
+  const st = document.getElementById("pstat_"+qIdx);
+  if(!p || checked[qIdx]){ if(st) st.innerHTML = ""; return; }
+  const q = QUESTIONS[qIdx];
+  const total = q.subs.length;
+  let ok = 0, blank = 0, edited = 0;
+  q.subs.forEach((sub, s)=>{
+    if(p.stale[s]){ edited++; practiceMarkSub(qIdx, s, undefined); return; }
+    const r = p.res[s];
+    if(r === true) ok++; else if(r === null) blank++;
+    practiceMarkSub(qIdx, s, r);
+  });
+  let h = '🔁 ตรวจซ้ำครั้งที่ '+p.count+': ถูก <b class="'+(ok === total ? 'ok' : 'ng')+'">'+ok+'/'+total+'</b> ช่อง';
+  if(blank) h += ' · ยังว่าง '+blank+' ช่อง';
+  if(edited) h += ' · แก้แล้ว '+edited+' ช่อง (ยังไม่ได้ตรวจซ้ำ)';
+  if(ok === total) h += ' — ถูกครบแล้ว กด "ตรวจคำตอบข้อนี้" เพื่อบันทึกคะแนน';
+  if(st) st.innerHTML = h;
+}
+
+function applyAllPractice(){
+  Object.keys(practice).forEach(k=>applyPractice(parseInt(k, 10)));
+}
+
+function clearPracticeMark(key){
+  const parts = String(key).split("_");
+  const qIdx = parseInt(parts[0], 10), s = parseInt(parts[1], 10);
+  const p = practice[qIdx];
+  if(!p || p.stale[s]) return;
+  p.stale[s] = true;
+  applyPractice(qIdx);
+}
+
 function resetAll(){
   userAnswers = {};
   checked = {};
+  practice = {};
   render();
 }
 
@@ -1409,6 +1490,7 @@ function renderExercise(){
     html += '<div class="footer-actions">';
     if(!isChecked){
       html += '<button class="check-btn" data-qidx="'+qIdx+'">ตรวจคำตอบข้อนี้</button>';
+      html += '<button class="secondary practice-btn" data-qidx="'+qIdx+'" title="ตรวจได้หลายครั้ง ไม่ล็อกช่อง ไม่เฉลย และไม่นับคะแนน">🔁 ตรวจซ้ำ (ไม่ล็อก)</button>';
     }
     if(q.formula){
       html += '<button class="secondary hint-btn" data-qidx="'+qIdx+'">💡 คำใบ้</button>';
@@ -1417,6 +1499,9 @@ function renderExercise(){
       html += '<button class="secondary calc-open-btn" data-qidx="'+qIdx+'">🧮 เครื่องคิดเลข</button>';
     }
     html += '</div>';
+    if(!isChecked){
+      html += '<div class="practice-status" id="pstat_'+qIdx+'" aria-live="polite"></div>';
+    }
     if(q.formula){
       html += '<div class="hint-box" id="hintbox_'+qIdx+'" style="display:none">'+escHtml(q.formula)+'</div>';
     }
@@ -1440,6 +1525,7 @@ function renderExercise(){
       if(!key) return;
       if(e.target.type==="radio" && !e.target.checked) return;
       userAnswers[key] = e.target.value;
+      clearPracticeMark(key);
       if(e.target.type!=="radio"){
         main.querySelectorAll('[data-key="'+key+'"]').forEach(other=>{
           if(other !== e.target && other.type!=="radio" && other.value !== e.target.value) other.value = e.target.value;
@@ -1455,7 +1541,14 @@ function renderExercise(){
     btn.addEventListener("click", (e)=>{
       const qIdx = parseInt(e.target.getAttribute("data-qidx"));
       checked[qIdx] = true;
+      delete practice[qIdx];
       renderExercise();
+    });
+  });
+
+  main.querySelectorAll(".practice-btn").forEach(btn=>{
+    btn.addEventListener("click", (e)=>{
+      runPractice(parseInt(e.currentTarget.getAttribute("data-qidx"), 10));
     });
   });
 
@@ -1477,6 +1570,7 @@ function renderExercise(){
 
   renderNavGrid();
   updateScore();
+  applyAllPractice();
   renderMath(document.getElementById("mainArea"));
 }
 
