@@ -744,6 +744,12 @@ header .view-controls .vc-sep{width:1px;background:rgba(242,239,230,0.3);}
 .q-card .q-prompt .rad .pmk-blank{display:block;font-size:0.8125rem;color:var(--text-soft);margin:2px 0 0 8px;}
 @media print{.practice-btn,.practice-status{display:none !important;}}
 </style>
+
+<style>
+.chapter-divider{margin:26px 0 12px;padding:10px 14px;border-left:4px solid var(--accent2);background:var(--accent-soft);border-radius:6px;color:var(--heading);font-weight:700;font-size:0.9375rem;}
+.chapter-divider:first-child{margin-top:0;}
+.chapter-divider small{display:block;font-weight:400;font-size:0.8125rem;color:var(--text);margin-top:2px;}
+</style>
 </head>
 <body>
 
@@ -761,6 +767,7 @@ header .view-controls .vc-sep{width:1px;background:rgba(242,239,230,0.3);}
     <select id="orderSelect">
       <option value="original">เรียงตามต้นฉบับ</option>
       <option value="shuffle">สลับข้อ</option>
+      <option value="chapter">เรียงตามบท (LC-3 I/O → บท 1–5)</option>
     </select>
     <select id="timerModeSelect">
       <option value="stopwatch">นับขึ้น</option>
@@ -1073,6 +1080,23 @@ function sanitizePromptHtml(str){
 let mode = "exercise";
 let calcCurrentSlotId = null;
 let order = "original";
+/* order-by-chapter: oldest material (LC-3 I/O) first, then P&H ch.1 -> ch.5; ch.6 has no quiz questions */
+const QUIZ_CHAPTERS = [{"label": "Topic 9 — LC-3 Input/Output", "q": [9, 17, 36]}, {"label": "P&H บทที่ 1 — สมรรถนะและ power wall", "q": [7, 14, 16, 25, 28, 39, 40]}, {"label": "P&H บทที่ 2 — ชุดคำสั่ง RISC-V", "q": [3, 4, 5, 20, 24]}, {"label": "P&H บทที่ 3 — เลขคณิตของคอมพิวเตอร์", "q": [8, 26, 41]}, {"label": "P&H บทที่ 4 — Processor และ pipeline", "q": [13, 15, 18, 21, 22, 23, 27, 32, 33, 34, 35, 37]}, {"label": "P&H บทที่ 5 — ลำดับชั้นหน่วยความจำและแคช", "q": [1, 2, 6, 10, 11, 12, 19, 29, 30, 31, 38, 42, 43]}];
+function chapterOrder(){
+  return QUIZ_CHAPTERS.reduce((a, ch)=>a.concat(ch.q.map(n=>n-1)), []);
+}
+function appendChapterDivider(main, qIdx){
+  if(order !== "chapter") return;
+  const ci = QUIZ_CHAPTERS.findIndex(ch=>ch.q[0]-1 === qIdx);
+  if(ci < 0) return;
+  const ch = QUIZ_CHAPTERS[ci];
+  const d = document.createElement("div");
+  d.className = "chapter-divider";
+  let note = ch.q.length+' ข้อ · ข้อเดิมที่ '+ch.q.join(", ");
+  if(ci === QUIZ_CHAPTERS.length-1) note += ' · (P&H บทที่ 6 ไม่มีข้อใน Quiz)';
+  d.innerHTML = escHtml(ch.label)+'<small>'+escHtml(note)+'</small>';
+  main.appendChild(d);
+}
 let displayIndexes = QUESTIONS.map((q,i)=>i);
 let userAnswers = {};
 let checked = {};
@@ -1467,11 +1491,12 @@ function renderExercise(){
   main.innerHTML = "";
   displayIndexes.forEach((qIdx, pos)=>{
     const q = QUESTIONS[qIdx];
+    appendChapterDivider(main, qIdx);
     const isChecked = !!checked[qIdx];
     const card = document.createElement("div");
     card.className = "q-card";
     card.id = "qcard_"+qIdx;
-    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
+    let html = '<div class="q-index">ข้อ '+(pos+1)+(order==="chapter" ? ' · ข้อเดิมที่ '+(qIdx+1) : '')+'</div>';
     const usedSubs = new Set();
     html += '<div class="q-prompt">'+(q.inline ? renderInlinePrompt(q, qIdx, isChecked, usedSubs, false) : sanitizePromptHtml(q.prompt))+'</div>';
     if(Array.isArray(q.layout) && q.layout.length){
@@ -1603,10 +1628,11 @@ function renderAnswers(){
   let subTotal = 0;
   displayIndexes.forEach((qIdx, pos)=>{
     const q = QUESTIONS[qIdx];
+    appendChapterDivider(main, qIdx);
     const card = document.createElement("div");
     card.className = "q-card";
     card.id = "qcard_"+qIdx;
-    let html = '<div class="q-index">ข้อ '+(pos+1)+'</div>';
+    let html = '<div class="q-index">ข้อ '+(pos+1)+(order==="chapter" ? ' · ข้อเดิมที่ '+(qIdx+1) : '')+'</div>';
     const usedSubs = new Set();
     html += '<div class="q-prompt">'+(q.inline ? renderInlinePrompt(q, qIdx, false, usedSubs, true) : sanitizePromptHtml(q.prompt))+'</div>';
     if(Array.isArray(q.layout) && q.layout.length){
@@ -1663,7 +1689,7 @@ document.getElementById("btnAnswerMode").onclick = ()=>{
 };
 document.getElementById("orderSelect").onchange = (e)=>{
   order = e.target.value;
-  displayIndexes = order==="shuffle" ? shuffleArray(QUESTIONS.map((q,i)=>i)) : QUESTIONS.map((q,i)=>i);
+  displayIndexes = order==="shuffle" ? shuffleArray(QUESTIONS.map((q,i)=>i)) : (order==="chapter" ? chapterOrder() : QUESTIONS.map((q,i)=>i));
   render();
 };
 
