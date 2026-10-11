@@ -1648,6 +1648,20 @@ renderTOC();
 renderContent();
 setupScrollSpy();
 setupTocPanel();
+function setupReveal(){
+  const cards = document.querySelectorAll('.section-card');
+  if(!('IntersectionObserver' in window)){
+    cards.forEach(function(c){ c.classList.add('revealed'); });
+    return;
+  }
+  const io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.08, rootMargin:'0px 0px -60px 0px'});
+  cards.forEach(function(c){ io.observe(c); });
+}
+setupReveal();
 function setupTocPanel(){
   const panel = document.getElementById("tocPanel");
   if(panel && window.matchMedia("(max-width:800px)").matches){
