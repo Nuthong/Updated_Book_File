@@ -652,6 +652,32 @@ header .view-controls .vc-sep{width:1px;background:rgba(242,239,230,0.3);}
 .back-to-index:hover{opacity:1;text-decoration:underline;}
 @media print{.back-to-index{display:none;}}
 </style>
+<style>/* a11y-fix 2026-11 */
+:root:not([data-theme="dark"]) .callout-example .callout-title{color:#886321;}
+:root[data-theme="dark"] .callout-note .callout-title{color:#7FB0E0;}
+:root[data-theme="dark"] .section-card a{color:#7FB0E0;}
+:root[data-theme="dark"] .toc-list a:hover{color:#7FB0E0;}
+:root[data-theme="dark"] .src-ref,:root[data-theme="dark"] .toc-tab-label,:root[data-theme="dark"] .tab-bar .tab-count{color:#B8B4A6;}
+.katex-display{overflow-x:auto;overflow-y:hidden;}
+.section-card .body-text{overflow-wrap:break-word;}
+.section-card{overflow-wrap:break-word;}
+.section-card a{overflow-wrap:anywhere;}
+.section-card td,.section-card th{overflow-wrap:anywhere;}
+@media (max-width:700px){.section-card > table{display:block;overflow-x:auto;max-width:100%;}}
+</style>
+<style>/* a11y-fix 2026-11 calc */
+#calcModal .linecalc-empty,.calc-slot .linecalc-empty,.linecalc-empty{color:#9DB0C4 !important;}
+#calcModal .lc-placeholder,.lc-placeholder{color:#6B6558 !important;}
+:root[data-theme="dark"] #calcModal .lc-placeholder,:root[data-theme="dark"] .lc-placeholder{color:#ADA99B !important;}
+#calcModal .deg-toggle button{color:var(--text);}
+:root[data-theme="dark"] #calcModal .chipbtn.active,:root[data-theme="dark"] #calcModal .deg-toggle button.active,
+:root[data-theme="dark"] #calcModal .calc-grid button.eq,:root[data-theme="dark"] #calcModal button.primary{color:#0F1620;}
+:root[data-theme="dark"] #calcModal .calc-grid button.op{color:#8EC1F2;}
+</style>
+<style>/* a11y-fix 2026-11 sort */
+.sort-item{max-width:100%;min-width:0;flex-wrap:wrap;}
+.sort-item select{max-width:100%;min-width:0;}
+</style>
 </head>
 <body>
 

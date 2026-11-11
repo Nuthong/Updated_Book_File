@@ -750,6 +750,31 @@ header .view-controls .vc-sep{width:1px;background:rgba(242,239,230,0.3);}
 .chapter-divider:first-child{margin-top:0;}
 .chapter-divider small{display:block;font-weight:400;font-size:0.8125rem;color:var(--text);margin-top:2px;}
 </style>
+<style>/* a11y-fix 2026-11 */
+:root:not([data-theme="dark"]) #resetAllBtn,:root:not([data-theme="dark"]) #retryWrongBtn{color:#886321 !important;}
+:root[data-theme="dark"] .nav-cell.answered{color:#7FB0E0;}
+.q-card .q-prompt .inl{max-width:100%;}
+.q-card .q-prompt .inl select{max-width:100%;min-width:0;}
+.q-card .katex-display{overflow-x:auto;overflow-y:hidden;}
+html.in-frame .back-to-index{display:none;}
+</style>
+<script>if(window.self !== window.top) document.documentElement.classList.add("in-frame");</script>
+<style>/* a11y-fix 2026-11 quiz */
+.step-content,.q-prompt{overflow-wrap:anywhere;}
+.step-content{overflow-wrap:anywhere;}
+:root:not([data-theme="dark"]) #resetAllBtn,:root:not([data-theme="dark"]) #retryWrongBtn{color:#886321 !important;}
+:root:not([data-theme="dark"]) .step-item.step-why .step-num{background:#886321;}
+:root:not([data-theme="dark"]) .step-item.step-why .step-label,:root:not([data-theme="dark"]) .flag-badge,:root:not([data-theme="dark"]) .hint-btn{color:#886321;}
+</style>
+<style>/* a11y-fix 2026-11 calc */
+#calcModal .linecalc-empty,.calc-slot .linecalc-empty,.linecalc-empty{color:#9DB0C4 !important;}
+#calcModal .lc-placeholder,.lc-placeholder{color:#6B6558 !important;}
+:root[data-theme="dark"] #calcModal .lc-placeholder,:root[data-theme="dark"] .lc-placeholder{color:#ADA99B !important;}
+#calcModal .deg-toggle button{color:var(--text);}
+:root[data-theme="dark"] #calcModal .chipbtn.active,:root[data-theme="dark"] #calcModal .deg-toggle button.active,
+:root[data-theme="dark"] #calcModal .calc-grid button.eq,:root[data-theme="dark"] #calcModal button.primary{color:#0F1620;}
+:root[data-theme="dark"] #calcModal .calc-grid button.op{color:#8EC1F2;}
+</style>
 </head>
 <body>
 

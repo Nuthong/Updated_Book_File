@@ -663,6 +663,21 @@ table{font-size:calc(13.5px * var(--fontScale)) !important;}
   border:1.5px solid var(--border);font-size:13px;line-height:1.6;color:var(--text);min-height:20px;}
 
 </style>
+<style>/* a11y-fix 2026-11 calc */
+#calcModal .linecalc-empty,.calc-slot .linecalc-empty,.linecalc-empty{color:#9DB0C4 !important;}
+#calcModal .lc-placeholder,.lc-placeholder{color:#6B6558 !important;}
+:root[data-theme="dark"] #calcModal .lc-placeholder,:root[data-theme="dark"] .lc-placeholder{color:#ADA99B !important;}
+#calcModal .deg-toggle button{color:var(--text);}
+:root[data-theme="dark"] #calcModal .chipbtn.active,:root[data-theme="dark"] #calcModal .deg-toggle button.active,
+:root[data-theme="dark"] #calcModal .calc-grid button.eq,:root[data-theme="dark"] #calcModal button.primary{color:#0F1620;}
+:root[data-theme="dark"] #calcModal .calc-grid button.op{color:#8EC1F2;}
+:root[data-theme="dark"] #calcModal .chipbtn:not(.active),:root[data-theme="dark"] #calcModal .st-table input,
+:root[data-theme="dark"] #calcModal .st-tablebtns button,:root[data-theme="dark"] #calcModal .calc-grid button:not(.eq),
+:root[data-theme="dark"] #calcModal .lc-mathfield,:root[data-theme="dark"] #calcModal .lc-kb-row button,
+:root[data-theme="dark"] #calcModal .deg-toggle button:not(.active){background:var(--panel);}
+:root[data-theme="dark"] #calcModal .chipbtn.active,:root[data-theme="dark"] #calcModal .deg-toggle button.active,
+:root[data-theme="dark"] #calcModal .calc-grid button.eq{background:var(--navy);}
+</style>
 </head>
 <body>
 
