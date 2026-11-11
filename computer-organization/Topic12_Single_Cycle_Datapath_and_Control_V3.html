@@ -1077,6 +1077,49 @@ svg.g5-rvdp-svg{display:block;width:100%;height:auto;aspect-ratio:740/420;margin
   });
 })();
 </script>
+<style>
+/* a11y-fix 2026-11 site */
+:root[data-theme="dark"] #fontCtrl button,:root[data-theme="dark"] .theme-toggle-btn,:root[data-theme="dark"] .calc-toggle-btn{color:var(--text);}
+:root[data-theme="dark"] .diagram-block h4,:root[data-theme="dark"] .diagram-block h4 span{color:var(--text);}
+:root[data-theme="dark"] .diagram-actor-label,:root[data-theme="dark"] .diagram-arrow-label{fill:#E4E7EC;}
+.bw-sdlc-node.bw-active .bw-sdlc-dot{color:#F2EFE6;}
+:root:not([data-theme="dark"]) .callout-example:not(.callout-quiz) .callout-title{color:#886321;}
+:root[data-theme="dark"] #fontCtrl button,:root[data-theme="dark"] .theme-toggle-btn,:root[data-theme="dark"] .header-actions button,
+:root[data-theme="dark"] .calc-toggle-btn,:root[data-theme="dark"] .diagram-play-btn{background:var(--panel);}
+:root[data-theme="dark"] .section-card h2,:root[data-theme="dark"] .section-card h3,:root[data-theme="dark"] .diagram-block{color:var(--text);}
+:root[data-theme="dark"] .callout-example{background:var(--flag-soft, #332a17);}
+:root[data-theme="dark"] table tr:nth-child(2n) td{background:rgba(255,255,255,0.04);}
+:root[data-theme="dark"] .section-card pre{background:var(--panel) !important;color:var(--text) !important;}
+:root[data-theme="dark"] .diagram-steps-list .step-num,:root[data-theme="dark"] .game-btn:not(.ghost):not(.secondary){color:#0F1620;}
+:root[data-theme="dark"] .section-card a:not([class]),:root[data-theme="dark"] main a:not([class]){color:#8EC1F2;}
+:root[data-theme="dark"] .refs,:root[data-theme="dark"] .refs li,:root[data-theme="dark"] .refs i{color:#B8C2CF;}
+.section-card,.callout,.body-text{overflow-wrap:break-word;}
+.section-card a,.section-card td,.section-card th{overflow-wrap:anywhere;}
+.katex-display{overflow-x:auto;overflow-y:hidden;}
+.section-card pre,.section-card .code-block{overflow-x:auto;max-width:100%;}
+.section-card img,.section-card svg{max-width:100%;height:auto;}
+@media (max-width:700px){
+  .section-card table,.table-wrap table{display:block;overflow-x:auto;max-width:100%;}
+  .diagram-block,.diagram-wrap{overflow-x:auto;max-width:100%;}
+}
+</style>
+<style>/* a11y-fix 2026-11 v3 */
+:root[data-theme="light"] .g3-x,:root[data-theme="light"] .g3-hint,:root[data-theme="light"] .g3-mapph,:root[data-theme="light"] .g2-lab,:root[data-theme="light"] .g2-bit:not(.on),:root[data-theme="light"] .g5-stackframe-laddr,:root[data-theme="light"] .g5-stackframe-lcm,:root[data-theme="light"] .g5-stackframe-lcode,:root[data-theme="light"] .g5-stackframe-rd,:root[data-theme="light"] .g5-lisplit-rule:not(.g5-lisplit-ruleon),:root[data-theme="light"] .g3-hwarrow,:root[data-theme="light"] .hp-arrow,:root[data-theme="light"] .g5-rvdp-f:not(.on){color:#475569;}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .g3-x,:root:not([data-theme="dark"]) .g3-hint,:root:not([data-theme="dark"]) .g3-mapph,:root:not([data-theme="dark"]) .g2-lab,:root:not([data-theme="dark"]) .g2-bit:not(.on),:root:not([data-theme="dark"]) .g5-stackframe-laddr,:root:not([data-theme="dark"]) .g5-stackframe-lcm,:root:not([data-theme="dark"]) .g5-stackframe-lcode,:root:not([data-theme="dark"]) .g5-stackframe-rd,:root:not([data-theme="dark"]) .g5-lisplit-rule:not(.g5-lisplit-ruleon),:root:not([data-theme="dark"]) .g3-hwarrow,:root:not([data-theme="dark"]) .hp-arrow,:root:not([data-theme="dark"]) .g5-rvdp-f:not(.on){color:#475569;}}
+:root[data-theme="dark"] .g3-x,:root[data-theme="dark"] .g3-hint,:root[data-theme="dark"] .g3-mapph,:root[data-theme="dark"] .g2-lab,:root[data-theme="dark"] .g2-bit:not(.on),:root[data-theme="dark"] .g5-stackframe-laddr,:root[data-theme="dark"] .g5-stackframe-lcm,:root[data-theme="dark"] .g5-stackframe-lcode,:root[data-theme="dark"] .g5-stackframe-rd,:root[data-theme="dark"] .g5-lisplit-rule:not(.g5-lisplit-ruleon),:root[data-theme="dark"] .g3-hwarrow,:root[data-theme="dark"] .hp-arrow,:root[data-theme="dark"] .g5-rvdp-f:not(.on){color:#A3B0C2;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .g3-x,:root:not([data-theme="light"]) .g3-hint,:root:not([data-theme="light"]) .g3-mapph,:root:not([data-theme="light"]) .g2-lab,:root:not([data-theme="light"]) .g2-bit:not(.on),:root:not([data-theme="light"]) .g5-stackframe-laddr,:root:not([data-theme="light"]) .g5-stackframe-lcm,:root:not([data-theme="light"]) .g5-stackframe-lcode,:root:not([data-theme="light"]) .g5-stackframe-rd,:root:not([data-theme="light"]) .g5-lisplit-rule:not(.g5-lisplit-ruleon),:root:not([data-theme="light"]) .g3-hwarrow,:root:not([data-theme="light"]) .hp-arrow,:root:not([data-theme="light"]) .g5-rvdp-f:not(.on){color:#A3B0C2;}}
+:root[data-theme="dark"] .hp-reset,:root[data-theme="dark"] .il-time{color:#A5B4FC;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hp-reset,:root:not([data-theme="light"]) .il-time{color:#A5B4FC;}}
+:root[data-theme="light"] .hp-btn:disabled{color:#334155;}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .hp-btn:disabled{color:#334155;}}
+</style>
+<style>/* a11y-fix 2026-11 tables */
+.topic-section{overflow-wrap:anywhere;}
+@media (max-width:700px){.topic-section{overflow-x:auto;}}
+@media (max-width:700px){table{display:block;overflow-x:auto;max-width:100%;}
+.g5-stackframe-grp{flex-wrap:wrap;max-width:100%;}
+.g5-stackframe-sel{max-width:100%;min-width:0;}}
+</style>
 </head>
 <body>
 <div class="layout">

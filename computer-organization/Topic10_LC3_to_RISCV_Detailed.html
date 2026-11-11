@@ -231,6 +231,32 @@ tbody tr:nth-child(even){background:var(--surface);}
   });
 })();
 </script>
+<style>
+/* a11y-fix 2026-11 site */
+:root[data-theme="dark"] #fontCtrl button,:root[data-theme="dark"] .theme-toggle-btn,:root[data-theme="dark"] .calc-toggle-btn{color:var(--text);}
+:root[data-theme="dark"] .diagram-block h4,:root[data-theme="dark"] .diagram-block h4 span{color:var(--text);}
+:root[data-theme="dark"] .diagram-actor-label,:root[data-theme="dark"] .diagram-arrow-label{fill:#E4E7EC;}
+.bw-sdlc-node.bw-active .bw-sdlc-dot{color:#F2EFE6;}
+:root:not([data-theme="dark"]) .callout-example:not(.callout-quiz) .callout-title{color:#886321;}
+:root[data-theme="dark"] #fontCtrl button,:root[data-theme="dark"] .theme-toggle-btn,:root[data-theme="dark"] .header-actions button,
+:root[data-theme="dark"] .calc-toggle-btn,:root[data-theme="dark"] .diagram-play-btn{background:var(--panel);}
+:root[data-theme="dark"] .section-card h2,:root[data-theme="dark"] .section-card h3,:root[data-theme="dark"] .diagram-block{color:var(--text);}
+:root[data-theme="dark"] .callout-example{background:var(--flag-soft, #332a17);}
+:root[data-theme="dark"] table tr:nth-child(2n) td{background:rgba(255,255,255,0.04);}
+:root[data-theme="dark"] .section-card pre{background:var(--panel) !important;color:var(--text) !important;}
+:root[data-theme="dark"] .diagram-steps-list .step-num,:root[data-theme="dark"] .game-btn:not(.ghost):not(.secondary){color:#0F1620;}
+:root[data-theme="dark"] .section-card a:not([class]),:root[data-theme="dark"] main a:not([class]){color:#8EC1F2;}
+:root[data-theme="dark"] .refs,:root[data-theme="dark"] .refs li,:root[data-theme="dark"] .refs i{color:#B8C2CF;}
+.section-card,.callout,.body-text{overflow-wrap:break-word;}
+.section-card a,.section-card td,.section-card th{overflow-wrap:anywhere;}
+.katex-display{overflow-x:auto;overflow-y:hidden;}
+.section-card pre,.section-card .code-block{overflow-x:auto;max-width:100%;}
+.section-card img,.section-card svg{max-width:100%;height:auto;}
+@media (max-width:700px){
+  .section-card table,.table-wrap table{display:block;overflow-x:auto;max-width:100%;}
+  .diagram-block,.diagram-wrap{overflow-x:auto;max-width:100%;}
+}
+</style>
 </head>
 <body>
 <div class="layout">
