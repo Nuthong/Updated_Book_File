@@ -662,6 +662,40 @@ main{flex:1;min-width:0;}
   });
 })();
 </script>
+<style>/* a11y-fix 2026-11 quiz */
+.step-content,.q-prompt{overflow-wrap:anywhere;}
+.step-content{overflow-wrap:anywhere;}
+:root:not([data-theme="dark"]) #resetAllBtn,:root:not([data-theme="dark"]) #retryWrongBtn{color:#886321 !important;}
+:root:not([data-theme="dark"]) .step-item.step-why .step-num{background:#886321;}
+:root:not([data-theme="dark"]) .step-item.step-why .step-label,:root:not([data-theme="dark"]) .flag-badge,:root:not([data-theme="dark"]) .hint-btn{color:#886321;}
+:root[data-theme="dark"] .toolbar :is(button,select):not(.mode-toggle *),:root[data-theme="dark"] .theme-toggle-btn,
+:root[data-theme="dark"] .nav-cell,:root[data-theme="dark"] .calc-open-btn,:root[data-theme="dark"] .hint-btn,
+:root[data-theme="dark"] #calcModal .chipbtn,:root[data-theme="dark"] #calcModal .st-table input,:root[data-theme="dark"] #calcModal .st-tablebtns button,
+:root[data-theme="dark"] #calcModal .calc-grid button,:root[data-theme="dark"] #calcModal .lc-mathfield,:root[data-theme="dark"] #calcModal .lc-kb-row button,
+:root[data-theme="dark"] #calcModal .deg-toggle button{background:var(--panel);}
+:root[data-theme="dark"] .nav-cell.answered{background:var(--accent-soft);}
+:root[data-theme="dark"] .nav-cell.correct{background:var(--correct-soft);}
+:root[data-theme="dark"] .nav-cell.incorrect{background:var(--incorrect-soft);}
+:root[data-theme="dark"] .nav-cell{color:var(--text);}
+:root[data-theme="dark"] .footer-actions button:not(.secondary),:root[data-theme="dark"] .check-btn,:root[data-theme="dark"] .step-num{color:#0F1620;}
+:root[data-theme="dark"] .ans-table th{color:#F2EFE6;}
+:root[data-theme="dark"] .mode-toggle button:not(.active){background:var(--panel);}
+</style>
+<style>/* a11y-fix 2026-11 calc */
+#calcModal .linecalc-empty,.calc-slot .linecalc-empty,.linecalc-empty{color:#9DB0C4 !important;}
+#calcModal .lc-placeholder,.lc-placeholder{color:#6B6558 !important;}
+:root[data-theme="dark"] #calcModal .lc-placeholder,:root[data-theme="dark"] .lc-placeholder{color:#ADA99B !important;}
+#calcModal .deg-toggle button{color:var(--text);}
+:root[data-theme="dark"] #calcModal .chipbtn.active,:root[data-theme="dark"] #calcModal .deg-toggle button.active,
+:root[data-theme="dark"] #calcModal .calc-grid button.eq,:root[data-theme="dark"] #calcModal button.primary{color:#0F1620;}
+:root[data-theme="dark"] #calcModal .calc-grid button.op{color:#8EC1F2;}
+:root[data-theme="dark"] #calcModal .chipbtn:not(.active),:root[data-theme="dark"] #calcModal .st-table input,
+:root[data-theme="dark"] #calcModal .st-tablebtns button,:root[data-theme="dark"] #calcModal .calc-grid button:not(.eq),
+:root[data-theme="dark"] #calcModal .lc-mathfield,:root[data-theme="dark"] #calcModal .lc-kb-row button,
+:root[data-theme="dark"] #calcModal .deg-toggle button:not(.active){background:var(--panel);}
+:root[data-theme="dark"] #calcModal .chipbtn.active,:root[data-theme="dark"] #calcModal .deg-toggle button.active,
+:root[data-theme="dark"] #calcModal .calc-grid button.eq{background:var(--navy);}
+</style>
 </head>
 <body>
 
@@ -3194,5 +3228,101 @@ lineCalcRenderEmpty();
 </script>
 
 
+<!-- eab-addon:practice-check v1 -->
+<style>
+.practice-status{margin-top:10px;font-size:0.84375rem;color:var(--text);line-height:1.6;}
+.practice-status:empty{display:none;}
+.practice-status b.ok{color:var(--correct);} .practice-status b.ng{color:var(--incorrect);}
+.pmk{font-weight:700;margin-left:6px;font-size:0.875rem;}
+.correct > .pmk, .pick-correct > .pmk{color:var(--correct);} .incorrect > .pmk, .pick-incorrect > .pmk{color:var(--incorrect);}
+td.correct{background:var(--correct-soft, rgba(37,109,70,0.12));} td.incorrect{background:var(--incorrect-soft, rgba(179,52,31,0.12));}
+@media print{.practice-btn,.practice-status{display:none !important;}}
+</style>
+<script>
+(function(){
+  if(typeof QUESTIONS === "undefined" || typeof checkSubAnswer !== "function" || typeof subKey !== "function") return;
+  const practice = {};
+  const isChecked = q => { try{ return !!checked[q]; }catch(e){ return false; } };
+  function mark(q, s, state){
+    const wrap = document.getElementById("sitem_" + subKey(q, s));
+    if(!wrap) return;
+    wrap.querySelectorAll(".pmk").forEach(m=>m.remove());
+    wrap.querySelectorAll("label").forEach(l=>l.classList.remove("pick-correct","pick-incorrect"));
+    wrap.classList.remove("correct","incorrect");
+    if(state === undefined) return;
+    const sym = state === null ? "?" : (state ? "✓" : "✗");
+    const radio = wrap.querySelector('input[type=radio]:checked');
+    if(radio && state !== null){
+      const lab = radio.closest("label") || wrap;
+      lab.classList.add(state ? "pick-correct" : "pick-incorrect");
+      lab.insertAdjacentHTML("beforeend", '<span class="pmk">' + sym + '</span>');
+      return;
+    }
+    if(state !== null) wrap.classList.add(state ? "correct" : "incorrect");
+    wrap.insertAdjacentHTML("beforeend", '<span class="pmk">' + sym + '</span>');
+  }
+  function apply(q){
+    const p = practice[q], st = document.getElementById("pstat_" + q);
+    if(!p || isChecked(q)){ if(st) st.innerHTML = ""; return; }
+    const subs = QUESTIONS[q].subs, total = subs.length;
+    let ok = 0, blank = 0, edited = 0;
+    subs.forEach((sub, s)=>{
+      if(p.stale[s]){ edited++; mark(q, s, undefined); return; }
+      const r = p.res[s];
+      if(r === true) ok++; else if(r === null) blank++;
+      mark(q, s, r);
+    });
+    let h = '🔁 ตรวจซ้ำครั้งที่ ' + p.count + ': ถูก <b class="' + (ok === total ? 'ok' : 'ng') + '">' + ok + '/' + total + '</b> ช่อง';
+    if(blank) h += ' · ยังว่าง ' + blank + ' ช่อง';
+    if(edited) h += ' · แก้แล้ว ' + edited + ' ช่อง (ยังไม่ได้ตรวจซ้ำ)';
+    if(ok === total) h += ' — ถูกครบแล้ว กด "ตรวจคำตอบข้อนี้" เพื่อบันทึกคะแนน';
+    if(st) st.innerHTML = h;
+  }
+  function run(q){
+    const res = {};
+    QUESTIONS[q].subs.forEach((sub, s)=>{
+      const v = userAnswers[subKey(q, s)];
+      res[s] = (v === undefined || v === "") ? null : checkSubAnswer(QUESTIONS[q], s, v);
+    });
+    practice[q] = {count: (practice[q] ? practice[q].count : 0) + 1, res: res, stale: {}};
+    apply(q);
+  }
+  function decorate(){
+    const main = document.getElementById("mainArea");
+    if(!main) return;
+    main.querySelectorAll(".check-btn").forEach(btn=>{
+      const q = parseInt(btn.getAttribute("data-qidx"), 10);
+      if(isNaN(q) || main.querySelector('.practice-btn[data-qidx="' + q + '"]')) return;
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "secondary practice-btn"; b.setAttribute("data-qidx", q);
+      b.title = "ตรวจได้หลายครั้ง ไม่ล็อกช่อง ไม่เฉลย และไม่นับคะแนน"; b.textContent = "🔁 ตรวจซ้ำ (ไม่ล็อก)";
+      btn.insertAdjacentElement("afterend", b);
+      const st = document.createElement("div");
+      st.className = "practice-status"; st.id = "pstat_" + q; st.setAttribute("aria-live", "polite");
+      (btn.closest(".footer-actions") || btn.parentNode).insertAdjacentElement("afterend", st);
+    });
+    Object.keys(practice).forEach(k=>apply(parseInt(k, 10)));
+  }
+  document.addEventListener("click", e=>{
+    const t = e.target.closest ? e.target : e.target.parentElement;
+    const pb = t && t.closest(".practice-btn");
+    if(pb){ run(parseInt(pb.getAttribute("data-qidx"), 10)); return; }
+    const cb = t && t.closest(".check-btn");
+    if(cb) delete practice[parseInt(cb.getAttribute("data-qidx"), 10)];
+    if(t && t.closest("#resetAllBtn, #retryWrongBtn")) Object.keys(practice).forEach(k=>delete practice[k]);
+  }, true);
+  const stale = e=>{
+    const key = e.target && e.target.getAttribute && e.target.getAttribute("data-key");
+    if(!key) return;
+    const parts = key.split("_"), q = parseInt(parts[0], 10), s = parseInt(parts[1], 10), p = practice[q];
+    if(p && !p.stale[s]){ p.stale[s] = true; apply(q); }
+  };
+  document.addEventListener("input", stale, true);
+  document.addEventListener("change", stale, true);
+  const main = document.getElementById("mainArea");
+  if(main) new MutationObserver(decorate).observe(main, {childList: true});
+  decorate();
+})();
+</script>
 </body>
 </html>
