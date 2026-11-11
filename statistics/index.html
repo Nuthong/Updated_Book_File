@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<title>สถิติ 300-1211 — สารบัญแบบฝึกหัดทั้งหมด</title>
+<title>สถิติและการวิเคราะห์ข้อมูล · 300-1211 — สารบัญ</title>
 <style>
 :root{
   color-scheme: light dark;
@@ -153,6 +153,107 @@ a.item .label{font-size:14.5px;}
 :root:not([data-theme="dark"]) a.item .tag.quiz{background:#886321;}
 :root[data-theme="dark"] a.item .tag.quiz{color:#1B1300;}
 
+/* design-2026-11 — shared design tokens + component polish (Navy/Gold/Paper identity kept) */
+:root{
+  --ds-r-sm:8px;--ds-r:12px;--ds-r-lg:16px;--ds-r-pill:999px;
+  --ds-sh-1:0 1px 2px rgba(15,39,64,.05),0 2px 6px rgba(15,39,64,.06);
+  --ds-sh-2:0 2px 6px rgba(15,39,64,.06),0 10px 28px rgba(15,39,64,.10);
+  --ds-hdr:linear-gradient(135deg,#0F2740 0%,#1B3A5C 100%);
+  --ds-line:rgba(15,39,64,.10);
+  --ds-tint:rgba(27,58,92,.06);
+}
+:root[data-theme="dark"]{--ds-sh-1:0 1px 2px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.25);--ds-sh-2:0 4px 10px rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.35);--ds-hdr:linear-gradient(135deg,#0F1620 0%,#18222F 100%);--ds-line:rgba(255,255,255,.08);--ds-tint:rgba(142,193,242,.08);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ds-sh-1:0 1px 2px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.25);--ds-sh-2:0 4px 10px rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.35);--ds-hdr:linear-gradient(135deg,#0F1620 0%,#18222F 100%);--ds-line:rgba(255,255,255,.08);--ds-tint:rgba(142,193,242,.08);}}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+/* header */
+body > header,.site-header{background-color:var(--navy-deep)!important;background-image:var(--ds-hdr)!important;border-bottom:3px solid var(--flag)!important;box-shadow:var(--ds-sh-2)!important;}
+body > header h1{letter-spacing:.2px;line-height:1.35;}
+body > header > p,body > header .subtitle{opacity:.92;line-height:1.6;}
+/* hero header on library + hub pages */
+body:has(.book-grid) > header,body:has(.chapter-list) > header,body:has(.chapter .items) > header{padding:44px 20px 40px!important;}
+body:has(.book-grid) > header h1,body:has(.chapter-list) > header h1,body:has(.chapter .items) > header h1{font-size:clamp(1.6rem,3.2vw,2.15rem);font-weight:700;margin:6px 0 10px;}
+body:has(.book-grid) > header p,body:has(.chapter-list) > header p,body:has(.chapter .items) > header p{max-width:720px;margin:0 auto;font-size:1rem;}
+body > header .back-to-books,body > header .back-to-index{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--ds-r-pill);background:rgba(242,239,230,.10);border:1px solid rgba(242,239,230,.22);text-decoration:none;font-size:.85rem;}
+body > header .back-to-books:hover,body > header .back-to-index:hover{background:rgba(242,239,230,.18);}
+/* header controls: one consistent pill style */
+body > header button,body > header select,body > header input[type="number"],body > header input[type="text"]{border-radius:var(--ds-r-sm)!important;min-height:34px;}
+.theme-toggle-btn,.calc-toggle-btn{border-radius:var(--ds-r-pill)!important;min-width:38px;min-height:38px;}
+/* content cards */
+.section-card,.q-card,.sidebar-panel,.score-box,.timer-box{border-radius:var(--ds-r-lg)!important;border:1px solid var(--ds-line)!important;box-shadow:var(--ds-sh-1)!important;}
+.section-card{padding:28px 32px;}
+.q-card{padding:24px 26px;}
+.section-card h2{font-size:1.4rem;line-height:1.4;padding-bottom:12px;margin-bottom:16px;border-bottom:1px solid var(--ds-line);}
+.section-card h3{line-height:1.45;margin-top:1.4em;}
+.body-text,.section-card p,.section-card li{line-height:1.8;}
+.callout{border-radius:var(--ds-r)!important;border-left-width:4px!important;}
+.callout-title{letter-spacing:.2px;}
+.table-wrap,.qtable-wrap{border-radius:var(--ds-r);overflow:auto;border:1px solid var(--ds-line);}
+.section-card table th,.qtable th{padding:10px 12px;}
+.section-card table td,.qtable td{padding:9px 12px;}
+.image-block img,.section-card img{border-radius:var(--ds-r);}
+.game-btn,.check-btn,.practice-btn,.hint-btn,.calc-open-btn,.secondary{border-radius:var(--ds-r-sm)!important;}
+.diagram-block,.diagram-wrap{border-radius:var(--ds-r)!important;}
+.sub-item input,.sub-item select,.q-card select,.q-card input[type="text"]{border-radius:var(--ds-r-sm)!important;}
+/* sidebar / TOC */
+.sidebar-panel{padding:16px 14px!important;}
+.toc-list a,.toc-list li > a{border-radius:var(--ds-r-sm);padding:6px 10px!important;line-height:1.5;display:block;}
+.toc-list a:hover{background:var(--ds-tint);}
+.nav-cell{border-radius:var(--ds-r-sm)!important;}
+/* hubs: chapter cards as a 2-column grid of tiles */
+.wrap{max-width:1040px;}
+.chapter-list{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px!important;}
+.chapter-list > .section-divider,.chapter-list > .ds-group{grid-column:1/-1;}
+.chapter-card{border-radius:var(--ds-r-lg)!important;border:1px solid var(--ds-line)!important;box-shadow:var(--ds-sh-1)!important;padding:16px 18px!important;margin:0!important;align-items:flex-start!important;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;height:100%;box-sizing:border-box;}
+.chapter-card:hover{transform:translateY(-2px);box-shadow:var(--ds-sh-2)!important;border-color:var(--flag)!important;}
+.chapter-icon{width:44px;height:44px;min-width:44px;display:flex!important;align-items:center;justify-content:center;border-radius:var(--ds-r);background:var(--ds-tint);font-size:1.35rem!important;}
+.chapter-title{line-height:1.45;}
+.chapter-desc{line-height:1.6;margin-top:4px;}
+.chapter-arrow{align-self:center;opacity:.55;}
+.section-divider{margin:22px 0 2px!important;}
+.section-divider h2{font-size:1.05rem!important;letter-spacing:.3px;}
+/* statistics-style hub */
+.chapter{border-radius:var(--ds-r-lg)!important;overflow:hidden;border:1px solid var(--ds-line)!important;box-shadow:var(--ds-sh-1)!important;}
+.chapter .items .item{border-radius:var(--ds-r-sm);transition:background .15s;}
+.chapter .items .item:hover{background:var(--ds-tint);}
+.tag,.ds-badge{border-radius:var(--ds-r-pill)!important;padding:2px 9px!important;font-size:.72rem!important;font-weight:700;letter-spacing:.3px;}
+/* library */
+.book-grid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(290px,1fr))!important;gap:18px!important;}
+.book-card{border-radius:var(--ds-r-lg)!important;border:1px solid var(--ds-line)!important;box-shadow:var(--ds-sh-1)!important;padding:22px!important;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;}
+.book-card:hover{transform:translateY(-3px);box-shadow:var(--ds-sh-2)!important;border-color:var(--flag)!important;}
+.book-icon{width:52px;height:52px;display:flex!important;align-items:center;justify-content:center;border-radius:14px;background:var(--ds-tint);font-size:1.6rem!important;margin-bottom:12px!important;}
+.book-title{line-height:1.4;}
+.ds-code{display:block;margin-top:4px;font-size:.78rem;font-weight:600;letter-spacing:.4px;color:var(--text-soft);font-family:'JetBrains Mono',ui-monospace,monospace;}
+.book-desc{line-height:1.65;}
+.book-meta{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:var(--ds-r-pill);background:var(--ds-tint);}
+.ds-group-title{grid-column:1/-1;margin:26px 2px 4px;font-size:.82rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-soft);}
+.ds-badges{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px;}
+.ds-badge{display:inline-block;vertical-align:middle;background:var(--ds-tint);color:var(--text);}
+.ds-badge--quiz{background:var(--flag-soft,#FBF1DA);color:var(--flag-text,#886321);}
+.ds-badge--new{background:#E7F3EB;color:#1F5C3A;}
+.ds-badge--old{background:var(--ds-tint);color:var(--text-soft);}
+:root[data-theme="dark"] .ds-badge--quiz{background:#3A2F17;color:#E9C987;}
+:root[data-theme="dark"] .ds-badge--new{background:#17372A;color:#8FD9AE;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ds-badge--quiz{background:#3A2F17;color:#E9C987;}:root:not([data-theme="light"]) .ds-badge--new{background:#17372A;color:#8FD9AE;}}
+details.ds-older{grid-column:1/-1;border:1px dashed var(--ds-line);border-radius:var(--ds-r-lg);padding:6px 14px;}
+details.ds-older > summary{cursor:pointer;font-weight:700;color:var(--text-soft);padding:8px 2px;}
+details.ds-older > .ds-older-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:6px 0 12px;}
+footer{opacity:.85;}
+/* V3 pages (aside.sidebar + .masthead) */
+.layout > aside.sidebar{box-shadow:var(--ds-sh-1);}
+.layout > aside.sidebar .topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;}
+.layout > aside.sidebar .back-to-index{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--ds-r-pill);background:var(--ds-tint);border:1px solid var(--ds-line);text-decoration:none;font-size:.85rem;}
+.layout > aside.sidebar h2{font-size:1.15rem;line-height:1.4;}
+.layout > aside.sidebar nav ul{list-style:none;padding:0;margin:10px 0 0;}
+.layout > aside.sidebar nav li a{display:block;padding:7px 10px;border-radius:var(--ds-r-sm);text-decoration:none;line-height:1.5;}
+.layout > aside.sidebar nav li a:hover{background:var(--ds-tint);}
+.layout > main .masthead{border-radius:var(--ds-r-lg)!important;box-shadow:var(--ds-sh-2);}
+.layout > main table{border-radius:var(--ds-r);overflow:hidden;}
+@media (max-width:700px){
+  .section-card{padding:20px 18px;}
+  .q-card{padding:18px 16px;}
+  .chapter-list,details.ds-older > .ds-older-list{grid-template-columns:1fr;}
+  body:has(.book-grid) > header,body:has(.chapter-list) > header,body:has(.chapter .items) > header{padding:30px 16px 26px!important;}
+}
 /* a11y-wcag22 2026-11 — WCAG 2.2 AA layer: skip link, focus ring, target size, reduced motion */
 :root{--a11y-focus:#1F5FA8;--a11y-focus-on-dark:#F2EFE6;}
 :root[data-theme="dark"]{--a11y-focus:#8EC1F2;}
@@ -175,7 +276,7 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <header>
   <button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button>
   <a class="back-to-books" href="../index.html">&larr; ทุกเล่ม / All Books</a>
-  <h1>สถิติ 300-1211 — สารบัญแบบฝึกหัดทั้งหมด</h1>
+  <h1>สถิติและการวิเคราะห์ข้อมูล · 300-1211</h1>
   <p>เรียงตามลำดับบทเรียน · คลิกหัวข้อเพื่อเปิดเอกสาร</p>
 </header>
 
@@ -192,104 +293,104 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 4</span><h2>Binomial Distribution</h2></div>
     <div class="items">
-      <a class="item" href="01_บทที่4_Binomial_Distribution/Practice_1_IC_4-1_Binomial_Distribution.html"><span class="tag quiz">Quiz</span><span class="label">IC 4-1: Binomial Distribution</span></a>
+      <a class="item" href="01_บทที่4_Binomial_Distribution/IC_Quiz_4-1_Binomial_Distribution.html"><span class="tag quiz">Quiz</span><span class="label">IC 4-1 · Binomial Distribution</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 5</span><h2>Normal &amp; Sampling Distribution</h2></div>
     <div class="items">
-      <a class="item" href="02_บทที่5_Normal_and_Sampling_Distribution/Practice_IC_5-2_Normal_Distribution.html"><span class="tag quiz">Quiz</span><span class="label">IC 5-2: Normal Distribution</span></a>
-      <a class="item" href="02_บทที่5_Normal_and_Sampling_Distribution/Practice_2_IC_5-3_Sampling_Distribution.html"><span class="tag quiz">Quiz</span><span class="label">IC 5-3: Sampling Distribution</span></a>
+      <a class="item" href="02_บทที่5_Normal_and_Sampling_Distribution/IC_Quiz_5-2_Normal_Distribution.html"><span class="tag quiz">Quiz</span><span class="label">IC 5-2 · Normal Distribution</span></a>
+      <a class="item" href="02_บทที่5_Normal_and_Sampling_Distribution/IC_Quiz_5-3_Sampling_Distribution.html"><span class="tag quiz">Quiz</span><span class="label">IC 5-3 · Sampling Distribution</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 6</span><h2>Confidence Intervals</h2></div>
     <div class="items">
-      <a class="item" href="03_บทที่6_Confidence_Intervals/สรุปบทเรียน_Confidence_Intervals_4กรณี.html"><span class="tag summary">สรุป</span><span class="label">สรุปบทเรียน — Confidence Intervals ครบ 4 กรณี</span></a>
-      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-1_CI_Mean_sigma_Known.html"><span class="tag quiz">Quiz</span><span class="label">6-1: CI for the Mean (σ Known)</span></a>
-      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-2_CI_Mean_sigma_Unknown.html"><span class="tag quiz">Quiz</span><span class="label">6-2: CI for the Mean (σ Unknown)</span></a>
-      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-3_CI_Proportion.html"><span class="tag quiz">Quiz</span><span class="label">6-3: CI for Population Proportions</span></a>
-      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-4_CI_Variance_SD.html"><span class="tag quiz">Quiz</span><span class="label">6-4: CI for Variance and Standard Deviation</span></a>
+      <a class="item" href="03_บทที่6_Confidence_Intervals/สรุปบทเรียน_Confidence_Intervals_4กรณี.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 6 · Confidence Intervals ครบ 4 กรณี</span></a>
+      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-1_CI_Mean_sigma_Known.html"><span class="tag quiz">Quiz</span><span class="label">IC 6-1 · CI for the Mean (σ Known)</span></a>
+      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-2_CI_Mean_sigma_Unknown.html"><span class="tag quiz">Quiz</span><span class="label">IC 6-2 · CI for the Mean (σ Unknown)</span></a>
+      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-3_CI_Proportion.html"><span class="tag quiz">Quiz</span><span class="label">IC 6-3 · CI for Population Proportions</span></a>
+      <a class="item" href="03_บทที่6_Confidence_Intervals/IC_Quiz_6-4_CI_Variance_SD.html"><span class="tag quiz">Quiz</span><span class="label">IC 6-4 · CI for Variance and Standard Deviation</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 7</span><h2>Hypothesis Testing</h2></div>
     <div class="items">
-      <a class="item" href="04_บทที่7_Hypothesis_Testing/สรุปบทเรียน_Hypothesis_Testing_4กรณี.html"><span class="tag summary">สรุป</span><span class="label">สรุปบทเรียน — Hypothesis Testing ครบ 4 กรณี</span></a>
-      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-1_HT_Mean_sigma_Known.html"><span class="tag quiz">Quiz</span><span class="label">7-1: HT for the Mean (σ Known)</span></a>
-      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-2_HT_Mean_sigma_Unknown.html"><span class="tag quiz">Quiz</span><span class="label">7-2: HT for the Mean (σ Unknown)</span></a>
-      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-3_HT_Proportion.html"><span class="tag quiz">Quiz</span><span class="label">7-3: HT for the Proportion</span></a>
-      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-4_HT_Variance.html"><span class="tag quiz">Quiz</span><span class="label">7-4: HT for the Variance</span></a>
+      <a class="item" href="04_บทที่7_Hypothesis_Testing/สรุปบทเรียน_Hypothesis_Testing_4กรณี.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 7 · Hypothesis Testing ครบ 4 กรณี</span></a>
+      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-1_HT_Mean_sigma_Known.html"><span class="tag quiz">Quiz</span><span class="label">IC 7-1 · HT for the Mean (σ Known)</span></a>
+      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-2_HT_Mean_sigma_Unknown.html"><span class="tag quiz">Quiz</span><span class="label">IC 7-2 · HT for the Mean (σ Unknown)</span></a>
+      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-3_HT_Proportion.html"><span class="tag quiz">Quiz</span><span class="label">IC 7-3 · HT for the Proportion</span></a>
+      <a class="item" href="04_บทที่7_Hypothesis_Testing/IC_Quiz_7-4_HT_Variance.html"><span class="tag quiz">Quiz</span><span class="label">IC 7-4 · HT for the Variance</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">ทบทวน</span><h2>Pretest &amp; Midterm Review</h2></div>
     <div class="items">
-      <a class="item" href="05_Pretest_and_Midterm_Review/สรุปบทเรียนสถิติ_Pretest_I.html"><span class="tag summary">สรุป</span><span class="label">สรุปบทเรียนสถิติ — Pretest I</span></a>
-      <a class="item" href="05_Pretest_and_Midterm_Review/Pretest_I1_Statistics.html"><span class="tag exam">Exam</span><span class="label">Pretest I1 — สถิติ (12 ข้อ)</span></a>
-      <a class="item" href="05_Pretest_and_Midterm_Review/Midterm_Exam_Statistics.html"><span class="tag exam">Exam</span><span class="label">Midterm Exam — สถิติ (12 ข้อ)</span></a>
+      <a class="item" href="05_Pretest_and_Midterm_Review/สรุปบทเรียนสถิติ_Pretest_I.html"><span class="tag summary">สรุป</span><span class="label">Pretest I · สรุปเนื้อหาก่อนสอบ</span></a>
+      <a class="item" href="05_Pretest_and_Midterm_Review/Pretest_I1_Statistics.html"><span class="tag exam">Exam</span><span class="label">Pretest I1 · 12 ข้อ</span></a>
+      <a class="item" href="05_Pretest_and_Midterm_Review/Midterm_Exam_Statistics.html"><span class="tag exam">Exam</span><span class="label">Midterm Exam · 12 ข้อ</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 8</span><h2>Difference of Means &amp; Proportions</h2></div>
     <div class="items">
-      <a class="item" href="06_บทที่8_Difference_of_Means_and_Proportions/สรุปบทเรียน_Two_Sample_Hypothesis_Testing_บทที่8.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 8 — การทดสอบสมมติฐานสองประชากร (z/t independent, paired t, two-proportion)</span></a>
-      <a class="item" href="06_บทที่8_Difference_of_Means_and_Proportions/(STATICS)Practice_by_CLaude_IC_Quiz_8.1-8.4.html"><span class="tag quiz">Quiz</span><span class="label">Quiz 8: Testing the Difference Between Means &amp; Proportions (รวม 4 ชุด)</span></a>
+      <a class="item" href="06_บทที่8_Difference_of_Means_and_Proportions/สรุปบทเรียน_Two_Sample_Hypothesis_Testing_บทที่8.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 8 · การทดสอบสมมติฐานสองประชากร (z/t independent, paired t, two-proportion)</span></a>
+      <a class="item" href="06_บทที่8_Difference_of_Means_and_Proportions/IC_Quiz_8.1-8.4_Difference_of_Means_and_Proportions.html"><span class="tag quiz">Quiz</span><span class="label">IC 8.1–8.4 · Difference Between Means &amp; Proportions (รวม 4 ชุด)</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 9</span><h2>สหสัมพันธ์และการถดถอย (Correlation &amp; Regression)</h2></div>
     <div class="items">
-      <a class="item" href="07_บทที่9_Correlation_and_Regression/(STATICS)บทที่_9_สหสัมพันธ์และการถดถอย_สรุป.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 9 — สรุปสหสัมพันธ์และการถดถอย</span></a>
-      <a class="item" href="07_บทที่9_Correlation_and_Regression/(STATICS)Practice_by_CLaude_IC_Quiz_9.1-9.2.html"><span class="tag quiz">Quiz</span><span class="label">Quiz 9-1, 9-2 — สหสัมพันธ์และการถดถอย</span></a>
+      <a class="item" href="07_บทที่9_Correlation_and_Regression/สรุปบทเรียน_Correlation_and_Regression_บทที่9.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 9 · สหสัมพันธ์และการถดถอย</span></a>
+      <a class="item" href="07_บทที่9_Correlation_and_Regression/IC_Quiz_9.1-9.2_Correlation_and_Regression.html"><span class="tag quiz">Quiz</span><span class="label">IC 9-1, 9-2 · สหสัมพันธ์และการถดถอย</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 10</span><h2>Chi-Square Tests</h2></div>
     <div class="items">
-      <a class="item" href="08_บทที่10_Chi_Square_Tests/สรุปบทเรียน_Chi_Square_Tests_บทที่10.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 10 — Chi-Square: Goodness-of-fit, Independence, RR/OR, Simpson's Paradox, Fisher's Exact Test</span></a>
-      <a class="item" href="08_บทที่10_Chi_Square_Tests/(STATICS)Chi-Square_Tests_Quiz_บทที่_10.html"><span class="tag quiz">Quiz</span><span class="label">แบบฝึกหัด Chi-Square Tests (บทที่ 10)</span></a>
+      <a class="item" href="08_บทที่10_Chi_Square_Tests/สรุปบทเรียน_Chi_Square_Tests_บทที่10.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 10 · Chi-Square: Goodness-of-fit, Independence, RR/OR, Simpson's Paradox, Fisher's Exact</span></a>
+      <a class="item" href="08_บทที่10_Chi_Square_Tests/IC_Quiz_Chi_Square_Tests_บทที่10.html"><span class="tag quiz">Quiz</span><span class="label">IC บทที่ 10 · Chi-Square Tests</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 11</span><h2>ANOVA</h2></div>
     <div class="items">
-      <a class="item" href="09_บทที่11_ANOVA/สรุปบทเรียน_ANOVA_บทที่11.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 11 — F-test, ANOVA ทางเดียว/สองทาง, Post-hoc</span></a>
-      <a class="item" href="09_บทที่11_ANOVA/IC_Quiz_11-1_Ftest.html"><span class="tag quiz">Quiz</span><span class="label">IC Quiz 11-1: F-test (เปรียบเทียบความแปรปรวนสองกลุ่ม)</span></a>
+      <a class="item" href="09_บทที่11_ANOVA/สรุปบทเรียน_ANOVA_บทที่11.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 11 · F-test, ANOVA ทางเดียว/สองทาง, Post-hoc</span></a>
+      <a class="item" href="09_บทที่11_ANOVA/IC_Quiz_11-1_Ftest.html"><span class="tag quiz">Quiz</span><span class="label">IC 11-1 · F-test (เปรียบเทียบความแปรปรวนสองกลุ่ม)</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">บทที่ 12</span><h2>สถิตินอนพาราเมตริก (Nonparametric)</h2></div>
     <div class="items">
-      <a class="item" href="10_บทที่12_Nonparametric/สรุปบทเรียน_Nonparametric_บทที่12.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 12 — Sign Test, Wilcoxon, Mann-Whitney U, Kruskal-Wallis, Spearman</span></a>
-      <a class="item" href="10_บทที่12_Nonparametric/IC_Quiz_12-1_Sign_Test.html"><span class="tag quiz">Quiz</span><span class="label">IC Quiz 12-1: Nonparametric Test — Sign Test</span></a>
+      <a class="item" href="10_บทที่12_Nonparametric/สรุปบทเรียน_Nonparametric_บทที่12.html"><span class="tag summary">สรุป</span><span class="label">บทที่ 12 · Sign Test, Wilcoxon, Mann-Whitney U, Kruskal-Wallis, Spearman</span></a>
+      <a class="item" href="10_บทที่12_Nonparametric/IC_Quiz_12-1_Sign_Test.html"><span class="tag quiz">Quiz</span><span class="label">IC 12-1 · Nonparametric — Sign Test</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">เสริม</span><h2>ทฤษฎีการตัดสินใจแบบเบส์ (Bayes Decision Theory)</h2></div>
     <div class="items">
-      <a class="item" href="11_Bayes_Decision_Theory/สรุปบทเรียน_Bayes_Decision_Theory.html"><span class="tag summary">สรุป</span><span class="label">Bayes' Theorem, Bayes Decision Theory, Naive Bayes (เนื้อหาเสริมจากอาจารย์)</span></a>
-      <a class="item" href="11_Bayes_Decision_Theory/IC_Quiz_12_Bayes_Theorem.html"><span class="tag quiz">Quiz</span><span class="label">IC Quiz 12: ทฤษฎีบทเบย์ (Bayes Theorem)</span></a>
+      <a class="item" href="11_Bayes_Decision_Theory/สรุปบทเรียน_Bayes_Decision_Theory.html"><span class="tag summary">สรุป</span><span class="label">Bayes · Bayes' Theorem, Decision Theory, Naive Bayes (เนื้อหาเสริม)</span></a>
+      <a class="item" href="11_Bayes_Decision_Theory/IC_Quiz_12_Bayes_Theorem.html"><span class="tag quiz">Quiz</span><span class="label">IC 12 · ทฤษฎีบทเบย์ (Bayes' Theorem)</span></a>
     </div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="num">ทบทวน</span><h2>Pretest ปลายภาค (Final Exam Review)</h2></div>
     <div class="items">
-      <a class="item" href="12_Pretest_Final_Exam_Review/สรุป_Hypothesis_Testing_10_แบบ_GeoGebra.html"><span class="tag summary">สรุป</span><span class="label">สรุป Hypothesis Testing ครบ 10 แบบ + GeoGebra ทีละคลิก</span></a>
-      <a class="item" href="12_Pretest_Final_Exam_Review/สรุปสูตร_Pretest_Final_และเนื้อหาหลัง_Midterm_L4.html"><span class="tag summary">สรุป</span><span class="label">สรุปสูตร Pretest Final + เนื้อหาหลัง Midterm (บท 7–12, Bayes · L4)</span></a>
-      <a class="item" href="12_Pretest_Final_Exam_Review/Pretest_Final_Exam_Statistics.html"><span class="tag exam">Exam</span><span class="label">Pretest Final Exam — สถิติ (10 ข้อ)</span></a>
-      <a class="item" href="12_Pretest_Final_Exam_Review/Final_Exam_Statistics.html"><span class="tag exam">Exam</span><span class="label">Final Exam — สถิติ (10 ข้อ)</span></a>
+      <a class="item" href="12_Pretest_Final_Exam_Review/สรุป_Hypothesis_Testing_10_แบบ_GeoGebra.html"><span class="tag summary">สรุป</span><span class="label">Final · Hypothesis Testing ครบ 10 แบบ + GeoGebra ทีละคลิก</span></a>
+      <a class="item" href="12_Pretest_Final_Exam_Review/สรุปสูตร_Pretest_Final_และเนื้อหาหลัง_Midterm_L4.html"><span class="tag summary">สรุป</span><span class="label">Final · สรุปสูตร Pretest Final + เนื้อหาบท 7–12, Bayes (L4)</span></a>
+      <a class="item" href="12_Pretest_Final_Exam_Review/Pretest_Final_Exam_Statistics.html"><span class="tag exam">Exam</span><span class="label">Pretest Final Exam · 10 ข้อ</span></a>
+      <a class="item" href="12_Pretest_Final_Exam_Review/Final_Exam_Statistics.html"><span class="tag exam">Exam</span><span class="label">Final Exam · 10 ข้อ</span></a>
     </div>
   </div>
 

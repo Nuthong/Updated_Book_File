@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
-<title>Computer Organization — สารบัญหนังสือ</title>
+<title>Computer Organization · 310-2202 — สารบัญ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -98,6 +98,107 @@ footer{text-align:center;padding:20px;font-size:12px;color:var(--text-soft);}
   .diagram-block,.diagram-wrap{overflow-x:auto;max-width:100%;}
 }
 
+/* design-2026-11 — shared design tokens + component polish (Navy/Gold/Paper identity kept) */
+:root{
+  --ds-r-sm:8px;--ds-r:12px;--ds-r-lg:16px;--ds-r-pill:999px;
+  --ds-sh-1:0 1px 2px rgba(15,39,64,.05),0 2px 6px rgba(15,39,64,.06);
+  --ds-sh-2:0 2px 6px rgba(15,39,64,.06),0 10px 28px rgba(15,39,64,.10);
+  --ds-hdr:linear-gradient(135deg,#0F2740 0%,#1B3A5C 100%);
+  --ds-line:rgba(15,39,64,.10);
+  --ds-tint:rgba(27,58,92,.06);
+}
+:root[data-theme="dark"]{--ds-sh-1:0 1px 2px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.25);--ds-sh-2:0 4px 10px rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.35);--ds-hdr:linear-gradient(135deg,#0F1620 0%,#18222F 100%);--ds-line:rgba(255,255,255,.08);--ds-tint:rgba(142,193,242,.08);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ds-sh-1:0 1px 2px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.25);--ds-sh-2:0 4px 10px rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.35);--ds-hdr:linear-gradient(135deg,#0F1620 0%,#18222F 100%);--ds-line:rgba(255,255,255,.08);--ds-tint:rgba(142,193,242,.08);}}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+/* header */
+body > header,.site-header{background-color:var(--navy-deep)!important;background-image:var(--ds-hdr)!important;border-bottom:3px solid var(--flag)!important;box-shadow:var(--ds-sh-2)!important;}
+body > header h1{letter-spacing:.2px;line-height:1.35;}
+body > header > p,body > header .subtitle{opacity:.92;line-height:1.6;}
+/* hero header on library + hub pages */
+body:has(.book-grid) > header,body:has(.chapter-list) > header,body:has(.chapter .items) > header{padding:44px 20px 40px!important;}
+body:has(.book-grid) > header h1,body:has(.chapter-list) > header h1,body:has(.chapter .items) > header h1{font-size:clamp(1.6rem,3.2vw,2.15rem);font-weight:700;margin:6px 0 10px;}
+body:has(.book-grid) > header p,body:has(.chapter-list) > header p,body:has(.chapter .items) > header p{max-width:720px;margin:0 auto;font-size:1rem;}
+body > header .back-to-books,body > header .back-to-index{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--ds-r-pill);background:rgba(242,239,230,.10);border:1px solid rgba(242,239,230,.22);text-decoration:none;font-size:.85rem;}
+body > header .back-to-books:hover,body > header .back-to-index:hover{background:rgba(242,239,230,.18);}
+/* header controls: one consistent pill style */
+body > header button,body > header select,body > header input[type="number"],body > header input[type="text"]{border-radius:var(--ds-r-sm)!important;min-height:34px;}
+.theme-toggle-btn,.calc-toggle-btn{border-radius:var(--ds-r-pill)!important;min-width:38px;min-height:38px;}
+/* content cards */
+.section-card,.q-card,.sidebar-panel,.score-box,.timer-box{border-radius:var(--ds-r-lg)!important;border:1px solid var(--ds-line)!important;box-shadow:var(--ds-sh-1)!important;}
+.section-card{padding:28px 32px;}
+.q-card{padding:24px 26px;}
+.section-card h2{font-size:1.4rem;line-height:1.4;padding-bottom:12px;margin-bottom:16px;border-bottom:1px solid var(--ds-line);}
+.section-card h3{line-height:1.45;margin-top:1.4em;}
+.body-text,.section-card p,.section-card li{line-height:1.8;}
+.callout{border-radius:var(--ds-r)!important;border-left-width:4px!important;}
+.callout-title{letter-spacing:.2px;}
+.table-wrap,.qtable-wrap{border-radius:var(--ds-r);overflow:auto;border:1px solid var(--ds-line);}
+.section-card table th,.qtable th{padding:10px 12px;}
+.section-card table td,.qtable td{padding:9px 12px;}
+.image-block img,.section-card img{border-radius:var(--ds-r);}
+.game-btn,.check-btn,.practice-btn,.hint-btn,.calc-open-btn,.secondary{border-radius:var(--ds-r-sm)!important;}
+.diagram-block,.diagram-wrap{border-radius:var(--ds-r)!important;}
+.sub-item input,.sub-item select,.q-card select,.q-card input[type="text"]{border-radius:var(--ds-r-sm)!important;}
+/* sidebar / TOC */
+.sidebar-panel{padding:16px 14px!important;}
+.toc-list a,.toc-list li > a{border-radius:var(--ds-r-sm);padding:6px 10px!important;line-height:1.5;display:block;}
+.toc-list a:hover{background:var(--ds-tint);}
+.nav-cell{border-radius:var(--ds-r-sm)!important;}
+/* hubs: chapter cards as a 2-column grid of tiles */
+.wrap{max-width:1040px;}
+.chapter-list{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px!important;}
+.chapter-list > .section-divider,.chapter-list > .ds-group{grid-column:1/-1;}
+.chapter-card{border-radius:var(--ds-r-lg)!important;border:1px solid var(--ds-line)!important;box-shadow:var(--ds-sh-1)!important;padding:16px 18px!important;margin:0!important;align-items:flex-start!important;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;height:100%;box-sizing:border-box;}
+.chapter-card:hover{transform:translateY(-2px);box-shadow:var(--ds-sh-2)!important;border-color:var(--flag)!important;}
+.chapter-icon{width:44px;height:44px;min-width:44px;display:flex!important;align-items:center;justify-content:center;border-radius:var(--ds-r);background:var(--ds-tint);font-size:1.35rem!important;}
+.chapter-title{line-height:1.45;}
+.chapter-desc{line-height:1.6;margin-top:4px;}
+.chapter-arrow{align-self:center;opacity:.55;}
+.section-divider{margin:22px 0 2px!important;}
+.section-divider h2{font-size:1.05rem!important;letter-spacing:.3px;}
+/* statistics-style hub */
+.chapter{border-radius:var(--ds-r-lg)!important;overflow:hidden;border:1px solid var(--ds-line)!important;box-shadow:var(--ds-sh-1)!important;}
+.chapter .items .item{border-radius:var(--ds-r-sm);transition:background .15s;}
+.chapter .items .item:hover{background:var(--ds-tint);}
+.tag,.ds-badge{border-radius:var(--ds-r-pill)!important;padding:2px 9px!important;font-size:.72rem!important;font-weight:700;letter-spacing:.3px;}
+/* library */
+.book-grid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(290px,1fr))!important;gap:18px!important;}
+.book-card{border-radius:var(--ds-r-lg)!important;border:1px solid var(--ds-line)!important;box-shadow:var(--ds-sh-1)!important;padding:22px!important;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;}
+.book-card:hover{transform:translateY(-3px);box-shadow:var(--ds-sh-2)!important;border-color:var(--flag)!important;}
+.book-icon{width:52px;height:52px;display:flex!important;align-items:center;justify-content:center;border-radius:14px;background:var(--ds-tint);font-size:1.6rem!important;margin-bottom:12px!important;}
+.book-title{line-height:1.4;}
+.ds-code{display:block;margin-top:4px;font-size:.78rem;font-weight:600;letter-spacing:.4px;color:var(--text-soft);font-family:'JetBrains Mono',ui-monospace,monospace;}
+.book-desc{line-height:1.65;}
+.book-meta{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:var(--ds-r-pill);background:var(--ds-tint);}
+.ds-group-title{grid-column:1/-1;margin:26px 2px 4px;font-size:.82rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-soft);}
+.ds-badges{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px;}
+.ds-badge{display:inline-block;vertical-align:middle;background:var(--ds-tint);color:var(--text);}
+.ds-badge--quiz{background:var(--flag-soft,#FBF1DA);color:var(--flag-text,#886321);}
+.ds-badge--new{background:#E7F3EB;color:#1F5C3A;}
+.ds-badge--old{background:var(--ds-tint);color:var(--text-soft);}
+:root[data-theme="dark"] .ds-badge--quiz{background:#3A2F17;color:#E9C987;}
+:root[data-theme="dark"] .ds-badge--new{background:#17372A;color:#8FD9AE;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ds-badge--quiz{background:#3A2F17;color:#E9C987;}:root:not([data-theme="light"]) .ds-badge--new{background:#17372A;color:#8FD9AE;}}
+details.ds-older{grid-column:1/-1;border:1px dashed var(--ds-line);border-radius:var(--ds-r-lg);padding:6px 14px;}
+details.ds-older > summary{cursor:pointer;font-weight:700;color:var(--text-soft);padding:8px 2px;}
+details.ds-older > .ds-older-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:6px 0 12px;}
+footer{opacity:.85;}
+/* V3 pages (aside.sidebar + .masthead) */
+.layout > aside.sidebar{box-shadow:var(--ds-sh-1);}
+.layout > aside.sidebar .topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;}
+.layout > aside.sidebar .back-to-index{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--ds-r-pill);background:var(--ds-tint);border:1px solid var(--ds-line);text-decoration:none;font-size:.85rem;}
+.layout > aside.sidebar h2{font-size:1.15rem;line-height:1.4;}
+.layout > aside.sidebar nav ul{list-style:none;padding:0;margin:10px 0 0;}
+.layout > aside.sidebar nav li a{display:block;padding:7px 10px;border-radius:var(--ds-r-sm);text-decoration:none;line-height:1.5;}
+.layout > aside.sidebar nav li a:hover{background:var(--ds-tint);}
+.layout > main .masthead{border-radius:var(--ds-r-lg)!important;box-shadow:var(--ds-sh-2);}
+.layout > main table{border-radius:var(--ds-r);overflow:hidden;}
+@media (max-width:700px){
+  .section-card{padding:20px 18px;}
+  .q-card{padding:18px 16px;}
+  .chapter-list,details.ds-older > .ds-older-list{grid-template-columns:1fr;}
+  body:has(.book-grid) > header,body:has(.chapter-list) > header,body:has(.chapter .items) > header{padding:30px 16px 26px!important;}
+}
 /* a11y-wcag22 2026-11 — WCAG 2.2 AA layer: skip link, focus ring, target size, reduced motion */
 :root{--a11y-focus:#1F5FA8;--a11y-focus-on-dark:#F2EFE6;}
 :root[data-theme="dark"]{--a11y-focus:#8EC1F2;}
@@ -119,15 +220,20 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <header>
   <button id="themeToggle" class="theme-toggle-btn" title="สลับโหมดสว่าง/มืด / Toggle light/dark mode">🌙</button>
   <a class="back-to-books" href="../index.html">&larr; ทุกเล่ม / All Books</a>
-  <h1>Computer Organization</h1>
+  <h1>Computer Organization · 310-2202</h1>
   <p>310-2202 Computer Organization — สรุปบทเรียนฉบับอ่านง่าย พร้อม diagram แอนิเมชัน</p>
 </header>
 <div class="wrap">
   <div class="chapter-list">
+<div class="section-divider">
+  <h2>ส่วนที่ 1 · LC-3 (Topic 0–9)</h2>
+  <p>เริ่มจากพื้นฐานบิตและวงจร จนถึงการเขียนโปรแกรม LC-3 และ I/O — แบบฝึกหัดอยู่ถัดจาก Topic ที่เกี่ยวข้อง</p>
+</div>
 <a class="chapter-card" href="Topic0_Brushup.html">
   <div class="chapter-icon">🧰</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 0: Brushup</div>
+    <div class="chapter-title">Topic 0 · Brushup</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">ปูพื้นฐานก่อนเรียน — ไฟฟ้า, ทรานซิสเตอร์, เลขฐาน, Logic Gate</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -135,7 +241,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic1_Introduction_to_Computing_Systems.html">
   <div class="chapter-icon">🖥️</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 1: Introduction to Computing Systems</div>
+    <div class="chapter-title">Topic 1 · Introduction to Computing Systems</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">ภาพรวมวิชา, Von Neumann Model, ประวัติศาสตร์คอมพิวเตอร์</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -143,7 +250,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic2_Bit_Data_Types_and_Operations.html">
   <div class="chapter-icon">🔢</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 2: Bit, Data Types, and Operations</div>
+    <div class="chapter-title">Topic 2 · Bit, Data Types, and Operations</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">เลขฐานสอง, 2's Complement, Logical Operations</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -151,7 +259,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic3_Digital_Logic.html">
   <div class="chapter-icon">⚡</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 3: Digital Logic</div>
+    <div class="chapter-title">Topic 3 · Digital Logic</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">CMOS, Combinational/Sequential Logic, State Machine</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -159,7 +268,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic4_The_von_Neumann_Model.html">
   <div class="chapter-icon">🔁</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 4: The von Neumann Model</div>
+    <div class="chapter-title">Topic 4 · The von Neumann Model</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">Instruction Cycle 6 ขั้นตอน, Control Unit</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -167,7 +277,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic5_The_LC3_Instructions.html">
   <div class="chapter-icon">📜</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 5: The LC-3 Instructions</div>
+    <div class="chapter-title">Topic 5 · The LC-3 Instructions</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">Operate, Data Movement, Control Instructions</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -175,7 +286,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic4-5_Exercises_Review.html">
   <div class="chapter-icon">✏️</div>
   <div class="chapter-info">
-    <div class="chapter-title">แบบฝึกหัดทบทวน Topic 4-5: LC-3 ISA และ Data Path</div>
+    <div class="chapter-title">Topic 4–5 · LC-3 ISA และ Data Path</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--quiz">แบบฝึกหัด</span></div>
     <div class="chapter-desc">MAR/MDR, Instruction Format, Data Path, Instruction Cycle พร้อมเฉลยทีละขั้นตอน (14 ข้อ)</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -183,7 +295,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic6_LC3_Programming.html">
   <div class="chapter-icon">🐞</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 6: LC-3 Programming</div>
+    <div class="chapter-title">Topic 6 · LC-3 Programming</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">Booting, Problem Solving, Debugging</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -191,7 +304,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic6_Exercises_LC3_Programming.html">
   <div class="chapter-icon">✏️</div>
   <div class="chapter-info">
-    <div class="chapter-title">แบบฝึกหัด Topic 6: LC-3 Programming</div>
+    <div class="chapter-title">Topic 6 · LC-3 Programming</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--quiz">แบบฝึกหัด</span></div>
     <div class="chapter-desc">โจทย์เขียน/trace โปรแกรม LC-3 (ข้อ 6.3-6.18) พร้อมเฉลยทีละขั้นตอน</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -199,7 +313,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic7_Assembly_Language_Program.html">
   <div class="chapter-icon">📝</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 7: Assembly Language Program</div>
+    <div class="chapter-title">Topic 7 · Assembly Language Program</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">Syntax, Directives, Trap Codes, Memory Map</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -207,7 +322,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic7_Exercises_Assembly_Language.html">
   <div class="chapter-icon">✏️</div>
   <div class="chapter-info">
-    <div class="chapter-title">แบบฝึกหัด Topic 7: Assembly Language Program</div>
+    <div class="chapter-title">Topic 7 · Assembly Language Program</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--quiz">แบบฝึกหัด</span></div>
     <div class="chapter-desc">Assembler, Symbol Table, Instruction Encoding (ข้อ 7.1-7.31) พร้อมเฉลยทีละขั้นตอน</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -215,7 +331,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic8_Data_Structures_and_Subroutines.html">
   <div class="chapter-icon">📚</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 8: Data Structures and Subroutines</div>
+    <div class="chapter-title">Topic 8 · Data Structures and Subroutines</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">Stack, Call Stack, Calling Convention</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -223,84 +340,102 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Topic9_InputOutput.html">
   <div class="chapter-icon">🔌</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 9: Input/Output</div>
+    <div class="chapter-title">Topic 9 · Input/Output</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">Memory-Mapped I/O, Polling, Interrupt-Driven I/O</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
-<a class="chapter-card" href="Topic10_LC3_to_RISCV.html">
-  <div class="chapter-icon">🌉</div>
-  <div class="chapter-info">
-    <div class="chapter-title">Topic 10: สะพาน LC-3 → RISC-V</div>
-    <div class="chapter-desc">เปรียบเทียบ ISA, การย้ายจาก LC-3 สู่ RV32I</div>
-  </div>
-  <div class="chapter-arrow">&rarr;</div>
-</a>
+<div class="section-divider">
+  <h2>ส่วนที่ 2 · RISC-V (Topic 10–12)</h2>
+  <p>ฉบับล่าสุดมีตัวจำลองและแบบฝึกหัดโต้ตอบในตัว — ฉบับก่อนหน้าเก็บไว้ด้านล่าง</p>
+</div>
 <a class="chapter-card" href="Topic9-10_Exercises_LC3_to_RISCV.html">
   <div class="chapter-icon">✏️</div>
   <div class="chapter-info">
-    <div class="chapter-title">แบบฝึกหัด Topic 9-10: จาก LC-3 สู่ RISC-V</div>
+    <div class="chapter-title">Topic 9–10 · จาก LC-3 สู่ RISC-V</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--quiz">แบบฝึกหัด</span></div>
     <div class="chapter-desc">โจทย์แปลโปรแกรม LC-3 ↔ RV32I พร้อมเฉลยทีละขั้นตอน</div>
-  </div>
-  <div class="chapter-arrow">&rarr;</div>
-</a>
-<a class="chapter-card" href="Topic10_LC3_to_RISCV_Detailed.html">
-  <div class="chapter-icon">🌉</div>
-  <div class="chapter-info">
-    <div class="chapter-title">Topic 10: สะพาน LC-3 → RISC-V (ฉบับละเอียด)</div>
-    <div class="chapter-desc">เนื้อหาละเอียดกว่าฉบับด้านบน — diagram, ตารางแมปคำสั่งครบ, ตัวอย่างเขียนโปรแกรมใหม่ (อัปโหลด 17 ก.ย. 2569 ทีหลังฉบับแรกด้านบนซึ่งอัปโหลด 5 ก.ย. 2569)</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
 <a class="chapter-card" href="Topic10_LC3_to_RISCV_V3.html">
   <div class="chapter-icon">🎮</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 10: สะพาน LC-3 → RISC-V (V3 — มีแบบฝึกหัดโต้ตอบ)</div>
+    <div class="chapter-title">Topic 10 · สะพาน LC-3 → RISC-V</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span><span class="ds-badge ds-badge--new">ฉบับล่าสุด</span></div>
     <div class="chapter-desc">ฉบับล่าสุด — มีตัวจำลอง/เกมโต้ตอบในตัว (แมปรีจิสเตอร์ LC-3↔RV32I, ฟอร์แมตคำสั่ง) และคำถามแบบคลิกตอบ (อัปโหลด 17 ก.ย. 2569)</div>
-  </div>
-  <div class="chapter-arrow">&rarr;</div>
-</a>
-<a class="chapter-card" href="Topic11_RV32I_ISA_and_Assembly.html">
-  <div class="chapter-icon">🧩</div>
-  <div class="chapter-info">
-    <div class="chapter-title">Topic 11: RV32I ISA &amp; Assembly</div>
-    <div class="chapter-desc">ชุดคำสั่ง RV32I แบบเจาะลึก การเขียนโปรแกรม Assembly บน RISC-V</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
 <a class="chapter-card" href="Topic11_RV32I_ISA_and_Assembly_V3.html">
   <div class="chapter-icon">🎮</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 11: RV32I ISA &amp; Assembly (V3 — มีแบบฝึกหัดโต้ตอบ)</div>
+    <div class="chapter-title">Topic 11 · RV32I ISA & Assembly</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span><span class="ds-badge ds-badge--new">ฉบับล่าสุด</span></div>
     <div class="chapter-desc">ฉบับล่าสุด — มีตัวจำลองการเข้ารหัสคำสั่ง, Stack Frame, la/li pseudo-instruction และคำถามแบบคลิกตอบ (อัปโหลด 17 ก.ย. 2569)</div>
-  </div>
-  <div class="chapter-arrow">&rarr;</div>
-</a>
-<a class="chapter-card" href="Topic12_Single_Cycle_Datapath_and_Control.html">
-  <div class="chapter-icon">🔧</div>
-  <div class="chapter-info">
-    <div class="chapter-title">Topic 12: Single-Cycle Datapath &amp; Control</div>
-    <div class="chapter-desc">การออกแบบ Datapath และวงจรควบคุมแบบ Single-Cycle สำหรับ RV32I</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
 <a class="chapter-card" href="Topic12_Single_Cycle_Datapath_and_Control_V3.html">
   <div class="chapter-icon">🎮</div>
   <div class="chapter-info">
-    <div class="chapter-title">Topic 12: Single-Cycle Datapath &amp; Control (V3 — มีแบบฝึกหัดโต้ตอบ)</div>
+    <div class="chapter-title">Topic 12 · Single-Cycle Datapath & Control</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span><span class="ds-badge ds-badge--new">ฉบับล่าสุด</span></div>
     <div class="chapter-desc">ฉบับล่าสุด — มีตัวจำลอง Datapath แบบโต้ตอบและคำถามแบบคลิกตอบ (อัปโหลด 17 ก.ย. 2569)</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
-
+<details class="ds-older">
+  <summary>ฉบับก่อนหน้าของ Topic 10–12 (4 ฉบับ) — เนื้อหาเดิม เก็บไว้อ้างอิง</summary>
+  <div class="ds-older-list">
+<a class="chapter-card" href="Topic10_LC3_to_RISCV.html">
+  <div class="chapter-icon">🌉</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 10 · สะพาน LC-3 → RISC-V (ฉบับแรก)</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
+    <div class="chapter-desc">เปรียบเทียบ ISA, การย้ายจาก LC-3 สู่ RV32I</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic10_LC3_to_RISCV_Detailed.html">
+  <div class="chapter-icon">🌉</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 10 · สะพาน LC-3 → RISC-V (ฉบับละเอียด)</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
+    <div class="chapter-desc">เนื้อหาละเอียดกว่าฉบับด้านบน — diagram, ตารางแมปคำสั่งครบ, ตัวอย่างเขียนโปรแกรมใหม่ (อัปโหลด 17 ก.ย. 2569 ทีหลังฉบับแรกด้านบนซึ่งอัปโหลด 5 ก.ย. 2569)</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic11_RV32I_ISA_and_Assembly.html">
+  <div class="chapter-icon">🧩</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 11 · RV32I ISA & Assembly (ฉบับแรก)</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
+    <div class="chapter-desc">ชุดคำสั่ง RV32I แบบเจาะลึก การเขียนโปรแกรม Assembly บน RISC-V</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+<a class="chapter-card" href="Topic12_Single_Cycle_Datapath_and_Control.html">
+  <div class="chapter-icon">🔧</div>
+  <div class="chapter-info">
+    <div class="chapter-title">Topic 12 · Single-Cycle Datapath & Control (ฉบับแรก)</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
+    <div class="chapter-desc">การออกแบบ Datapath และวงจรควบคุมแบบ Single-Cycle สำหรับ RV32I</div>
+  </div>
+  <div class="chapter-arrow">&rarr;</div>
+</a>
+  </div>
+</details>
 <div class="section-divider">
-  <h2>สรุปเสริมจากหนังสือ Patterson &amp; Hennessy</h2>
-  <p>Computer Organization and Design (RISC-V Edition) — เนื้อหาคู่ขนานกับ Topic ด้านบน แต่อิงตำราเล่มนี้โดยตรง ละเอียดกว่าและครอบคลุมกว้างกว่า</p>
+  <h2>ส่วนที่ 3 · ตำรา Patterson &amp; Hennessy (บทที่ 1–6)</h2>
+  <p>Computer Organization and Design (RISC-V Edition) — คู่ขนานกับ Topic ด้านบน ละเอียดและกว้างกว่า</p>
 </div>
 <a class="chapter-card" href="PH_Chapter1_Computer_Abstractions_and_Technology.html">
   <div class="chapter-icon">📘</div>
   <div class="chapter-info">
-    <div class="chapter-title">P&amp;H บทที่ 1: Computer Abstractions and Technology</div>
+    <div class="chapter-title">P&amp;H บทที่ 1 · Computer Abstractions and Technology</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">การนิยามสมรรถนะ (performance), Response Time/Throughput, Power, Multiprocessors, Benchmarks</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -308,7 +443,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="PH_Chapter2_Instructions_Language_of_the_Computer.html">
   <div class="chapter-icon">📘</div>
   <div class="chapter-info">
-    <div class="chapter-title">P&amp;H บทที่ 2: Instructions — Language of the Computer</div>
+    <div class="chapter-title">P&amp;H บทที่ 2 · Instructions — Language of the Computer</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">ชุดคำสั่ง RISC-V, ตัวถูกดำเนินการแบบรีจิสเตอร์/หน่วยความจำ, การแทนคำสั่งและข้อมูล (41 หัวข้อย่อย ละเอียดที่สุด)</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -316,7 +452,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="PH_Chapter3_Arithmetic_for_Computers.html">
   <div class="chapter-icon">📘</div>
   <div class="chapter-info">
-    <div class="chapter-title">P&amp;H บทที่ 3: Arithmetic for Computers</div>
+    <div class="chapter-title">P&amp;H บทที่ 3 · Arithmetic for Computers</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">การบวก/ลบเลขจำนวนเต็มและ overflow, เลขคณิตมัลติมีเดีย (SIMD), การคูณ/หาร, จุดลอยตัว</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -324,7 +461,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="PH_Chapter4_The_Processor.html">
   <div class="chapter-icon">📘</div>
   <div class="chapter-info">
-    <div class="chapter-title">P&amp;H บทที่ 4: The Processor</div>
+    <div class="chapter-title">P&amp;H บทที่ 4 · The Processor</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">Datapath แบบ Single-Cycle และ Pipelined, Control Unit, ปัญหาสมรรถนะและ Hazard</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -332,7 +470,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="PH_Chapter5_Large_and_Fast_Memory_Hierarchy.html">
   <div class="chapter-icon">📘</div>
   <div class="chapter-info">
-    <div class="chapter-title">P&amp;H บทที่ 5: Large and Fast — Exploiting Memory Hierarchy</div>
+    <div class="chapter-title">P&amp;H บทที่ 5 · Large and Fast — Exploiting Memory Hierarchy</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">หลักการ Locality, ลำดับชั้นหน่วยความจำ, เทคโนโลยี Memory/DRAM, Cache</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -340,20 +479,21 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="PH_Chapter6_Parallel_Processors_Client_to_Cloud.html">
   <div class="chapter-icon">📘</div>
   <div class="chapter-info">
-    <div class="chapter-title">P&amp;H บทที่ 6: Parallel Processors from Client to Cloud</div>
+    <div class="chapter-title">P&amp;H บทที่ 6 · Parallel Processors from Client to Cloud</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">Serial vs Parallel, ความยากของการเขียนโปรแกรมขนาน, สถาปัตยกรรมมัลติคอร์</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
-
 <div class="section-divider">
-  <h2>ทบทวนก่อนสอบปลายภาค (Final Exam Review)</h2>
-  <p>สรุปรวมและแบบฝึกหัดครอบคลุมทั้งวิชา — อ่านสรุปก่อน แล้วทำ Quiz</p>
+  <h2>ส่วนที่ 4 · เตรียมสอบปลายภาค</h2>
+  <p>อ่านสรุปรวมก่อน แล้วทำ Quiz</p>
 </div>
 <a class="chapter-card" href="Final_Exam_Summary_Computer_Organization.html">
   <div class="chapter-icon">📚</div>
   <div class="chapter-info">
-    <div class="chapter-title">สรุปเตรียมสอบ Final (P&amp;H บทที่ 1–6 + LC-3 I/O)</div>
+    <div class="chapter-title">Final · สรุปเตรียมสอบ (P&amp;H บทที่ 1–6 + LC-3 I/O)</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
     <div class="chapter-desc">สรุปรวม 86 หัวข้อ แยกแท็บตามบท พร้อมรูปประกอบ สูตร เฉลยการบ้าน มินิเกม 61 เกม และ Quiz 43 ข้อในไฟล์เดียว</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
@@ -361,7 +501,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 <a class="chapter-card" href="Final_Quiz_Computer_Organization.html">
   <div class="chapter-icon">📝</div>
   <div class="chapter-info">
-    <div class="chapter-title">Quiz ก่อนสอบ Final (43 ข้อ)</div>
+    <div class="chapter-title">Final · Quiz ก่อนสอบ (43 ข้อ)</div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--quiz">ข้อสอบ</span></div>
     <div class="chapter-desc">Performance/CPI/MIPS, ชุดคำสั่ง RISC-V, วงจรคูณ-หาร, Pipeline และ Hazard, Branch Prediction, Cache/AMAT, LC-3 I/O — เติมคำตอบทีละขั้นพร้อมเฉลย</div>
   </div>
   <div class="chapter-arrow">&rarr;</div>
