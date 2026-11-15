@@ -210,6 +210,24 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 @media (max-width:700px){body > header,body > .header,body > .site-header{position:relative!important;top:auto!important;}}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}}
 </style>
+<style>
+/* week-view 2026-11 — group hub cards by week or by type */
+.wv-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:4px 2px 2px;}
+.wv-label{font-size:.85rem;font-weight:600;color:var(--text-soft);}
+.wv-seg{display:inline-flex;border:1px solid var(--ds-line,#d9d4c7);border-radius:999px;overflow:hidden;background:var(--panel,#fff);}
+.wv-seg button{font:inherit;font-size:.88rem;font-weight:600;min-height:36px;padding:6px 16px;border:0;background:transparent;color:var(--text);cursor:pointer;}
+.wv-seg button+button{border-left:1px solid var(--ds-line,#d9d4c7);}
+.wv-seg button[aria-pressed="true"]{background:var(--navy-deep,#0F2740);color:#fff;}
+.wv-seg button:focus-visible{outline:3px solid var(--flag,#C9A24B);outline-offset:-3px;}
+.wv-hint{font-size:.82rem;color:var(--text-soft);}
+.chapter-list .ds-group-title.wv-h{display:flex;align-items:baseline;gap:10px;text-transform:none;letter-spacing:.2px;font-size:1rem;color:var(--text);border-bottom:1px solid var(--ds-line,#d9d4c7);padding-bottom:6px;margin-top:22px;}
+.chapter-list .ds-group-title.wv-h:first-child{margin-top:4px;}
+.wv-h .wv-sub{font-size:.82rem;font-weight:500;color:var(--text-soft);}
+.ds-badge--all{background:#E6EEF8;color:#1E4A7A;}
+:root[data-theme="dark"] .wv-seg button[aria-pressed="true"]{background:#C9A24B;color:#14202E;}
+:root[data-theme="dark"] .ds-badge--all{background:#1B2F47;color:#A9CBF0;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wv-seg button[aria-pressed="true"]{background:#C9A24B;color:#14202E;}:root:not([data-theme="light"]) .ds-badge--all{background:#1B2F47;color:#A9CBF0;}}
+</style>
 </head>
 <body>
 <header>
@@ -219,8 +237,8 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
   <p>พัฒนาซอฟต์แวร์ครบวงจรด้วย Java Spring Boot Stack — สรุปรายสัปดาห์และแบบทดสอบ OOP</p>
 </header>
 <div class="wrap">
-  <div class="chapter-list">
-<a class="chapter-card" href="Week1_Setup_Summary.html">
+  <div class="chapter-list" data-week-start="2026-11-09">
+<a class="chapter-card" data-week="1" href="Week1_Setup_Summary.html">
   <div class="chapter-icon">🛠️</div>
   <div class="chapter-info">
     <div class="chapter-title">Week 1 · เตรียมเครื่องมือ Java Spring Boot</div>
@@ -229,7 +247,7 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
-<a class="chapter-card" href="OOP_Java_Quiz.html">
+<a class="chapter-card" data-week="1" href="OOP_Java_Quiz.html">
   <div class="chapter-icon">🧩</div>
   <div class="chapter-info">
     <div class="chapter-title">Week 1 · OOP (Java) · แบบทดสอบ 20 ข้อ</div>
@@ -238,7 +256,7 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
-<a class="chapter-card" href="Requirements_Architecture_Quiz.html">
+<a class="chapter-card" data-week="1" href="Requirements_Architecture_Quiz.html">
   <div class="chapter-icon">📐</div>
   <div class="chapter-info">
     <div class="chapter-title">Week 1 · Software Requirements, Architecture &amp; Design · แบบทดสอบ 20 ข้อ</div>
@@ -247,7 +265,7 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
-<a class="chapter-card" href="Spring_Framework_Quiz.html">
+<a class="chapter-card" data-week="1" href="Spring_Framework_Quiz.html">
   <div class="chapter-icon">🌱</div>
   <div class="chapter-info">
     <div class="chapter-title">Week 1 · Spring Framework &amp; Modern Application Development · แบบทดสอบ 20 ข้อ</div>
@@ -445,6 +463,48 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
   new MutationObserver(function(muts){
     for(var i=0;i<muts.length;i++){ if(muts[i].addedNodes.length || muts[i].removedNodes.length){ later(); return; } }
   }).observe(document.documentElement, {childList:true, subtree:true});
+})();
+</script>
+<script>
+/* week-view 2026-11 — no-JS fallback = the original card order */
+(function(){
+  var list=document.querySelector('.chapter-list[data-week-start]'); if(!list) return;
+  var cards=[].slice.call(list.querySelectorAll('.chapter-card'));
+  cards.forEach(function(c,i){c.setAttribute('data-wv-i',i);});
+  var MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  var p=list.getAttribute('data-week-start').split('-'); var start=new Date(+p[0],+p[1]-1,+p[2]);
+  function range(w){var a=new Date(start);a.setDate(a.getDate()+7*(w-1));var b=new Date(a);b.setDate(b.getDate()+4);
+    var y=' '+(b.getFullYear()+543);
+    return a.getMonth()===b.getMonth()? a.getDate()+'–'+b.getDate()+' '+MON[b.getMonth()]+y : a.getDate()+' '+MON[a.getMonth()]+' – '+b.getDate()+' '+MON[b.getMonth()]+y;}
+  function wk(c){return +(c.getAttribute('data-week')||0);}
+  function kind(c){return c.querySelector('.ds-badge--quiz')?1:0;}
+  var KIND=['สรุปบทเรียน','แบบฝึกหัดและแบบทดสอบ'];
+  var bar=document.createElement('div'); bar.className='wv-bar';
+  bar.innerHTML='<span class="wv-label" id="wvLabel">จัดเรียง:</span><div class="wv-seg" role="group" aria-labelledby="wvLabel">'+
+    '<button type="button" data-v="week">ตามสัปดาห์</button><button type="button" data-v="kind">ตามประเภท</button></div>'+
+    '<span class="wv-hint" aria-live="polite"></span>';
+  list.parentNode.insertBefore(bar,list);
+  var hint=bar.querySelector('.wv-hint');
+  function h(text,sub){var e=document.createElement('h2');e.className='ds-group-title wv-h';e.textContent=text+' ';
+    if(sub){var s=document.createElement('span');s.className='wv-sub';s.textContent=sub;e.appendChild(s);} return e;}
+  function render(v){
+    [].slice.call(list.querySelectorAll('.wv-h')).forEach(function(e){e.remove();});
+    var groups={},order=[];
+    cards.forEach(function(c){var k=v==='week'?wk(c):kind(c); if(!(k in groups)){groups[k]=[];order.push(k);} groups[k].push(c);});
+    order.sort(function(a,b){ if(v==='week'){ if(a===0)return 1; if(b===0)return -1; } return a-b; });
+    order.forEach(function(k){
+      var g=groups[k].sort(function(a,b){ return v==='week' ? (kind(a)-kind(b)) || (a.getAttribute('data-wv-i')-b.getAttribute('data-wv-i'))
+                                                            : ((wk(a)||99)-(wk(b)||99)) || (a.getAttribute('data-wv-i')-b.getAttribute('data-wv-i')); });
+      var head = v==='week' ? (k===0 ? h('ภาพรวมทั้งวิชา','ใช้ทบทวนได้ทุกสัปดาห์') : h('Week '+k, range(k))) : h(KIND[k], g.length+' รายการ');
+      list.appendChild(head); g.forEach(function(c){list.appendChild(c);});
+    });
+    [].slice.call(bar.querySelectorAll('button')).forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-v')===v));});
+    hint.textContent = v==='week' ? 'เรียงจากสัปดาห์แรกไปล่าสุด' : 'แยกสรุปกับแบบฝึกหัด เรียงตามสัปดาห์ในแต่ละกลุ่ม';
+    try{localStorage.setItem('hub_view',v);}catch(e){}
+  }
+  bar.addEventListener('click',function(e){var b=e.target.closest('button[data-v]'); if(b) render(b.getAttribute('data-v'));});
+  var v='week'; try{ if(localStorage.getItem('hub_view')==='kind') v='kind'; }catch(e){}
+  render(v);
 })();
 </script>
 </body>
