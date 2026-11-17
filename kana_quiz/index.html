@@ -219,6 +219,9 @@ main{flex:1;min-width:0;}
 <style>/* a11y-fix 2026-11 kana */
 :root:not([data-theme="dark"]) .toolbar button[style*="--flag"],:root:not([data-theme="dark"]) #resetAllBtn,:root:not([data-theme="dark"]) .cat-section-label{color:#886321 !important;}
 :root:not([data-theme="dark"]) .nav-cell{color:#2A2A26;}
+:root[data-theme="light"] .nav-cell.answered,:root[data-theme="light"] .nav-cell.correct,:root[data-theme="light"] .nav-cell.incorrect{color:#fff;}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .nav-cell.answered,:root:not([data-theme="dark"]) .nav-cell.correct,:root:not([data-theme="dark"]) .nav-cell.incorrect{color:#fff;}}
+.nav-cell.current{color:#1B1300!important;}
 :root[data-theme="dark"] .nav-cell,:root[data-theme="dark"] .mode-toggle button.active,:root[data-theme="dark"] .footer-actions .check-btn{color:#0F1620;}
 :root[data-theme="dark"] .score-box .big,:root[data-theme="dark"] .q-prompt .kanji-big{color:var(--text);}
 
@@ -338,6 +341,60 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 [id]{scroll-margin-top:var(--a11y-hdr,0px);}
 @media (max-width:700px){body > header,body > .header,body > .site-header{position:relative!important;top:auto!important;}}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}}
+/* system-dark mirror 2026-11 — same as the explicit dark rules, for visitors who never toggled the theme */
+@media (prefers-color-scheme: dark){
+:root:not([data-theme="light"]){--paper:#12161d; --panel:#1b212b; --border:#333c48;
+  --text:#e4e7ec; --text-soft:#9aa5b3; --navy:#7fb0e0; --navy-deep:#0b1420;
+  --accent:#7fb0e0; --accent2:#8ec1f2; --accent-soft:#1c2b3d;
+  --correct:#7fd0a0; --correct-soft:#173323;
+  --incorrect:#f0958a; --incorrect-soft:#33201d;
+  --flag:#e3bd74; --flag-soft:#332a17; --unanswered:#8b93a0; --cream:#232922;}
+:root:not([data-theme="light"]) .theme-toggle-btn,:root:not([data-theme="light"]) .calc-toggle-btn{color:var(--text);}
+:root:not([data-theme="light"]) .diagram-block h4,:root:not([data-theme="light"]) .diagram-block h4 span{color:var(--text);}
+:root:not([data-theme="light"]) .diagram-actor-label,:root:not([data-theme="light"]) .diagram-arrow-label{fill:#E4E7EC;}
+:root:not([data-theme="light"]) #fontCtrl button,:root:not([data-theme="light"]) .theme-toggle-btn,:root:not([data-theme="light"]) .header-actions button,:root:not([data-theme="light"]) .calc-toggle-btn,:root:not([data-theme="light"]) .diagram-play-btn{background:var(--panel);}
+:root:not([data-theme="light"]) .section-card h2,:root:not([data-theme="light"]) .section-card h3,:root:not([data-theme="light"]) .diagram-block{color:var(--text);}
+:root:not([data-theme="light"]) .callout-example{background:var(--flag-soft, #332a17);}
+:root:not([data-theme="light"]) table tr:nth-child(2n) td{background:rgba(255,255,255,0.04);}
+:root:not([data-theme="light"]) .section-card pre{background:var(--panel) !important;color:var(--text) !important;}
+:root:not([data-theme="light"]) .diagram-steps-list .step-num,:root:not([data-theme="light"]) .game-btn:not(.ghost):not(.secondary){color:#0F1620;}
+:root:not([data-theme="light"]) .section-card a:not([class]),:root:not([data-theme="light"]) main a:not([class]){color:#8EC1F2;}
+:root:not([data-theme="light"]) .refs,:root:not([data-theme="light"]) .refs li,:root:not([data-theme="light"]) .refs i{color:#B8C2CF;}
+:root:not([data-theme="light"]) .nav-cell,:root:not([data-theme="light"]) .mode-toggle button.active,:root:not([data-theme="light"]) .footer-actions .check-btn{color:#0F1620;}
+:root:not([data-theme="light"]) .score-box .big,:root:not([data-theme="light"]) .q-prompt .kanji-big{color:var(--text);}
+:root:not([data-theme="light"]){--ds-sh-1:0 1px 2px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.25);--ds-sh-2:0 4px 10px rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.35);--ds-hdr:linear-gradient(135deg,#0F1620 0%,#18222F 100%);--ds-line:rgba(255,255,255,.08);--ds-tint:rgba(142,193,242,.08);}
+:root:not([data-theme="light"]) .ds-badge--quiz{background:#3A2F17;color:#E9C987;}
+:root:not([data-theme="light"]) .ds-badge--new{background:#17372A;color:#8FD9AE;}
+:root:not([data-theme="light"]){--a11y-focus:#8EC1F2;}
+:root:not([data-theme="light"]) .type-char{color:var(--text);}
+:root:not([data-theme="light"]) .type-btn:not(.secondary){background:#C9A24B;color:#14202E;}
+:root:not([data-theme="light"]) .toolbar button[style*="--flag"],:root:not([data-theme="light"]) #resetAllBtn,:root:not([data-theme="light"]) .cat-section-label,:root:not([data-theme="light"]) .callout-example:not(.callout-quiz) .callout-title{color:var(--flag)!important;}
+}
+/* type-mode 2026-11 — พิมพ์คำอ่าน */
+.type-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--ds-r-lg,16px);padding:28px 20px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:var(--ds-sh-1,0 2px 14px rgba(15,39,64,.08));margin-bottom:16px;}
+.type-stats{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 16px;font-size:13.5px;color:var(--text-soft);}
+.type-stats b{color:var(--text);}
+.type-char{font-size:104px;font-weight:700;line-height:1.05;color:var(--navy-deep);}
+:root[data-theme="dark"] .type-char{color:var(--text);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .type-char{color:var(--text);}}
+.type-form{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;width:100%;max-width:420px;}
+.type-form label{width:100%;text-align:center;font-size:14px;font-weight:600;color:var(--text);}
+.type-input{flex:1 1 180px;min-width:0;font-family:'JetBrains Mono',monospace;font-size:24px;text-align:center;padding:10px 12px;border:2px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);}
+.type-input:focus{border-color:var(--accent2);outline:3px solid var(--a11y-focus,#1F5FA8);outline-offset:2px;}
+.type-input.ok{border-color:var(--correct);background:var(--correct-soft);}
+.type-input.bad{border-color:var(--incorrect);background:var(--incorrect-soft);}
+.type-btn{border:none;background:var(--navy);color:#fff;padding:11px 18px;min-height:44px;border-radius:10px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;}
+.type-btn.secondary{background:var(--panel);color:var(--text);border:1.5px solid var(--border);}
+:root[data-theme="dark"] .type-btn:not(.secondary){background:#C9A24B;color:#14202E;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .type-btn:not(.secondary){background:#C9A24B;color:#14202E;}}
+.type-feedback{min-height:1.6em;font-size:16px;font-weight:700;text-align:center;}
+.type-feedback.ok{color:var(--correct);}
+.type-feedback.bad{color:var(--incorrect);}
+.type-detail{width:100%;max-width:460px;border-left:3px solid var(--incorrect);background:var(--incorrect-soft);border-radius:8px;padding:12px 14px;font-size:14px;line-height:1.7;}
+.type-help{font-size:12.5px;color:var(--text-soft);text-align:center;max-width:460px;line-height:1.6;}
+.type-summary{width:100%;max-width:460px;text-align:center;line-height:1.8;}
+.type-summary .wrong-list{font-size:28px;letter-spacing:6px;margin:6px 0;}
+.type-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
 </style>
 </head>
 <body>
@@ -358,6 +415,7 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
       <button id="btnExerciseMode" class="active">แบบฝึกหัด</button>
       <button id="btnAnswerMode">เฉลย</button>
       <button id="btnFlashcardMode">Flashcard</button>
+      <button id="btnTypeMode">พิมพ์คำอ่าน</button>
     </div>
     <button id="resetAllBtn" style="border:1.5px solid var(--flag);color:var(--flag);">↺ ทำใหม่ทั้งชุด</button>
     <select id="orderSelect">
@@ -672,6 +730,21 @@ function isFullyCorrect(qIdx){ return questionStatus(qIdx) === "correct"; }
 function renderNavGrid(){
   const nav = document.getElementById("navGrid");
   nav.innerHTML = "";
+  if(mode==="type"){
+    const st = typeState[currentScript];
+    typeList.forEach((x, pos)=>{
+      const cell = document.createElement("div");
+      cell.className = "nav-cell";
+      if(st.res[x.ch]==="ok") cell.classList.add("correct");
+      else if(st.res[x.ch]==="bad") cell.classList.add("incorrect");
+      if(pos===st.pos) cell.classList.add("current");
+      cell.textContent = pos+1;
+      cell.setAttribute("aria-label", "ตัวที่ "+(pos+1));
+      cell.onclick = ()=>{ st.pos = pos; renderTypeMode(); };
+      nav.appendChild(cell);
+    });
+    return;
+  }
   displayIndexes.forEach((qIdx, pos)=>{
     const cell = document.createElement("div");
     cell.className = "nav-cell";
@@ -921,6 +994,7 @@ function updateScore(){
 }
 
 function resetAll(){
+  typeState[currentScript] = {pos:0, res:{}, streak:0, best:0}; typeOnlyWrong = false;
   progressState[currentScript].userAnswers = {};
   progressState[currentScript].checked = {};
   userAnswers = progressState[currentScript].userAnswers;
@@ -929,19 +1003,161 @@ function resetAll(){
 }
 document.getElementById("resetAllBtn").addEventListener("click", resetAll);
 
+/* ===== type-mode 2026-11: พิมพ์คำอ่าน (โรมันจิ) ===== */
+// accepted spellings: Hepburn first (shown as the answer), then common Kunrei/IME spellings
+const TYPE_ALT = {shi:["si"], chi:["ti"], tsu:["tu"], fu:["hu"], ji:["zi"], wo:["o"], n:["nn"]};
+const TYPE_CHAR_ALT = {"ぢ":["ji","di"], "ヂ":["ji","di"], "づ":["zu","du"], "ヅ":["zu","du"]};
+function typeAccepted(ch, romaji){
+  if(TYPE_CHAR_ALT[ch]) return TYPE_CHAR_ALT[ch];
+  return [romaji].concat(TYPE_ALT[romaji]||[]);
+}
+function typeNormalize(v){
+  return String(v||"").normalize("NFKC").toLowerCase().replace(/[^a-z]/g,"");
+}
+let typeState = { katakana:{pos:0, res:{}, streak:0, best:0}, hiragana:{pos:0, res:{}, streak:0, best:0} };
+let typeList = [];
+let typeOnlyWrong = false;
+let typeAnswered = false;   // current card has been checked
+let typeTimer = null;
+function buildTypeList(){
+  const isHira = currentScript === "hiragana";
+  let list = [];
+  KANA.rows.forEach(row=>{
+    if(!selectedCats.has(row.id)) return;
+    row.chars.forEach(c=>{
+      const ch = isHira ? c.hira : c.kata;
+      list.push({ch:ch, romaji:c.romaji, mnemo: isHira ? c.mnemoHira : c.mnemoKata, row:row});
+    });
+  });
+  const st = typeState[currentScript];
+  if(typeOnlyWrong){
+    const w = list.filter(x=>st.res[x.ch]==="bad");
+    if(w.length) list = w; else typeOnlyWrong = false;
+  }
+  if(order==="shuffle") list = shuffleArray(list);
+  else if(order==="weak") list = list.slice().sort((a,b)=>(masteryWrong[masteryKey(currentScript,b.ch)]||0)-(masteryWrong[masteryKey(currentScript,a.ch)]||0));
+  typeList = list;
+  if(st.pos >= typeList.length) st.pos = 0;
+}
+function typeCounts(){
+  const st = typeState[currentScript];
+  let ok=0, bad=0;
+  typeList.forEach(x=>{ if(st.res[x.ch]==="ok") ok++; else if(st.res[x.ch]==="bad") bad++; });
+  return {ok, bad, done: ok+bad};
+}
+function renderTypeMode(){
+  clearTimeout(typeTimer);
+  const main = document.getElementById("mainArea");
+  main.innerHTML = "";
+  const st = typeState[currentScript];
+  if(typeList.length===0){
+    main.innerHTML = '<div class="q-card">ไม่มีตัวอักษรในหมวดที่เลือก กรุณาเลือกอย่างน้อย 1 หมวด</div>';
+    renderNavGrid(); updateTypeScore(); return;
+  }
+  const n = typeCounts();
+  const card = document.createElement("div");
+  card.className = "type-card";
+  if(st.pos >= typeList.length){
+    const wrong = typeList.filter(x=>st.res[x.ch]==="bad");
+    card.innerHTML = '<div class="type-summary"><h2 style="margin:0 0 6px">จบชุดแล้ว</h2>'
+      + '<div>ถูก <b>'+n.ok+'</b> จาก '+typeList.length+' ตัว · ต่อเนื่องสูงสุด <b>'+st.best+'</b> ตัว</div>'
+      + (wrong.length ? '<div style="margin-top:10px">ตัวที่ยังพิมพ์ผิด</div><div class="wrong-list" lang="ja">'+wrong.map(x=>x.ch).join(" ")+'</div>' : '<div style="margin-top:10px">ถูกทุกตัว 🎉</div>')
+      + '</div><div class="type-actions">'
+      + (wrong.length ? '<button class="type-btn" id="typeWrongBtn">ฝึกเฉพาะตัวที่ผิด ('+wrong.length+')</button>' : '')
+      + '<button class="type-btn'+(wrong.length?' secondary':'')+'" id="typeRestartBtn">เริ่มชุดใหม่</button></div>';
+    main.appendChild(card);
+    const wb = document.getElementById("typeWrongBtn");
+    if(wb) wb.onclick = ()=>{ typeOnlyWrong = true; st.pos = 0; st.streak = 0; buildTypeList(); typeList.forEach(x=>{ delete st.res[x.ch]; }); renderTypeMode(); };
+    document.getElementById("typeRestartBtn").onclick = ()=>{ typeOnlyWrong=false; st.res={}; st.pos=0; st.streak=0; buildTypeList(); renderTypeMode(); };
+    (wb || document.getElementById("typeRestartBtn")).focus();
+    renderNavGrid(); updateTypeScore(); return;
+  }
+  const item = typeList[st.pos];
+  typeAnswered = false;
+  card.innerHTML =
+      '<div class="type-stats" aria-label="ความคืบหน้า"><span>ตัวที่ <b>'+(st.pos+1)+'</b> / '+typeList.length+'</span>'
+    + '<span>ถูก <b>'+n.ok+'</b></span><span>ผิด <b>'+n.bad+'</b></span><span>ต่อเนื่อง <b>'+st.streak+'</b></span></div>'
+    + '<div class="type-char" lang="ja" aria-hidden="true">'+item.ch+'</div>'
+    + '<form class="type-form" id="typeForm" autocomplete="off">'
+    + '<label for="typeInput">พิมพ์คำอ่านเป็นโรมันจิของตัว <span lang="ja">'+item.ch+'</span></label>'
+    + '<input id="typeInput" class="type-input" type="text" inputmode="latin" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="8" placeholder="เช่น ka">'
+    + '<button class="type-btn" type="submit" id="typeSubmit">ตรวจ</button>'
+    + '<button class="type-btn secondary" type="button" id="typeSkip">ไม่รู้ / ดูคำตอบ</button>'
+    + '</form>'
+    + '<div class="type-feedback" id="typeFeedback" role="status" aria-live="polite"></div>'
+    + '<div id="typeDetail"></div>'
+    + '<div class="type-help">กด Enter เพื่อตรวจ · ใช้ตัวสะกดแบบ Hepburn (เช่น shi, chi, tsu, fu, ji) — แบบ si, ti, tu, hu, zi ก็นับว่าถูก</div>';
+  main.appendChild(card);
+  const input = document.getElementById("typeInput");
+  const form = document.getElementById("typeForm");
+  form.addEventListener("submit", (e)=>{ e.preventDefault(); if(typeAnswered) typeNext(); else typeCheck(item, input.value, false); });
+  document.getElementById("typeSkip").onclick = ()=>{ if(typeAnswered) typeNext(); else typeCheck(item, "", true); };
+  input.focus();
+  renderNavGrid(); updateTypeScore();
+}
+function typeCheck(item, value, gaveUp){
+  const st = typeState[currentScript];
+  const v = typeNormalize(value);
+  if(!gaveUp && v===""){ const fb=document.getElementById("typeFeedback"); fb.className="type-feedback"; fb.textContent="พิมพ์คำอ่านก่อนกดตรวจ"; return; }
+  const ok = !gaveUp && typeAccepted(item.ch, item.romaji).includes(v);
+  typeAnswered = true;
+  const first = st.res[item.ch]===undefined;
+  st.res[item.ch] = ok ? "ok" : "bad";
+  if(ok){ st.streak++; st.best=Math.max(st.best, st.streak); }
+  else { st.streak=0; masteryWrong[masteryKey(currentScript,item.ch)]=(masteryWrong[masteryKey(currentScript,item.ch)]||0)+1; saveMastery(); }
+  const input = document.getElementById("typeInput");
+  const fb = document.getElementById("typeFeedback");
+  input.readOnly = true;
+  input.classList.add(ok ? "ok" : "bad");
+  const ans = item.romaji + (item.ch==="を"||item.ch==="ヲ" ? ' (ออกเสียง "o")' : "");
+  if(ok){
+    fb.className = "type-feedback ok";
+    fb.textContent = "✓ ถูกต้อง — " + item.ch + " = " + ans + (v!==item.romaji ? " (ตัวสะกดมาตรฐาน: "+item.romaji+")" : "");
+    document.getElementById("typeSubmit").textContent = "ถัดไป";
+    document.getElementById("typeSkip").style.display = "none";
+    typeTimer = setTimeout(typeNext, v!==item.romaji ? 1600 : 700);
+  } else {
+    fb.className = "type-feedback bad";
+    fb.textContent = (gaveUp ? "คำตอบ: " : "✗ ยังไม่ถูก — คำตอบคือ ") + ans;
+    const d = document.getElementById("typeDetail");
+    d.innerHTML = '<div class="type-detail">'
+      + (gaveUp ? "" : '<div>คุณพิมพ์: <code>'+escapeHtml(value)+'</code></div>')
+      + '<div><b>วรรค '+escapeHtml(item.row.label)+':</b> '+escapeHtml(item.row.tip)+'</div>'
+      + (item.mnemo ? '<div><b>เทคนิคจำ:</b> '+escapeHtml(item.mnemo)+'</div>' : '')
+      + '</div>' + renderStrokeAnim(item.ch, "typestroke", false);
+    wireStrokeButtons(d);
+    document.getElementById("typeSubmit").textContent = "ถัดไป (Enter)";
+    document.getElementById("typeSkip").style.display = "none";
+    document.getElementById("typeSubmit").focus();
+  }
+  renderNavGrid(); updateTypeScore();
+}
+function typeNext(){
+  clearTimeout(typeTimer);
+  typeState[currentScript].pos++;
+  renderTypeMode();
+}
+function updateTypeScore(){
+  const n = typeCounts();
+  document.getElementById("scoreText").textContent = n.ok + "/" + typeList.length;
+  document.getElementById("scoreBox").style.display = "block";
+}
+
 function render(){
   if(mode==="exercise") renderExercise();
   else if(mode==="answer") renderAnswers();
+  else if(mode==="type"){ buildTypeList(); renderTypeMode(); }
   else renderFlashcard();
 }
 
 function setActiveModeBtn(id){
-  ["btnExerciseMode","btnAnswerMode","btnFlashcardMode"].forEach(btnId=>{
+  ["btnExerciseMode","btnAnswerMode","btnFlashcardMode","btnTypeMode"].forEach(btnId=>{
     document.getElementById(btnId).classList.toggle("active", btnId===id);
   });
 }
 document.getElementById("btnExerciseMode").onclick = ()=>{ mode="exercise"; setActiveModeBtn("btnExerciseMode"); render(); };
 document.getElementById("btnAnswerMode").onclick = ()=>{ mode="answer"; setActiveModeBtn("btnAnswerMode"); render(); };
+document.getElementById("btnTypeMode").onclick = ()=>{ mode="type"; typeOnlyWrong=false; setActiveModeBtn("btnTypeMode"); render(); };
 document.getElementById("btnFlashcardMode").onclick = ()=>{ mode="flashcard"; flashPos=0; flashFlipped=false; setActiveModeBtn("btnFlashcardMode"); render(); };
 
 function updateScriptLabel(){
