@@ -228,6 +228,18 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 :root[data-theme="dark"] .ds-badge--all{background:#1B2F47;color:#A9CBF0;}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wv-seg button[aria-pressed="true"]{background:#C9A24B;color:#14202E;}:root:not([data-theme="light"]) .ds-badge--all{background:#1B2F47;color:#A9CBF0;}}
 </style>
+<style>
+/* card-download 2026-11: download button on hub cards (stretched-link card, no nested links; no cursor:pointer on the div,
+   or the a11y layer would turn it into role=button) */
+.cc-has-dl{position:relative;}
+.cc-main{color:inherit;text-decoration:none;}
+.cc-main::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:0;}
+.cc-main:focus-visible{outline:none;}
+.cc-main:focus-visible::after{outline:3px solid var(--a11y-focus,#1a5fb4);outline-offset:2px;}
+.cc-actions{margin-top:10px;}
+.cc-dl{position:relative;z-index:1;display:inline-flex;align-items:center;min-height:36px;padding:6px 12px;border:1.5px solid var(--accent2);border-radius:var(--ds-r-pill,999px);background:var(--panel);color:var(--navy);font-size:.82rem;font-weight:700;text-decoration:none;white-space:nowrap;}
+.cc-dl:hover{background:var(--ds-tint);}
+</style>
 </head>
 <body>
 <header>
@@ -238,15 +250,16 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 </header>
 <div class="wrap">
   <div class="chapter-list" data-week-start="2026-11-09">
-<a class="chapter-card" data-week="1" href="OS_W01_Introduction.html">
+<div class="chapter-card cc-has-dl" data-week="1">
   <div class="chapter-icon">🖥️</div>
   <div class="chapter-info">
-    <div class="chapter-title">Week 1 · บทนำ: ระดับสิทธิ์ของ CPU, system call และ xv6</div>
+    <div class="chapter-title"><a class="cc-main" href="OS_W01_Introduction.html">Week 1 · บทนำ: OS กับฮาร์ดแวร์, system call และโครงสร้างของ OS</a></div>
     <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
-    <div class="chapter-desc">บทที่ 1–2 ของ OSC: OS กับฮาร์ดแวร์, interrupt, DMA, dual-mode, timer · xv6 บน RISC-V, CSR, การบูตทีละขั้น · บริการ system call และโครงสร้างระบบ · Lab L0</div>
+    <div class="chapter-desc">ฉบับปรับปรุงตามสไลด์ใหม่ · บทที่ 1–2 ของ OSC: OS กับฮาร์ดแวร์, interrupt, DMA · โหมด CPU, system call, timer (stimecmp) · strace และ buffering · โครงสร้างของ OS · บูต, ดีบัก, /proc</div>
+    <div class="cc-actions"><a class="cc-dl" href="OS_W01_Introduction.html" download="OS_W01_Introduction.html" aria-label="ดาวน์โหลดไฟล์ HTML สำหรับเปิดออฟไลน์: OS_W01_Introduction.html">⬇ ดาวน์โหลด</a></div>
   </div>
-  <div class="chapter-arrow">&rarr;</div>
-</a>
+  <div class="chapter-arrow" aria-hidden="true">&rarr;</div>
+</div>
 <a class="chapter-card" data-week="1" href="Exercise1_C_Basics.html">
   <div class="chapter-icon">💻</div>
   <div class="chapter-info">
@@ -256,6 +269,16 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
+<div class="chapter-card cc-has-dl" data-week="2">
+  <div class="chapter-icon">⚙️</div>
+  <div class="chapter-info">
+    <div class="chapter-title"><a class="cc-main" href="OS_W02_Process_IPC.html">Week 2 · โปรเซสและการสื่อสารระหว่างโปรเซส (IPC)</a></div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
+    <div class="chapter-desc">บทที่ 3 ของ OSC: โปรเซสในหน่วยความจำ, สถานะ, PCB, fd · context switch · fork/exec/exit/wait · zombie/orphan · shared memory, message passing, pipe, socket, signal</div>
+    <div class="cc-actions"><a class="cc-dl" href="OS_W02_Process_IPC.html" download="OS_W02_Process_IPC.html" aria-label="ดาวน์โหลดไฟล์ HTML สำหรับเปิดออฟไลน์: OS_W02_Process_IPC.html">⬇ ดาวน์โหลด</a></div>
+  </div>
+  <div class="chapter-arrow" aria-hidden="true">&rarr;</div>
+</div>
   </div>
 </div>
 <footer>สรุปบทเรียนสำหรับทบทวน — ไม่ใช่เอกสารทางการของวิชา</footer>
