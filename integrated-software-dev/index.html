@@ -228,6 +228,18 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
 :root[data-theme="dark"] .ds-badge--all{background:#1B2F47;color:#A9CBF0;}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wv-seg button[aria-pressed="true"]{background:#C9A24B;color:#14202E;}:root:not([data-theme="light"]) .ds-badge--all{background:#1B2F47;color:#A9CBF0;}}
 </style>
+<style>
+/* card-download 2026-11: download button on hub cards (stretched-link card, no nested links; no cursor:pointer on the div,
+   or the a11y layer would turn it into role=button) */
+.cc-has-dl{position:relative;}
+.cc-main{color:inherit;text-decoration:none;}
+.cc-main::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:0;}
+.cc-main:focus-visible{outline:none;}
+.cc-main:focus-visible::after{outline:3px solid var(--a11y-focus,#1a5fb4);outline-offset:2px;}
+.cc-actions{margin-top:10px;}
+.cc-dl{position:relative;z-index:1;display:inline-flex;align-items:center;min-height:36px;padding:6px 12px;border:1.5px solid var(--accent2);border-radius:var(--ds-r-pill,999px);background:var(--panel);color:var(--navy);font-size:.82rem;font-weight:700;text-decoration:none;white-space:nowrap;}
+.cc-dl:hover{background:var(--ds-tint);}
+</style>
 </head>
 <body>
 <header>
@@ -274,6 +286,26 @@ summary{min-height:24px;padding-top:3px;padding-bottom:3px;}
   </div>
   <div class="chapter-arrow">&rarr;</div>
 </a>
+<div class="chapter-card cc-has-dl" data-week="2">
+  <div class="chapter-icon">🌱</div>
+  <div class="chapter-info">
+    <div class="chapter-title"><a class="cc-main" href="Week2_SpringBoot_Basics.html">Week 2 · Spring Boot Basic Understanding</a></div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--sum">สรุป</span></div>
+    <div class="chapter-desc">Git workflow (fork/clone/PR) · Taco Cloud use case และ sequence · เบื้องหลัง spring-boot:run 5 ขั้น · เส้นทาง request · Lombok @Data · Naming conventions · OOP: Pure Java vs Spring Boot</div>
+    <div class="cc-actions"><a class="cc-dl" href="Week2_SpringBoot_Basics.html" download="Week2_SpringBoot_Basics.html" aria-label="ดาวน์โหลดไฟล์ HTML สำหรับเปิดออฟไลน์: Week2_SpringBoot_Basics.html">⬇ ดาวน์โหลด</a></div>
+  </div>
+  <div class="chapter-arrow" aria-hidden="true">&rarr;</div>
+</div>
+<div class="chapter-card cc-has-dl" data-week="2">
+  <div class="chapter-icon">🧩</div>
+  <div class="chapter-info">
+    <div class="chapter-title"><a class="cc-main" href="OOP_SpringBoot_W2_Quiz.html">Week 2 · OOP with Java &amp; Spring Boot · แบบทดสอบ 10 ข้อ (EN/TH)</a></div>
+    <div class="ds-badges"><span class="ds-badge ds-badge--quiz">แบบฝึกหัด</span></div>
+    <div class="chapter-desc">IoC/DI, Lombok, Composition, Converter, Spring Data proxy, Polymorphism, JPA @Entity, Validation — ติ๊กเลือก 2 จาก 5 คะแนนบางส่วน · สลับโจทย์อังกฤษ/ไทยได้ทุกเมื่อ คำตอบไม่หาย</div>
+    <div class="cc-actions"><a class="cc-dl" href="OOP_SpringBoot_W2_Quiz.html" download="OOP_SpringBoot_W2_Quiz.html" aria-label="ดาวน์โหลดไฟล์ HTML สำหรับเปิดออฟไลน์: OOP_SpringBoot_W2_Quiz.html">⬇ ดาวน์โหลด</a></div>
+  </div>
+  <div class="chapter-arrow" aria-hidden="true">&rarr;</div>
+</div>
   </div>
 </div>
 <footer>สรุปบทเรียนสำหรับทบทวน — ไม่ใช่เอกสารทางการของวิชา</footer>
